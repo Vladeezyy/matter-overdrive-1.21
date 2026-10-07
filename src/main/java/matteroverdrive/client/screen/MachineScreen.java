@@ -27,6 +27,7 @@ public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractCo
 
     protected static final ResourceLocation ENERGY = tex("energy");
     protected static final ResourceLocation ARROW = tex("progress_arrow_right");
+    protected static final ResourceLocation MATTER = tex("matter");
     private static final ResourceLocation SLOT_BIG = tex("slot_big");
     private static final ResourceLocation SLOT_SMALL = tex("slot_small");
     private static final ResourceLocation INDICATOR = tex("indicator");
@@ -171,6 +172,23 @@ public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractCo
         if (in(mx, my, barX, barY, 16, 42)) {
             g.setTooltipForNextFrame(font, Component.translatable("tooltip.matteroverdrive.energy_stored",
                     MOText.energy(menu.getEnergy()), MOText.energy(menu.getCapacity())), mouseX, mouseY);
+        }
+    }
+
+    /** 1.7.10 ElementMatterStored: same 16x42 layout as the energy bar, from matter.png. */
+    protected void drawMatter(GuiGraphics g, int x, int y) {
+        g.blit(RenderPipelines.GUI_TEXTURED, MATTER, x, y, 0, 0, 16, 42, 32, 64);
+        int capacity = menu.getMatterCapacity();
+        int h = capacity > 0 ? (int) ((long) menu.getMatter() * 42 / capacity) : 0;
+        if (h > 0) {
+            g.blit(RenderPipelines.GUI_TEXTURED, MATTER, x, y + 42 - h, 16, 42 - h, 16, h, 32, 64);
+        }
+    }
+
+    protected void matterTooltip(GuiGraphics g, int mx, int my, int barX, int barY, int mouseX, int mouseY) {
+        if (in(mx, my, barX, barY, 16, 42)) {
+            g.setTooltipForNextFrame(font, Component.translatable("tooltip.matteroverdrive.matter_stored",
+                    menu.getMatter(), menu.getMatterCapacity()), mouseX, mouseY);
         }
     }
 

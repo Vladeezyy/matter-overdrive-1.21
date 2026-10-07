@@ -17,5 +17,9 @@ public final class MODataComponents {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> ENERGY =
             COMPONENTS.registerComponentType("energy", b -> b.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
 
+    /** Matter carried by matter dust (1.7.10 kept it in the item damage). */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> MATTER =
+            COMPONENTS.registerComponentType("matter", b -> b.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
+
     private MODataComponents() {}
 }

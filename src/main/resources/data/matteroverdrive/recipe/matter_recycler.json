@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "T T",
+    "1P2",
+    "NTM"
+  ],
+  "key": {
+    "T": "#c:plates/tritanium",
+    "1": "matteroverdrive:isolinear_circuit_mk1",
+    "2": "matteroverdrive:isolinear_circuit_mk2",
+    "P": "minecraft:piston",
+    "N": "matteroverdrive:integration_matrix",
+    "M": "matteroverdrive:me_conversion_matrix"
+  },
+  "result": {
+    "id": "matteroverdrive:matter_recycler",
+    "count": 1
+  }
+}

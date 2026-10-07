@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/orientable_with_bottom",
+  "textures": {
+    "top": "matteroverdrive:block/decomposer_top",
+    "front": "matteroverdrive:block/recycler_side_anim",
+    "side": "matteroverdrive:block/recycler_side_anim",
+    "bottom": "matteroverdrive:block/base"
+  }
+}

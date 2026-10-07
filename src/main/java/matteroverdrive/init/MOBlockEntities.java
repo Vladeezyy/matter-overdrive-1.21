@@ -1,7 +1,10 @@
 package matteroverdrive.init;
 
 import matteroverdrive.MatterOverdrive;
+import matteroverdrive.block.entity.DecomposerBlockEntity;
 import matteroverdrive.block.entity.InscriberBlockEntity;
+import matteroverdrive.block.entity.MatterPipeBlockEntity;
+import matteroverdrive.block.entity.RecyclerBlockEntity;
 import matteroverdrive.block.entity.SolarPanelBlockEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -16,6 +19,14 @@ public final class MOBlockEntities {
             BLOCK_ENTITIES.register("solar_panel", () -> new BlockEntityType<>(SolarPanelBlockEntity::new, MOBlocks.SOLAR_PANEL.get()));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<InscriberBlockEntity>> INSCRIBER =
             BLOCK_ENTITIES.register("inscriber", () -> new BlockEntityType<>(InscriberBlockEntity::new, MOBlocks.INSCRIBER.get()));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<DecomposerBlockEntity>> DECOMPOSER =
+            BLOCK_ENTITIES.register("decomposer", () -> new BlockEntityType<>(DecomposerBlockEntity::new, MOBlocks.DECOMPOSER.get()));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<RecyclerBlockEntity>> RECYCLER =
+            BLOCK_ENTITIES.register("matter_recycler", () -> new BlockEntityType<>(RecyclerBlockEntity::new, MOBlocks.RECYCLER.get()));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<MatterPipeBlockEntity>> MATTER_PIPE =
+            BLOCK_ENTITIES.register("matter_pipe", () -> new BlockEntityType<>(MatterPipeBlockEntity::new,
+                    MOBlocks.MATTER_PIPE.get(), MOBlocks.HEAVY_MATTER_PIPE.get()));
 
     private MOBlockEntities() {}
 }

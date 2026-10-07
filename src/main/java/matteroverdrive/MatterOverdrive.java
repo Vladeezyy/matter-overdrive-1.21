@@ -8,6 +8,7 @@ import matteroverdrive.gametest.MOGameTests;
 import matteroverdrive.init.MOBlockEntities;
 import matteroverdrive.init.MOBlocks;
 import matteroverdrive.init.MOCreativeTabs;
+import matteroverdrive.init.MOFluids;
 import matteroverdrive.init.MODataComponents;
 import matteroverdrive.init.MOItems;
 import matteroverdrive.init.MOMenus;
@@ -28,6 +29,8 @@ public class MatterOverdrive {
 
     public MatterOverdrive(IEventBus modEventBus, ModContainer modContainer) {
         MODataComponents.COMPONENTS.register(modEventBus);
+        MOFluids.FLUID_TYPES.register(modEventBus);
+        MOFluids.FLUIDS.register(modEventBus);
         MOBlocks.BLOCKS.register(modEventBus);
         MOItems.ITEMS.register(modEventBus);
         MOBlockEntities.BLOCK_ENTITIES.register(modEventBus);
@@ -45,10 +48,14 @@ public class MatterOverdrive {
         }
         machine(event, MOBlockEntities.SOLAR_PANEL.get());
         machine(event, MOBlockEntities.INSCRIBER.get());
+        machine(event, MOBlockEntities.DECOMPOSER.get());
+        machine(event, MOBlockEntities.RECYCLER.get());
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, MOBlockEntities.MATTER_PIPE.get(), (pipe, side) -> pipe.getTank());
     }
 
     private static <T extends MachineBlockEntity> void machine(RegisterCapabilitiesEvent event, BlockEntityType<T> type) {
         event.registerBlockEntity(Capabilities.Energy.BLOCK, type, MachineBlockEntity::getEnergyHandler);
         event.registerBlockEntity(Capabilities.Item.BLOCK, type, (be, side) -> be.getInventory().automation());
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, type, (be, side) -> be.getMatterTank());
     }
 }

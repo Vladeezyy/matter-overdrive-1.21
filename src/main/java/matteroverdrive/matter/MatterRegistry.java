@@ -63,6 +63,15 @@ public final class MatterRegistry {
         serverValues = null;
     }
 
+    /**
+     * For code that runs on both sides (slot filters): the server table when this JVM has one, else the client copy.
+     * Both hold the same values once the client has synced.
+     */
+    public static int getAnySide(Item item) {
+        Map<Item, Integer> values = serverValues != null ? serverValues : clientValues;
+        return values.getOrDefault(item, 0);
+    }
+
     public static int getClient(Item item) {
         return clientValues.getOrDefault(item, 0);
     }

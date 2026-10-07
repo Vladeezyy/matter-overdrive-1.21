@@ -1,0 +1,91 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "pipe": "matteroverdrive:block/heavy_matter_pipe",
+    "particle": "matteroverdrive:block/heavy_matter_pipe"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        5.333333333333333,
+        5.333333333333333
+      ],
+      "to": [
+        16,
+        10.666666666666666,
+        10.666666666666666
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6,
+            0,
+            12,
+            6
+          ],
+          "texture": "#pipe"
+        },
+        "south": {
+          "uv": [
+            6,
+            0,
+            12,
+            6
+          ],
+          "texture": "#pipe"
+        },
+        "east": {
+          "uv": [
+            6,
+            0,
+            12,
+            6
+          ],
+          "texture": "#pipe"
+        },
+        "west": {
+          "uv": [
+            6,
+            0,
+            12,
+            6
+          ],
+          "texture": "#pipe"
+        },
+        "up": {
+          "uv": [
+            6,
+            0,
+            12,
+            6
+          ],
+          "texture": "#pipe"
+        },
+        "down": {
+          "uv": [
+            6,
+            0,
+            12,
+            6
+          ],
+          "texture": "#pipe"
+        }
+      }
+    }
+  ],
+  "display": {
+    "gui": {
+      "rotation": [
+        30,
+        225,
+        0
+      ],
+      "scale": [
+        0.9,
+        0.9,
+        0.9
+      ]
+    }
+  }
+}

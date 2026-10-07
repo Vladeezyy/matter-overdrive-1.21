@@ -1,7 +1,10 @@
 package matteroverdrive.init;
 
 import matteroverdrive.MatterOverdrive;
+import matteroverdrive.block.DecomposerBlock;
 import matteroverdrive.block.InscriberBlock;
+import matteroverdrive.block.MatterPipeBlock;
+import matteroverdrive.block.RecyclerBlock;
 import matteroverdrive.block.SolarPanelBlock;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.block.Block;
@@ -29,6 +32,16 @@ public final class MOBlocks {
             p -> p.mapColor(MapColor.METAL).strength(20f, 5f).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion());
     public static final DeferredBlock<InscriberBlock> INSCRIBER = BLOCKS.registerBlock("inscriber", InscriberBlock::new,
             p -> p.mapColor(MapColor.METAL).strength(20f, 9f).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion());
+
+    // Matter (phase 3)
+    public static final DeferredBlock<DecomposerBlock> DECOMPOSER = BLOCKS.registerBlock("decomposer", DecomposerBlock::new,
+            p -> p.mapColor(MapColor.METAL).strength(20f, 9f).sound(SoundType.METAL).requiresCorrectToolForDrops());
+    public static final DeferredBlock<RecyclerBlock> RECYCLER = BLOCKS.registerBlock("matter_recycler", RecyclerBlock::new,
+            p -> p.mapColor(MapColor.METAL).strength(20f, 9f).sound(SoundType.METAL).requiresCorrectToolForDrops());
+    public static final DeferredBlock<MatterPipeBlock> MATTER_PIPE = BLOCKS.registerBlock("matter_pipe",
+            p -> new MatterPipeBlock(false, p), p -> p.mapColor(MapColor.METAL).strength(1f, 5f).sound(SoundType.METAL).noOcclusion());
+    public static final DeferredBlock<MatterPipeBlock> HEAVY_MATTER_PIPE = BLOCKS.registerBlock("heavy_matter_pipe",
+            p -> new MatterPipeBlock(true, p), p -> p.mapColor(MapColor.METAL).strength(1f, 5f).sound(SoundType.METAL).noOcclusion());
 
     private MOBlocks() {}
 }

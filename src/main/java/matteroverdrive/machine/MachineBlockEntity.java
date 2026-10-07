@@ -16,6 +16,7 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -37,6 +38,8 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
 
     protected final MachineInventory inventory;
     protected final MachineEnergy energy;
+    /** Matter Plasma storage for matter machines (1.7.10 MOTileEntityMachineMatter); null for the others. */
+    protected @Nullable MatterTank matter;
     private final int batterySlot;
     private final Set<UpgradeType> affectedBy;
     private RedstoneMode redstoneMode = RedstoneMode.LOW;
@@ -60,6 +63,15 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
         this.energy = new MachineEnergy(capacity, maxInsert, maxExtract, this::getUpgradeMultiplier, this::setChanged);
     }
 
+    /** Gives this machine a matter tank; call from the subclass constructor. */
+    protected void initMatter(int capacity, int maxInsert, int maxExtract) {
+        this.matter = new MatterTank(capacity, maxInsert, maxExtract, this::getUpgradeMultiplier, this::setChanged);
+    }
+
+    public @Nullable MatterTank getMatterTank() {
+        return matter;
+    }
+
     // --- ticking ---------------------------------------------------------------------------------
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, MachineBlockEntity be) {
@@ -69,7 +81,11 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
         if (nowActive != be.active) {
             be.active = nowActive;
             be.setChanged();
-            level.sendBlockUpdated(pos, state, state, 3);
+            if (state.hasProperty(MachineBlock.ACTIVE)) {
+                level.setBlock(pos, state.setValue(MachineBlock.ACTIVE, nowActive), Block.UPDATE_CLIENTS);
+            } else {
+                level.sendBlockUpdated(pos, state, state, Block.UPDATE_CLIENTS);
+            }
         }
     }
 
@@ -152,7 +168,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
 
     /**
      * Values synced to an open menu. Ints are sent as shorts, so energy is split into two halves.
-     * 0-1 energy, 2-3 capacity, 4 progress (0-1000), 5 active, 6 redstone mode.
+     * 0-1 energy, 2-3 capacity, 4 progress (0-1000), 5 active, 6 redstone mode, 7-8 matter, 9-10 matter capacity.
      */
     public final ContainerData dataAccess = new ContainerData() {
         @Override
@@ -165,6 +181,10 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
                 case 4 -> Math.round(getProgress() * 1000);
                 case 5 -> active ? 1 : 0;
                 case 6 -> redstoneMode.ordinal();
+                case 7 -> matter == null ? 0 : matter.getMatter() & 0xFFFF;
+                case 8 -> matter == null ? 0 : matter.getMatter() >>> 16;
+                case 9 -> matter == null ? 0 : matter.getCapacity() & 0xFFFF;
+                case 10 -> matter == null ? 0 : matter.getCapacity() >>> 16;
                 default -> 0;
             };
         }
@@ -177,7 +197,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
             return DATA_COUNT;
         }
     };
-    public static final int DATA_COUNT = 7;
+    public static final int DATA_COUNT = 11;
 
     // --- persistence -----------------------------------------------------------------------------
 
@@ -186,6 +206,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
         super.saveAdditional(output);
         inventory.serialize(output.child("inventory"));
         energy.serialize(output.child("energy"));
+        if (matter != null) matter.serialize(output.child("matter"));
         output.putString("redstone_mode", redstoneMode.name());
         output.putBoolean("active", active);
     }
@@ -196,6 +217,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
         input.child("inventory").ifPresent(inventory::deserialize);
         energy.refresh();
         input.child("energy").ifPresent(energy::deserialize);
+        if (matter != null) input.child("matter").ifPresent(matter::deserialize);
         redstoneMode = input.getString("redstone_mode").map(s -> {
             try {
                 return RedstoneMode.valueOf(s);

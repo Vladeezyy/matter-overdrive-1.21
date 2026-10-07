@@ -43,7 +43,7 @@ public final class DevScene {
     private static final boolean ENABLED = System.getProperty("matteroverdrive.scene") != null;
     private static final List<Step> STEPS = new ArrayList<>();
     private static int tick;
-    private static BlockPos inscriberPos, solarPos;
+    private static BlockPos inscriberPos, solarPos, decomposerPos, recyclerPos;
 
     private record Step(int at, Consumer<Minecraft> action) {}
 
@@ -62,7 +62,15 @@ public final class DevScene {
         at(165, mc -> openMachine(mc, solarPos));
         at(185, mc -> shot(mc, "solar_home"));
         at(190, mc -> mc.player.closeContainer());
-        at(200, mc -> mc.stop());
+        at(195, mc -> openMachine(mc, decomposerPos));
+        at(215, mc -> shot(mc, "decomposer_home"));
+        at(220, mc -> mc.player.closeContainer());
+        at(225, mc -> openMachine(mc, recyclerPos));
+        at(245, mc -> shot(mc, "recycler_home"));
+        at(250, mc -> mc.player.closeContainer());
+        at(252, mc -> server(mc, p -> p.teleportTo(p.level(), p.getX() + 0.5, p.getY() + 1.5, p.getZ() + 1.5, Set.of(), 140f, 30f, false)));
+        at(260, mc -> shot(mc, "pipes"));
+        at(270, mc -> mc.stop());
     }
 
     private static void at(int t, Consumer<Minecraft> action) {
@@ -113,6 +121,22 @@ public final class DevScene {
         solarPos = base.offset(1, 0, -3);
         level.setBlockAndUpdate(inscriberPos, MOBlocks.INSCRIBER.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
         level.setBlockAndUpdate(solarPos, MOBlocks.SOLAR_PANEL.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
+        decomposerPos = base.offset(-3, 0, -3);
+        recyclerPos = base.offset(3, 0, -3);
+        level.setBlockAndUpdate(decomposerPos, MOBlocks.DECOMPOSER.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
+        level.setBlockAndUpdate(recyclerPos, MOBlocks.RECYCLER.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
+        level.setBlockAndUpdate(base.offset(-3, 0, -2), MOBlocks.MATTER_PIPE.get().defaultBlockState());
+        level.setBlockAndUpdate(base.offset(-3, 0, -1), MOBlocks.MATTER_PIPE.get().defaultBlockState());
+        level.setBlockAndUpdate(base.offset(-2, 0, -1), MOBlocks.HEAVY_MATTER_PIPE.get().defaultBlockState());
+        level.setBlockAndUpdate(base.offset(-3, 1, -1), MOBlocks.MATTER_PIPE.get().defaultBlockState());
+        var decomposer = (matteroverdrive.block.entity.DecomposerBlockEntity) level.getBlockEntity(decomposerPos);
+        decomposer.getEnergy().set(400000);
+        decomposer.getMatterTank().setMatter(300);
+        decomposer.getInventory().setStack(matteroverdrive.block.entity.DecomposerBlockEntity.INPUT, new ItemStack(Items.COBBLESTONE, 64));
+        var recycler = (matteroverdrive.block.entity.RecyclerBlockEntity) level.getBlockEntity(recyclerPos);
+        recycler.getEnergy().set(200000);
+        recycler.getInventory().setStack(matteroverdrive.block.entity.RecyclerBlockEntity.INPUT,
+                matteroverdrive.item.MatterDustItem.withMatter(MOItems.MATTER_DUST.get(), 1).copyWithCount(16));
         level.setBlockAndUpdate(base.offset(0, 0, -5), MOBlocks.TRITANIUM_ORE.get().defaultBlockState());
         level.setBlockAndUpdate(base.offset(-2, 0, -5), MOBlocks.DILITHIUM_ORE.get().defaultBlockState());
         level.setBlockAndUpdate(base.offset(2, 0, -5), MOBlocks.TRITANIUM_BLOCK.get().defaultBlockState());

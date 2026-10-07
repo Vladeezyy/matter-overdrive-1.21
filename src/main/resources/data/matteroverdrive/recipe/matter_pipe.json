@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " G ",
+    "IMI",
+    " G "
+  ],
+  "key": {
+    "G": "minecraft:glass",
+    "I": "minecraft:iron_ingot",
+    "M": "matteroverdrive:s_magnet"
+  },
+  "result": {
+    "id": "matteroverdrive:matter_pipe",
+    "count": 8
+  }
+}

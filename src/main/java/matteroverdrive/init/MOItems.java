@@ -8,6 +8,7 @@ import java.util.function.UnaryOperator;
 
 import matteroverdrive.MatterOverdrive;
 import matteroverdrive.item.BatteryItem;
+import matteroverdrive.item.MatterDustItem;
 import matteroverdrive.item.UpgradeItem;
 import matteroverdrive.item.WrenchItem;
 import matteroverdrive.machine.UpgradeType;
@@ -35,8 +36,8 @@ public final class MOItems {
     public static final DeferredItem<Item> TRITANIUM_DUST = simple("tritanium_dust");
     public static final DeferredItem<Item> TRITANIUM_PLATE = simple("tritanium_plate");
     public static final DeferredItem<Item> DILITHIUM_CRYSTAL = simple("dilithium_crystal");
-    public static final DeferredItem<Item> MATTER_DUST = simple("matter_dust");
-    public static final DeferredItem<Item> MATTER_DUST_REFINED = simple("matter_dust_refined");
+    public static final DeferredItem<MatterDustItem> MATTER_DUST = item("matter_dust", p -> new MatterDustItem(false, p), p -> p);
+    public static final DeferredItem<MatterDustItem> MATTER_DUST_REFINED = item("matter_dust_refined", p -> new MatterDustItem(true, p), p -> p);
     public static final DeferredItem<Item> MACHINE_CASING = simple("machine_casing");
     public static final DeferredItem<Item> S_MAGNET = simple("s_magnet");
     public static final DeferredItem<Item> H_COMPENSATOR = simple("h_compensator");
@@ -71,6 +72,10 @@ public final class MOItems {
     // Machines
     public static final DeferredItem<BlockItem> SOLAR_PANEL = block("solar_panel", MOBlocks.SOLAR_PANEL);
     public static final DeferredItem<BlockItem> INSCRIBER = block("inscriber", MOBlocks.INSCRIBER);
+    public static final DeferredItem<BlockItem> DECOMPOSER = block("decomposer", MOBlocks.DECOMPOSER);
+    public static final DeferredItem<BlockItem> RECYCLER = block("matter_recycler", MOBlocks.RECYCLER);
+    public static final DeferredItem<BlockItem> MATTER_PIPE = block("matter_pipe", MOBlocks.MATTER_PIPE);
+    public static final DeferredItem<BlockItem> HEAVY_MATTER_PIPE = block("heavy_matter_pipe", MOBlocks.HEAVY_MATTER_PIPE);
 
     // Energy (1.7.10: battery 2^19 FE 400/800, hc_battery 2^20 FE 4096/4096, creative 2^24 FE 8192/8192)
     public static final DeferredItem<BatteryItem> BATTERY = item("battery",

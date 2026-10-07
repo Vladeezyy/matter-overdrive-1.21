@@ -35,6 +35,7 @@ ITEMS.update({f"upgrade_{u}": (f"upgrade_{u}", "generated") for u in UPGRADES})
 BATTERIES = {"battery": (191, 228, 230), "hc_battery": (254, 203, 4), "creative_battery": (230, 80, 20)}
 BLOCKS = ["tritanium_ore", "dilithium_ore", "tritanium_block"]
 MACHINES = ["solar_panel", "inscriber"]
+MACHINES_P3 = ["decomposer", "matter_recycler", "matter_pipe", "heavy_matter_pipe"]
 
 # lang keys that don't follow item.<name>.name / tile.<name>.name in the 1.7.10 files
 LANG_KEYS = {f"isolinear_circuit_mk{i}": f"item.isolinear_circuit.mk{i}.name" for i in range(1, 5)}
@@ -220,8 +221,10 @@ FACING_Y = {"north": 0, "east": 90, "south": 180, "west": 270}
 
 
 def facing_blockstate(n, model):
+    """Every machine block has facing and active; this one looks the same while working."""
     w(A / "blockstates" / f"{n}.json", {"variants": {
-        f"facing={f}": ({"model": model, "y": y} if y else {"model": model}) for f, y in FACING_Y.items()}})
+        f"active={a},facing={f}": ({"model": model, "y": y} if y else {"model": model})
+        for f, y in FACING_Y.items() for a in ("false", "true")}})
     w(A / "items" / f"{n}.json", {"model": {"type": "minecraft:model", "model": model}})
 
 
@@ -306,6 +309,92 @@ for i, (material, energy, time) in {2: ("minecraft:gold_ingot", 64000, 300), 3: 
         "secondary": material, "result": {"id": MK[i]}, "energy": energy, "time": time})
 
 
+# --- phase 3: matter machines, pipes, matter fluid --------------------------------------------------
+def machine_blockstate(n, model, active_model=None):
+    """facing x active variants (active_model defaults to the idle model)."""
+    variants = {}
+    for f, y in FACING_Y.items():
+        for active in (False, True):
+            m = active_model if active and active_model else model
+            variants[f"active={str(active).lower()},facing={f}"] = {"model": m, "y": y} if y else {"model": m}
+    w(A / "blockstates" / f"{n}.json", {"variants": variants})
+    w(A / "items" / f"{n}.json", {"model": {"type": "minecraft:model", "model": model}})
+
+
+for tex in ["base_stripes", "decomposer_top", "tank_empty", "tank_full", "recycler_side", "matter_pipe", "heavy_matter_pipe"]:
+    cp(ref / "textures/blocks" / f"{tex}.png", A / "textures/block" / f"{tex}.png")
+cp(ref / "textures/blocks/recycler_side_anim.png", A / "textures/block/recycler_side_anim.png")
+cp(ref / "textures/blocks/recycler_side_anim.png.mcmeta", A / "textures/block/recycler_side_anim.png.mcmeta")
+for t in ["matter_plasma_still", "matter_plasma_flowing"]:
+    cp(ref / "textures/blocks" / f"{t}.png", A / "textures/block" / f"{t}.png")
+    cp(ref / "textures/blocks" / f"{t}.png.mcmeta", A / "textures/block" / f"{t}.png.mcmeta")
+cp(ref / "textures/gui/elements/Matter.png", A / "textures/gui/elements/matter.png")
+
+
+def orientable(top, front, side, bottom=None):
+    return {"parent": "minecraft:block/orientable_with_bottom", "textures": {
+        "top": f"{MOD}:block/{top}", "front": f"{MOD}:block/{front}", "side": f"{MOD}:block/{side}",
+        "bottom": f"{MOD}:block/{bottom or 'base'}"}}
+
+
+# 1.7.10 BlockDecomposer: front shows the matter tank, top decomposer_top, other sides yellow stripes.
+w(A / "models/block/decomposer.json", orientable("decomposer_top", "tank_empty", "base_stripes"))
+w(A / "models/block/decomposer_active.json", orientable("decomposer_top", "tank_full", "base_stripes"))
+machine_blockstate("decomposer", f"{MOD}:block/decomposer", f"{MOD}:block/decomposer_active")
+# 1.7.10 BlockMatterRecycler: recycler_side all round (animated while working), decomposer_top on top.
+w(A / "models/block/matter_recycler.json", orientable("decomposer_top", "recycler_side", "recycler_side"))
+w(A / "models/block/matter_recycler_active.json", orientable("decomposer_top", "recycler_side_anim", "recycler_side_anim"))
+machine_blockstate("matter_recycler", f"{MOD}:block/matter_recycler", f"{MOD}:block/matter_recycler_active")
+
+# Pipes: multipart core + arms, 1/3-block cubes. UV quadrant (0,0)-(6,6) is the core, (6,0)-(12,6) the arm.
+P0, P1 = 16 / 3, 32 / 3
+
+
+def cube(frm, to, uv, rot=0):
+    faces = {}
+    for face in ["north", "south", "east", "west", "up", "down"]:
+        faces[face] = {"uv": uv, "texture": "#pipe"} | ({"rotation": rot} if rot else {})
+    return {"from": frm, "to": to, "faces": faces}
+
+
+ARM_BOX = {"north": ([P0, P0, 0], [P1, P1, P0]), "south": ([P0, P0, P1], [P1, P1, 16]),
+           "west": ([0, P0, P0], [P0, P1, P1]), "east": ([P1, P0, P0], [16, P1, P1]),
+           "down": ([P0, 0, P0], [P1, P0, P1]), "up": ([P0, P1, P0], [P1, 16, P1])}
+for pipe in ["matter_pipe", "heavy_matter_pipe"]:
+    tex = {"pipe": f"{MOD}:block/{pipe}", "particle": f"{MOD}:block/{pipe}"}
+    w(A / f"models/block/{pipe}_core.json", {"textures": tex, "elements": [cube([P0, P0, P0], [P1, P1, P1], [0, 0, 6, 6])]})
+    for d, (frm, to) in ARM_BOX.items():
+        w(A / f"models/block/{pipe}_{d}.json", {"textures": tex, "elements": [
+            cube(frm, to, [6, 0, 12, 6], 90 if d in ("up", "down") else 0)]})
+    w(A / "blockstates" / f"{pipe}.json", {"multipart": [{"apply": {"model": f"{MOD}:block/{pipe}_core"}}] + [
+        {"when": {d: "true"}, "apply": {"model": f"{MOD}:block/{pipe}_{d}"}} for d in ARM_BOX]})
+    # item: a straight pipe along x, like 1.7.10's inventory render
+    w(A / f"models/item/{pipe}.json", {"parent": "minecraft:block/block", "textures": tex, "elements": [
+        cube([0, P0, P0], [16, P1, P1], [6, 0, 12, 6])],
+        "display": {"gui": {"rotation": [30, 225, 0], "scale": [0.9, 0.9, 0.9]}}})
+    w(A / "items" / f"{pipe}.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:item/{pipe}"}})
+
+PHASE3_BLOCKS = ["decomposer", "matter_recycler", "matter_pipe", "heavy_matter_pipe"]
+for n in PHASE3_BLOCKS:
+    w(D / f"loot_table/blocks/{n}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "bonus_rolls": 0,
+        "entries": [{"type": "minecraft:item", "name": mid(n)} | ({"functions": [{"function": "minecraft:copy_components",
+            "source": "block_entity", "include": [mid("energy")]}]} if n in ("decomposer", "matter_recycler") else {})],
+        "conditions": [{"condition": "minecraft:survives_explosion"}]}]})
+for tag in ["mineable/pickaxe", "needs_iron_tool"]:
+    p = TAGS / f"minecraft/tags/block/{tag}.json"
+    values = json.loads(p.read_text())["values"]
+    w(p, {"values": values + [mid(n) for n in PHASE3_BLOCKS if not (tag == "needs_iron_tool" and "pipe" in n)]})
+
+shaped("decomposer", mid("decomposer"), ["TCT", "S S", "NTM"],
+       {"T": PLATE, "C": MK[3], "S": "minecraft:sticky_piston", "N": mid("integration_matrix"), "M": mid("me_conversion_matrix")})
+shaped("matter_recycler", mid("matter_recycler"), ["T T", "1P2", "NTM"],
+       {"T": PLATE, "1": MK[1], "2": MK[2], "P": "minecraft:piston", "N": mid("integration_matrix"), "M": mid("me_conversion_matrix")})
+shaped("matter_pipe", mid("matter_pipe"), [" G ", "IMI", " G "],
+       {"G": "minecraft:glass", "I": "minecraft:iron_ingot", "M": mid("s_magnet")}, count=8)
+shaped("heavy_matter_pipe", mid("heavy_matter_pipe"), ["RMR", "TMT", "RMR"],
+       {"R": "minecraft:redstone", "M": mid("s_magnet"), "T": PLATE}, count=8)
+
+
 # --- matter values (1.7.10 MatterOverdriveMatter.registerBasic*) -----------------------------------
 # Base values of the matteroverdrive:matter data map; everything else is calculated from recipes at runtime.
 # Ore dictionary names are mapped to today's tags. Tags come first so that single items can override them.
@@ -380,6 +469,9 @@ GUI_KEYS = {
     "gui.matteroverdrive.generating": {"en_us": "+%s FE/t", "ru_ru": "+%s FE/т"},
     "tooltip.matteroverdrive.energy_stored": {"en_us": "Energy: %s / %s", "ru_ru": "Энергия: %s / %s"},
     "tooltip.matteroverdrive.matter": {"en_us": "Matter: %s kM", "ru_ru": "Материя: %s kM"},
+    "tooltip.matteroverdrive.matter_stored": {"en_us": "Matter: %s / %s kM", "ru_ru": "Материя: %s / %s kM"},
+    "item.matteroverdrive.matter_dust.details": "item.matter_dust.details",
+    "fluid.matteroverdrive.matter_plasma": {"en_us": "Matter Plasma", "ru_ru": "Плазменная материя"},
     "tooltip.matteroverdrive.energy_io": {"en_us": "Input/Output: %s/%s FE/t", "ru_ru": "Вход/выход: %s/%s FE/т"},
     "upgrade_type.matteroverdrive.speed": "upgradetype.Speed.name",
     "upgrade_type.matteroverdrive.power_usage": "upgradetype.PowerUsage.name",
@@ -406,7 +498,7 @@ for src_name, dst_name in [("en_US", "en_us"), ("ru_RU", "ru_ru")]:
             fallback.append(n)
     for n in BATTERIES:
         lang[f"item.{MOD}.{n}"] = src.get(f"item.{n}.name") or en.get(f"item.{n}.name")
-    for n in BLOCKS + MACHINES:
+    for n in BLOCKS + MACHINES + MACHINES_P3:
         key = LANG_KEYS.get(n, f"tile.{n}.name")
         lang[f"block.{MOD}.{n}"] = src.get(key) or en.get(key) or n
         if key not in src:

@@ -3,6 +3,8 @@
     "matteroverdrive:tritanium_ore",
     "matteroverdrive:tritanium_block",
     "matteroverdrive:solar_panel",
-    "matteroverdrive:inscriber"
+    "matteroverdrive:inscriber",
+    "matteroverdrive:decomposer",
+    "matteroverdrive:matter_recycler"
   ]
 }

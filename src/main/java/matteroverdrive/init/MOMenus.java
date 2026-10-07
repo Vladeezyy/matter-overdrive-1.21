@@ -1,7 +1,9 @@
 package matteroverdrive.init;
 
 import matteroverdrive.MatterOverdrive;
+import matteroverdrive.menu.DecomposerMenu;
 import matteroverdrive.menu.InscriberMenu;
+import matteroverdrive.menu.RecyclerMenu;
 import matteroverdrive.menu.SolarPanelMenu;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.inventory.MenuType;
@@ -16,6 +18,11 @@ public final class MOMenus {
             MENUS.register("solar_panel", () -> IMenuTypeExtension.create(SolarPanelMenu::new));
     public static final DeferredHolder<MenuType<?>, MenuType<InscriberMenu>> INSCRIBER =
             MENUS.register("inscriber", () -> IMenuTypeExtension.create(InscriberMenu::new));
+
+    public static final DeferredHolder<MenuType<?>, MenuType<DecomposerMenu>> DECOMPOSER =
+            MENUS.register("decomposer", () -> IMenuTypeExtension.create(DecomposerMenu::new));
+    public static final DeferredHolder<MenuType<?>, MenuType<RecyclerMenu>> RECYCLER =
+            MENUS.register("matter_recycler", () -> IMenuTypeExtension.create(RecyclerMenu::new));
 
     private MOMenus() {}
 }

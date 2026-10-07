@@ -86,6 +86,14 @@ public abstract class MachineMenu<T extends MachineBlockEntity> extends Abstract
         return data.get(2) | data.get(3) << 16;
     }
 
+    public int getMatter() {
+        return data.get(7) | data.get(8) << 16;
+    }
+
+    public int getMatterCapacity() {
+        return data.get(9) | data.get(10) << 16;
+    }
+
     public float getProgress() {
         return data.get(4) / 1000f;
     }

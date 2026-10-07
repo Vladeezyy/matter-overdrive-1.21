@@ -23,24 +23,27 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 
 /** Base block for machines: horizontal facing, opens the machine GUI, server ticker, wrench dismantling. */
 public abstract class MachineBlock extends BaseEntityBlock {
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
+    /** Whether the machine is working; models may show it (1.7.10 swapped icons, e.g. the recycler animation). */
+    public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
 
     private final Supplier<? extends BlockEntityType<? extends MachineBlockEntity>> type;
 
     protected MachineBlock(Supplier<? extends BlockEntityType<? extends MachineBlockEntity>> type, Properties properties) {
         super(properties);
         this.type = type;
-        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH));
+        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(ACTIVE, false));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING);
+        builder.add(FACING, ACTIVE);
     }
 
     @Override
