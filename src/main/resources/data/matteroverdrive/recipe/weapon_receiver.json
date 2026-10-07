@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "IRT",
+    "IIT"
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "R": "minecraft:redstone",
+    "T": "#c:ingots/tritanium"
+  },
+  "result": {
+    "id": "matteroverdrive:weapon_receiver",
+    "count": 1
+  }
+}

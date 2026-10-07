@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " M ",
+    "GPG",
+    "DED"
+  ],
+  "key": {
+    "M": "matteroverdrive:machine_casing",
+    "G": "minecraft:glass",
+    "P": "matteroverdrive:isolinear_circuit_mk2",
+    "D": "#c:gems/dilithium",
+    "E": "minecraft:ender_pearl"
+  },
+  "result": {
+    "id": "matteroverdrive:integration_matrix",
+    "count": 1
+  }
+}

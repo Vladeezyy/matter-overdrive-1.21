@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "XCX",
+    "X X",
+    "X X"
+  ],
+  "key": {
+    "X": "#c:ingots/tritanium",
+    "C": "matteroverdrive:isolinear_circuit_mk2"
+  },
+  "result": {
+    "id": "matteroverdrive:tritanium_leggings",
+    "count": 1
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "TT"
+  ],
+  "key": {
+    "T": "#c:ingots/tritanium"
+  },
+  "result": {
+    "id": "matteroverdrive:tritanium_plate",
+    "count": 1
+  }
+}

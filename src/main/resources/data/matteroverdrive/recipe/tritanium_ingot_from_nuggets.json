@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": "#c:nuggets/tritanium"
+  },
+  "result": {
+    "id": "matteroverdrive:tritanium_ingot",
+    "count": 1
+  }
+}

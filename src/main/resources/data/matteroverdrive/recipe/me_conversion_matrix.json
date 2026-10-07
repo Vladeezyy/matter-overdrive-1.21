@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "EIE",
+    "CDC",
+    "EIE"
+  ],
+  "key": {
+    "E": "minecraft:ender_pearl",
+    "I": "minecraft:iron_ingot",
+    "C": "matteroverdrive:isolinear_circuit_mk2",
+    "D": "#c:gems/dilithium"
+  },
+  "result": {
+    "id": "matteroverdrive:me_conversion_matrix",
+    "count": 1
+  }
+}

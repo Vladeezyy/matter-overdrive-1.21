@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "X",
+    "X",
+    "#"
+  ],
+  "key": {
+    "X": "#c:ingots/tritanium",
+    "#": "minecraft:stick"
+  },
+  "result": {
+    "id": "matteroverdrive:tritanium_sword",
+    "count": 1
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "X X",
+    "XCX",
+    "XXX"
+  ],
+  "key": {
+    "X": "#c:ingots/tritanium",
+    "C": "matteroverdrive:isolinear_circuit_mk2"
+  },
+  "result": {
+    "id": "matteroverdrive:tritanium_chestplate",
+    "count": 1
+  }
+}

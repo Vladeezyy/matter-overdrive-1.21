@@ -1,0 +1,14 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "matteroverdrive:tritanium"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "matteroverdrive:tritanium"
+      }
+    ]
+  }
+}

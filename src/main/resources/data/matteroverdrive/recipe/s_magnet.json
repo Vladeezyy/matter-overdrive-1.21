@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "RRR",
+    "TET",
+    "RRR"
+  ],
+  "key": {
+    "R": "minecraft:redstone",
+    "T": "#c:ingots/tritanium",
+    "E": "minecraft:ender_pearl"
+  },
+  "result": {
+    "id": "matteroverdrive:s_magnet",
+    "count": 4
+  }
+}
