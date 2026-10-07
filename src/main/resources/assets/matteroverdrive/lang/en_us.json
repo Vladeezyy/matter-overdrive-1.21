@@ -54,6 +54,7 @@
   "gui.matteroverdrive.config.redstone": "Redstone Mode",
   "gui.matteroverdrive.generating": "+%s FE/t",
   "tooltip.matteroverdrive.energy_stored": "Energy: %s / %s",
+  "tooltip.matteroverdrive.matter": "Matter: %s kM",
   "tooltip.matteroverdrive.energy_io": "Input/Output: %s/%s FE/t",
   "upgrade_type.matteroverdrive.speed": "Time",
   "upgrade_type.matteroverdrive.power_usage": "Power Usage",

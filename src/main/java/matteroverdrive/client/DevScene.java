@@ -49,6 +49,8 @@ public final class DevScene {
 
     static {
         at(40, mc -> server(mc, DevScene::build));
+        at(60, mc -> MatterOverdrive.LOGGER.info("[scene] client matter: iron_block={} cake={}",
+                matteroverdrive.matter.MatterRegistry.getClient(Items.IRON_BLOCK), matteroverdrive.matter.MatterRegistry.getClient(Items.CAKE)));
         at(100, mc -> shot(mc, "world"));
         at(105, mc -> openMachine(mc, inscriberPos));
         at(125, mc -> shot(mc, "inscriber_home"));

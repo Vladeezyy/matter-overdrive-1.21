@@ -306,6 +306,42 @@ for i, (material, energy, time) in {2: ("minecraft:gold_ingot", 64000, 300), 3: 
         "secondary": material, "result": {"id": MK[i]}, "energy": energy, "time": time})
 
 
+# --- matter values (1.7.10 MatterOverdriveMatter.registerBasic*) -----------------------------------
+# Base values of the matteroverdrive:matter data map; everything else is calculated from recipes at runtime.
+# Ore dictionary names are mapped to today's tags. Tags come first so that single items can override them.
+MATTER_TAGS = {
+    "#minecraft:wool": 2, "#c:glass_blocks": 3, "#c:glass_panes": 1, "#c:cobblestones": 1, "#minecraft:logs": 16,
+    "#c:sands": 2, "#c:sandstone/blocks": 4, "#minecraft:planks": 4, "#minecraft:leaves": 1, "#minecraft:saplings": 2,
+    "#c:flowers/small": 1, "#c:flowers/tall": 1, "#minecraft:terracotta": 3, "#c:music_discs": 4, "#minecraft:skulls": 16,
+    "#c:crops/wheat": 1, "#c:crops/carrot": 1, "#c:crops/potato": 1, "#c:nuggets/gold": 4, "#c:rods/wooden": 1,
+    "#c:dusts/redstone": 4, "#c:dusts/glowstone": 2, "#c:slime_balls": 2, "#c:gems/diamond": 256, "#c:gems/quartz": 3,
+    "#c:gems/lapis": 4, "#c:gems/emerald": 256, "#c:ingots/iron": 32, "#c:ingots/gold": 42, "#c:ingots/copper": 28,
+    "#c:bricks/normal": 2, "#c:bricks/nether": 1,
+    # regOre: ore = 2 x its product (4 x for redstone and lapis)
+    "#c:ores/diamond": 512, "#c:ores/emerald": 512, "#c:ores/coal": 16, "#c:ores/redstone": 16, "#c:ores/lapis": 16,
+    "#c:ores/iron": 64, "#c:ores/gold": 84, "#c:ores/quartz": 6, "#c:ores/copper": 56,
+    # Not in 1.7.10: raw ores smelt into one ingot, so they hold one ingot of matter.
+    "#c:raw_materials/iron": 32, "#c:raw_materials/gold": 42, "#c:raw_materials/copper": 28,
+}
+MATTER_ITEMS = {
+    "dirt": 1, "coarse_dirt": 1, "podzol": 1, "grass_block": 1, "gravel": 2, "clay": 4, "cactus": 4, "end_stone": 6,
+    "stone": 1, "soul_sand": 4, "snow_block": 2, "pumpkin": 2, "obsidian": 16, "mycelium": 5, "ice": 3, "packed_ice": 4,
+    "bedrock": 1024, "sponge": 8, "vine": 1, "short_grass": 1, "fern": 1, "mossy_cobblestone": 2, "netherrack": 1,
+    "stone_bricks": 2, "mossy_stone_bricks": 2, "cracked_stone_bricks": 2, "chiseled_stone_bricks": 2,
+    "cobblestone_wall": 1, "cobweb": 1, "brown_mushroom": 1, "red_mushroom": 1, "brown_mushroom_block": 1,
+    "red_mushroom_block": 1, "dead_bush": 1, "lily_pad": 1,
+    "apple": 1, "arrow": 1, "baked_potato": 1, "beef": 2, "blaze_rod": 4, "bone": 2, "clay_ball": 1, "coal": 8,
+    "charcoal": 5, "egg": 1, "cocoa_beans": 1, "ink_sac": 1, "green_dye": 1, "ender_pearl": 8, "feather": 1,
+    "fermented_spider_eye": 1, "flint": 1, "cod": 1, "salmon": 1, "tropical_fish": 1, "pufferfish": 1, "ghast_tear": 8,
+    "gunpowder": 2, "melon_slice": 1, "wheat_seeds": 1, "sugar": 1, "string": 1, "spider_eye": 1, "saddle": 18,
+    "sugar_cane": 1, "leather": 3, "pumpkin_seeds": 1, "porkchop": 2, "cooked_porkchop": 4, "paper": 1,
+    "lava_bucket": 24 + 96, "water_bucket": 12 + 96, "milk_bucket": 12 + 96, "nether_wart": 3, "nether_star": 1024,
+    "iron_horse_armor": 32 * 5, "golden_horse_armor": 42 * 5, "diamond_horse_armor": 256 * 5, "experience_bottle": 32,
+    "chicken": 2, "cooked_chicken": 3, "rotten_flesh": 1, "name_tag": 32, "glass_bottle": 3,
+}
+w(D / "data_maps/item/matter.json", {"values": {**MATTER_TAGS, **{f"minecraft:{k}": v for k, v in MATTER_ITEMS.items()}}})
+
+
 # --- game test area ---------------------------------------------------------------------------------
 # GameTests are laid out (size + 5) blocks apart; vanilla's 1x1x1 "minecraft:empty" structure lets tests that
 # build bigger scenes overwrite their neighbours. This is that same empty structure with size 12x12x12.
@@ -343,6 +379,7 @@ GUI_KEYS = {
     "gui.matteroverdrive.config.redstone": {"en_us": "Redstone Mode", "ru_ru": "Режим редстоуна"},
     "gui.matteroverdrive.generating": {"en_us": "+%s FE/t", "ru_ru": "+%s FE/т"},
     "tooltip.matteroverdrive.energy_stored": {"en_us": "Energy: %s / %s", "ru_ru": "Энергия: %s / %s"},
+    "tooltip.matteroverdrive.matter": {"en_us": "Matter: %s kM", "ru_ru": "Материя: %s kM"},
     "tooltip.matteroverdrive.energy_io": {"en_us": "Input/Output: %s/%s FE/t", "ru_ru": "Вход/выход: %s/%s FE/т"},
     "upgrade_type.matteroverdrive.speed": "upgradetype.Speed.name",
     "upgrade_type.matteroverdrive.power_usage": "upgradetype.PowerUsage.name",

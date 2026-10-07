@@ -54,6 +54,7 @@
   "gui.matteroverdrive.config.redstone": "Режим редстоуна",
   "gui.matteroverdrive.generating": "+%s FE/т",
   "tooltip.matteroverdrive.energy_stored": "Энергия: %s / %s",
+  "tooltip.matteroverdrive.matter": "Материя: %s kM",
   "tooltip.matteroverdrive.energy_io": "Вход/выход: %s/%s FE/т",
   "upgrade_type.matteroverdrive.speed": "Время",
   "upgrade_type.matteroverdrive.power_usage": "Потребляемая мощность",
