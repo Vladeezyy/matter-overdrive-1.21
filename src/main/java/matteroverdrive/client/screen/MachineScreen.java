@@ -36,7 +36,8 @@ public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractCo
     private static final int[] PAGE_ICON_SIZES = {14, 12, 16};
 
     private static final int CLOSE_X = MachineMenu.WIDTH - 17, CLOSE_Y = 6;
-    private static final int PAGES_X = MachineMenu.WIDTH - 30, PAGES_Y = 33;
+    // The background's right 12 px are transparent (1.7.10 kept its side panel there); the tabs hang off the frame edge.
+    private static final int PAGES_X = MachineMenu.WIDTH - 14, PAGES_Y = 33;
     private static final int REDSTONE_X = 50, REDSTONE_Y = 50, REDSTONE_W = 140, REDSTONE_H = 20;
 
     protected MachineScreen(M menu, Inventory playerInventory, Component title) {
