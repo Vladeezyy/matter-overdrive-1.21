@@ -24,7 +24,10 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.AABB;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -98,9 +101,12 @@ public final class DevScene {
         for (BlockPos p : BlockPos.betweenClosed(base.offset(-3, -1, -6), base.offset(3, -1, 0))) {
             level.setBlockAndUpdate(p, Blocks.SMOOTH_STONE.defaultBlockState());
         }
+        // Clear the previous run's scene without machine side effects (they would drop their contents),
+        // then remove any items already lying around.
         for (BlockPos p : BlockPos.betweenClosed(base.offset(-3, 0, -6), base.offset(3, 4, 0))) {
-            level.setBlockAndUpdate(p, Blocks.AIR.defaultBlockState());
+            level.setBlock(p, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
         }
+        level.getEntitiesOfClass(ItemEntity.class, new AABB(base).inflate(8)).forEach(e -> e.discard());
         inscriberPos = base.offset(-1, 0, -3);
         solarPos = base.offset(1, 0, -3);
         level.setBlockAndUpdate(inscriberPos, MOBlocks.INSCRIBER.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
