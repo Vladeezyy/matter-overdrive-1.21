@@ -1,6 +1,8 @@
 {
   "values": [
     "matteroverdrive:tritanium_ore",
-    "matteroverdrive:tritanium_block"
+    "matteroverdrive:tritanium_block",
+    "matteroverdrive:solar_panel",
+    "matteroverdrive:inscriber"
   ]
 }

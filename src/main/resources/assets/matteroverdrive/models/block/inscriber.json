@@ -1,0 +1,9 @@
+{
+  "loader": "neoforge:obj",
+  "model": "matteroverdrive:models/block/inscriber.obj",
+  "flip_v": true,
+  "textures": {
+    "texture": "matteroverdrive:block/inscriber",
+    "particle": "matteroverdrive:block/base"
+  }
+}

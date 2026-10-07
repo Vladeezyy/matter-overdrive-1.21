@@ -1,6 +1,9 @@
 package matteroverdrive.gametest;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import matteroverdrive.MatterOverdrive;
@@ -12,6 +15,8 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.FunctionGameTestInstance;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestData;
+import net.minecraft.gametest.framework.TestEnvironmentDefinition;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -39,15 +44,30 @@ public final class MOGameTests {
     private static final DeferredRegister<Consumer<GameTestHelper>> FUNCTIONS =
             DeferredRegister.create(Registries.TEST_FUNCTION, MatterOverdrive.MODID);
 
-    private static final String[] NAMES = {"ores_in_overworld", "ores_place_in_stone", "dilithium_drops_crystal",
-            "tritanium_smelts", "tool_tiers"};
+    /**
+     * A registered test: body, tick budget, whether the area needs open sky, and a fixed time of day (-1: any).
+     * Tests in one environment share a world and run together, so each time of day gets its own environment.
+     */
+    public record Spec(Consumer<GameTestHelper> body, int maxTicks, boolean skyAccess, int timeOfDay) {}
+
+    private static final Map<String, Spec> TESTS = new LinkedHashMap<>();
+
+    public static void add(String name, int maxTicks, boolean skyAccess, Consumer<GameTestHelper> body) {
+        add(name, maxTicks, skyAccess, -1, body);
+    }
+
+    public static void add(String name, int maxTicks, boolean skyAccess, int timeOfDay, Consumer<GameTestHelper> body) {
+        TESTS.put(name, new Spec(body, maxTicks, skyAccess, timeOfDay));
+    }
 
     static {
-        FUNCTIONS.register("ores_in_overworld", () -> MOGameTests::oresInOverworld);
-        FUNCTIONS.register("ores_place_in_stone", () -> MOGameTests::oresPlaceInStone);
-        FUNCTIONS.register("dilithium_drops_crystal", () -> MOGameTests::dilithiumDropsCrystal);
-        FUNCTIONS.register("tritanium_smelts", () -> MOGameTests::tritaniumSmelts);
-        FUNCTIONS.register("tool_tiers", () -> MOGameTests::toolTiers);
+        add("ores_in_overworld", 100, false, MOGameTests::oresInOverworld);
+        add("ores_place_in_stone", 100, false, MOGameTests::oresPlaceInStone);
+        add("dilithium_drops_crystal", 100, false, MOGameTests::dilithiumDropsCrystal);
+        add("tritanium_smelts", 100, false, MOGameTests::tritaniumSmelts);
+        add("tool_tiers", 100, false, MOGameTests::toolTiers);
+        MachineGameTests.addAll();
+        TESTS.forEach((name, spec) -> FUNCTIONS.register(name, () -> spec.body()));
     }
 
     public static void register(IEventBus modBus) {
@@ -56,12 +76,16 @@ public final class MOGameTests {
     }
 
     private static void registerTests(RegisterGameTestsEvent event) {
-        var environment = event.registerEnvironment(id("default"), new net.minecraft.gametest.framework.TestEnvironmentDefinition.AllOf(List.of()));
-        for (String name : NAMES) {
+        var anyTime = event.registerEnvironment(id("default"), new TestEnvironmentDefinition.AllOf(List.of()));
+        Map<Integer, Holder<TestEnvironmentDefinition>> timed = new HashMap<>();
+        TESTS.forEach((name, spec) -> {
+            var environment = spec.timeOfDay() < 0 ? anyTime : timed.computeIfAbsent(spec.timeOfDay(),
+                    t -> event.registerEnvironment(id("time_" + t), new TestEnvironmentDefinition.TimeOfDay(t)));
             event.registerTest(id(name), new FunctionGameTestInstance(
-                    ResourceKey.create(Registries.TEST_FUNCTION, id(name)),
-                    new TestData<>(environment, ResourceLocation.withDefaultNamespace("empty"), 100, 0, true)));
-        }
+                ResourceKey.create(Registries.TEST_FUNCTION, id(name)),
+                new TestData<>(environment, id("gametest_area"), spec.maxTicks(), 0, true,
+                        net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, spec.skyAccess())));
+        });
     }
 
     /** The biome modifiers attach both placed features to an overworld biome's ore step. */

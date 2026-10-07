@@ -6,8 +6,10 @@ Writes models, client item definitions, blockstates, loot tables, tags, recipes,
 (en_us + ru_ru converted from the original .lang files), and copies the original textures.
 Hand-written resources must not live at the paths this script owns: it overwrites them.
 """
+import gzip
 import json
 import shutil
+import struct
 import sys
 from pathlib import Path
 
@@ -24,11 +26,19 @@ ITEMS = {n: (n, "generated") for n in [
     "me_conversion_matrix", "forcefield_emitter", "weapon_handle", "weapon_receiver", "plasma_core",
     "isolinear_circuit_mk1", "isolinear_circuit_mk2", "isolinear_circuit_mk3", "isolinear_circuit_mk4",
     "tritanium_helmet", "tritanium_chestplate", "tritanium_leggings", "tritanium_boots"]}
-ITEMS.update({n: (n, "handheld") for n in ["tritanium_sword", "tritanium_pickaxe", "tritanium_axe", "tritanium_hoe"]})
+ITEMS.update({n: (n, "handheld") for n in ["tritanium_sword", "tritanium_pickaxe", "tritanium_axe", "tritanium_hoe",
+                                            "tritanium_wrench"]})
+UPGRADES = ["base", "speed", "power", "failsafe", "range", "power_storage", "hyper_speed", "matter_storage"]
+ITEMS.update({f"upgrade_{u}": (f"upgrade_{u}", "generated") for u in UPGRADES})
+# Batteries: one base texture + an overlay tinted per battery (1.7.10 Battery colours: COLOR_MATTER,
+# COLOR_YELLOW_STRIPES, COLOR_HOLO_RED).
+BATTERIES = {"battery": (191, 228, 230), "hc_battery": (254, 203, 4), "creative_battery": (230, 80, 20)}
 BLOCKS = ["tritanium_ore", "dilithium_ore", "tritanium_block"]
+MACHINES = ["solar_panel", "inscriber"]
 
 # lang keys that don't follow item.<name>.name / tile.<name>.name in the 1.7.10 files
 LANG_KEYS = {f"isolinear_circuit_mk{i}": f"item.isolinear_circuit.mk{i}.name" for i in range(1, 5)}
+LANG_KEYS.update({f"upgrade_{u}": f"item.upgrade.{u}.name" for u in UPGRADES})
 # Strings the original translation never had.
 EXTRA = {"ru_ru": {"weapon_handle": "Рукоять оружия", "weapon_receiver": "Ствольная коробка оружия",
                    "plasma_core": "Плазменное ядро"}}
@@ -196,6 +206,123 @@ for ore, (count, size, lo, hi) in ORES.items():
         "biomes": "#minecraft:is_overworld", "features": mid(f"ore_{ore}"), "step": "underground_ores"})
 
 
+# --- phase 2: energy items, machines, GUI textures ----------------------------------------------
+for n, rgb in BATTERIES.items():
+    cp(ref / "textures/items/battery.png", A / "textures/item/battery.png")
+    cp(ref / "textures/items/battery_overlay.png", A / "textures/item/battery_overlay.png")
+    w(A / "models/item" / f"{n}.json", {"parent": "minecraft:item/generated", "textures": {
+        "layer0": f"{MOD}:item/battery", "layer1": f"{MOD}:item/battery_overlay"}})
+    w(A / "items" / f"{n}.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:item/{n}", "tints": [
+        {"type": "minecraft:constant", "value": -1},
+        {"type": "minecraft:constant", "value": (0xFF << 24 | rgb[0] << 16 | rgb[1] << 8 | rgb[2]) - (1 << 32)}]}})
+
+FACING_Y = {"north": 0, "east": 90, "south": 180, "west": 270}
+
+
+def facing_blockstate(n, model):
+    w(A / "blockstates" / f"{n}.json", {"variants": {
+        f"facing={f}": ({"model": model, "y": y} if y else {"model": model}) for f, y in FACING_Y.items()}})
+    w(A / "items" / f"{n}.json", {"model": {"type": "minecraft:model", "model": model}})
+
+
+cp(ref / "textures/blocks/base.png", A / "textures/block/base.png")
+cp(ref / "textures/blocks/solar_panel.png", A / "textures/block/solar_panel.png")
+w(A / "models/block/solar_panel.json", {"parent": "minecraft:block/slab", "textures": {
+    "bottom": f"{MOD}:block/base", "top": f"{MOD}:block/solar_panel", "side": f"{MOD}:block/base"}})
+facing_blockstate("solar_panel", f"{MOD}:block/solar_panel")
+
+# Inscriber: the original Wavefront model. NeoForge's OBJ loader needs a material, and expects block-corner
+# coordinates where the 1.7.10 model is centred on x/z, so shift it by half a block.
+cp(ref / "textures/blocks/inscriber.png", A / "textures/block/inscriber.png")
+obj_lines = ["mtllib inscriber.mtl", "usemtl inscriber"]
+for line in (ref / "models/block/inscriber.obj").read_text().splitlines():
+    if line.startswith("v "):
+        _, x, y, z = line.split()
+        line = f"v {float(x) + 0.5:.4f} {float(y):.4f} {float(z) + 0.5:.4f}"
+    obj_lines.append(line)
+(A / "models/block").mkdir(parents=True, exist_ok=True)
+(A / "models/block/inscriber.obj").write_text("\n".join(obj_lines) + "\n")
+(A / "models/block/inscriber.mtl").write_text("newmtl inscriber\nmap_Kd #texture\n")
+w(A / "models/block/inscriber.json", {"loader": "neoforge:obj", "model": f"{MOD}:models/block/inscriber.obj",
+    "flip_v": True, "textures": {"texture": f"{MOD}:block/inscriber", "particle": f"{MOD}:block/base"}})
+facing_blockstate("inscriber", f"{MOD}:block/inscriber")
+
+for n in MACHINES:
+    w(D / f"loot_table/blocks/{n}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "bonus_rolls": 0,
+        "entries": [{"type": "minecraft:item", "name": mid(n), "functions": [{"function": "minecraft:copy_components",
+            "source": "block_entity", "include": [mid("energy")]}]}],
+        "conditions": [{"condition": "minecraft:survives_explosion"}]}]})
+
+# GUI: the 1.7.10 element textures, lower-cased; the machine background as a nine-slice sprite
+# (1.7.10 ScaleTexture offsets left 57, right 34, top 42, bottom 34).
+GUI = A / "textures/gui"
+for src, dst in {"elements/Energy.png": "energy", "elements/Progress_Arrow_Right.png": "progress_arrow_right",
+                 "elements/slot_big.png": "slot_big", "elements/slot_small.png": "slot_small",
+                 "elements/indicator.png": "indicator", "elements/close_button.png": "close_button",
+                 "elements/page_button.png": "page_button", "items/page_icon_home.png": "page_icon_home",
+                 "items/page_icon_upgrades.png": "page_icon_upgrades", "items/page_icon_config.png": "page_icon_config"}.items():
+    cp(ref / "textures/gui" / src, GUI / "elements" / f"{dst}.png")
+cp(ref / "textures/gui/elements/base_gui_hotbar.png", GUI / "sprites/machine_background.png")
+w(GUI / "sprites/machine_background.png.mcmeta", {"gui": {"scaling": {"type": "nine_slice", "width": 92, "height": 77,
+    "border": {"left": 57, "top": 42, "right": 34, "bottom": 34}, "stretch_inner": True}}})
+
+for tag in ["mineable/pickaxe", "needs_iron_tool"]:
+    p = TAGS / f"minecraft/tags/block/{tag}.json"
+    values = json.loads(p.read_text())["values"]
+    w(p, {"values": values + [mid(n) for n in MACHINES]})
+
+# Recipes. Upgrades, batteries and the wrench are from ItemUpgrade.register / registerItemRecipes;
+# the solar panel and inscriber from registerBlockRecipes.
+shaped("battery", mid("battery"), [" R ", "TGT", "TDT"],
+       {"R": "minecraft:redstone", "T": INGOT, "G": "minecraft:gold_ingot", "D": DILITHIUM}, category="equipment")
+shaped("hc_battery", mid("hc_battery"), [" P ", "DBD", " P "],
+       {"P": PLATE, "D": DILITHIUM, "B": mid("battery")}, category="equipment")
+shaped("tritanium_wrench", mid("tritanium_wrench"), ["T T", " Y ", " T "],
+       {"T": INGOT, "Y": "minecraft:yellow_wool"}, category="equipment")
+shaped("solar_panel", mid("solar_panel"), ["CGC", "GQG", "KMK"],
+       {"C": "minecraft:coal", "G": "minecraft:glass", "Q": "minecraft:quartz", "K": MK[2], "M": mid("machine_casing")})
+shaped("inscriber", mid("inscriber"), ["IDI", "TPT", "RMR"],
+       {"I": "minecraft:iron_ingot", "D": DILITHIUM, "T": PLATE, "P": "minecraft:piston", "R": "minecraft:redstone",
+        "M": mid("machine_casing")})
+U = mid("upgrade_base")
+shaped("upgrade_base", U, ["R", "C", "T"], {"R": "minecraft:redstone", "C": MK[1], "T": PLATE})
+shaped("upgrade_speed", mid("upgrade_speed"), [" R ", "GUG", " E "],
+       {"R": "minecraft:redstone", "G": "minecraft:glowstone_dust", "U": U, "E": "minecraft:emerald"})
+shaped("upgrade_power", mid("upgrade_power"), [" B ", "RUR", " C "],
+       {"B": mid("battery"), "R": "minecraft:redstone", "U": U, "C": "minecraft:quartz"})
+shaped("upgrade_failsafe", mid("upgrade_failsafe"), [" D ", "RUR", " G "],
+       {"D": "minecraft:diamond", "R": "minecraft:redstone", "U": U, "G": "minecraft:gold_ingot"})
+shaped("upgrade_range", mid("upgrade_range"), [" E ", "RUR", " G "],
+       {"E": "minecraft:ender_pearl", "R": "minecraft:redstone", "U": U, "G": "minecraft:gold_ingot"})
+shaped("upgrade_power_storage", mid("upgrade_power_storage"), ["RUR", " B "],
+       {"R": "minecraft:redstone", "U": U, "B": mid("hc_battery")})
+shapeless("upgrade_hyper_speed", mid("upgrade_hyper_speed"), [DILITHIUM, "minecraft:nether_star", mid("upgrade_speed")])
+shaped("upgrade_matter_storage", mid("upgrade_matter_storage"), [" R ", "MUM", " R "],
+       {"R": "minecraft:redstone", "M": mid("s_magnet"), "U": U})
+# 1.7.10 registerInscriberRecipes: circuit + material -> next circuit, energy (FE) over time (ticks).
+for i, (material, energy, time) in {2: ("minecraft:gold_ingot", 64000, 300), 3: ("minecraft:diamond", 88000, 600),
+                                    4: ("minecraft:emerald", 114000, 1200)}.items():
+    w(D / "recipe" / f"isolinear_circuit_mk{i}.json", {"type": mid("inscriber"), "main": MK[i - 1],
+        "secondary": material, "result": {"id": MK[i]}, "energy": energy, "time": time})
+
+
+# --- game test area ---------------------------------------------------------------------------------
+# GameTests are laid out (size + 5) blocks apart; vanilla's 1x1x1 "minecraft:empty" structure lets tests that
+# build bigger scenes overwrite their neighbours. This is that same empty structure with size 12x12x12.
+EMPTY_STRUCTURE = bytes.fromhex(
+    "0a0000090004" "73697a65" "0300000003" "00000001" "00000001" "00000001"
+    "090008" "656e746974696573" "0000000000"
+    "090006" "626c6f636b73" "0a00000001" "090003" "706f73" "0300000003" "000000000000000000000000"
+    "030005" "7374617465" "00000000" "00"
+    "090007" "70616c65747465" "0a00000001" "080004" "4e616d65" "000d" "6d696e6563726166743a616972" "00"
+    "03000b" "4461746156657273696f6e" "000011cc" "00")
+size_at = EMPTY_STRUCTURE.index(bytes.fromhex("0300000003")) + 5
+area = EMPTY_STRUCTURE[:size_at] + struct.pack(">3i", 12, 12, 12) + EMPTY_STRUCTURE[size_at + 12:]
+(D / "structure").mkdir(parents=True, exist_ok=True)
+with gzip.open(D / "structure/gametest_area.nbt", "wb") as f:
+    f.write(area)
+
+
 # --- lang ------------------------------------------------------------------------------------
 def parse_lang(p):
     d = {}
@@ -204,6 +331,30 @@ def parse_lang(p):
             k, v = line.split("=", 1)
             d[k.strip()] = v.strip()
     return d
+
+# Our key -> 1.7.10 key, or literal strings where the original had none.
+GUI_KEYS = {
+    "gui.matteroverdrive.page.home": "gui.tooltip.page.home",
+    "gui.matteroverdrive.page.upgrades": "gui.tooltip.page.upgrades",
+    "gui.matteroverdrive.page.config": "gui.tooltip.page.configurations",
+    "gui.matteroverdrive.redstone_mode.low": "gui.redstone_mode.low",
+    "gui.matteroverdrive.redstone_mode.high": "gui.redstone_mode.high",
+    "gui.matteroverdrive.redstone_mode.disabled": "gui.redstone_mode.disabled",
+    "gui.matteroverdrive.config.redstone": {"en_us": "Redstone Mode", "ru_ru": "Режим редстоуна"},
+    "gui.matteroverdrive.generating": {"en_us": "+%s FE/t", "ru_ru": "+%s FE/т"},
+    "tooltip.matteroverdrive.energy_stored": {"en_us": "Energy: %s / %s", "ru_ru": "Энергия: %s / %s"},
+    "tooltip.matteroverdrive.energy_io": {"en_us": "Input/Output: %s/%s FE/t", "ru_ru": "Вход/выход: %s/%s FE/т"},
+    "upgrade_type.matteroverdrive.speed": "upgradetype.Speed.name",
+    "upgrade_type.matteroverdrive.power_usage": "upgradetype.PowerUsage.name",
+    "upgrade_type.matteroverdrive.output": "upgradetype.Output.name",
+    "upgrade_type.matteroverdrive.second_output": "upgradetype.SecondOutput.name",
+    "upgrade_type.matteroverdrive.fail": "upgradetype.Fail.name",
+    "upgrade_type.matteroverdrive.range": "upgradetype.Range.name",
+    "upgrade_type.matteroverdrive.power_storage": "upgradetype.PowerStorage.name",
+    "upgrade_type.matteroverdrive.power_transfer": {"en_us": "Power Transfer", "ru_ru": "Передача мощности"},
+    "upgrade_type.matteroverdrive.matter_storage": "upgradetype.MatterStorage.name",
+    "upgrade_type.matteroverdrive.matter_transfer": {"en_us": "Matter Transfer", "ru_ru": "Передача материи"},
+}
 
 
 en = parse_lang(ref / "lang/en_US.lang")
@@ -216,10 +367,19 @@ for src_name, dst_name in [("en_US", "en_us"), ("ru_RU", "ru_ru")]:
         lang[f"item.{MOD}.{n}"] = src.get(key) or EXTRA.get(dst_name, {}).get(n) or en.get(key) or n
         if key not in src and n not in EXTRA.get(dst_name, {}):
             fallback.append(n)
-    for n in BLOCKS:
+    for n in BATTERIES:
+        lang[f"item.{MOD}.{n}"] = src.get(f"item.{n}.name") or en.get(f"item.{n}.name")
+    for n in BLOCKS + MACHINES:
         key = LANG_KEYS.get(n, f"tile.{n}.name")
         lang[f"block.{MOD}.{n}"] = src.get(key) or en.get(key) or n
         if key not in src:
             fallback.append(n)
+    for ours, theirs in GUI_KEYS.items():
+        if isinstance(theirs, dict):
+            lang[ours] = theirs[dst_name]
+        else:
+            lang[ours] = src.get(theirs) or en[theirs]
+            if theirs not in src:
+                fallback.append(ours)
     w(A / "lang" / f"{dst_name}.json", lang)
     print(f"{dst_name}: {len(lang)} keys, not in original {src_name}: {fallback or 'none'}")

@@ -2,10 +2,15 @@ package matteroverdrive.init;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 import matteroverdrive.MatterOverdrive;
+import matteroverdrive.item.BatteryItem;
+import matteroverdrive.item.UpgradeItem;
+import matteroverdrive.item.WrenchItem;
+import matteroverdrive.machine.UpgradeType;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.HoeItem;
@@ -62,6 +67,41 @@ public final class MOItems {
     public static final DeferredItem<Item> TRITANIUM_CHESTPLATE = armor("tritanium_chestplate", ArmorType.CHESTPLATE);
     public static final DeferredItem<Item> TRITANIUM_LEGGINGS = armor("tritanium_leggings", ArmorType.LEGGINGS);
     public static final DeferredItem<Item> TRITANIUM_BOOTS = armor("tritanium_boots", ArmorType.BOOTS);
+
+    // Machines
+    public static final DeferredItem<BlockItem> SOLAR_PANEL = block("solar_panel", MOBlocks.SOLAR_PANEL);
+    public static final DeferredItem<BlockItem> INSCRIBER = block("inscriber", MOBlocks.INSCRIBER);
+
+    // Energy (1.7.10: battery 2^19 FE 400/800, hc_battery 2^20 FE 4096/4096, creative 2^24 FE 8192/8192)
+    public static final DeferredItem<BatteryItem> BATTERY = item("battery",
+            p -> new BatteryItem(1 << 19, 400, 800, false, p), p -> p);
+    public static final DeferredItem<BatteryItem> HC_BATTERY = item("hc_battery",
+            p -> new BatteryItem(1 << 20, 4096, 4096, false, p), p -> p);
+    public static final DeferredItem<BatteryItem> CREATIVE_BATTERY = item("creative_battery",
+            p -> new BatteryItem(1 << 24, 8192, 8192, true, p), p -> p);
+
+    // Upgrades (1.7.10 ItemUpgrade damage values 0-7)
+    public static final DeferredItem<UpgradeItem> UPGRADE_BASE = upgrade("upgrade_base", Map.of());
+    public static final DeferredItem<UpgradeItem> UPGRADE_SPEED = upgrade("upgrade_speed",
+            Map.of(UpgradeType.SPEED, 0.75, UpgradeType.POWER_USAGE, 1.25, UpgradeType.FAIL, 1.25));
+    public static final DeferredItem<UpgradeItem> UPGRADE_POWER = upgrade("upgrade_power",
+            Map.of(UpgradeType.SPEED, 1.5, UpgradeType.POWER_USAGE, 0.75, UpgradeType.FAIL, 1.25));
+    public static final DeferredItem<UpgradeItem> UPGRADE_FAILSAFE = upgrade("upgrade_failsafe",
+            Map.of(UpgradeType.FAIL, 0.5, UpgradeType.SPEED, 1.25, UpgradeType.POWER_USAGE, 1.25));
+    public static final DeferredItem<UpgradeItem> UPGRADE_RANGE = upgrade("upgrade_range",
+            Map.of(UpgradeType.RANGE, 4.0, UpgradeType.POWER_USAGE, 1.5));
+    public static final DeferredItem<UpgradeItem> UPGRADE_POWER_STORAGE = upgrade("upgrade_power_storage",
+            Map.of(UpgradeType.POWER_STORAGE, 2.0));
+    public static final DeferredItem<UpgradeItem> UPGRADE_HYPER_SPEED = upgrade("upgrade_hyper_speed",
+            Map.of(UpgradeType.SPEED, 0.15, UpgradeType.POWER_USAGE, 2.0, UpgradeType.FAIL, 1.25));
+    public static final DeferredItem<UpgradeItem> UPGRADE_MATTER_STORAGE = upgrade("upgrade_matter_storage",
+            Map.of(UpgradeType.MATTER_STORAGE, 2.0));
+
+    public static final DeferredItem<WrenchItem> TRITANIUM_WRENCH = item("tritanium_wrench", WrenchItem::new, p -> p);
+
+    private static DeferredItem<UpgradeItem> upgrade(String name, Map<UpgradeType, Double> stats) {
+        return item(name, p -> new UpgradeItem(stats, p), p -> p);
+    }
 
     private static DeferredItem<Item> simple(String name) {
         DeferredItem<Item> item = ITEMS.registerSimpleItem(name);

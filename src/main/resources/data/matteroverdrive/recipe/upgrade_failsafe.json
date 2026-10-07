@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " D ",
+    "RUR",
+    " G "
+  ],
+  "key": {
+    "D": "minecraft:diamond",
+    "R": "minecraft:redstone",
+    "U": "matteroverdrive:upgrade_base",
+    "G": "minecraft:gold_ingot"
+  },
+  "result": {
+    "id": "matteroverdrive:upgrade_failsafe",
+    "count": 1
+  }
+}

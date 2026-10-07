@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " E ",
+    "RUR",
+    " G "
+  ],
+  "key": {
+    "E": "minecraft:ender_pearl",
+    "R": "minecraft:redstone",
+    "U": "matteroverdrive:upgrade_base",
+    "G": "minecraft:gold_ingot"
+  },
+  "result": {
+    "id": "matteroverdrive:upgrade_range",
+    "count": 1
+  }
+}

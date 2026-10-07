@@ -23,13 +23,14 @@ Each feature is rewritten against the 1.7.10 code as the spec and keeps its numb
 
 ## Phases (each ends working in `runClient`)
 1. **Base content** ✅ — materials, ores + worldgen, tritanium block, tools, armor, isolinear circuits, recipes, tags, GameTests.
-2. **Machine framework** — base BlockEntity, FE energy, item/fluid handlers, menus + screens in MO style,
-   upgrades, side configs, wrench, batteries/charging station, solar panel.
+2. **Machine framework** ✅ — base machine, FE energy (transfer API), menus + screens in MO style, upgrades,
+   redstone config, wrench, batteries, solar panel, inscriber + its recipes, DevScene screenshots.
 3. **Matter core** — matter values (data map), Decomposer, Matter Recycler, matter pipes, Pattern Storage +
    drives, Matter Analyzer, **Replicator**, Matter Scanner, network router/switch/pattern monitor.
 4. **Power endgame** — Gravitational anomaly + stabilizer, Fusion reactor multiblock.
 5. **Weapons** — Phaser, Phaser Rifle, Plasma Shotgun, Ion Sniper, modules, Weapon Station, energy pack.
-6. **Androids** — player attachment for android state, biotic stats tree, Android Station, HUD, abilities.
+6. **Androids** — player attachment for android state, biotic stats tree, Android Station, HUD, abilities,
+   charging station (it only charges androids).
 7. **World & extras** — rogue androids, mad scientist, structures (sand/crashed ship etc.), Tritanium crate,
    holo sign, inscriber, transporter, star map / galaxy, quests & dialogs, guide book (Data Pad), foods.
 

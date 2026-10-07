@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " R ",
+    "GUG",
+    " E "
+  ],
+  "key": {
+    "R": "minecraft:redstone",
+    "G": "minecraft:glowstone_dust",
+    "U": "matteroverdrive:upgrade_base",
+    "E": "minecraft:emerald"
+  },
+  "result": {
+    "id": "matteroverdrive:upgrade_speed",
+    "count": 1
+  }
+}

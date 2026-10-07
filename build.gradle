@@ -58,6 +58,13 @@ neoForge {
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
+        // Scripted test scene (matteroverdrive.client.DevScene): joins run/saves/mo_scene, screenshots every
+        // machine GUI to run/screenshots/scene_*.png and quits.
+        scene {
+            client()
+            programArguments.addAll '--quickPlaySingleplayer', 'mo_scene'
+            systemProperty 'matteroverdrive.scene', 'true'
+        }
         server {
             server()
             programArgument '--nogui'

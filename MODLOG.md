@@ -39,6 +39,38 @@
 4. macOS has no `timeout`; run long Gradle tasks in the background.
 5. Tools in 1.21.5+: sword/pickaxe are plain `Item` with `Item.Properties.sword()/pickaxe()`; axe/hoe keep `AxeItem`/`HoeItem` for stripping/tilling.
 
+## 2026-10-08 — phase 2: machine framework ✅
+- **Transfer API**: NeoForge 21.10 replaced IEnergyStorage/IItemHandler with the transactional transfer API
+  (`transfer.energy.EnergyHandler`, `ResourceHandler<ItemResource>`, `Transaction`). Capabilities: `Capabilities.Energy.BLOCK/ITEM`,
+  `Capabilities.Item.BLOCK`. Item energy via `ItemAccessEnergyHandler` + a data component (`matteroverdrive:energy`).
+- `machine/`: `MachineBlockEntity` (inventory + battery slot + upgrade slots, `MachineEnergy` scaled by POWER_STORAGE/POWER_TRANSFER,
+  redstone mode, active flag, energy kept on the dropped item via implicit components + `copy_components` loot), `MachineBlock`
+  (facing, GUI, ticker, wrench dismantle), `MachineInventory` (slot roles; `automation()` view for hoppers/pipes).
+- Upgrade multipliers as 1.7.10: product of upgrades, floor 0.05 overall and 0.1 for SPEED; per-machine affected set.
+- Items: battery (2^19, 400/800), hc_battery (2^20, 4096/4096), creative_battery (infinite), 8 upgrades (1.7.10 values), tritanium_wrench.
+- Machines: **solar panel** (16 FE/t × sun factor, 64k buffer, pushes 512 FE/t to neighbours), **inscriber** (custom recipe type
+  `matteroverdrive:inscriber`, 3 recipes isolinear mk1→mk2→mk3→mk4 with the original FE/time, original OBJ model).
+- GUI = 1.7.10 MOGuiMachine look: nine-slice `base_gui_hotbar` sprite (`stretch_inner`), Home/Upgrades/Config pages, energy bar,
+  progress arrow, indicator, close button. Main inventory only on Home (as 1.7.10), hotbar always.
+- Deviation: the inscriber output may stack onto a matching item (1.7.10 needed an empty output slot).
+- Charging station moved to phase 6: in 1.7.10 it only charges android players.
+- **Oracles**: 13 GameTests (+ vanilla) all pass 5/5 runs; `./gradlew runScene` (DevScene) builds the machines in `run/saves/mo_scene`,
+  opens every GUI page and saves `run/screenshots/scene_*.png`, then quits. Screenshots checked by eye.
+
+### Gotchas
+6. ContainerData values travel as shorts: split FE values into two 16-bit halves.
+7. Tests in one GameTest environment share a world and run in the same batch; a test that sets the time of day breaks another.
+   Give each time of day its own `TestEnvironmentDefinition.TimeOfDay` environment.
+8. Tests are placed (structure size + 5) blocks apart. With vanilla `minecraft:empty` (1x1x1) a test that builds a 9-block scene
+   overwrote neighbours and made another test flaky (~1 in 6). Use the generated 12x12x12 `matteroverdrive:gametest_area`.
+9. A scripted client scene must set `options.pauseOnLostFocus = false`: an unfocused window opens the pause menu, which pauses the
+   integrated server, so `server.execute` tasks never run.
+10. NeoForge OBJ loader: needs `mtllib`/`usemtl` (a material with `map_Kd #texture`), uses block-corner coordinates (the 1.7.10 models are
+    centred: shift x/z by 0.5), and `flip_v: true` for these 3ds Max exports.
+11. `GuiGraphics` in 1.21.10: `blit(RenderPipelines.GUI_TEXTURED, ...)`, `blitSprite`, `submitOutline` (not renderOutline), ARGB colours.
+12. macOS: the terminal has no screen-recording permission, so `screencapture` fails; use Minecraft's own `Screenshot.grab` from the scene.
+
 ## Next
-- Phase 2 machine framework: base machine BlockEntity, FE energy (NeoForge `Capabilities.Energy`), item handlers, menus/screens in the MO GUI style,
-  upgrades, wrench, battery / hc_battery, charging station, solar panel, Inscriber (unlocks isolinear mk2-4).
+- Phase 3 matter core: matter values (data map), Decomposer, Matter Recycler, matter pipes, Pattern Storage + drives, Matter Analyzer,
+  Replicator, Matter Scanner, network.
+- Polish later: machine item tooltip with stored energy, inscriber head animation (BER), machine sounds, custom tritanium armor model.

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "#c:gems/dilithium",
+    "minecraft:nether_star",
+    "matteroverdrive:upgrade_speed"
+  ],
+  "result": {
+    "id": "matteroverdrive:upgrade_hyper_speed",
+    "count": 1
+  }
+}

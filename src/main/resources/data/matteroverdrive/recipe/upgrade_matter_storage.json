@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " R ",
+    "MUM",
+    " R "
+  ],
+  "key": {
+    "R": "minecraft:redstone",
+    "M": "matteroverdrive:s_magnet",
+    "U": "matteroverdrive:upgrade_base"
+  },
+  "result": {
+    "id": "matteroverdrive:upgrade_matter_storage",
+    "count": 1
+  }
+}

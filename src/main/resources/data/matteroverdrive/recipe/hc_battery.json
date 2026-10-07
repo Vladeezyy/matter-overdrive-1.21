@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " P ",
+    "DBD",
+    " P "
+  ],
+  "key": {
+    "P": "#c:plates/tritanium",
+    "D": "#c:gems/dilithium",
+    "B": "matteroverdrive:battery"
+  },
+  "result": {
+    "id": "matteroverdrive:hc_battery",
+    "count": 1
+  }
+}

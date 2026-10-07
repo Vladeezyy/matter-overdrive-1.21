@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "matteroverdrive:block/solar_panel"
+    },
+    "facing=east": {
+      "model": "matteroverdrive:block/solar_panel",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "matteroverdrive:block/solar_panel",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "matteroverdrive:block/solar_panel",
+      "y": 270
+    }
+  }
+}

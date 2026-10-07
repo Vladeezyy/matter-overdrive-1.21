@@ -1,0 +1,10 @@
+{
+  "type": "matteroverdrive:inscriber",
+  "main": "matteroverdrive:isolinear_circuit_mk3",
+  "secondary": "minecraft:emerald",
+  "result": {
+    "id": "matteroverdrive:isolinear_circuit_mk4"
+  },
+  "energy": 114000,
+  "time": 1200
+}

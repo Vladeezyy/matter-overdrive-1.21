@@ -1,6 +1,8 @@
 package matteroverdrive.init;
 
 import matteroverdrive.MatterOverdrive;
+import matteroverdrive.block.InscriberBlock;
+import matteroverdrive.block.SolarPanelBlock;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DropExperienceBlock;
@@ -21,6 +23,12 @@ public final class MOBlocks {
             p -> p.mapColor(MapColor.STONE).strength(4f, 5f).requiresCorrectToolForDrops());
     public static final DeferredBlock<Block> TRITANIUM_BLOCK = BLOCKS.registerSimpleBlock("tritanium_block",
             p -> p.mapColor(MapColor.METAL).strength(15f, 10f).sound(SoundType.METAL).requiresCorrectToolForDrops());
+
+    // Machines (1.7.10: hardness 20, iron pickaxe)
+    public static final DeferredBlock<SolarPanelBlock> SOLAR_PANEL = BLOCKS.registerBlock("solar_panel", SolarPanelBlock::new,
+            p -> p.mapColor(MapColor.METAL).strength(20f, 5f).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion());
+    public static final DeferredBlock<InscriberBlock> INSCRIBER = BLOCKS.registerBlock("inscriber", InscriberBlock::new,
+            p -> p.mapColor(MapColor.METAL).strength(20f, 9f).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion());
 
     private MOBlocks() {}
 }

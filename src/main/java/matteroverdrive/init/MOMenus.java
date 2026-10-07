@@ -1,0 +1,21 @@
+package matteroverdrive.init;
+
+import matteroverdrive.MatterOverdrive;
+import matteroverdrive.menu.InscriberMenu;
+import matteroverdrive.menu.SolarPanelMenu;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.inventory.MenuType;
+import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
+
+public final class MOMenus {
+    public static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(Registries.MENU, MatterOverdrive.MODID);
+
+    public static final DeferredHolder<MenuType<?>, MenuType<SolarPanelMenu>> SOLAR_PANEL =
+            MENUS.register("solar_panel", () -> IMenuTypeExtension.create(SolarPanelMenu::new));
+    public static final DeferredHolder<MenuType<?>, MenuType<InscriberMenu>> INSCRIBER =
+            MENUS.register("inscriber", () -> IMenuTypeExtension.create(InscriberMenu::new));
+
+    private MOMenus() {}
+}
