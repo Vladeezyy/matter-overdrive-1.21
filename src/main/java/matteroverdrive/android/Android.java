@@ -241,11 +241,12 @@ public final class Android {
         if (health == null || glitch == null) return;
         for (int slot = AndroidData.SLOT_HEAD; slot <= AndroidData.SLOT_OTHER; slot++) {
             var id = matteroverdrive.item.android.BionicPartItem.modifierId(slot);
-            if (data.getStack(slot).getItem() instanceof matteroverdrive.item.android.BionicPartItem part) {
-                var healthModifier = new AttributeModifier(id, part.maxHealthBonus(), AttributeModifier.Operation.ADD_VALUE);
+            ItemStack partStack = data.getStack(slot);
+            if (partStack.getItem() instanceof matteroverdrive.item.android.BionicPartItem part) {
+                var healthModifier = new AttributeModifier(id, part.maxHealthBonus(partStack), AttributeModifier.Operation.ADD_VALUE);
                 if (!healthModifier.equals(health.getModifier(id))) health.addOrUpdateTransientModifier(healthModifier);
-                if (part.glitchBonus() != 0) {
-                    var glitchModifier = new AttributeModifier(id, part.glitchBonus(), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+                if (part.glitchBonus(partStack) != 0) {
+                    var glitchModifier = new AttributeModifier(id, part.glitchBonus(partStack), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
                     if (!glitchModifier.equals(glitch.getModifier(id))) glitch.addOrUpdateTransientModifier(glitchModifier);
                 } else {
                     glitch.removeModifier(id);

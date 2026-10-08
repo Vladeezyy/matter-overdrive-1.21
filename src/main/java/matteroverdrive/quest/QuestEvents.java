@@ -24,6 +24,12 @@ public final class QuestEvents {
     /** 1.7.10 MOEventDialogInteract: a dialog message became active for the player. */
     public record DialogInteract(Entity npc, Object message) {}
 
+    /** 1.7.10 MOEventTransport: a transporter sent the player somewhere. */
+    public record Transport(net.minecraft.core.BlockPos from, net.minecraft.core.BlockPos to) {}
+
+    /** 1.7.10 MOEventGravitationalAnomalyConsume.Post: the player went into an anomaly's horizon. */
+    public record AnomalyConsume(net.minecraft.core.BlockPos anomaly) {}
+
     /** 1.7.10 MOEventScan: a Data Pad or matter scanner finished scanning a block. */
     public record Scan(net.minecraft.core.BlockPos pos, net.minecraft.world.level.block.state.BlockState state, ItemStack scanner) {}
 
@@ -35,6 +41,8 @@ public final class QuestEvents {
         if (quests.active.isEmpty() && quests.completed.isEmpty()) {
             player.getInventory().add(new ItemStack(matteroverdrive.init.MOItems.DATA_PAD.get()));
         }
+        // 1.7.10 addQuest: initQuestStack(rng, stack, player)
+        stack.getQuest().onTaken(player.getRandom(), stack, player);
         quests.active.add(stack);
         PlayerQuests.sync(player);
         return true;
@@ -46,7 +54,7 @@ public final class QuestEvents {
         boolean changed = false;
         for (QuestStack stack : List.copyOf(PlayerQuests.get(player).active)) {
             Quest quest = stack.getQuest();
-            if (quest != null && quest.logic().onEvent(stack, event, player)) changed = true;
+            if (quest != null && quest.onEvent(stack, event, player)) changed = true;
         }
         if (changed) PlayerQuests.sync(server);
     }
@@ -54,6 +62,18 @@ public final class QuestEvents {
     @SubscribeEvent
     static void onDeath(LivingDeathEvent event) {
         if (event.getSource().getEntity() instanceof ServerPlayer player) onEvent(player, event);
+    }
+
+    /** 1.7.10 PlayerEventHandler.onItemCrafted (server side). */
+    @SubscribeEvent
+    static void onCrafted(net.neoforged.neoforge.event.entity.player.PlayerEvent.ItemCraftedEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) onEvent(player, event);
+    }
+
+    /** 1.7.10 HarvestDropsEvent with a harvester (QuestLogicMine). */
+    @SubscribeEvent
+    static void onBreak(net.neoforged.neoforge.event.level.BlockEvent.BreakEvent event) {
+        if (event.getPlayer() instanceof ServerPlayer player) onEvent(player, event);
     }
 
     @SubscribeEvent
@@ -82,9 +102,19 @@ public final class QuestEvents {
                     player.level().addFreshEntity(new ItemEntity(player.level(), player.getX(), player.getEyeY(), player.getZ(), reward));
                 }
             }
-            quest.logic().onCompleted(stack, player);
+            quest.onCompleted(stack, player);
+            // 1.7.10 QuestStackReward: the follow-up quest, with some of this one's data
+            for (Quest.QuestStackReward reward : quest.getQuestRewards()) {
+                QuestStack next = new QuestStack(reward.quest().get());
+                if (!next.getQuest().canBeAccepted(next, player)) continue;
+                next.getQuest().initQuestStack(player.getRandom(), next);
+                for (String key : reward.copyData()) {
+                    if (stack.getData().get(key) != null) next.getData().put(key, stack.getData().get(key).copy());
+                }
+                addQuest(player, next);
+            }
             player.sendSystemMessage(Component.translatable("chat." + MatterOverdrive.MODID + ".quest_completed", player.getDisplayName(),
-                    Component.translatable(quest.key("title")).withStyle(ChatFormatting.GOLD)));
+                    Component.translatable(quest.titleKey(stack)).withStyle(ChatFormatting.GOLD)));
         }
         if (changed) PlayerQuests.sync(player);
     }

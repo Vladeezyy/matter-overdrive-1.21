@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "active=false,facing=north": {
+      "model": "matteroverdrive:block/contract_market"
+    },
+    "active=true,facing=north": {
+      "model": "matteroverdrive:block/contract_market"
+    },
+    "active=false,facing=east": {
+      "model": "matteroverdrive:block/contract_market",
+      "y": 90
+    },
+    "active=true,facing=east": {
+      "model": "matteroverdrive:block/contract_market",
+      "y": 90
+    },
+    "active=false,facing=south": {
+      "model": "matteroverdrive:block/contract_market",
+      "y": 180
+    },
+    "active=true,facing=south": {
+      "model": "matteroverdrive:block/contract_market",
+      "y": 180
+    },
+    "active=false,facing=west": {
+      "model": "matteroverdrive:block/contract_market",
+      "y": 270
+    },
+    "active=true,facing=west": {
+      "model": "matteroverdrive:block/contract_market",
+      "y": 270
+    }
+  }
+}

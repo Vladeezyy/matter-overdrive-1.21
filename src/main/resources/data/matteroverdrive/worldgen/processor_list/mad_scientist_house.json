@@ -4,6 +4,9 @@
       "processor_type": "matteroverdrive:random_crate"
     },
     {
+      "processor_type": "matteroverdrive:mad_scientist_crate"
+    },
+    {
       "processor_type": "minecraft:rule",
       "rules": [
         {

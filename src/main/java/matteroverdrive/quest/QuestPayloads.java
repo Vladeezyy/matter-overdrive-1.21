@@ -16,7 +16,7 @@ import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 /** 1.7.10 PacketQuestActions (complete / abandon an active quest) and PacketDataPadCommands (the pad's screen state). */
 public final class QuestPayloads {
-    public enum Action { COMPLETE, ABANDON }
+    public enum Action { COMPLETE, ABANDON, ADD }
 
     public record QuestAction(Action action, int index) implements CustomPacketPayload {
         public static final Type<QuestAction> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "quest_action"));
@@ -48,6 +48,16 @@ public final class QuestPayloads {
 
     /** 1.7.10: complete when every objective is done (forced), abandon removes it. */
     public static void apply(ServerPlayer player, Action action, int index) {
+        if (action == Action.ADD) {
+            // 1.7.10 QUEST_ACTION_ADD: take the contract in that inventory slot
+            if (index < 0 || index >= player.getInventory().getContainerSize()) return;
+            ItemStack contract = player.getInventory().getItem(index);
+            QuestStack stack = matteroverdrive.item.ContractItem.getQuest(contract);
+            if (stack == null || !stack.getQuest().canBeAccepted(stack, player)) return;
+            QuestEvents.addQuest(player, stack.copy());
+            contract.shrink(1);
+            return;
+        }
         PlayerQuests quests = PlayerQuests.get(player);
         if (index < 0 || index >= quests.active.size()) return;
         QuestStack stack = quests.active.get(index);

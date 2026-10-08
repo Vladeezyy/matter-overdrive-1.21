@@ -56,6 +56,12 @@ public interface QuestLogic {
         return min + (range > 0 ? random.nextInt(range) : 0);
     }
 
+    /** 1.7.10 String.format(text, "", a, b, c): fills %2$s, %3$s, ... (%1$s, the player, is already replaced). */
+    static String fmt(String text, Object... args) {
+        for (int i = 0; i < args.length; i++) text = text.replace("%" + (i + 2) + "$s", String.valueOf(args[i]));
+        return text;
+    }
+
     /** 1.7.10 getTag with a null id: the stack's whole data tag. */
     static CompoundTag tag(QuestStack stack) {
         return stack.getData();

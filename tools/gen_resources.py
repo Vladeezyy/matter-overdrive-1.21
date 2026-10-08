@@ -25,7 +25,7 @@ ITEMS = {n: (n, "generated") for n in [
     "matter_dust", "matter_dust_refined", "machine_casing", "s_magnet", "h_compensator", "integration_matrix",
     "me_conversion_matrix", "forcefield_emitter", "weapon_handle", "weapon_receiver", "plasma_core",
     "isolinear_circuit_mk1", "isolinear_circuit_mk2", "isolinear_circuit_mk3", "isolinear_circuit_mk4",
-    "tritanium_helmet", "tritanium_chestplate", "tritanium_leggings", "tritanium_boots", "data_pad"]}
+    "tritanium_helmet", "tritanium_chestplate", "tritanium_leggings", "tritanium_boots", "data_pad", "contract"]}
 ITEMS.update({n: (n, "handheld") for n in ["tritanium_sword", "tritanium_pickaxe", "tritanium_axe", "tritanium_hoe",
                                             "tritanium_wrench"]})
 UPGRADES = ["base", "speed", "power", "failsafe", "range", "power_storage", "hyper_speed", "matter_storage"]
@@ -506,12 +506,16 @@ def quad(frm, to, uv, tex, cull=None):
 screen = [quad([0, 8, 10.99], [8, 16, 10.99], [0, 0, 2, 2], "#screen"), quad([8, 8, 10.99], [16, 16, 10.99], [14, 0, 16, 2], "#screen"),
           quad([0, 0, 10.99], [8, 8, 10.99], [0, 14, 2, 16], "#screen"), quad([8, 0, 10.99], [16, 8, 10.99], [14, 14, 16, 16], "#screen"),
           quad([4, 4, 10.9], [12, 12, 10.9], [0, 0, 16, 16], "#holo")]
+# 1.7.10 TileEntityRendererMonitor tinted the holo COLOR_HOLO * 0.7 (169,226,251 -> 0x769EAF); tint 0 = block colour
+screen[-1]["faces"]["north"]["tintindex"] = 0
+HOLO_TINT = [{"type": "minecraft:constant", "value": 0xFF769EAF - (1 << 32)}]
 body = {"from": [0, 0, 11], "to": [16, 16, 16], "faces": {d: {"texture": "#base"} for d in ["south", "east", "west", "up", "down"]}
         | {"south": {"texture": "#port"}}}
 w(A / "models/block/pattern_monitor.json", {"parent": "minecraft:block/block", "render_type": "minecraft:cutout", "textures": {
     "base": f"{MOD}:block/base", "port": f"{MOD}:block/network_port", "screen": f"{MOD}:block/holo_monitor",
     "holo": f"{MOD}:block/pattern_monitor_holo", "particle": f"{MOD}:block/base"}, "elements": [body] + screen})
 facing_blockstate("pattern_monitor", f"{MOD}:block/pattern_monitor")
+w(A / "items/pattern_monitor.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:block/pattern_monitor", "tints": HOLO_TINT}})
 
 for tex in ["refresh", "request"]:
     cp(ref / "textures/gui/items" / f"{tex}.png", A / "textures/gui/elements" / f"{tex}.png")
@@ -1197,6 +1201,23 @@ w(GUI / "sprites/guide_group.png.mcmeta", {"gui": {"scaling": {"type": "nine_sli
 for icon in ["home_icon", "ammo", "android_slot_arms", "list", "grid", "sort_random", "page_icon_search"]:
     cp(ref / "textures/gui/items" / f"{icon}.png", A / "textures/gui/holo" / f"{icon}.png")
 
+# --- phase 7q: contract market ------------------------------------------------------------------------------
+# 1.7.10 BlockContractMarket is a BlockMonitor like the pattern monitor; its TESR drew contract_station_holo
+cp(ref / "textures/blocks/contract_station_holo.png", A / "textures/block/contract_station_holo.png")
+# 1.7.10 GuiQuestPreview background
+cp(ref / "textures/gui/contract.png", A / "textures/gui/contract.png")
+w(A / "models/block/contract_market.json", {"parent": "minecraft:block/block", "render_type": "minecraft:cutout", "textures": {
+    "base": f"{MOD}:block/base", "port": f"{MOD}:block/base", "screen": f"{MOD}:block/holo_monitor",
+    "holo": f"{MOD}:block/contract_station_holo", "particle": f"{MOD}:block/base"}, "elements": [body] + screen})
+facing_blockstate("contract_market", f"{MOD}:block/contract_market")
+w(A / "items/contract_market.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:block/contract_market", "tints": HOLO_TINT}})
+w(D / "loot_table/blocks/contract_market.json", self_drop("contract_market"))
+for tag in ["mineable/pickaxe", "needs_iron_tool"]:
+    p = TAGS / f"minecraft/tags/block/{tag}.json"
+    w(p, {"values": json.loads(p.read_text())["values"] + [mid("contract_market")]})
+shaped("contract_market", mid("contract_market"), [" T ", "GEG", " M "],
+       {"T": mid("tritanium_ingot"), "G": "minecraft:gold_ingot", "E": "minecraft:emerald", "M": mid("machine_casing")})
+
 # --- phase 7b: mobs -----------------------------------------------------------------------------------------
 import zlib
 
@@ -1665,10 +1686,12 @@ for desert in (False, True):
         f.write(nbt_bytes(house_template(desert)))
 # the crate's colour (1.7.10 picked a random crate), plains houses also get the village moss
 w(D / "worldgen/processor_list/mad_scientist_house.json", {"processors": [{"processor_type": f"{MOD}:random_crate"},
+    {"processor_type": f"{MOD}:mad_scientist_crate"},
     {"processor_type": "minecraft:rule", "rules": [{"input_predicate": {"predicate_type": "minecraft:random_block_match",
         "block": "minecraft:cobblestone", "probability": 0.1}, "location_predicate": {"predicate_type": "minecraft:always_true"},
         "output_state": {"Name": "minecraft:mossy_cobblestone"}}]}]})
-w(D / "worldgen/processor_list/mad_scientist_house_desert.json", {"processors": [{"processor_type": f"{MOD}:random_crate"}]})
+w(D / "worldgen/processor_list/mad_scientist_house_desert.json", {"processors": [{"processor_type": f"{MOD}:random_crate"},
+    {"processor_type": f"{MOD}:mad_scientist_crate"}]})
 
 # --- lang ------------------------------------------------------------------------------------
 def parse_lang(p):
@@ -1717,6 +1740,11 @@ GUI_KEYS = {
     "item.matteroverdrive.matter_scanner": {"en_us": "Matter Scanner", "ru_ru": "Сканер материи"},
     "block.matteroverdrive.transporter": {"en_us": "Transporter", "ru_ru": "Транспортер"},
     "block.matteroverdrive.android_spawner": "tile.android_spawner.name",
+    "block.matteroverdrive.contract_market": {"en_us": "Contract Market", "ru_ru": "Рынок контрактов"},
+    "gui.matteroverdrive.contract_market.next_quest": "gui.time_until_next_quest",
+    "gui.matteroverdrive.contract.accept": "gui.label.accept",
+    "gui.matteroverdrive.contract.accept_tooltip": "gui.tooltip.quest.accept",
+    "gui.matteroverdrive.contract.rewards": {"en_us": "Rewards:", "ru_ru": "Награды:"},
     "gui.matteroverdrive.android_spawner.kill_all": {"en_us": "Kill All", "ru_ru": "Убить всех"},
     "gui.matteroverdrive.android_spawner.next_spawn": {"en_us": "Time to next spawn: %s", "ru_ru": "До появления: %s"},
     "gui.matteroverdrive.android_spawner.no_team": {"en_us": "No such scoreboard team", "ru_ru": "Такой команды нет"},

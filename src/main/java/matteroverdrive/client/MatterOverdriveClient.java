@@ -42,6 +42,9 @@ public class MatterOverdriveClient {
             event.register((state, level, pos, tint) -> rgb, matteroverdrive.init.MODecorative.COLORED_PLATES.get(i).get());
             event.register((state, level, pos, tint) -> tint == 0 ? rgb : -1, matteroverdrive.init.MOBlocks.TRITANIUM_CRATES.get(i).get());
         }
+        // 1.7.10 TileEntityRendererMonitor: the monitors' holo drawn in COLOR_HOLO * 0.7
+        event.register((state, level, pos, tint) -> tint == 0 ? 0xFF769EAF : -1,
+                matteroverdrive.init.MOBlocks.PATTERN_MONITOR.get(), matteroverdrive.init.MOBlocks.CONTRACT_MARKET.get());
     }
 
     public MatterOverdriveClient() {
@@ -53,6 +56,9 @@ public class MatterOverdriveClient {
         // 1.7.10 AndroidPlayer.playTransformMusic
         matteroverdrive.quest.PlayerQuests.clientUpdated = matteroverdrive.client.quest.QuestHud::onSync;
         matteroverdrive.network.GuideRecipePayload.onGrid = matteroverdrive.client.guide.GuideRecipes::receive;
+        matteroverdrive.item.ContractItem.openScreen = hand -> net.minecraft.client.Minecraft.getInstance().setScreen(
+                new matteroverdrive.client.quest.ContractScreen(hand));
+        matteroverdrive.item.ContractItem.clientPlayer = () -> net.minecraft.client.Minecraft.getInstance().player;
         matteroverdrive.item.DataPadItem.openScreen = hand -> net.minecraft.client.Minecraft.getInstance().setScreen(
                 new matteroverdrive.client.quest.DataPadScreen(hand));
         matteroverdrive.dialog.DialogPayloads.openScreen = npc -> net.minecraft.client.Minecraft.getInstance().setScreen(
@@ -91,6 +97,7 @@ public class MatterOverdriveClient {
         event.register(MOMenus.FUSION_REACTOR.get(), FusionReactorScreen::new);
         event.register(MOMenus.TRANSPORTER.get(), matteroverdrive.client.screen.TransporterScreen::new);
         event.register(MOMenus.ANDROID_SPAWNER.get(), matteroverdrive.client.screen.AndroidSpawnerScreen::new);
+        event.register(MOMenus.CONTRACT_MARKET.get(), matteroverdrive.client.screen.ContractMarketScreen::new);
     }
 
     @SubscribeEvent

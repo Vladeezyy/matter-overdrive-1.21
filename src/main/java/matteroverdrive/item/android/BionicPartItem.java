@@ -32,8 +32,19 @@ public class BionicPartItem extends Item {
         this.glitch = glitch;
     }
 
-    public double glitchBonus() {
-        return glitch;
+    /** 1.7.10 BionicPart.loadCustomAttributes: a part's own bonuses replace the defaults (the Hardened Tritanium Spine). */
+    public record Stats(double health, double glitch) {
+        public static final com.mojang.serialization.Codec<Stats> CODEC = com.mojang.serialization.codecs.RecordCodecBuilder.create(i -> i.group(
+                com.mojang.serialization.Codec.DOUBLE.fieldOf("health").forGetter(Stats::health),
+                com.mojang.serialization.Codec.DOUBLE.fieldOf("glitch").forGetter(Stats::glitch)).apply(i, Stats::new));
+        public static final net.minecraft.network.codec.StreamCodec<io.netty.buffer.ByteBuf, Stats> STREAM_CODEC =
+                net.minecraft.network.codec.StreamCodec.composite(net.minecraft.network.codec.ByteBufCodecs.DOUBLE, Stats::health,
+                        net.minecraft.network.codec.ByteBufCodecs.DOUBLE, Stats::glitch, Stats::new);
+    }
+
+    public double glitchBonus(ItemStack stack) {
+        Stats custom = stack.get(matteroverdrive.init.MODataComponents.BIONIC_STATS.get());
+        return custom != null ? custom.glitch() : glitch;
     }
 
     /** The android slot it fits: {@link matteroverdrive.android.AndroidData#SLOT_HEAD} etc. */
@@ -42,8 +53,9 @@ public class BionicPartItem extends Item {
     }
 
     /** 1.7.10 getModifiers: max health +1 (one modifier per slot so parts stack). */
-    public double maxHealthBonus() {
-        return health;
+    public double maxHealthBonus(ItemStack stack) {
+        Stats custom = stack.get(matteroverdrive.init.MODataComponents.BIONIC_STATS.get());
+        return custom != null ? custom.health() : health;
     }
 
     public static ResourceLocation modifierId(int slot) {
@@ -53,10 +65,10 @@ public class BionicPartItem extends Item {
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
         if (slot < 4) tooltip.accept(Component.translatable("item." + MatterOverdrive.MODID + ".rogue_android_part.melee").withStyle(ChatFormatting.GOLD));
-        tooltip.accept(Component.translatable("attribute.name.max_health").append(": +" + (int) maxHealthBonus()).withStyle(ChatFormatting.GREEN));
-        if (glitch != 0) {
+        tooltip.accept(Component.translatable("attribute.name.max_health").append(": +" + (int) maxHealthBonus(stack)).withStyle(ChatFormatting.GREEN));
+        if (glitchBonus(stack) != 0) {
             tooltip.accept(Component.translatable("attribute.name." + MatterOverdrive.MODID + ".android_glitch_time")
-                    .append(": " + Math.round((1 + glitch) * 100) + "%").withStyle(ChatFormatting.GREEN));
+                    .append(": " + Math.round((1 + glitchBonus(stack)) * 100) + "%").withStyle(ChatFormatting.GREEN));
         }
     }
 }

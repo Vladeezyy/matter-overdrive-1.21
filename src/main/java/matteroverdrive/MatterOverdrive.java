@@ -75,6 +75,7 @@ public class MatterOverdrive {
         machine(event, MOBlockEntities.RECYCLER.get());
         machine(event, MOBlockEntities.ANALYZER.get());
         machine(event, MOBlockEntities.TRANSPORTER.get());
+        event.registerBlockEntity(Capabilities.Item.BLOCK, MOBlockEntities.CONTRACT_MARKET.get(), (be, side) -> be.getInventory().automation());
         machine(event, MOBlockEntities.PATTERN_STORAGE.get());
         machine(event, MOBlockEntities.REPLICATOR.get());
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, MOBlockEntities.MATTER_PIPE.get(), (pipe, side) -> pipe.getTank());

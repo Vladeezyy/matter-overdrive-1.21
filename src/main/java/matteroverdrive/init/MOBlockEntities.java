@@ -80,5 +80,9 @@ public final class MOBlockEntities {
             BLOCK_ENTITIES.register("android_spawner", () -> new BlockEntityType<>(matteroverdrive.block.entity.AndroidSpawnerBlockEntity::new,
                     MOBlocks.ANDROID_SPAWNER.get()));
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<matteroverdrive.block.entity.ContractMarketBlockEntity>> CONTRACT_MARKET =
+            BLOCK_ENTITIES.register("contract_market", () -> new BlockEntityType<>(matteroverdrive.block.entity.ContractMarketBlockEntity::new,
+                    MOBlocks.CONTRACT_MARKET.get()));
+
     private MOBlockEntities() {}
 }

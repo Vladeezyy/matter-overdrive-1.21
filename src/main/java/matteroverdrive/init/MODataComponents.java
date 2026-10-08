@@ -51,6 +51,15 @@ public final class MODataComponents {
             COMPONENTS.registerComponentType("decompose_list", b -> b.persistent(net.minecraft.core.registries.BuiltInRegistries.ITEM.byNameCodec().listOf())
                     .networkSynchronized(ByteBufCodecs.registry(Registries.ITEM).apply(ByteBufCodecs.list())));
 
+    /** Bionic part bonuses replacing the item's defaults (1.7.10 CustomAttributes). */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<matteroverdrive.item.android.BionicPartItem.Stats>> BIONIC_STATS =
+            COMPONENTS.registerComponentType("bionic_stats", b -> b.persistent(matteroverdrive.item.android.BionicPartItem.Stats.CODEC)
+                    .networkSynchronized(matteroverdrive.item.android.BionicPartItem.Stats.STREAM_CODEC));
+    /** A contract's quest (1.7.10 Contract NBT = the QuestStack). */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<matteroverdrive.quest.QuestStack>> CONTRACT_QUEST =
+            COMPONENTS.registerComponentType("contract_quest", b -> b.persistent(matteroverdrive.quest.QuestStack.CODEC)
+                    .networkSynchronized(net.minecraft.network.codec.ByteBufCodecs.fromCodecWithRegistries(matteroverdrive.quest.QuestStack.CODEC)));
+
     /** Data Pad: screen state (page, selected quest, scroll) and the mad scientist's scan settings. */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<matteroverdrive.item.DataPadItem.State>> DATA_PAD =
             COMPONENTS.registerComponentType("data_pad", b -> b.persistent(matteroverdrive.item.DataPadItem.State.CODEC)

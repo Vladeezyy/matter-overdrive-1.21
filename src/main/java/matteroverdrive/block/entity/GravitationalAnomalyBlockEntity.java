@@ -231,6 +231,10 @@ public class GravitationalAnomalyBlockEntity extends BlockEntity {
             } else {
                 living.hurtServer(level, level.damageSources().source(BLACK_HOLE), strength);
             }
+            // 1.7.10 MOEventGravitationalAnomalyConsume.Post ("The belly of the beast")
+            if (living instanceof Player player) {
+                matteroverdrive.quest.QuestEvents.onEvent(player, new matteroverdrive.quest.QuestEvents.AnomalyConsume(getBlockPos()));
+            }
         }
         setChanged();
     }

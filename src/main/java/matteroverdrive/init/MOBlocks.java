@@ -120,6 +120,11 @@ public final class MOBlocks {
             matteroverdrive.block.TransporterBlock::new, p -> p.mapColor(MapColor.METAL).strength(20f, 9f).sound(SoundType.METAL)
                     .requiresCorrectToolForDrops());
 
+    /** 1.7.10 BlockContractMarket: a BlockMonitor, hardness 20. */
+    public static final DeferredBlock<matteroverdrive.block.ContractMarketBlock> CONTRACT_MARKET = BLOCKS.registerBlock("contract_market",
+            matteroverdrive.block.ContractMarketBlock::new, p -> p.mapColor(MapColor.METAL).strength(20f, 9f).sound(SoundType.METAL)
+                    .requiresCorrectToolForDrops().noOcclusion().lightLevel(s -> 8));
+
     /** 1.7.10 BlockAndroidSpawner: unbreakable (hardness -1). */
     public static final DeferredBlock<matteroverdrive.block.AndroidSpawnerBlock> ANDROID_SPAWNER = BLOCKS.registerBlock("android_spawner",
             matteroverdrive.block.AndroidSpawnerBlock::new, p -> p.mapColor(MapColor.METAL).strength(-1f, 3600000f).sound(SoundType.METAL)

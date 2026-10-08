@@ -16,8 +16,7 @@ import net.minecraft.world.level.ItemLike;
 
 /**
  * 1.7.10 MatterOverdriveGuides + MatterOverdriveGuide: the three categories and their entries at the 1.7.10 grid
- * positions (18 + x * 28, 16 + y * 28). Entries for things not ported yet (contract, contract market, security protocol)
- * are left out until they exist.
+ * positions (18 + x * 28, 16 + y * 28). The security protocol entry comes with the security protocol.
  */
 public final class Guides {
     public record Category(String name, String icon, List<GuideEntry> entries) {}
@@ -45,6 +44,7 @@ public final class Guides {
         add(general, block(MOBlocks.TRANSPORTER.get()), "machines", 0, 3);
         add(general, block(MOBlocks.HOLO_SIGN.get()), "machines", 1, 3);
         add(general, block(MOBlocks.INSCRIBER.get()), "machines", 0, 4);
+        add(general, block(MOBlocks.CONTRACT_MARKET.get()), "machines", 1, 4);
         add(general, named("fusion_reactor", MOBlocks.FUSION_REACTOR_CONTROLLER.get(), MOBlocks.FUSION_REACTOR_COIL.get(),
                 matteroverdrive.init.MODecorative.FORCE_GLASS.get(), MOBlocks.FUSION_REACTOR_IO.get()), "power", 3, 3);
         add(general, block(MOBlocks.GRAVITATIONAL_ANOMALY.get()), "power", 4, 3);
@@ -66,6 +66,7 @@ public final class Guides {
         add(general, named("food", MOItems.EMERGENCY_RATION.get()), "items", 4, 6);
         add(general, item(MOItems.TRITANIUM_WRENCH.get()), "items", 0, 7);
         add(general, item(MOItems.TRANSPORT_FLASH_DRIVE.get()), "items", 1, 7);
+        add(general, item(MOItems.CONTRACT.get()), "items", 2, 7);
         add(weapons, item(MOItems.PHASER.get()), "weapons", 4, 0);
         add(weapons, item(MOItems.PHASER_RIFLE.get()), "weapons", 5, 0);
         add(weapons, item(MOItems.OMNI_TOOL.get()), "weapons", 6, 0);

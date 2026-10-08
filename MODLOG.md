@@ -363,6 +363,22 @@
   - Deviations: the depth infogram uses a scissor instead of a stencil; recipes are drawn by their real width
     (1.7.10 packed narrow shaped recipes into the 3x3 grid row-first); no contract / contract market / security
     protocol entries yet (shortcodes to them drop out of the text, like unknown items did in 1.7.10).
+- **7q ✅** Contract market + contracts (1.7.10 TileEntityMachineContractMarket, Contract, GuiQuestPreview, quests/).
+  `Quest` grew the 1.7.10 Quest API (generate / initQuestStack / onTaken / onEvent / onCompleted / rewards) with
+  `Quest.RandomText` (random title + info variation) and `Quest.Multi` (sequential objectives); `AbstractLogic` +
+  logics `KillCreatureLogic`, `RandomItemLogic`, `CollectItemLogic`, `CraftLogic`, `MineLogic` (deepslate ores count),
+  `SingleEventLogic`, `ScanBlockLogic`. Contracts: kill_androids, sacrifice, department_of_agriculture, weapons_of_war,
+  one_true_love, is_it_really_me (transporter), beast_belly (gravitational anomaly) with the 1.7.10 generation weights;
+  gmo (Multi: scan 24 carrots, then 24 potatoes with a destroying Data Pad) rewards a hardened tritanium spine
+  (`bionic_stats` +5 max health, custom name). `ContractItem` (`contract_quest` component; right click = preview
+  `ContractScreen` with Accept), `ContractMarketBlock` (monitor model with contract_station_holo; 18 contract slots,
+  a new contract every 30 min + 5 min per filled slot, never a duplicate; screen shows "Next Quest in"). The mad
+  scientist house crate (`MadScientistCrateProcessor`) holds the GMO contract + "Mad Scientist's Data Pad" (scan-only,
+  destroys). The transporter and anomaly fire quest events. Guide entries contract_market / contract. The monitors'
+  holo (pattern monitor too) is now tinted COLOR_HOLO * 0.7 like 1.7.10 TileEntityRendererMonitor (block colour,
+  tintindex 0). 83 GameTests.
+  - Deviations: the holo is a static model quad (1.7.10 TESR); still no crash_landing / we_must_know contracts (need
+    the security protocol, 7r).
 - Cloud (Linux) notes: regenerating resources rewrites the .ogg and ffmpeg-made .png bytes (different ffmpeg/oggenc
   builds) - `git checkout` them. Screenshots: `Xvfb :99` + `DISPLAY=:99 ./gradlew runScene` (software GL is slow; give
   menus extra ticks), world created by `runServer` with a flat creative server.properties, then moved to run/saves;
@@ -374,8 +390,8 @@
 2. ~~Mutant scientist~~ ✅ 7d (underwater base spawns one named "Mitko'Urrr", persistent, on the star map block).
 3. ~~Structures~~ ✅ 7f (the mad scientist house is a village piece: comes with the mad scientist in item 5).
 4. ~~Transporter, omni tool, matter scanner, portable decomposer, matter container, microwave~~ ✅ 7g-7k.
-5. Star map / galaxy / ships / buildings / quests / dialogs / contract market; mad scientist villager (dialog + trades:
-   TradeHandlerMadScientist); android spawner ✅ 7l.
+5. Star map / galaxy / ships / buildings; quests / dialogs / mad scientist ✅ 7m-7p, contract market ✅ 7q, android
+   spawner ✅ 7l. Next: 7r security protocol + crash_landing / we_must_know contracts (crashed ship contract).
 - Deviations so far: legendary rogue android parts drop without bonus attributes; no rogue android teams/paths;
   legendary weapons have no stat bonuses; buildings: star map → holo matrix stand-in (swap STAR_MAP in
   gen_resources.py when ported), no crashed-ship quest contract, underwater base needs 16+ water (1.7.10: 27+, rare in today's deep
@@ -386,7 +402,7 @@
 **Workflow**
 - Resources: never hand-edit `src/main/resources/{assets,data}` — regenerate:
   `rm -rf src/main/resources/{assets,data} && python3 -I tools/gen_resources.py ~/mo-reference/mo-1.7.10/src/main/resources/assets/mo src/main/resources`
-- Tests: `./gradlew runGameTestServer` (73 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
+- Tests: `./gradlew runGameTestServer` (83 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
   `FunctionGameTestInstance`, custom 12³ structure `matteroverdrive:gametest_area`, time-of-day via `TestEnvironmentDefinition.TimeOfDay`,
   `makeMockServerPlayerInLevel`). Visual: `./gradlew runScene` → `run/screenshots/scene_*.png` (DevScene, world `run/saves/mo_scene`;
   pristine copy = "Новый мир (2)"; needs `pauseOnLostFocus=false`; selected hotbar slot is client-side; place blocks with

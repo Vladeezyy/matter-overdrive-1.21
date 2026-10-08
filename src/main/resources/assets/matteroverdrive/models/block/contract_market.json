@@ -3,9 +3,9 @@
   "render_type": "minecraft:cutout",
   "textures": {
     "base": "matteroverdrive:block/base",
-    "port": "matteroverdrive:block/network_port",
+    "port": "matteroverdrive:block/base",
     "screen": "matteroverdrive:block/holo_monitor",
-    "holo": "matteroverdrive:block/pattern_monitor_holo",
+    "holo": "matteroverdrive:block/contract_station_holo",
     "particle": "matteroverdrive:block/base"
   },
   "elements": [

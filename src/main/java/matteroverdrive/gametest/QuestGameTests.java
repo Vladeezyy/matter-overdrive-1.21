@@ -195,8 +195,8 @@ final class QuestGameTests {
         check(helper, grid != null && grid.size() == 9 && grid.stream().anyMatch(slot -> !slot.isEmpty()), "no decomposer recipe " + grid);
         var dataPad = matteroverdrive.network.GuideRecipePayload.find(player, MOItems.DATA_PAD.get());
         check(helper, dataPad != null && dataPad.get(0).stream().anyMatch(s -> s.is(Items.BOOK)), "data pad shapeless recipe " + dataPad);
-        // not ported yet: the contract, contract market and security protocol
-        var missing = java.util.Set.of("contract", "contract_market", "security_protocol");
+        // not ported yet: the security protocol
+        var missing = java.util.Set.of("security_protocol");
         var shortcode = java.util.regex.Pattern.compile("\\[(?:item|block)([^\\]]*)\\]");
         int files = 0;
         java.util.Set<String> unknown = new java.util.TreeSet<>();

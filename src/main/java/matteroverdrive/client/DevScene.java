@@ -763,7 +763,49 @@ public final class DevScene {
         at(2286, mc -> mc.setScreen(new matteroverdrive.client.quest.DataPadScreen(net.minecraft.world.InteractionHand.MAIN_HAND)));
         at(2294, mc -> shot(mc, "data_pad_quests_2"));
         at(2298, mc -> mc.setScreen(null));
-        at(2301, mc -> mc.stop());
+        // 7q: a contract market with a few contracts, its screen, a contract's preview screen and the block in the world
+        at(2302, mc -> server(mc, p -> {
+            BlockPos base = origin.above(30);
+            for (BlockPos pos : BlockPos.betweenClosed(base.offset(-8, -1, -14), base.offset(8, 5, 2))) {
+                p.level().setBlock(pos, pos.getY() < base.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
+                        Block.UPDATE_CLIENTS | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
+            }
+            p.level().getEntitiesOfClass(net.minecraft.world.entity.Mob.class, new AABB(base).inflate(20)).forEach(e -> e.discard());
+            BlockPos market = base.offset(0, 0, -3);
+            p.level().setBlockAndUpdate(market, matteroverdrive.init.MOBlocks.CONTRACT_MARKET.get().defaultBlockState()
+                    .setValue(matteroverdrive.machine.MachineBlock.FACING, net.minecraft.core.Direction.SOUTH));
+            if (p.level().getBlockEntity(market) instanceof matteroverdrive.block.entity.ContractMarketBlockEntity m) {
+                var quests = List.of(matteroverdrive.quest.Quests.KILL_ANDROIDS, matteroverdrive.quest.Quests.SACRIFICE,
+                        matteroverdrive.quest.Quests.DEPARTMENT_OF_AGRICULTURE, matteroverdrive.quest.Quests.WEAPONS_OF_WAR,
+                        matteroverdrive.quest.Quests.ONE_TRUE_LOVE, matteroverdrive.quest.Quests.IS_IT_REALLY_ME,
+                        matteroverdrive.quest.Quests.BEAST_BELLY);
+                for (int i = 0; i < quests.size(); i++) {
+                    m.getInventory().setStack(i, matteroverdrive.item.ContractItem.of(quests.get(i).generate(p.level().random)));
+                }
+                m.addGenerationDelay();
+            }
+            p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() + 0.5, Set.of(), 180f, 20f, false);
+        }));
+        at(2310, mc -> server(mc, p -> {
+            BlockPos market = origin.above(30).offset(0, 0, -3);
+            if (p.level().getBlockEntity(market) instanceof matteroverdrive.block.entity.ContractMarketBlockEntity m) {
+                p.openMenu(m, buf -> buf.writeBlockPos(market));
+            }
+        }));
+        at(2320, mc -> shot(mc, "contract_market"));
+        at(2321, mc -> server(mc, ServerPlayer::closeContainer));
+        at(2324, mc -> server(mc, p -> p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,
+                matteroverdrive.item.ContractItem.of(matteroverdrive.quest.Quests.KILL_ANDROIDS.generate(p.level().random)))));
+        at(2330, mc -> mc.setScreen(new matteroverdrive.client.quest.ContractScreen(net.minecraft.world.InteractionHand.MAIN_HAND)));
+        at(2338, mc -> shot(mc, "contract_screen"));
+        at(2339, mc -> mc.setScreen(null));
+        at(2342, mc -> server(mc, p -> p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,
+                matteroverdrive.item.ContractItem.of(matteroverdrive.quest.Quests.GMO.generate(p.level().random)))));
+        at(2348, mc -> mc.setScreen(new matteroverdrive.client.quest.ContractScreen(net.minecraft.world.InteractionHand.MAIN_HAND)));
+        at(2356, mc -> shot(mc, "contract_screen_gmo"));
+        at(2357, mc -> mc.setScreen(null));
+        at(2362, mc -> shot(mc, "contract_market_world"));
+        at(2366, mc -> mc.stop());
     }
 
     private static void at(int t, Consumer<Minecraft> action) {

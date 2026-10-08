@@ -185,6 +185,10 @@ public class TransporterBlockEntity extends MachineBlockEntity {
                 Entity e = entities.get(i);
                 e.teleportTo(level, to.x, to.y, to.z, Relative.union(Relative.ROTATION), e.getYRot(), e.getXRot(), true);
                 e.resetFallDistance();
+                // 1.7.10 MOEventTransport ("Is it really me?")
+                if (e instanceof net.minecraft.world.entity.player.Player player) {
+                    matteroverdrive.quest.QuestEvents.onEvent(player, new matteroverdrive.quest.QuestEvents.Transport(getBlockPos(), target.pos()));
+                }
             }
             level.playSound(null, getBlockPos(), MOSounds.TRANSPORTER.get(), SoundSource.BLOCKS, 0.5f, 1);
             level.playSound(null, target.pos(), MOSounds.TRANSPORTER.get(), SoundSource.BLOCKS, 0.5f, 1);

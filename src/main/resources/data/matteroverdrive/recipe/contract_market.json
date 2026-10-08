@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " T ",
+    "GEG",
+    " M "
+  ],
+  "key": {
+    "T": "matteroverdrive:tritanium_ingot",
+    "G": "minecraft:gold_ingot",
+    "E": "minecraft:emerald",
+    "M": "matteroverdrive:machine_casing"
+  },
+  "result": {
+    "id": "matteroverdrive:contract_market",
+    "count": 1
+  }
+}

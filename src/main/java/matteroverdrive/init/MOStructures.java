@@ -24,5 +24,9 @@ public final class MOStructures {
             net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType<matteroverdrive.world.RandomCrateProcessor>> RANDOM_CRATE =
             PROCESSORS.register("random_crate", () -> () -> matteroverdrive.world.RandomCrateProcessor.CODEC);
 
+    public static final DeferredHolder<net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType<?>,
+            net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType<matteroverdrive.world.MadScientistCrateProcessor>> MAD_SCIENTIST_CRATE =
+            PROCESSORS.register("mad_scientist_crate", () -> () -> matteroverdrive.world.MadScientistCrateProcessor.CODEC);
+
     private MOStructures() {}
 }
