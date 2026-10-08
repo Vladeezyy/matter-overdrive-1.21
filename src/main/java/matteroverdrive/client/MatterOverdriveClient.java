@@ -13,6 +13,15 @@ import matteroverdrive.init.MOFluids;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
+import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.world.item.ItemStack;
+import matteroverdrive.init.MOItems;
 import matteroverdrive.client.screen.SolarPanelScreen;
 import matteroverdrive.init.MOMenus;
 import net.neoforged.api.distmarker.Dist;
@@ -56,5 +65,21 @@ public class MatterOverdriveClient {
                 return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "block/matter_plasma_flowing");
             }
         }, MOFluids.MATTER_PLASMA_TYPE.get());
+        // 1.7.10 weapons stayed raised while firing; vanilla drops the hand after every successful use (itemUsed)
+        event.registerItem(new IClientItemExtensions() {
+            @Override
+            public boolean applyForgeHandTransform(PoseStack pose, LocalPlayer player, HumanoidArm arm, ItemStack stack,
+                                                   float partialTick, float equipProgress, float swingProgress) {
+                if (!player.isUsingItem() || player.getUseItem().getItem() != stack.getItem()) return false;
+                pose.translate(arm == HumanoidArm.RIGHT ? 0.56f : -0.56f, -0.52f, -0.72f);
+                return true;
+            }
+
+            /** Aim the weapon down the line of sight while firing or zooming, as seen by other players. */
+            @Override
+            public HumanoidModel.ArmPose getArmPose(LivingEntity entity, InteractionHand hand, ItemStack stack) {
+                return entity.isUsingItem() && entity.getUsedItemHand() == hand ? HumanoidModel.ArmPose.BOW_AND_ARROW : null;
+            }
+        }, MOItems.PHASER.get(), MOItems.PHASER_RIFLE.get(), MOItems.PLASMA_SHOTGUN.get(), MOItems.ION_SNIPER.get());
     }
 }

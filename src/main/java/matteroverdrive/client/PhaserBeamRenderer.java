@@ -56,7 +56,7 @@ public final class PhaserBeamRenderer {
                 || !(player.getUseItem().getItem() instanceof PhaserItem phaser)) return;
         double distance = PhaserItem.trace(mc.level, player, phaser.getRange(player.getUseItem())).getLocation()
                 .distanceTo(player.getEyePosition(event.getPartialTick()));
-        Vec3 start = new Vec3(0.28, -0.22, -0.7);
+        Vec3 start = new Vec3(0.36, -0.16, -0.7);
         Vec3 end = new Vec3(0, 0, -distance);
         submit(event.getSubmitNodeCollector(), event.getPoseStack(), start, end, Vec3.ZERO, phaser, player);
     }
@@ -65,7 +65,7 @@ public final class PhaserBeamRenderer {
         long time = player.level().getGameTime();
         float pulse = 0.5f + (float) (1 + Math.sin(time * 0.5)) * 0.25f;
         int color = ARGB.color(Math.round(255 * pulse), phaser.getColor(player.getUseItem()));
-        RenderType type = RenderType.energySwirl(BEAM, time * -0.05f % 1, 0);
+        RenderType type = RenderType.energySwirl(BEAM, 0, 0);
         collector.submitCustomGeometry(pose, type, (p, vc) -> ribbon(vc, p, start, end, camera, color));
     }
 
@@ -73,11 +73,11 @@ public final class PhaserBeamRenderer {
     private static void ribbon(VertexConsumer vc, PoseStack.Pose pose, Vec3 start, Vec3 end, Vec3 camera, int color) {
         Vec3 axis = end.subtract(start);
         Vec3 side = axis.cross(start.subtract(camera)).normalize().scale(WIDTH);
-        float length = (float) axis.length();
+        // plasmabeam.png runs vertically: u across the beam, v along it (textures clamp, so v stays in 0..1)
         vertex(vc, pose, start.add(side), color, 0, 0);
-        vertex(vc, pose, start.subtract(side), color, 0, 1);
-        vertex(vc, pose, end.subtract(side), color, length, 1);
-        vertex(vc, pose, end.add(side), color, length, 0);
+        vertex(vc, pose, start.subtract(side), color, 1, 0);
+        vertex(vc, pose, end.subtract(side), color, 1, 1);
+        vertex(vc, pose, end.add(side), color, 0, 1);
     }
 
     private static void vertex(VertexConsumer vc, PoseStack.Pose pose, Vec3 p, int color, float u, float v) {

@@ -131,20 +131,21 @@ public final class DevScene {
             p.getInventory().setItem(0, phaser);
             p.teleportTo(p.level(), p.getX(), p.getY(), p.getZ(), Set.of(), 180f, 25f, false);
         }));
-        at(452, mc -> shot(mc, "phaser_hand"));
-        at(453, mc -> mc.gameMode.useItem(mc.player, net.minecraft.world.InteractionHand.MAIN_HAND));
-        at(456, mc -> shot(mc, "phaser_beam"));
-        at(457, mc -> mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_BACK));
-        at(459, mc -> shot(mc, "phaser_beam_third"));
-        at(460, mc -> {
+        at(455, mc -> shot(mc, "phaser_hand"));
+        // hold the use key: the client releases item use every tick the key is up
+        at(456, mc -> mc.options.keyUse.setDown(true));
+        at(459, mc -> shot(mc, "phaser_beam"));
+        at(460, mc -> mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT));
+        at(462, mc -> shot(mc, "phaser_beam_third"));
+        at(463, mc -> {
             mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
-            mc.gameMode.releaseUsingItem(mc.player);
+            mc.options.keyUse.setDown(false);
         });
-        at(461, mc -> mc.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player)));
-        at(466, mc -> shot(mc, "inventory"));
-        at(468, mc -> mc.setScreen(null));
-        at(470, mc -> server(mc, p -> p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 35f, false)));
-        at(478, mc -> mc.stop());
+        at(464, mc -> mc.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player)));
+        at(469, mc -> shot(mc, "inventory"));
+        at(471, mc -> mc.setScreen(null));
+        at(473, mc -> server(mc, p -> p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 35f, false)));
+        at(481, mc -> mc.stop());
     }
 
     private static void at(int t, Consumer<Minecraft> action) {

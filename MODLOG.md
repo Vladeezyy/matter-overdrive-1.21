@@ -136,20 +136,18 @@
   Client: `WeaponClient` (attack key → `FireWeaponPayload`, FOV zoom), `PlasmaBoltRenderer`, `PhaserBeamRenderer`.
   All 47 GameTests passed before the beam renderer rewrite.
 
-### Open problems (start here)
-1. **Phaser beam is invisible.** Tried, all draw nothing on screen (event fires, verified by log):
-   a) `RenderLevelStageEvent.AfterParticles` + `renderBuffers().bufferSource()` with identity PoseStack + translate(-cam);
-   b) same with `pose.mulPose(event.getModelViewMatrix())`;
-   c) current code: `submitCustomGeometry` from `RenderPlayerEvent.Post` (pose = entity render origin) and `RenderHandEvent`
-      (camera space), `RenderType.energySwirl(plasmabeam.png, scroll, 0)`; screenshots `scene_phaser_beam*.png` still empty.
-   Ideas to check next: is `RenderHandEvent` fired for an item using a custom model / during use? Log inside the lambda to see
-   whether the geometry callback runs at all; try `RenderType.lightning()`/`entityTranslucentEmissive` and opaque colour to
-   rule out alpha/cull (quad winding: energySwirl has cull on → emit both windings); check `ARGB.color(alpha, rgb)` with rgb
-   that already has alpha 0 (getColor may return 0x00RRGGBB → fine, but verify not 0); check scroll uv (energySwirl uses
-   texture matrix offset). Look at vanilla `GuardianRenderer`/`BeaconRenderer` submitCustomGeometry usage as the template.
-2. Phaser first-person position while using drifts bottom-right — tune `display.firstperson_righthand` in
-   `tools/gen_resources.py` (`weapon_obj("phaser", ...)` display) after the beam works.
-3. Ask the user: 1.7.10 explosion barrel multiplies FIRE_RATE by 0.15 (almost no cooldown) — keep or fix?
+### 5b fixes ✅
+- Beam was invisible because the UVs were swapped: plasmabeam.png runs vertically (u across, v along); with u along the beam
+  the clamped sampler read the black edge column, and black is invisible with additive blending. Drawn via
+  `submitCustomGeometry` from `RenderPlayerEvent.Post` (world, relative to the player origin) and `RenderHandEvent` (camera space).
+- The scene's single `gameMode.useItem` call was released on the next tick (the client stops using when the use key is up):
+  hold `mc.options.keyUse.setDown(true)` instead.
+- Vanilla calls `itemInHandRenderer.itemUsed()` after every successful use, which dips the hand; weapons override
+  `IClientItemExtensions.applyForgeHandTransform` while using (no equip offset) and `getArmPose` → BOW_AND_ARROW.
+- The earlier "phaser drifts while firing" was the display itself (hold screenshot showed the previous item mid-swap);
+  phaser first-person translation is now [-1, 4, 1].
+- Resource generation is deterministic (oggenc `-s 1`, gzip mtime 0): regenerating no longer dirties git.
+- Open question for the user: 1.7.10 explosion barrel multiplies FIRE_RATE by 0.15 (almost no cooldown) — keep or fix?
 
 ### Remaining phase 5 (5c)
 - Barrel modules (damage/fire/explosion/heal, 1.7.10 recipes) and sniper scope (accuracy ×0.8, range ×1.5; recipe IIC/GFG/III).

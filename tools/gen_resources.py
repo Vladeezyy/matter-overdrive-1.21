@@ -663,8 +663,8 @@ weapon_obj("ion_sniper", "ion_sniper", "ion_sniper", 0.06)
 # 1.7.10 ItemRendererPhaser: phaser2.obj at scale 6; it drew the barrel part matching the barrel module (none for now).
 weapon_obj("phaser", "phaser2", "phaser2", 6.0, hidden=("weapon_module_barrel_damage", "weapon_module_barrel_explosion",
                                                         "weapon_module_barrel_fire", "weapon_module_barrel_heal"),
-           display={"firstperson_righthand": {"rotation": [0, 175, 0], "translation": [1, 1, 0], "scale": [0.75, 0.75, 0.75]},
-                    "firstperson_lefthand": {"rotation": [0, 185, 0], "translation": [1, 1, 0], "scale": [0.75, 0.75, 0.75]}})
+           display={"firstperson_righthand": {"rotation": [0, 175, 0], "translation": [-1, 4, 1], "scale": [0.75, 0.75, 0.75]},
+                    "firstperson_lefthand": {"rotation": [0, 185, 0], "translation": [-1, 4, 1], "scale": [0.75, 0.75, 0.75]}})
 cp(ref / "textures/fx/plasmabeam.png", A / "textures/fx/plasmabeam.png")
 
 def tinted_item(name, base, overlay, rgb):
@@ -699,7 +699,7 @@ for files in SOUNDS.values():
         wav = dst.with_suffix(".wav")
         subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(ref / "sounds" / f"{f}.ogg"), "-ac", "1", "-map_metadata", "-1",
                         "-fflags", "+bitexact", "-flags:a", "+bitexact", str(wav)], check=True)
-        subprocess.run(["oggenc", "-Q", "-q", "5", "-o", str(dst), str(wav)], check=True)
+        subprocess.run(["oggenc", "-Q", "-q", "5", "-s", "1", "-o", str(dst), str(wav)], check=True)
         wav.unlink()
 w(A / "sounds.json", {k: {"category": "player", "sounds": [f"{MOD}:{f}" for f in v]} for k, v in SOUNDS.items()})
 
@@ -774,7 +774,7 @@ EMPTY_STRUCTURE = bytes.fromhex(
 size_at = EMPTY_STRUCTURE.index(bytes.fromhex("0300000003")) + 5
 area = EMPTY_STRUCTURE[:size_at] + struct.pack(">3i", 12, 12, 12) + EMPTY_STRUCTURE[size_at + 12:]
 (D / "structure").mkdir(parents=True, exist_ok=True)
-with gzip.open(D / "structure/gametest_area.nbt", "wb") as f:
+with gzip.GzipFile(D / "structure/gametest_area.nbt", "wb", mtime=0) as f:
     f.write(area)
 
 
