@@ -43,3 +43,6 @@ repo/
 _original/
 *.jar
 !gradle/wrapper/gradle-wrapper.jar
+
+### Local notes ###
+CLAUDE.md

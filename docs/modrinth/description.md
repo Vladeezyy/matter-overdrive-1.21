@@ -105,7 +105,7 @@ If you played Matter Overdrive in 2015, it should feel exactly like you remember
 <summary><b>Differences from the 1.7.10 original</b></summary>
 
 The port follows the original closely; the few deliberate differences are listed in the
-[work log](https://github.com/Vladeezyy/matter-overdrive-1.21/blob/main-uvidhk/MODLOG.md). For example: there is no
+[work log](https://github.com/Vladeezyy/matter-overdrive-1.21/blob/main/MODLOG.md). For example: there is no
 config file yet, the machine pages are always-visible tabs instead of a collapsible side panel, and the ComputerCraft /
 OpenComputers integrations are not ported.
 
@@ -126,7 +126,6 @@ OpenComputers integrations are not ported.
 - **Matter Overdrive** — original mod, art, models, sounds and translations by **Simeon Radivoev** and the
   Matter Overdrive contributors ([source](https://github.com/simeonradivoev/MatterOverdrive)).
 - This port keeps the original assets and is licensed under **GPL-3.0-or-later**, the same as the original.
-- The port was written with the help of an AI coding assistant (Claude Code).
 
 <details>
 <summary><b>🇷🇺 На русском</b></summary>
