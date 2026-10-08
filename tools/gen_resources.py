@@ -847,6 +847,45 @@ for n in ["up_arrow", "black_circle"] + [f"android_slot_{p}" for p in PARTS + ["
          [f"biotic_stat_{s}" for s in ["teleport", "nanobots", "nano_armor", "floatation", "speed", "high_jump", "equalizer",
                                        "shield", "attack", "cloak", "nightvision", "minimap", "shockwave"]]:
     cp(ref / "textures/gui/items" / f"{n}.png", GUI / "elements" / f"{n}.png")
+# Charging station (6e): the 1.7.10 OBJ (base + rod, centred on x/z, 2.3 blocks high) on the bottom block only.
+cp(ref / "textures/blocks/charging_station.png", A / "textures/block/charging_station.png")
+obj_lines = ["mtllib charging_station.mtl"]
+for line in (ref / "models/block/charging_station.obj").read_text().splitlines():
+    if line.startswith("v "):
+        _, x, y, z = line.split()
+        line = f"v {float(x) + 0.5:.4f} {float(y):.4f} {float(z) + 0.5:.4f}"
+    elif line.startswith("g "):
+        line = line + "\nusemtl station"
+    elif line.startswith("usemtl") or line.startswith("mtllib"):
+        continue
+    obj_lines.append(line)
+(A / "models/block/charging_station.obj").write_text("\n".join(obj_lines) + "\n")
+(A / "models/block/charging_station.mtl").write_text("newmtl station\nmap_Kd #texture\n")
+w(A / "models/block/charging_station.json", {"loader": "neoforge:obj", "model": f"{MOD}:models/block/charging_station.obj",
+    "flip_v": True, "textures": {"texture": f"{MOD}:block/charging_station", "particle": f"{MOD}:block/base"}})
+w(A / "models/block/charging_station_part.json", {"textures": {"particle": f"{MOD}:block/base"}})
+w(A / "blockstates/charging_station.json", {"variants": {
+    f"active={a},facing={f},part={p}": ({"model": f"{MOD}:block/charging_station", "y": y} if p == 0 else {"model": f"{MOD}:block/charging_station_part"})
+    for f, y in FACING_Y.items() for a in ("false", "true") for p in (0, 1, 2)}})
+w(A / "items/charging_station.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:block/charging_station"}})
+w(D / "loot_table/blocks/charging_station.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "bonus_rolls": 0,
+    "entries": [{"type": "minecraft:item", "name": mid("charging_station"), "functions": [{"function": "minecraft:copy_components",
+        "source": "block_entity", "include": [mid("energy")]}]}],
+    "conditions": [{"condition": "minecraft:survives_explosion"}, {"condition": "minecraft:block_state_property",
+        "block": mid("charging_station"), "properties": {"part": "0"}}]}]})
+for tag in ["mineable/pickaxe", "needs_iron_tool"]:
+    p = TAGS / f"minecraft/tags/block/{tag}.json"
+    w(p, {"values": json.loads(p.read_text())["values"] + [mid("charging_station")]})
+shaped("charging_station", mid("charging_station"), [" F ", "EDR", "BMB"],
+       {"F": mid("forcefield_emitter"), "E": "minecraft:ender_eye", "D": DILITHIUM, "R": "minecraft:repeater",
+        "B": mid("hc_battery"), "M": mid("machine_casing")})
+
+# Android HUD (6d)
+for n in ["android_bg_element", "cloak_overlay", "spinner"]:
+    cp(ref / "textures/gui/elements" / f"{n}.png", GUI / "elements" / f"{n}.png")
+for n in ["android_feature_icon_bg", "android_feature_icon_bg_active", "health", "battery", "person", "ammo", "temperature"]:
+    cp(ref / "textures/gui/items" / f"{n}.png", GUI / "elements" / f"{n}.png")
+cp(ref / "textures/gui/glitch.png", GUI / "glitch.png")
 # 1.7.10 BioticStatFlashCooling used the "temperature" holo icon
 cp(ref / "textures/gui/items/temperature.png", GUI / "elements/biotic_stat_flash_cooling.png")
 
@@ -1006,6 +1045,7 @@ for src_name, dst_name in [("en_US", "en_us"), ("ru_RU", "ru_ru")]:
     lang[f"key.category.{MOD}.android"] = "Matter Overdrive"
     lang[f"key.{MOD}.ability_use"] = {"en_us": "Android Ability key", "ru_ru": "Способность андроида"}[dst_name]
     lang[f"key.{MOD}.ability_switch"] = {"en_us": "Android Switch Ability key", "ru_ru": "Выбор способности андроида"}[dst_name]
+    lang[f"block.{MOD}.charging_station"] = src.get("tile.charging_station.name") or en["tile.charging_station.name"]
     lang[f"block.{MOD}.android_station"] = src.get("tile.android_station.name") or en["tile.android_station.name"]
     for part in ["head", "arms", "legs", "chest"]:
         lang[f"item.{MOD}.rogue_android_part_{part}"] = src.get(f"item.rouge_android_part.{part}.name") or en[f"item.rouge_android_part.{part}.name"]

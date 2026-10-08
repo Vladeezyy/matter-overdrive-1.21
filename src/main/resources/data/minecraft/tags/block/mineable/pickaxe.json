@@ -22,6 +22,7 @@
     "matteroverdrive:fusion_reactor_io",
     "matteroverdrive:fusion_reactor_controller",
     "matteroverdrive:weapon_station",
-    "matteroverdrive:android_station"
+    "matteroverdrive:android_station",
+    "matteroverdrive:charging_station"
   ]
 }

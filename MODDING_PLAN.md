@@ -30,7 +30,7 @@ Each feature is rewritten against the 1.7.10 code as the spec and keeps its numb
    Matter Scanner and router/switch filters still to do.
 4. **Power endgame** ✅ — Gravitational anomaly (+ world gen) and stabilizer, space-time equalizer, Fusion reactor multiblock.
 5. **Weapons** ✅ — Phaser, Phaser Rifle, Plasma Shotgun, Ion Sniper, modules, Weapon Station, energy pack.
-6. **Androids** — player attachment for android state, biotic stats tree, Android Station, HUD, abilities,
+6. **Androids** ✅ — player attachment for android state, biotic stats tree, Android Station, HUD, abilities,
    charging station (it only charges androids).
 7. **World & extras** — rogue androids, mad scientist, structures (sand/crashed ship etc.), Tritanium crate,
    holo sign, inscriber, transporter, star map / galaxy, quests & dialogs, guide book (Data Pad), foods.

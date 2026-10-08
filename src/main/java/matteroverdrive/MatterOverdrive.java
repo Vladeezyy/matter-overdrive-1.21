@@ -58,6 +58,7 @@ public class MatterOverdrive {
             event.registerItem(Capabilities.Energy.ITEM, (stack, access) -> weapon.createEnergyHandler(access), weapon);
         }
         machine(event, MOBlockEntities.SOLAR_PANEL.get());
+        machine(event, MOBlockEntities.CHARGING_STATION.get());
         event.registerBlockEntity(Capabilities.Item.BLOCK, MOBlockEntities.WEAPON_STATION.get(), (be, side) -> be.getInventory().automation());
         machine(event, MOBlockEntities.INSCRIBER.get());
         machine(event, MOBlockEntities.DECOMPOSER.get());

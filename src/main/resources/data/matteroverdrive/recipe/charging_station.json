@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " F ",
+    "EDR",
+    "BMB"
+  ],
+  "key": {
+    "F": "matteroverdrive:forcefield_emitter",
+    "E": "minecraft:ender_eye",
+    "D": "#c:gems/dilithium",
+    "R": "minecraft:repeater",
+    "B": "matteroverdrive:hc_battery",
+    "M": "matteroverdrive:machine_casing"
+  },
+  "result": {
+    "id": "matteroverdrive:charging_station",
+    "count": 1
+  }
+}

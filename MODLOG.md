@@ -171,6 +171,42 @@
 - Damage sources aren't tagged fire / magic / explosion by barrel; the shotgun charge-up is still missing.
 - The explosion barrel keeps the 1.7.10 FIRE_RATE x0.15 (on the phaser it makes the burst explosions happen almost every tick).
 
+## 2026-10-08 — phase 6: androids ✅
+- **6a** Android state is a player attachment (`matteroverdrive:android`, `AndroidData`): android flag, built-in energy
+  (512000 FE, 1024 FE per pull), stats + levels, effects map (toggles/timestamps), selected ability, 6-slot inventory
+  (head, arms, legs, chest, other, battery). `copyOnDeath`, synced to the player and trackers with a custom
+  `AttachmentSyncHandler` (skips players without the channel = GameTest mocks). `Android` holds the 1.7.10 behaviour:
+  food from energy (256 FE/point), no potion effects, sinking, no drowning, 512 FE per jump, half fall distance, glitch
+  on damage, x0.5 speed when empty, 64000 FE after respawn, sneak with a battery in hand to charge.
+  Pills: red = 34 s transformation (nausea/slowness/hunger/weakness, 0.1 hits every 2 s, then android + death unless
+  creative/hardcore), blue = human again, yellow = reset stats for half their XP. Red pill in stronghold corridors (10%).
+- **6b** Android Station (9/16 table, androids only — "Biological Entity Detected!"): 364x240 GUI (1.7.10: 250 high,
+  doesn't fit a 240-high scaled screen) with the 4x4 stat tree (arrows to roots, level badges, colours by state,
+  requires/locks/XP tooltip), the 6 android slots around the player model, XP. Rogue android parts (head/arms/legs/chest)
+  as bionic parts: +1 max health each. `MachineMenu.width()/height()/inventoryY()` and `MachineScreen` hooks
+  (`drawSlotBackground`, `homeClicked`) make bigger machine GUIs possible.
+- **6c** All 14 stats with 1.7.10 numbers (`StatImpls`): speed +10%/lvl, attack +5%(lvl+1), nano armour 6%(lvl+1),
+  nanobots 0.6 HP/s for 640 FE, flotation, high jump +0.5 for 1024 FE, night vision (16 FE/t), cloak (128 FE/t), shield
+  (8 s on / 16 s cooldown, blocks projectiles & explosions for 256 FE per damage), shockwave (5-10 blocks, 12 s; action
+  key or sneak-landing), teleport (32 blocks, 4096 FE, 2 s, aim while X held, jump on release), flash cooling (20%
+  overheat cancel), equalizer (anomalies don't pull), minimap. Keys: X ability, Tab ability wheel (screen, pick by mouse
+  direction, release Tab).
+- **6d** HUD layer: health/battery/speed + weapon ammo/heat top left, parts and stats (active background, cooldown
+  seconds) top right, radar bottom left, glitch overlay, cloak tint, transformation typing text + spinner; vanilla
+  health/food/air hidden for androids.
+- **6e** Charging station: 3 blocks high (base + 2 invisible parts, breaks as one), OBJ base+rod, 512000 FE, charges
+  androids within 8 blocks (range upgrades up to x8) with up to 512 FE/t scaled by distance.
+- 63 GameTests pass (survival mock player helper: vanilla's mock is hard-wired to creative, invulnerable until
+  `setClientLoaded(true)`, abilities from the creative default).
+
+### Deviations (phase 6)
+- No HUD config screen (positions/colour/opacity fixed to 1.7.10 defaults); no HUD sway; radar shows entity dots only
+  (the 1.7.10 minimap also drew terrain); no custom crosshair.
+- No rogue-android hologram above the android station; the charging station rod doesn't pulse.
+- Bionic parts aren't drawn on the player model; rogue android mobs (their source) come in phase 7.
+- Teleport has no target marker; the shield has no visual bubble (hit flashes / shield_loop sound not ported).
+- Out of the 1.7.10 android commands, only test helpers exist (`Android.setTurning`, `Android.tick`).
+
 ## 1.21.10 / NeoForge 21.10.64 API notes (learned the hard way)
 **Workflow**
 - Resources: never hand-edit `src/main/resources/{assets,data}` — regenerate:
@@ -197,6 +233,17 @@
 - `GuiGraphics.blit(RenderPipelines.GUI_TEXTURED, ...)`, nine-slice via sprite `.mcmeta` (`stretch_inner`), colours are ARGB
   (alpha 0 = invisible!), `setTooltipForNextFrame`, input via `MouseButtonEvent`/`KeyEvent`. Tabs at x = WIDTH-14, y = 38.
 
+**Players / attachments**
+- `AttachmentType.serializable(...).copyOnDeath().sync(handler)`; `player.syncData(type)` pushes it; filter
+  `sendToPlayer` by `to.connection.hasChannel(SyncAttachmentsPayload.TYPE)` for GameTest mocks.
+- GameTest mock players: build your own `ServerPlayer` overriding `gameMode()`, then `setClientLoaded(true)` and
+  `GameType.SURVIVAL.updatePlayerAbilities(...)`, else they're creative and invulnerable.
+- Custom attributes: register + `EntityAttributeModificationEvent.add(EntityType.PLAYER, ...)`; `setSyncable(true)`.
+- `Minecraft.startUseItem` calls `itemInHandRenderer.itemUsed()` after any successful use (hand dips).
+- HUD: `RegisterGuiLayersEvent.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, ...)`; hide vanilla layers by
+  cancelling `RenderGuiLayerEvent.Pre`. Keys: `KeyMapping.Category` + `RegisterKeyMappingsEvent.registerCategory`.
+- `GuiGraphics.blit(pipeline, tex, x, y, u, v, w, h, regionW, regionH, texW, texH, color)` to scale icons.
+
 **Rendering**
 - Entity renderers: render state + `submit(state, pose, SubmitNodeCollector, CameraRenderState)`; draw custom quads with
   `collector.submitCustomGeometry(pose, renderType, (pose, vc) -> ...)`.
@@ -214,6 +261,6 @@
 - Sounds must be mono ogg: ffmpeg → mono wav → `oggenc` (vorbis-tools); ffmpeg's built-in vorbis is stereo-only.
 
 ## Next
-- Phase 6: androids (player attachment, biotic stats, android station, HUD, abilities, charging station). Phase 7: world & extras.
+- Phase 7: world & extras (rogue androids, mad scientist, structures, transporter, star map, quests, holo sign, crate, food).
 - Polish later: machine item tooltip with stored energy, inscriber head animation, machine sounds, custom tritanium armor model,
   pattern storage drive rendering, replicator item animation, monitor hologram, router/switch filters, matter scanner.

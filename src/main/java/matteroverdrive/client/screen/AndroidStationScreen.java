@@ -85,13 +85,13 @@ public class AndroidStationScreen extends MachineScreen<AndroidStationMenu> {
                     ? (level <= 0 ? ARGB.color(255, ARGB.scaleRGB(HOLO, 0.5f)) : ARGB.color(255, HOLO))
                     : ARGB.color(255, ARGB.scaleRGB(HOLO_RED, 0.5f));
             int px = x + cell.px(), py = y + cell.py();
-            g.blit(RenderPipelines.GUI_TEXTURED, SLOT_HOLO, px, py, 0, 0, 22, 22, 22, 22, color);
-            g.blit(RenderPipelines.GUI_TEXTURED, statIcon(cell.stat), px + 3, py + 3, 0, 0, 16, 16, 16, 16, color);
+            scaled(g, SLOT_HOLO, px, py, 22, 18, color);
+            scaled(g, statIcon(cell.stat), px + 3, py + 3, 16, 18, color);
             if (cell.dx != 0 || cell.dy != 0) {
                 arrow(g, px + 11 + Math.round(cell.dx * 22 * 0.75f), py + 11 + Math.round(cell.dy * 22 * 0.75f), cell.dx, cell.dy, color);
             }
             if (cell.stat.maxLevel() > 1 && level > 0) {
-                g.blit(RenderPipelines.GUI_TEXTURED, BLACK_CIRCLE, px + 14, py + 14, 0, 0, 10, 10, 10, 10);
+                scaled(g, BLACK_CIRCLE, px + 14, py + 14, 10, 18, 0xFFFFFFFF);
                 g.drawString(font, Integer.toString(level), px + 16, py + 16, 0xFFFFFFFF, false);
             }
         }
@@ -99,7 +99,7 @@ public class AndroidStationScreen extends MachineScreen<AndroidStationMenu> {
         for (Slot slot : menu.slots) {
             if (!(slot instanceof AndroidStationMenu.PartSlot part) || !slot.isActive()) continue;
             int sx = x + slot.x - 2, sy = y + slot.y - 2;
-            g.blit(RenderPipelines.GUI_TEXTURED, SLOT_HOLO, sx, sy, 0, 0, 20, 20, 20, 20, ARGB.color(78 * 2, MATTER));
+            scaled(g, SLOT_HOLO, sx, sy, 20, 18, ARGB.color(78 * 2, MATTER));
             if (!slot.hasItem()) {
                 g.blit(RenderPipelines.GUI_TEXTURED, PART_ICONS[part.part], sx + 2, sy + 2, 0, 0, 16, 16, 16, 16, ARGB.color(160, MATTER));
             }
@@ -109,6 +109,11 @@ public class AndroidStationScreen extends MachineScreen<AndroidStationMenu> {
                 x + mx, y + my, player());
         String xp = player().experienceLevel + " XP";
         g.drawString(font, xp, x + 280 - font.width(xp) / 2, y + imageHeight - 24, 0xFF55FF55, false);
+    }
+
+    /** A square texture of src px drawn at size px. */
+    private static void scaled(GuiGraphics g, ResourceLocation tex, int x, int y, int size, int src, int color) {
+        g.blit(RenderPipelines.GUI_TEXTURED, tex, x, y, 0, 0, size, size, src, src, src, src, color);
     }
 
     /** 1.7.10 up_arrow holo icon, turned towards the stat's root. */

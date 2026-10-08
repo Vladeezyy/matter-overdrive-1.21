@@ -79,8 +79,8 @@ public class AbilityWheelScreen extends Screen {
             double a = Math.toRadians(360.0 / stats.size() * i);
             int x = cx + (int) Math.round(Math.sin(a) * RADIUS) - 11, y = cy - (int) Math.round(Math.cos(a) * RADIUS) - 11;
             int color = ARGB.color(i == selected ? 255 : 120, HOLO);
-            g.blit(RenderPipelines.GUI_TEXTURED, tex("slot_holo"), x, y, 0, 0, 22, 22, 22, 22, color);
-            g.blit(RenderPipelines.GUI_TEXTURED, tex("biotic_stat_" + stats.get(i).id()), x + 3, y + 3, 0, 0, 16, 16, 16, 16, color);
+            AndroidHud.icon(g, tex("slot_holo"), x, y, 22, 22, 18, 18, color);
+            AndroidHud.icon(g, tex("biotic_stat_" + stats.get(i).id()), x + 3, y + 3, 16, 16, 18, 18, color);
         }
         if (selected >= 0) {
             Component name = Component.translatable("biotic_stat." + MatterOverdrive.MODID + "." + stats.get(selected).id() + ".name");

@@ -205,7 +205,41 @@ public final class DevScene {
         at(517, mc -> openMachine(mc, origin.offset(0, 0, -2)));
         at(524, mc -> shot(mc, "android_station_gui"));
         at(526, mc -> mc.setScreen(null));
-        at(530, mc -> mc.stop());
+        // 6c/6d: abilities and the android HUD, the ability wheel, the transformation screen
+        at(527, mc -> server(mc, p -> {
+            for (var stat : new matteroverdrive.android.BioticStat[] {matteroverdrive.android.BioticStats.NANO_ARMOR,
+                    matteroverdrive.android.BioticStats.SHIELD, matteroverdrive.android.BioticStats.CLOAK,
+                    matteroverdrive.android.BioticStats.MINIMAP, matteroverdrive.android.BioticStats.TELEPORT}) {
+                matteroverdrive.android.Android.get(p).getStats().put(stat.id(), stat.maxLevel());
+            }
+            matteroverdrive.android.Android.get(p).getStats().remove(matteroverdrive.android.BioticStats.ATTACK.id());
+            matteroverdrive.android.Android.get(p).setActiveStat(matteroverdrive.android.BioticStats.SHIELD.id());
+            matteroverdrive.android.Android.onActionKey(p);
+            p.getInventory().setItem(0, findWeapon(p, MOItems.PHASER_RIFLE.get()));
+            var pig = net.minecraft.world.entity.EntityType.PIG.create(p.level(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            pig.setPos(origin.getX() + 3.5, origin.getY(), origin.getZ() - 4.5);
+            p.level().addFreshEntity(pig);
+            matteroverdrive.android.Android.sync(p);
+        }));
+        at(534, mc -> shot(mc, "android_hud"));
+        at(535, mc -> mc.setScreen(new matteroverdrive.client.android.AbilityWheelScreen()));
+        at(538, mc -> shot(mc, "android_wheel"));
+        at(539, mc -> mc.setScreen(null));
+        at(540, mc -> server(mc, p -> {
+            matteroverdrive.android.Android.setAndroid(p, false);
+            matteroverdrive.android.Android.startTransformation(p);
+            matteroverdrive.android.Android.setTurning(p, 300);
+        }));
+        at(550, mc -> shot(mc, "android_transforming"));
+        at(551, mc -> server(mc, p -> matteroverdrive.android.Android.setTurning(p, 0)));
+        at(552, mc -> server(mc, p -> {
+            BlockPos charger = origin.offset(2, 0, -2);
+            var state = MOBlocks.CHARGING_STATION.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH);
+            p.level().setBlockAndUpdate(charger, state);
+            state.getBlock().setPlacedBy(p.level(), charger, state, p, ItemStack.EMPTY);
+        }));
+        at(558, mc -> shot(mc, "charging_station"));
+        at(560, mc -> mc.stop());
     }
 
     private static void at(int t, Consumer<Minecraft> action) {

@@ -19,6 +19,7 @@ import matteroverdrive.block.RecyclerBlock;
 import matteroverdrive.block.SolarPanelBlock;
 import matteroverdrive.block.WeaponStationBlock;
 import matteroverdrive.block.AndroidStationBlock;
+import matteroverdrive.block.ChargingStationBlock;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DropExperienceBlock;
@@ -97,6 +98,8 @@ public final class MOBlocks {
 
     // Androids (phase 6)
     public static final DeferredBlock<AndroidStationBlock> ANDROID_STATION = BLOCKS.registerBlock("android_station", AndroidStationBlock::new,
+            p -> p.mapColor(MapColor.METAL).strength(20f, 9f).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion().lightLevel(s -> 10));
+    public static final DeferredBlock<ChargingStationBlock> CHARGING_STATION = BLOCKS.registerBlock("charging_station", ChargingStationBlock::new,
             p -> p.mapColor(MapColor.METAL).strength(20f, 9f).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion().lightLevel(s -> 10));
 
     private MOBlocks() {}

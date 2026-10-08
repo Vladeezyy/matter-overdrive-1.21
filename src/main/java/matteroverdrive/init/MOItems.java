@@ -157,6 +157,7 @@ public final class MOItems {
     public static final DeferredItem<AndroidPillItem> ANDROID_PILL_RED = item("android_pill_red", p -> new AndroidPillItem(AndroidPillItem.Type.RED, p), p -> p);
     public static final DeferredItem<AndroidPillItem> ANDROID_PILL_BLUE = item("android_pill_blue", p -> new AndroidPillItem(AndroidPillItem.Type.BLUE, p), p -> p);
     public static final DeferredItem<BlockItem> ANDROID_STATION = block("android_station", MOBlocks.ANDROID_STATION);
+    public static final DeferredItem<BlockItem> CHARGING_STATION = block("charging_station", MOBlocks.CHARGING_STATION);
     public static final DeferredItem<BionicPartItem> ROGUE_ANDROID_HEAD = item("rogue_android_part_head", p -> new BionicPartItem(0, p), p -> p);
     public static final DeferredItem<BionicPartItem> ROGUE_ANDROID_ARMS = item("rogue_android_part_arms", p -> new BionicPartItem(1, p), p -> p);
     public static final DeferredItem<BionicPartItem> ROGUE_ANDROID_LEGS = item("rogue_android_part_legs", p -> new BionicPartItem(2, p), p -> p);

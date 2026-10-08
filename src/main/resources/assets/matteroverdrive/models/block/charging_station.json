@@ -1,0 +1,9 @@
+{
+  "loader": "neoforge:obj",
+  "model": "matteroverdrive:models/block/charging_station.obj",
+  "flip_v": true,
+  "textures": {
+    "texture": "matteroverdrive:block/charging_station",
+    "particle": "matteroverdrive:block/base"
+  }
+}

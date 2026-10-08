@@ -49,6 +49,7 @@ public class MatterOverdriveClient {
         event.register(MOMenus.SOLAR_PANEL.get(), SolarPanelScreen::new);
         event.register(MOMenus.WEAPON_STATION.get(), matteroverdrive.client.screen.WeaponStationScreen::new);
         event.register(MOMenus.ANDROID_STATION.get(), matteroverdrive.client.screen.AndroidStationScreen::new);
+        event.register(MOMenus.CHARGING_STATION.get(), matteroverdrive.client.screen.ChargingStationScreen::new);
         event.register(MOMenus.INSCRIBER.get(), InscriberScreen::new);
         event.register(MOMenus.DECOMPOSER.get(), DecomposerScreen::new);
         event.register(MOMenus.RECYCLER.get(), RecyclerScreen::new);

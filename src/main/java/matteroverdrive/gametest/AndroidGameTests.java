@@ -23,6 +23,7 @@ final class AndroidGameTests {
         MOGameTests.add("android_toggle_stats", 20, false, AndroidGameTests::toggleStats);
         MOGameTests.add("android_shield_and_shockwave", 20, false, AndroidGameTests::shieldAndShockwave);
         MOGameTests.add("android_teleport", 20, false, AndroidGameTests::teleport);
+        MOGameTests.add("charging_station_charges_androids", 20, false, AndroidGameTests::chargingStation);
     }
 
     private static void check(GameTestHelper helper, boolean ok, String message) {
@@ -234,6 +235,28 @@ final class AndroidGameTests {
         check(helper, Android.getEnergy(player) < energy, "teleport was free");
         Android.teleport(player, target.add(0, 0, 3));
         check(helper, player.position().distanceTo(target) < 1e-3, "teleported during the cooldown");
+        helper.succeed();
+    }
+
+    /** 1.7.10 charging station: up to 512 FE/t to androids in range, less with distance; three blocks high. */
+    private static void chargingStation(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(6, 1, 3);
+        helper.setBlock(pos, matteroverdrive.init.MOBlocks.CHARGING_STATION.get());
+        var state = helper.getBlockState(pos);
+        state.getBlock().setPlacedBy(helper.getLevel(), helper.absolutePos(pos), state, null, ItemStack.EMPTY);
+        check(helper, helper.getBlockState(pos.above(2)).is(matteroverdrive.init.MOBlocks.CHARGING_STATION.get()), "no top part");
+        var station = helper.getBlockEntity(pos, matteroverdrive.block.entity.ChargingStationBlockEntity.class);
+        try (var tx = net.neoforged.neoforge.transfer.transaction.Transaction.openRoot()) {
+            for (int i = 0; i < 100; i++) station.getEnergyHandler(null).insert(512, tx);
+            tx.commit();
+        }
+        ServerPlayer player = player(helper);
+        Android.setAndroid(player, true);
+        Android.extractEnergy(player, 1000, false);
+        int before = Android.getEnergy(player);
+        matteroverdrive.machine.MachineBlockEntity.serverTick(helper.getLevel(), station.getBlockPos(), station.getBlockState(), station);
+        int gained = Android.getEnergy(player) - before;
+        check(helper, gained > 0 && gained <= 512, "gained " + gained);
         helper.succeed();
     }
 }
