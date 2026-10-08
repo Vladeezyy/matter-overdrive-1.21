@@ -34,7 +34,7 @@ public class MeleeRogueAndroid extends RogueAndroid {
         goalSelector.addGoal(5, new LookAtPlayerGoal(this, LivingEntity.class, 8));
         goalSelector.addGoal(5, new RandomLookAroundGoal(this));
         targetSelector.addGoal(1, new HurtByTargetGoal(this));
-        targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, 10, false, true,
+        targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, LivingEntity.class, 10, false, true,
                 (target, level) -> RogueAndroid.isEnemy(target)));
     }
 

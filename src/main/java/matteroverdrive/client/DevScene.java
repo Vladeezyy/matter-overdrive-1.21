@@ -303,7 +303,20 @@ public final class DevScene {
             p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() - 1.0, Set.of(), 180f, 20f, false);
         }));
         at(588, mc -> shot(mc, "failed_animals"));
-        at(590, mc -> mc.stop());
+        // 7d: the mutant scientist on the same platform
+        at(590, mc -> server(mc, p -> {
+            BlockPos base = origin.above(14);
+            p.level().getEntitiesOfClass(net.minecraft.world.entity.animal.Animal.class, p.getBoundingBox().inflate(16)).forEach(e -> e.discard());
+            var mutant = matteroverdrive.init.MOEntities.MUTANT_SCIENTIST.get().create(p.level(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            mutant.snapTo(base.getX() + 0.5, base.getY(), base.getZ() - 4.5, 0, 0);
+            mutant.setNoAi(true);
+            mutant.setYRot(25);
+            mutant.setYHeadRot(25);
+            mutant.yBodyRot = 25;
+            p.level().addFreshEntity(mutant);
+        }));
+        at(598, mc -> shot(mc, "mutant_scientist"));
+        at(600, mc -> mc.stop());
     }
 
     private static void at(int t, Consumer<Minecraft> action) {

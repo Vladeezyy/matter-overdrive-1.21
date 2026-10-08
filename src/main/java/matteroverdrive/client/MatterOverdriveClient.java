@@ -88,6 +88,7 @@ public class MatterOverdriveClient {
         event.registerBlockEntityRenderer(matteroverdrive.init.MOBlockEntities.GRAVITATIONAL_ANOMALY.get(), AnomalyRenderer::new);
         event.registerEntityRenderer(matteroverdrive.init.MOEntities.ROGUE_ANDROID.get(), RogueAndroidRenderer::melee);
         event.registerEntityRenderer(matteroverdrive.init.MOEntities.RANGED_ROGUE_ANDROID.get(), RogueAndroidRenderer::ranged);
+        event.registerEntityRenderer(matteroverdrive.init.MOEntities.MUTANT_SCIENTIST.get(), MutantScientistRenderer::new);
         event.registerEntityRenderer(matteroverdrive.init.MOEntities.FAILED_PIG.get(), FailedAnimalRenderers::pig);
         event.registerEntityRenderer(matteroverdrive.init.MOEntities.FAILED_COW.get(), FailedAnimalRenderers::cow);
         event.registerEntityRenderer(matteroverdrive.init.MOEntities.FAILED_CHICKEN.get(), FailedAnimalRenderers::chicken);
@@ -99,6 +100,7 @@ public class MatterOverdriveClient {
         event.registerLayerDefinition(RogueAndroidRenderer.MELEE, RogueAndroidRenderer::meleeLayer);
         event.registerLayerDefinition(RogueAndroidRenderer.RANGED, RogueAndroidRenderer::rangedLayer);
         event.registerLayerDefinition(RogueAndroidRenderer.VISOR, RogueAndroidRenderer::visorLayer);
+        event.registerLayerDefinition(MutantScientistRenderer.LAYER, HulkingScientistModel::createLayer);
     }
 
     /** Matter Plasma textures (1.7.10 matter_plasma_still / _flowing), shown by tanks of other mods. */

@@ -192,6 +192,8 @@
   "entity.matteroverdrive.ranged_rogue_android": "Ranged Rogue Android",
   "item.matteroverdrive.rogue_android_spawn_egg": "Melee Rogue Android Spawn Egg",
   "item.matteroverdrive.ranged_rogue_android_spawn_egg": "Ranged Rogue Android Spawn Egg",
+  "entity.matteroverdrive.mutant_scientist": "Mutant Scientist",
+  "item.matteroverdrive.mutant_scientist_spawn_egg": "Mutant Scientist Spawn Egg",
   "entity.matteroverdrive.failed_pig": "Failed Pig",
   "item.matteroverdrive.failed_pig_spawn_egg": "Failed Pig Spawn Egg",
   "entity.matteroverdrive.failed_cow": "Failed Cow",

@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "matteroverdrive:item/mutant_scientist_spawn_egg"
+  }
+}

@@ -51,7 +51,7 @@ public class RangedRogueAndroid extends RogueAndroid implements RangedAttackMob,
         goalSelector.addGoal(6, new LookAtPlayerGoal(this, LivingEntity.class, 8));
         goalSelector.addGoal(6, new RandomLookAroundGoal(this));
         targetSelector.addGoal(1, new HurtByTargetGoal(this));
-        targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, true,
+        targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, LivingEntity.class, 10, true, true,
                 (target, level) -> RogueAndroid.isEnemy(target)));
     }
 

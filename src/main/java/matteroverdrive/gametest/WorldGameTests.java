@@ -13,6 +13,7 @@ import net.minecraft.world.item.DyeColor;
 final class WorldGameTests {
     static void addAll() {
         MOGameTests.add("failed_animals", 20, false, WorldGameTests::failedAnimals);
+        MOGameTests.add("mutant_scientist", 20, false, WorldGameTests::mutantScientist);
     }
 
     private static void check(GameTestHelper helper, boolean ok, String message) {
@@ -40,6 +41,14 @@ final class WorldGameTests {
         sheep2.setColor(DyeColor.YELLOW);
         var lamb = sheep.getBreedOffspring(level, sheep2);
         check(helper, lamb instanceof FailedSheep && lamb.getColor() == DyeColor.ORANGE, "lamb " + lamb);
+        helper.succeed();
+    }
+
+    /** Mutant scientist: 256 health, rogue androids hunt it. */
+    private static void mutantScientist(GameTestHelper helper) {
+        var mutant = helper.spawnWithNoFreeWill(MOEntities.MUTANT_SCIENTIST.get(), new BlockPos(3, 1, 3));
+        check(helper, mutant.getMaxHealth() == 256 && mutant.getHealth() == 256, "health " + mutant.getMaxHealth());
+        check(helper, matteroverdrive.entity.monster.RogueAndroid.isEnemy(mutant), "rogue androids ignore mutants");
         helper.succeed();
     }
 }

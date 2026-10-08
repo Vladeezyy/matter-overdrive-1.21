@@ -226,10 +226,16 @@
   texture) in `extractRenderState`, the sheep overrides the texture (vanilla wool layer on top, like 1.7.10). Pig/cow
   textures are padded to 64x64 by the generator (ffmpeg `pad`); the 1.21.5 cow muzzle (UV 1,33) is transparent → hidden.
   Spawn eggs in the 1.7.10 colours. No natural spawns (1.7.10 had none either). 65 GameTests pass.
+- **7d ✅** Mutant scientist (`MutantScientist`, 1x2.3, 256 HP, speed 0.25, damage 4, not in peaceful): attacks any living
+  entity but other mutants (and armor stands); rogue androids now target `LivingEntity` with `isEnemy` = humans +
+  mutants (1.7.10 AndroidTargetSelector). `HulkingScientistModel` = ModelHulkingScientist part-for-part (1.7.10 sets
+  `mirror` after `addBox`, so nothing is mirrored; rotation order ZYX matches). Texture `hulking_scinetist.png` →
+  `hulking_scientist.png`. ru name "Учёный-мутант" via EXTRA (missing in the original). No natural spawns: it comes
+  from the underwater base and the mad scientist's cocktail. 66 GameTests pass.
 
 ### Next in phase 7 (start here)
 1. ~~Failed animals~~ ✅ 7c.
-2. Mutant scientist (port ModelHulkingScientist, 256 HP) — used by the underwater base.
+2. ~~Mutant scientist~~ ✅ 7d (underwater base spawns one named "Mitko'Urrr", persistent, on the star map block).
 3. Structures (world/MO*: android house, sand pit, crashed ship, cargo ship, underwater base, mad scientist house;
    1.7.10 MOImageGen builds them from images in textures/world).
 4. Transporter + transport flash drive; omni tool (also 30% of rogue android weapons); matter scanner; portable
@@ -242,7 +248,7 @@
 **Workflow**
 - Resources: never hand-edit `src/main/resources/{assets,data}` — regenerate:
   `rm -rf src/main/resources/{assets,data} && python3 -I tools/gen_resources.py ~/mo-reference/mo-1.7.10/src/main/resources/assets/mo src/main/resources`
-- Tests: `./gradlew runGameTestServer` (65 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
+- Tests: `./gradlew runGameTestServer` (66 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
   `FunctionGameTestInstance`, custom 12³ structure `matteroverdrive:gametest_area`, time-of-day via `TestEnvironmentDefinition.TimeOfDay`,
   `makeMockServerPlayerInLevel`). Visual: `./gradlew runScene` → `run/screenshots/scene_*.png` (DevScene, world `run/saves/mo_scene`;
   pristine copy = "Новый мир (2)"; needs `pauseOnLostFocus=false`; selected hotbar slot is client-side; place blocks with

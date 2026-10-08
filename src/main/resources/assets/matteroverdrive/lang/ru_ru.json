@@ -192,6 +192,8 @@
   "entity.matteroverdrive.ranged_rogue_android": "Дальнобойный Андроид-разбойник",
   "item.matteroverdrive.rogue_android_spawn_egg": "Яйцо призыва: Рукопашный Андроид-разбойник",
   "item.matteroverdrive.ranged_rogue_android_spawn_egg": "Яйцо призыва: Дальнобойный Андроид-разбойник",
+  "entity.matteroverdrive.mutant_scientist": "Учёный-мутант",
+  "item.matteroverdrive.mutant_scientist_spawn_egg": "Яйцо призыва: Учёный-мутант",
   "entity.matteroverdrive.failed_pig": "Неудачная свинья",
   "item.matteroverdrive.failed_pig_spawn_egg": "Яйцо призыва: Неудачная свинья",
   "entity.matteroverdrive.failed_cow": "Неудачная корова",

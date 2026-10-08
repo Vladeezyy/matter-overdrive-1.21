@@ -149,7 +149,9 @@ public abstract class RogueAndroid extends Monster {
     }
 
     /** 1.7.10 AndroidTargetSelector: humans (not androids) and mutant scientists. */
+    /** 1.7.10 AndroidTargetSelector: humans (not androids) and mutant scientists. */
     public static boolean isEnemy(LivingEntity target) {
+        if (target instanceof MutantScientist) return true;
         return target instanceof Player player && !Android.isAndroid(player) && !player.isCreative() && !player.isSpectator();
     }
 

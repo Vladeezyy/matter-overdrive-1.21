@@ -50,7 +50,7 @@ LANG_KEYS.update({f"upgrade_{u}": f"item.upgrade.{u}.name" for u in UPGRADES})
 LANG_KEYS.update({f"weapon_module_barrel_{b}": f"item.weapon_module_barrel.{b}.name" for b in BARRELS})
 # Strings the original translation never had.
 EXTRA = {"ru_ru": {"weapon_handle": "Рукоять оружия", "weapon_receiver": "Ствольная коробка оружия",
-                   "plasma_core": "Плазменное ядро"}}
+                   "plasma_core": "Плазменное ядро", "entity.mutant_scientist.name": "Учёный-мутант"}}
 
 
 def w(p, obj):
@@ -1070,6 +1070,9 @@ for n, base in {"pig": 15771042, "cow": 4470310, "chicken": 10592673, "sheep": 1
                         "-fflags", "+bitexact", "-flags", "+bitexact", str(dst_png)], check=True)
     else:
         cp(src_png, dst_png)
+# 7d mutant scientist (1.7.10 file name has a typo)
+egg("mutant_scientist_spawn_egg", 0xFFFFFF, 0x00FF00)
+cp(ref / "textures/entities/hulking_scinetist.png", A / "textures/entity/hulking_scientist.png")
 # 1.7.10 EntityRogueAndroid.addAsBiomeGen: weight 15, groups of 1-2, all overworld biomes but the mushroom fields
 for n in ["rogue_android", "ranged_rogue_android"]:
     w(D / f"neoforge/biome_modifier/{n}.json", {"type": "neoforge:add_spawns",
@@ -1254,6 +1257,10 @@ for src_name, dst_name in [("en_US", "en_us"), ("ru_RU", "ru_ru")]:
     for n in ["rogue_android", "ranged_rogue_android"]:
         egg_word = {"en_us": "Spawn Egg", "ru_ru": "Яйцо призыва"}[dst_name]
         lang[f"item.{MOD}.{n}_spawn_egg"] = f"{egg_word}: {lang[f'entity.{MOD}.{n}']}" if dst_name == "ru_ru" else f"{lang[f'entity.{MOD}.{n}']} {egg_word}"
+    lang[f"entity.{MOD}.mutant_scientist"] = (src.get("entity.mutant_scientist.name")
+        or EXTRA.get(dst_name, {}).get("entity.mutant_scientist.name") or en["entity.mutant_scientist.name"])
+    lang[f"item.{MOD}.mutant_scientist_spawn_egg"] = {"en_us": f"{lang[f'entity.{MOD}.mutant_scientist']} Spawn Egg",
+                                                     "ru_ru": f"Яйцо призыва: {lang[f'entity.{MOD}.mutant_scientist']}"}[dst_name]
     for n in ["pig", "cow", "chicken", "sheep"]:
         lang[f"entity.{MOD}.failed_{n}"] = src.get(f"entity.failed_{n}.name") or en[f"entity.failed_{n}.name"]
         egg_word = {"en_us": "Spawn Egg", "ru_ru": "Яйцо призыва"}[dst_name]
