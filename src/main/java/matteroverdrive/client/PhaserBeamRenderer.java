@@ -4,6 +4,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import matteroverdrive.MatterOverdrive;
+import matteroverdrive.item.weapon.EnergyWeaponItem;
+import matteroverdrive.item.weapon.OmniToolItem;
 import matteroverdrive.item.weapon.PhaserItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
@@ -35,14 +37,14 @@ public final class PhaserBeamRenderer {
     static void onRenderPlayer(RenderPlayerEvent.Post<?> event) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || !(mc.level.getEntity(event.getRenderState().id) instanceof Player player)) return;
-        if (!player.isUsingItem() || !(player.getUseItem().getItem() instanceof PhaserItem phaser)) return;
+        if (!player.isUsingItem() || !(player.getUseItem().getItem() instanceof EnergyWeaponItem phaser) || !isBeam(phaser)) return;
         float partial = event.getPartialTick();
         Vec3 origin = player.getPosition(partial);
         Vec3 eye = player.getEyePosition(partial);
         Vec3 look = player.getViewVector(partial);
         Vec3 right = look.cross(new Vec3(0, 1, 0)).normalize();
         Vec3 start = eye.add(look.scale(0.7)).add(right.scale(0.35)).add(0, -0.25, 0).subtract(origin);
-        Vec3 end = PhaserItem.trace(mc.level, player, phaser.getRange(player.getUseItem())).getLocation().subtract(origin);
+        Vec3 end = target(mc, player, phaser).subtract(origin);
         Vec3 camera = mc.gameRenderer.getMainCamera().position().subtract(origin);
         submit(event.getSubmitNodeCollector(), event.getPoseStack(), start, end, camera, phaser, player);
     }
@@ -53,15 +55,25 @@ public final class PhaserBeamRenderer {
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
         if (event.getHand() != InteractionHand.MAIN_HAND || player == null || mc.level == null || !player.isUsingItem()
-                || !(player.getUseItem().getItem() instanceof PhaserItem phaser)) return;
-        double distance = PhaserItem.trace(mc.level, player, phaser.getRange(player.getUseItem())).getLocation()
-                .distanceTo(player.getEyePosition(event.getPartialTick()));
+                || !(player.getUseItem().getItem() instanceof EnergyWeaponItem phaser) || !isBeam(phaser)) return;
+        double distance = target(mc, player, phaser).distanceTo(player.getEyePosition(event.getPartialTick()));
         Vec3 start = new Vec3(0.36, -0.16, -0.7);
         Vec3 end = new Vec3(0, 0, -distance);
         submit(event.getSubmitNodeCollector(), event.getPoseStack(), start, end, Vec3.ZERO, phaser, player);
     }
 
-    private static void submit(SubmitNodeCollector collector, PoseStack pose, Vec3 start, Vec3 end, Vec3 camera, PhaserItem phaser, Player player) {
+    /** 1.7.10 RenderWeaponsBeam: the phaser's beam and the omni tool's digging beam. */
+    private static boolean isBeam(EnergyWeaponItem weapon) {
+        return weapon instanceof PhaserItem || weapon instanceof OmniToolItem;
+    }
+
+    /** Where the beam ends: the phaser stops at entities too, the omni tool only at blocks. */
+    private static Vec3 target(Minecraft mc, Player player, EnergyWeaponItem weapon) {
+        return weapon instanceof OmniToolItem ? OmniToolItem.traceBlock(mc.level, player).getLocation()
+                : PhaserItem.trace(mc.level, player, weapon.getRange(player.getUseItem())).getLocation();
+    }
+
+    private static void submit(SubmitNodeCollector collector, PoseStack pose, Vec3 start, Vec3 end, Vec3 camera, EnergyWeaponItem phaser, Player player) {
         long time = player.level().getGameTime();
         float pulse = 0.5f + (float) (1 + Math.sin(time * 0.5)) * 0.25f;
         int color = ARGB.color(Math.round(255 * pulse), phaser.getColor(player.getUseItem()));

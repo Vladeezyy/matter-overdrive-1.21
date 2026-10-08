@@ -684,6 +684,20 @@ w(A / "items/phaser.json", {"model": {"type": "minecraft:select", "property": mi
     "cases": [{"when": b, "model": {"type": "minecraft:model", "model": f"{MOD}:item/phaser_{b}"}} for b in PHASER_BARRELS],
     "fallback": {"type": "minecraft:model", "model": f"{MOD}:item/phaser"}}})
 cp(ref / "textures/fx/plasmabeam.png", A / "textures/fx/plasmabeam.png")
+# 1.7.10 ItemRendererOmniTool: wielder.obj at scale 7; renderGun drew the arms, grip, barrel, hull, rails and indicator
+# (not the level/kill indicators, Group7749 or the dig_effect used by the beam renderer).
+OMNI_HIDDEN = ("Group7749", "level_bg", "level_slider", "kill_indicator", "dig_effect")
+OMNI_BARRELS = ["damage", "fire"]
+weapon_obj("omni_tool", "wielder", "wielder", 7.0, hidden=OMNI_HIDDEN + tuple(f"weapon_module_barrel_{b}" for b in OMNI_BARRELS),
+           display={"firstperson_righthand": {"rotation": [0, 175, 0], "translation": [-1, 4, 1], "scale": [0.75, 0.75, 0.75]},
+                    "firstperson_lefthand": {"rotation": [0, 185, 0], "translation": [-1, 4, 1], "scale": [0.75, 0.75, 0.75]}})
+omni_display = json.loads((A / "models/item/omni_tool.json").read_text())
+for b in OMNI_BARRELS:
+    w(A / "models/item" / f"omni_tool_{b}.json", omni_display | {"visibility": {h: False for h in OMNI_HIDDEN} | {
+        f"weapon_module_barrel_{o}": False for o in ["none"] + [x for x in OMNI_BARRELS if x != b]}})
+w(A / "items/omni_tool.json", {"model": {"type": "minecraft:select", "property": mid("barrel"),
+    "cases": [{"when": b, "model": {"type": "minecraft:model", "model": f"{MOD}:item/omni_tool_{b}"}} for b in OMNI_BARRELS],
+    "fallback": {"type": "minecraft:model", "model": f"{MOD}:item/omni_tool"}}})
 
 def tinted_item(name, base, overlay, rgb):
     w(A / "models/item" / f"{name}.json", {"parent": "minecraft:item/generated", "textures": {
@@ -720,6 +734,7 @@ SOUNDS = {"phaser_rifle_shot": ["weapon/phaser_rifle_shot"], "plasma_shotgun_sho
           "sniper_rifle_fire": ["weapon/sniper_rifle_fire"], "reload": ["weapon/reload"], "overheat": ["weapon/overheat_med"],
           "overheat_alarm": ["weapon/overheat_alarm"], "phaser_beam": ["phaser/phaser_beam_0", "phaser/phaser_beam_1"],
           "phaser_switch_mode": ["phaser/phaser_switch_mode"],
+          "laser_fire": ["weapon/laser_fire_0"], "omni_tool_hum": ["weapon/omni_tool_hum"],
           # androids (phase 6)
           "glitch": [f"gui/glitch_{i}" for i in range(11)], "transformation_music": ["music/transformation_music"],
           "biotic_stat_unlock": ["gui/biotic_stat_unlock"], "android_teleport": ["entities/android_teleport"],
@@ -755,6 +770,9 @@ shaped("phaser", mid("phaser"), ["IGI", "IPH", "WCW"],
 shaped("phaser_rifle", mid("phaser_rifle"), ["III", "SPC", "WHB"],
        {"I": "minecraft:iron_ingot", "S": mid("weapon_receiver"), "P": mid("plasma_core"), "C": MK[3], "W": "#minecraft:wool",
         "H": mid("weapon_handle"), "B": mid("battery")}, category="equipment")
+shaped("omni_tool", mid("omni_tool"), ["IFC", "SPI", " BH"],
+       {"I": "minecraft:iron_ingot", "F": mid("forcefield_emitter"), "C": MK[3], "S": mid("weapon_receiver"), "P": mid("plasma_core"),
+        "B": mid("battery"), "H": mid("weapon_handle")}, category="equipment")
 shaped("plasma_shotgun", mid("plasma_shotgun"), ["SP ", "ICH", "SPB"],
        {"S": mid("weapon_receiver"), "P": mid("plasma_core"), "I": "minecraft:iron_ingot", "C": MK[3], "H": mid("weapon_handle"),
         "B": mid("battery")}, category="equipment")
@@ -1480,7 +1498,7 @@ for src_name, dst_name in [("en_US", "en_us"), ("ru_RU", "ru_ru")]:
         lang[f"item.{MOD}.{n}"] = src.get(key) or EXTRA.get(dst_name, {}).get(n) or en.get(key) or n
         if key not in src and n not in EXTRA.get(dst_name, {}):
             fallback.append(n)
-    for n in list(BATTERIES) + ["pattern_drive", "network_flash_drive", "spacetime_equalizer", "phaser", "phaser_rifle", "plasma_shotgun",
+    for n in list(BATTERIES) + ["pattern_drive", "network_flash_drive", "spacetime_equalizer", "phaser", "phaser_rifle", "plasma_shotgun", "omni_tool",
                                 "ion_sniper", "energy_pack", "matter_container", "matter_container_full"]:
         lang[f"item.{MOD}.{n}"] = src.get(f"item.{n}.name") or en.get(f"item.{n}.name")
     for n in BLOCKS + MACHINES + MACHINES_P3:

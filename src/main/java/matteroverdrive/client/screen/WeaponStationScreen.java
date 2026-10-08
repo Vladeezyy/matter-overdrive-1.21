@@ -33,7 +33,8 @@ public class WeaponStationScreen extends MachineScreen<WeaponStationMenu> {
         int[][] rifle = {{152, 52}, {100, 52}, {92, 58}, {132, 47}};
         return Map.of(MOItems.PHASER.get(), new int[][] {{152, 58}, {100, 52}, {88, 58}, null},
                 MOItems.PHASER_RIFLE.get(), rifle, MOItems.PLASMA_SHOTGUN.get(), rifle,
-                MOItems.ION_SNIPER.get(), new int[][] {{152, 52}, {108, 58}, {92, 62}, {140, 47}});
+                MOItems.ION_SNIPER.get(), new int[][] {{152, 52}, {108, 58}, {92, 62}, {140, 47}},
+                MOItems.OMNI_TOOL.get(), new int[][] {{158, 58}, {120, 47}, {88, 67}, null});
     }
 
     public WeaponStationScreen(WeaponStationMenu menu, Inventory playerInventory, Component title) {

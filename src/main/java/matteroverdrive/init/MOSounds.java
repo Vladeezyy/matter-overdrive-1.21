@@ -20,6 +20,8 @@ public final class MOSounds {
 
     public static final DeferredHolder<SoundEvent, SoundEvent> PHASER_BEAM = sound("phaser_beam");
     public static final DeferredHolder<SoundEvent, SoundEvent> PHASER_SWITCH_MODE = sound("phaser_switch_mode");
+    public static final DeferredHolder<SoundEvent, SoundEvent> LASER_FIRE = sound("laser_fire");
+    public static final DeferredHolder<SoundEvent, SoundEvent> OMNI_TOOL_HUM = sound("omni_tool_hum");
 
     // Androids (phase 6)
     public static final DeferredHolder<SoundEvent, SoundEvent> GLITCH = sound("glitch");

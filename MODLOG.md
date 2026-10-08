@@ -262,6 +262,14 @@
   plasma source / places one like a bucket; `Capabilities.Fluid.ITEM` handler swaps empty ↔ full for exactly 32 mB
   (1.7.10 FluidContainerRegistry). Full icon = container + centre fill (COLOR_MATTER) + bottom fill (yellow stripes)
   as tinted layers. Android house loot now has full containers. 69 GameTests.
+- **7h ✅** Omni tool (`OmniToolItem`): attack key fires 7-damage bolts every 18 ticks (504 FE: 1.7.10 drained
+  512/18 = 28 FE/t x 18), laser_fire sound, heat (heat+4) x 2.7 of 80, accuracy 0.3 + heat/max x 5, range 24. Held use
+  digs the block the beam points at (server-side progress per player, `getDestroyProgress` at destroy speed 8 through
+  the damage modules, `gameMode.destroyBlock`, crack overlay, 240 ticks per use). 1.7.10 digging cost rounded to 0 FE →
+  kept free (like the barrel quirk). No sights, damage/fire barrels + colour. Beam = phaser beam renderer (now also for
+  the omni tool, ends at blocks), looping omni_tool_hum while digging (client tickable sound). wielder.obj at scale 7
+  with damage/fire barrel variants (select property). Now 30 of 115 in `WeaponFactory` (rogue androids, loot).
+  Recipe IFC/SPI/ BH. 70 GameTests. Deviation: no dig_effect glow on the dug face; hull not tinted (like other weapons).
 
 ### Next in phase 7 (start here)
 1. ~~Failed animals~~ ✅ 7c.
@@ -281,7 +289,7 @@
 **Workflow**
 - Resources: never hand-edit `src/main/resources/{assets,data}` — regenerate:
   `rm -rf src/main/resources/{assets,data} && python3 -I tools/gen_resources.py ~/mo-reference/mo-1.7.10/src/main/resources/assets/mo src/main/resources`
-- Tests: `./gradlew runGameTestServer` (69 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
+- Tests: `./gradlew runGameTestServer` (70 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
   `FunctionGameTestInstance`, custom 12³ structure `matteroverdrive:gametest_area`, time-of-day via `TestEnvironmentDefinition.TimeOfDay`,
   `makeMockServerPlayerInLevel`). Visual: `./gradlew runScene` → `run/screenshots/scene_*.png` (DevScene, world `run/saves/mo_scene`;
   pristine copy = "Новый мир (2)"; needs `pauseOnLostFocus=false`; selected hotbar slot is client-side; place blocks with

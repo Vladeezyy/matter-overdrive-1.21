@@ -445,7 +445,26 @@ public final class DevScene {
             p.getInventory().setItem(1, new ItemStack(MOItems.MATTER_CONTAINER_FULL.get(), 3));
         }));
         at(1400, mc -> shot(mc, "matter_plasma"));
-        at(1402, mc -> mc.stop());
+        // 7h: the omni tool digging a wall 6 blocks away
+        at(1402, mc -> server(mc, p -> {
+            BlockPos base = origin.above(14);
+            for (BlockPos pos : BlockPos.betweenClosed(base.offset(-2, 0, -7), base.offset(2, 2, -7))) {
+                p.level().setBlockAndUpdate(pos, Blocks.STONE.defaultBlockState());
+            }
+            ItemStack tool = new ItemStack(MOItems.OMNI_TOOL.get());
+            matteroverdrive.item.weapon.EnergyWeaponItem.setEnergy(tool, 32000);
+            p.getInventory().setItem(0, tool);
+            p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() - 1.0, Set.of(), 180f, 0f, false);
+        }));
+        at(1410, mc -> mc.options.keyUse.setDown(true));
+        at(1428, mc -> shot(mc, "omni_tool"));
+        at(1429, mc -> mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT));
+        at(1436, mc -> shot(mc, "omni_tool_third_person"));
+        at(1437, mc -> {
+            mc.options.keyUse.setDown(false);
+            mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+        });
+        at(1440, mc -> mc.stop());
     }
 
     private static void at(int t, Consumer<Minecraft> action) {

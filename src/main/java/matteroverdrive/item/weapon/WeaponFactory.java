@@ -9,15 +9,15 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * 1.7.10 WeaponFactory.getRandomDecoratedEnergyWeapon: phaser rifle 70, plasma shotgun 10, ion sniper 5 (the omni tool,
- * weight 30, isn't ported yet); barrel none 200 / damage 100 (level 1+) / fire 10 (level 1+) / explosion 5 (level 2+);
+ * 1.7.10 WeaponFactory.getRandomDecoratedEnergyWeapon: phaser rifle 70, omni tool 30, plasma shotgun 10, ion sniper 5; barrel none 200 / damage 100 (level 1+) / fire 10 (level 1+) / explosion 5 (level 2+);
  * battery 100 / hc battery 20 (level 1+); sniper scope 10 of 310 (level 1+). Fully charged. Legendary weapons get the
  * gold "Legendary" name (their 1.7.10 stat bonuses aren't ported).
  */
 public final class WeaponFactory {
     public static ItemStack randomDecorated(RandomSource random, int level, boolean legendary) {
-        int roll = random.nextInt(85);
-        EnergyWeaponItem item = roll < 70 ? MOItems.PHASER_RIFLE.get() : roll < 80 ? MOItems.PLASMA_SHOTGUN.get() : MOItems.ION_SNIPER.get();
+        int roll = random.nextInt(115);
+        EnergyWeaponItem item = roll < 70 ? MOItems.PHASER_RIFLE.get() : roll < 100 ? MOItems.OMNI_TOOL.get()
+                : roll < 110 ? MOItems.PLASMA_SHOTGUN.get() : MOItems.ION_SNIPER.get();
         ItemStack weapon = new ItemStack(item);
         int barrel = random.nextInt(200 + (level >= 1 ? 110 : 0) + (level >= 2 ? 5 : 0));
         ItemStack module = barrel < 200 ? ItemStack.EMPTY : barrel < 300 ? new ItemStack(MOItems.BARREL_DAMAGE.get())

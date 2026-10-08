@@ -48,6 +48,18 @@
       "matteroverdrive:phaser/phaser_switch_mode"
     ]
   },
+  "laser_fire": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:weapon/laser_fire_0"
+    ]
+  },
+  "omni_tool_hum": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:weapon/omni_tool_hum"
+    ]
+  },
   "glitch": {
     "category": "player",
     "sounds": [

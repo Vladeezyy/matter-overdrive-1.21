@@ -38,6 +38,51 @@ public final class WeaponClient {
         }
     }
 
+    /** 1.7.10 RenderWeaponsBeam.playWeaponSound: the omni tool hums while it digs (one looping sound per player). */
+    private static final java.util.Map<net.minecraft.world.entity.player.Player, OmniToolHum> HUMS = new java.util.WeakHashMap<>();
+
+    @SubscribeEvent
+    static void onHum(ClientTickEvent.Post event) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level == null) return;
+        for (var player : mc.level.players()) {
+            OmniToolHum hum = HUMS.get(player);
+            if (OmniToolHum.digging(player) && (hum == null || hum.isStopped())) {
+                hum = new OmniToolHum(player);
+                HUMS.put(player, hum);
+                mc.getSoundManager().play(hum);
+            }
+        }
+    }
+
+    private static final class OmniToolHum extends net.minecraft.client.resources.sounds.AbstractTickableSoundInstance {
+        private final net.minecraft.world.entity.player.Player player;
+
+        OmniToolHum(net.minecraft.world.entity.player.Player player) {
+            super(matteroverdrive.init.MOSounds.OMNI_TOOL_HUM.get(), net.minecraft.sounds.SoundSource.PLAYERS, player.getRandom());
+            this.player = player;
+            this.looping = true;
+            this.volume = 0.06f + player.getRandom().nextFloat() * 0.04f;
+            this.pitch = 0.95f + player.getRandom().nextFloat() * 0.1f;
+            tick();
+        }
+
+        static boolean digging(net.minecraft.world.entity.player.Player player) {
+            return player.isUsingItem() && player.getUseItem().getItem() instanceof matteroverdrive.item.weapon.OmniToolItem;
+        }
+
+        @Override
+        public void tick() {
+            if (player.isRemoved() || !digging(player)) {
+                stop();
+                return;
+            }
+            x = player.getX();
+            y = player.getY();
+            z = player.getZ();
+        }
+    }
+
     @SubscribeEvent
     static void onFov(ComputeFovModifierEvent event) {
         var player = event.getPlayer();

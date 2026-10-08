@@ -133,6 +133,6 @@ public class MatterOverdriveClient {
             public HumanoidModel.ArmPose getArmPose(LivingEntity entity, InteractionHand hand, ItemStack stack) {
                 return entity.isUsingItem() && entity.getUsedItemHand() == hand ? HumanoidModel.ArmPose.BOW_AND_ARROW : null;
             }
-        }, MOItems.PHASER.get(), MOItems.PHASER_RIFLE.get(), MOItems.PLASMA_SHOTGUN.get(), MOItems.ION_SNIPER.get());
+        }, MOItems.PHASER.get(), MOItems.PHASER_RIFLE.get(), MOItems.PLASMA_SHOTGUN.get(), MOItems.ION_SNIPER.get(), MOItems.OMNI_TOOL.get());
     }
 }

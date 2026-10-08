@@ -26,6 +26,7 @@ final class ModuleGameTests {
         MOGameTests.add("battery_module_powers_weapon", 20, false, ModuleGameTests::batteryModule);
         MOGameTests.add("sniper_scope_stats", 20, false, ModuleGameTests::scope);
         MOGameTests.add("weapon_station_installs_modules", 20, false, ModuleGameTests::station);
+        MOGameTests.add("omni_tool", 20, false, ModuleGameTests::omniTool);
     }
 
     private static void check(GameTestHelper helper, boolean ok, String message) {
@@ -37,6 +38,30 @@ final class ModuleGameTests {
         var pos = helper.absolutePos(new BlockPos(6, 1, 1)).getBottomCenter();
         player.snapTo(pos.x, pos.y, pos.z, 0, 0);
         return player;
+    }
+
+    /** 1.7.10 OmniTool: digs the block it points at from afar, fires bolts, takes no sights or explosion/heal barrels. */
+    private static void omniTool(GameTestHelper helper) {
+        var omni = MOItems.OMNI_TOOL.get();
+        check(helper, !omni.canInstall(WeaponModule.SLOT_SIGHTS, new ItemStack(MOItems.SNIPER_SCOPE.get()))
+                && !omni.canInstall(WeaponModule.SLOT_BARREL, new ItemStack(MOItems.BARREL_EXPLOSION.get()))
+                && omni.canInstall(WeaponModule.SLOT_BARREL, new ItemStack(MOItems.BARREL_FIRE.get())), "module rules");
+        ItemStack tool = new ItemStack(omni);
+        EnergyWeaponItem.setEnergy(tool, EnergyWeaponItem.CAPACITY);
+        ServerPlayer player = player(helper);
+        player.setItemSlot(EquipmentSlot.MAINHAND, tool);
+        BlockPos stone = new BlockPos(6, 2, 7);
+        helper.setBlock(stone, net.minecraft.world.level.block.Blocks.STONE);
+        for (int i = 0; i < 200 && !helper.getLevel().getBlockState(helper.absolutePos(stone)).isAir(); i++) {
+            omni.onUseTick(helper.getLevel(), player, tool, 200 - i);
+        }
+        check(helper, helper.getLevel().getBlockState(helper.absolutePos(stone)).isAir(), "stone 6 blocks away wasn't dug");
+        omni.tryFire(player, tool, false);
+        var bolts = helper.getLevel().getEntitiesOfClass(matteroverdrive.entity.PlasmaBolt.class, player.getBoundingBox().inflate(8));
+        // 1.7.10 drained energy use x cooldown per shot: 512 / 18 = 28 FE/t, x 18 = 504
+        check(helper, bolts.size() == 1 && EnergyWeaponItem.getEnergy(tool) == EnergyWeaponItem.CAPACITY - 504, "bolts " + bolts.size()
+                + ", energy " + EnergyWeaponItem.getEnergy(tool));
+        helper.succeed();
     }
 
     /** 1.7.10 damage barrel: damage x1.5, energy x0.5. */

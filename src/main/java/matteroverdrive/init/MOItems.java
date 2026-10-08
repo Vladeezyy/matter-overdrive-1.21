@@ -140,6 +140,7 @@ public final class MOItems {
     // Weapons (phase 5)
     public static final DeferredItem<PhaserItem> PHASER = item("phaser", PhaserItem::new, p -> p);
     public static final DeferredItem<PhaserRifleItem> PHASER_RIFLE = item("phaser_rifle", PhaserRifleItem::new, p -> p);
+    public static final DeferredItem<matteroverdrive.item.weapon.OmniToolItem> OMNI_TOOL = item("omni_tool", matteroverdrive.item.weapon.OmniToolItem::new, p -> p);
     public static final DeferredItem<PlasmaShotgunItem> PLASMA_SHOTGUN = item("plasma_shotgun", PlasmaShotgunItem::new, p -> p);
     public static final DeferredItem<IonSniperItem> ION_SNIPER = item("ion_sniper", IonSniperItem::new, p -> p);
     public static final DeferredItem<EnergyPackItem> ENERGY_PACK = item("energy_pack", EnergyPackItem::new, p -> p);
