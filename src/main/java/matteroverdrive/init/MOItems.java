@@ -273,7 +273,10 @@ public final class MOItems {
     }
 
     private static DeferredItem<BlockItem> block(String name, net.neoforged.neoforge.registries.DeferredBlock<?> block) {
-        DeferredItem<BlockItem> item = ITEMS.registerSimpleBlockItem(name, block);
+        // machines get 1.7.10 MOMachineBlockItem: "[Configured]", the energy bar and the Shift tooltip
+        DeferredItem<BlockItem> item = ITEMS.registerItem(name, props -> block.get() instanceof matteroverdrive.machine.MachineBlock
+                ? new matteroverdrive.machine.MachineBlockItem(block.get(), props) : new BlockItem(block.get(), props),
+                net.minecraft.world.item.Item.Properties::useBlockDescriptionPrefix);
         TAB_ORDER.add(item);
         return item;
     }

@@ -14,6 +14,8 @@
               "source": "block_entity",
               "include": [
                 "matteroverdrive:energy",
+                "matteroverdrive:machine_storage",
+                "matteroverdrive:security_owner",
                 "matteroverdrive:transport_locations",
                 "matteroverdrive:transport_selected"
               ]

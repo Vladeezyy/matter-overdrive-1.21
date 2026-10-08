@@ -36,6 +36,14 @@ public class MatterTank extends FluidStacksResourceHandler {
         return (int) Math.min(Integer.MAX_VALUE, baseCapacity * upgrades.applyAsDouble(UpgradeType.MATTER_STORAGE));
     }
 
+    public int getMaxInsert() {
+        return maxInsert;
+    }
+
+    public int getMaxExtract() {
+        return maxExtract;
+    }
+
     public int getFreeSpace() {
         return Math.max(0, getCapacity() - getMatter());
     }

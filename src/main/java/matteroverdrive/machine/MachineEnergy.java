@@ -42,6 +42,14 @@ public class MachineEnergy extends SimpleEnergyHandler {
         return capacity;
     }
 
+    public int getMaxInsert() {
+        return maxInsert;
+    }
+
+    public int getMaxExtract() {
+        return maxExtract;
+    }
+
     /** Machine-side change that ignores the insert/extract limits (generation and consumption). */
     public void add(int amount) {
         set(Math.max(0, Math.min(capacity, energy + amount)));

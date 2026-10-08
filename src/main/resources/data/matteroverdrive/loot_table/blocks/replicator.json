@@ -13,7 +13,9 @@
               "function": "minecraft:copy_components",
               "source": "block_entity",
               "include": [
-                "matteroverdrive:energy"
+                "matteroverdrive:energy",
+                "matteroverdrive:machine_storage",
+                "matteroverdrive:security_owner"
               ]
             }
           ]

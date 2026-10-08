@@ -336,8 +336,16 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
     @Override
     protected void collectImplicitComponents(DataComponentMap.Builder components) {
         super.collectImplicitComponents(components);
-        if (energy.getEnergy() > 0) {
+        boolean hasEnergy = energy.getEnergy() > 0;
+        boolean hasMatter = matter != null && matter.getMatter() > 0;
+        if (hasEnergy) {
             components.set(MODataComponents.ENERGY.get(), energy.getEnergy());
+        }
+        if (hasEnergy || hasMatter) {
+            components.set(MODataComponents.MACHINE_STORAGE.get(), new MachineStorage(
+                    hasEnergy ? energy.getCapacity() : 0, hasEnergy ? energy.getMaxExtract() : 0, hasEnergy ? energy.getMaxInsert() : 0,
+                    hasMatter ? matter.getMatter() : 0, hasMatter ? matter.getCapacity() : 0,
+                    hasMatter ? matter.getMaxExtract() : 0, hasMatter ? matter.getMaxInsert() : 0));
         }
         // 1.7.10 writeToDropItem kept the owner on the machine's item
         if (owner != null) components.set(MODataComponents.SECURITY_OWNER.get(), owner);
@@ -351,6 +359,10 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
             energy.refresh();
             energy.set(Math.min(stored, energy.getCapacity()));
         }
+        MachineStorage storage = components.get(MODataComponents.MACHINE_STORAGE.get());
+        if (matter != null && storage != null && storage.matter() > 0) {
+            matter.setMatter(Math.min(storage.matter(), matter.getCapacity()));
+        }
         owner = components.get(MODataComponents.SECURITY_OWNER.get());
     }
 
@@ -358,6 +370,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
     public void removeComponentsFromTag(ValueOutput output) {
         super.removeComponentsFromTag(output);
         output.discard("energy");
+        output.discard("matter");
         output.discard("owner");
     }
 

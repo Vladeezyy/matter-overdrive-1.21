@@ -29,6 +29,7 @@ final class MachineGameTests {
         MOGameTests.add("battery_charges_machine", 20, false, MachineGameTests::batteryChargesMachine);
         MOGameTests.add("upgrade_multipliers", 20, false, MachineGameTests::upgradeMultipliers);
         MOGameTests.add("machine_drop_keeps_energy", 20, false, MachineGameTests::dropKeepsEnergy);
+        MOGameTests.add("machine_item_keeps_matter_and_owner", 20, false, MachineGameTests::itemKeepsMatterAndOwner);
     }
 
     private static void solarGeneratesAtNoon(GameTestHelper helper) {
@@ -144,6 +145,36 @@ final class MachineGameTests {
         helper.assertTrue(drops.size() == 1 && drops.get(0).is(MOItems.INSCRIBER.get()), Component.literal("drops: " + drops));
         Integer energy = drops.get(0).get(MODataComponents.ENERGY.get());
         helper.assertTrue(energy != null && energy == 12345, Component.literal("dropped energy " + energy));
+        helper.succeed();
+    }
+
+    /** 1.7.10 writeToDropItem / readFromPlaceItem: energy (with its capacity), matter and the owner go with the item. */
+    private static void itemKeepsMatterAndOwner(GameTestHelper helper) {
+        helper.setBlock(A, MOBlocks.REPLICATOR.get());
+        var replicator = helper.getBlockEntity(A, matteroverdrive.block.entity.ReplicatorBlockEntity.class);
+        replicator.getEnergy().set(5000);
+        replicator.getMatterTank().setMatter(321);
+        java.util.UUID owner = java.util.UUID.randomUUID();
+        ItemStack protocol = new ItemStack(MOItems.SECURITY_PROTOCOL.get());
+        protocol.set(MODataComponents.SECURITY_OWNER.get(), owner);
+        helper.assertTrue(replicator.claim(protocol), Component.literal("claim"));
+        BlockPos abs = helper.absolutePos(A);
+        List<ItemStack> drops = Block.getDrops(helper.getLevel().getBlockState(abs), helper.getLevel(), abs, replicator, null,
+                new ItemStack(Items.IRON_PICKAXE));
+        helper.assertTrue(drops.size() == 1, Component.literal("drops: " + drops));
+        ItemStack item = drops.get(0);
+        var storage = item.get(MODataComponents.MACHINE_STORAGE.get());
+        helper.assertTrue(item.getItem() instanceof matteroverdrive.machine.MachineBlockItem && storage != null
+                && storage.maxEnergy() == replicator.getEnergy().getCapacity() && storage.matter() == 321
+                && storage.maxMatter() == replicator.getMatterTank().getCapacity() && owner.equals(item.get(MODataComponents.SECURITY_OWNER.get()))
+                && matteroverdrive.machine.MachineBlockItem.isConfigured(item) && item.isBarVisible(),
+                Component.literal("item " + item.getComponentsPatch()));
+        helper.setBlock(B, MOBlocks.REPLICATOR.get());
+        var placed = helper.getBlockEntity(B, matteroverdrive.block.entity.ReplicatorBlockEntity.class);
+        placed.applyComponentsFromItemStack(item);
+        helper.assertTrue(placed.getEnergy().getEnergy() == 5000 && placed.getMatterTank().getMatter() == 321 && owner.equals(placed.getOwner()),
+                Component.literal("placed " + placed.getEnergy().getEnergy() + " FE, " + placed.getMatterTank().getMatter() + " kM, " + placed.getOwner()));
+        helper.assertFalse(matteroverdrive.machine.MachineBlockItem.isConfigured(new ItemStack(MOItems.REPLICATOR.get())), Component.literal("fresh item configured"));
         helper.succeed();
     }
 

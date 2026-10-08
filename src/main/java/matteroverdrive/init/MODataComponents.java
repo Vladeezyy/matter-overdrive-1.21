@@ -111,5 +111,10 @@ public final class MODataComponents {
             COMPONENTS.registerComponentType("network_filter", b -> b.persistent(net.minecraft.core.BlockPos.CODEC.listOf())
                     .networkSynchronized(net.minecraft.core.BlockPos.STREAM_CODEC.apply(ByteBufCodecs.list())));
 
+    /** A machine carried as an item: its energy capacity / transfer and its matter (1.7.10 writeToDropItem). */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<matteroverdrive.machine.MachineStorage>> MACHINE_STORAGE =
+            COMPONENTS.registerComponentType("machine_storage", b -> b.persistent(matteroverdrive.machine.MachineStorage.CODEC)
+                    .networkSynchronized(ByteBufCodecs.fromCodec(matteroverdrive.machine.MachineStorage.CODEC)));
+
     private MODataComponents() {}
 }

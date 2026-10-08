@@ -1780,6 +1780,24 @@ w(D / "worldgen/processor_list/mad_scientist_house.json", {"processors": [{"proc
 w(D / "worldgen/processor_list/mad_scientist_house_desert.json", {"processors": [{"processor_type": f"{MOD}:random_crate"},
     {"processor_type": f"{MOD}:mad_scientist_crate"}]})
 
+# Machines carry their energy, matter and owner on their item (1.7.10 writeToDropItem): add those components to
+# every machine's copy_components.
+MACHINE_ITEM_DATA = [mid("energy"), mid("machine_storage"), mid("security_owner")]
+for n in ["android_station", "decomposer", "fusion_reactor_controller", "gravitational_stabilizer",
+          "pattern_monitor", "pattern_storage", "solar_panel", "star_map", "weapon_station", "contract_market",
+          "charging_station", "inscriber", "replicator", "matter_recycler", "transporter", "matter_analyzer"]:
+    p = D / f"loot_table/blocks/{n}.json"
+    table = json.loads(p.read_text())
+    for pool in table["pools"]:
+        for entry in pool["entries"]:
+            functions = entry.setdefault("functions", [])
+            copy = next((f for f in functions if f["function"] == "minecraft:copy_components"), None)
+            if copy is None:
+                copy = {"function": "minecraft:copy_components", "source": "block_entity", "include": []}
+                functions.insert(0, copy)
+            copy["include"] = MACHINE_ITEM_DATA + [c for c in copy["include"] if c not in MACHINE_ITEM_DATA]
+    w(p, table)
+
 # --- lang ------------------------------------------------------------------------------------
 def parse_lang(p):
     d = {}
@@ -1876,6 +1894,9 @@ GUI_KEYS = {
     "item.matteroverdrive.portable_decomposer.details": {"en_us": "Decomposes picked up items into Matter Plasma",
                                                          "ru_ru": "Разбирает подобранные предметы в плазменную материю"},
     "block.matteroverdrive.matter_plasma": {"en_us": "Matter Plasma", "ru_ru": "Плазменная материя"},
+    "item.matteroverdrive.info.configured": "item.info.configured",
+    "tooltip.matteroverdrive.more_info": {"en_us": "Hold %s for Details.", "ru_ru": "Удерживайте %s для подробностей."},
+    "tooltip.matteroverdrive.send_receive": {"en_us": "Send/Receive: %s/%s %s/t", "ru_ru": "Отдача/приём: %s/%s %s/т"},
     "tooltip.matteroverdrive.energy_io": {"en_us": "Input/Output: %s/%s FE/t", "ru_ru": "Вход/выход: %s/%s FE/т"},
     "upgrade_type.matteroverdrive.speed": "upgradetype.Speed.name",
     "upgrade_type.matteroverdrive.power_usage": "upgradetype.PowerUsage.name",
@@ -1993,7 +2014,10 @@ for src_name, dst_name in [("en_US", "en_us"), ("ru_RU", "ru_ru")]:
         lang[f"gui.{MOD}.page.{k}"] = src.get(f"gui.tooltip.page.{k}") or en[f"gui.tooltip.page.{k}"]
     # 7s: star map
     lang[f"block.{MOD}.star_map"] = src.get("tile.star_map.name") or en["tile.star_map.name"]
-    lang[f"block.{MOD}.star_map.details"] = src.get("tile.star_map.details") or en["tile.star_map.details"]
+    # 1.7.10 tile.<name>.details: the machine items' Shift tooltip (and the guide's details)
+    for k in en:
+        if k.startswith("tile.") and k.endswith(".details"):
+            lang[f"block.{MOD}.{k[5:-8]}.details"] = src.get(k) or en[k]
     lang[f"gui.{MOD}.hologram.access_denied"] = src.get("gui.hologram.access_denied") or en["gui.hologram.access_denied"]
     # 7r: security protocol names / details and the machine rights alerts ($0 = the machine)
     for t in ["empty", "claim", "access", "remove"]:

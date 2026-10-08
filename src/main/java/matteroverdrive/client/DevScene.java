@@ -1204,7 +1204,24 @@ public final class DevScene {
                         sound instanceof net.minecraft.client.resources.sounds.SoundInstance s ? s.getVolume() : 0);
             }
         });
-        at(3184, mc -> mc.stop());
+        // leftovers: the machine item tooltip - a replicator carried with its energy, matter and owner
+        at(3182, mc -> {
+            ItemStack item = new ItemStack(MOItems.REPLICATOR.get());
+            if (mc.level.getBlockEntity(replicatorPos) instanceof matteroverdrive.machine.MachineBlockEntity m) {
+                m.getMatterTank().setMatter(600);
+                item.applyComponents(m.collectComponents());
+            }
+            item.set(matteroverdrive.init.MODataComponents.SECURITY_OWNER.get(), mc.player.getUUID());
+            mc.setScreen(new TooltipScreen(item));
+        });
+        at(3190, mc -> shot(mc, "machine_item_tooltip"));
+        at(3191, mc -> MachineTooltip.sceneShift = true);
+        at(3199, mc -> shot(mc, "machine_item_tooltip_shift"));
+        at(3200, mc -> {
+            MachineTooltip.sceneShift = false;
+            mc.setScreen(null);
+        });
+        at(3204, mc -> mc.stop());
     }
 
     /** Shows one item's tooltip in the middle of the screen. */
@@ -1220,6 +1237,7 @@ public final class DevScene {
         public void render(net.minecraft.client.gui.GuiGraphics g, int mouseX, int mouseY, float partialTick) {
             super.render(g, mouseX, mouseY, partialTick);
             g.renderItem(stack, width / 2 - 100, height / 2 - 40);
+            g.renderItemDecorations(font, stack, width / 2 - 100, height / 2 - 40);
             g.setTooltipForNextFrame(font, stack, width / 2 - 80, height / 2 - 40);
         }
 

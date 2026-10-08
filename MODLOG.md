@@ -490,6 +490,17 @@
   machine, analyzer, force_field, replicate_success, windy; transporter is a block sound now.
   - The transporter no longer plays a one-shot at both ends on teleport (1.7.10 only had the loop).
   - Deviations: no per-machine "volume" config (the port has no config file); sounds sit at the block centre.
+- **Leftovers: machine item tooltip ✅** (1.7.10 MOMachineBlockItem, MOTileEntityMachineEnergy / Matter writeToDropItem
+  and readFromPlaceItem). Machine blocks get `MachineBlockItem`: "[Configured]" in aqua after the name when the item
+  carries any data (1.7.10 hasTagCompound), the stored energy as the durability bar. `client/MachineTooltip`: with Shift
+  the 1.7.10 tile.*.details text, "energy / capacity FE" (yellow), "Send/Receive: x/y FE/t", "matter / capacity kM"
+  (blue), "Send/Receive" for matter (dark blue); without Shift "Hold Shift for Details." New `machine_storage`
+  component (capacity and transfer rates, the stored matter); machines now keep their matter on the item too and get
+  it back when placed. 94 GameTests.
+  - Fix: machine loot tables only copied the energy, so a claimed machine lost its owner when broken; every machine
+    now copies energy, machine_storage and security_owner (merged in gen_resources).
+  - Deviations: no "Inventory:" list (the port drops a machine's slots when it breaks instead of keeping upgrades /
+    battery / filter / shielding in the item like the 1.7.10 wrench); numbers use the port's compact format (512k).
 - Cloud (Linux) notes: regenerating resources rewrites the .ogg and ffmpeg-made .png bytes (different ffmpeg/oggenc
   builds) - `git checkout` them. Screenshots: `Xvfb :99` + `DISPLAY=:99 ./gradlew runScene` (software GL is slow; give
   menus extra ticks), world created by `runServer` with a flat creative server.properties, then moved to run/saves;
@@ -511,7 +522,7 @@
 **Workflow**
 - Resources: never hand-edit `src/main/resources/{assets,data}` — regenerate:
   `rm -rf src/main/resources/{assets,data} && python3 -I tools/gen_resources.py ~/mo-reference/mo-1.7.10/src/main/resources/assets/mo src/main/resources`
-- Tests: `./gradlew runGameTestServer` (93 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
+- Tests: `./gradlew runGameTestServer` (94 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
   `FunctionGameTestInstance`, custom 12³ structure `matteroverdrive:gametest_area`, time-of-day via `TestEnvironmentDefinition.TimeOfDay`,
   `makeMockServerPlayerInLevel`). Visual: `./gradlew runScene` → `run/screenshots/scene_*.png` (DevScene, world `run/saves/mo_scene`;
   pristine copy = "Новый мир (2)"; needs `pauseOnLostFocus=false`; selected hotbar slot is client-side; place blocks with
@@ -561,14 +572,17 @@
 - Sounds must be mono ogg: ffmpeg → mono wav → `oggenc` (vorbis-tools); ffmpeg's built-in vorbis is stereo-only.
 
 ## Next
-- Phase 7 ✅. Leftovers done: legendary bonuses, network destination filters, machine renderers, machine sounds.
+- Phase 7 ✅. Leftovers done: legendary bonuses, network destination filters, machine renderers, machine sounds,
+  machine item tooltip.
 - Leftovers still to do (user: any order):
-  1. the machine item tooltip with stored energy;
-  2. android shield bubble, hit flash and shield loop sound; teleport target marker;
-  3. custom tritanium armor model (1.7.10 Tritanium_Armor2_*).
+  1. android shield bubble, hit flash and shield loop sound; teleport target marker;
+  2. custom tritanium armor model (1.7.10 Tritanium_Armor2_*);
+  3. noticed while doing the sounds: the stabilizer's beam is END_ROD particles, not the 1.7.10 coloured beam
+     (GravitationalStabilizerBeamParticle; colours are `getBeamColorR/G/B` now); missing weapon sounds sizzle,
+     laser_ricochet (plasma bolt hits), plasma_shotgun_charging, gui button_expand.
 
 ## Handover (2026-10-08, cloud -> local)
-- Branch `main-uvidhk`, everything committed and pushed. Last commit: "Leftovers: machine renderers ...". 93 GameTests
+- Branch `main-uvidhk`, everything committed and pushed. Last commit: "Leftovers: machine item tooltip ...". 94 GameTests
   pass (`./gradlew runGameTestServer`).
 - DevScene now builds the scene at the world spawn on the flat surface (`level.getMinY() + 4`), not at the player's
   saved position. A local mo_scene world that isn't a default superflat may put the floor elsewhere: adjust `build()`
