@@ -24,11 +24,17 @@ public final class QuestEvents {
     /** 1.7.10 MOEventDialogInteract: a dialog message became active for the player. */
     public record DialogInteract(Entity npc, Object message) {}
 
+    /** 1.7.10 MOEventScan: a Data Pad or matter scanner finished scanning a block. */
+    public record Scan(net.minecraft.core.BlockPos pos, net.minecraft.world.level.block.state.BlockState state, ItemStack scanner) {}
+
     /** 1.7.10 MOExtendedProperties.addQuest (server). */
     public static boolean addQuest(ServerPlayer player, QuestStack stack) {
         if (stack.getQuest() == null) return false;
         PlayerQuests quests = PlayerQuests.get(player);
-        // 1.7.10 gave a Data Pad with the first quest; it arrives with the Data Pad port
+        // 1.7.10: the first quest ever comes with a Data Pad
+        if (quests.active.isEmpty() && quests.completed.isEmpty()) {
+            player.getInventory().add(new ItemStack(matteroverdrive.init.MOItems.DATA_PAD.get()));
+        }
         quests.active.add(stack);
         PlayerQuests.sync(player);
         return true;

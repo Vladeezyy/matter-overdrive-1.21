@@ -28,6 +28,7 @@ final class QuestGameTests {
         MOGameTests.add("quest_puny_humans", 20, false, QuestGameTests::punyHumans);
         MOGameTests.add("quest_cocktail_of_ascension", 20, false, QuestGameTests::cocktail);
         MOGameTests.add("mad_scientist_house", 20, false, QuestGameTests::house);
+        MOGameTests.add("data_pad", 20, false, QuestGameTests::dataPad);
     }
 
     private static void check(GameTestHelper helper, boolean ok, String message) {
@@ -155,6 +156,34 @@ final class QuestGameTests {
         var scientists = level.getEntitiesOfClass(MadScientist.class, new net.minecraft.world.phys.AABB(origin).inflate(10));
         check(helper, scientists.size() == 1 && !scientists.get(0).removeWhenFarAway(1000), "scientists " + scientists.size());
         scientists.forEach(MadScientist::discard);
+        helper.succeed();
+    }
+
+    /** The first quest brings a Data Pad; its Complete only works with every objective done, Abandon drops the quest. */
+    private static void dataPad(GameTestHelper helper) {
+        ServerPlayer player = AndroidGameTests.player(helper);
+        QuestEvents.addQuest(player, new QuestStack(Quests.COCKTAIL_OF_ASCENSION));
+        check(helper, player.getInventory().contains(new ItemStack(MOItems.DATA_PAD.get())), "no data pad with the first quest");
+        QuestEvents.addQuest(player, new QuestStack(Quests.PUNY_HUMANS));
+        check(helper, player.getInventory().countItem(MOItems.DATA_PAD.get()) == 1, "second data pad");
+        matteroverdrive.quest.QuestPayloads.apply(player, matteroverdrive.quest.QuestPayloads.Action.COMPLETE, 0);
+        check(helper, PlayerQuests.get(player).getActiveQuests().size() == 2, "completed with objectives left");
+        QuestStack cocktail = PlayerQuests.get(player).findActive(Quests.COCKTAIL_OF_ASCENSION);
+        cocktail.getData().putByte("CreeperKills", (byte) 5);
+        cocktail.getData().putByte("GunpowderCount", (byte) 5);
+        cocktail.getData().putByte("MushroomCount", (byte) 5);
+        matteroverdrive.quest.QuestPayloads.apply(player, matteroverdrive.quest.QuestPayloads.Action.COMPLETE, 0);
+        check(helper, PlayerQuests.get(player).hasCompletedQuest(new QuestStack(Quests.COCKTAIL_OF_ASCENSION)), "not completed");
+        matteroverdrive.quest.QuestPayloads.apply(player, matteroverdrive.quest.QuestPayloads.Action.ABANDON, 0);
+        check(helper, PlayerQuests.get(player).getActiveQuests().isEmpty(), "not abandoned");
+        // a whitelisted pad only scans its blocks
+        ItemStack pad = new ItemStack(MOItems.DATA_PAD.get());
+        pad.set(matteroverdrive.init.MODataComponents.DATA_PAD_SCAN.get(),
+                new matteroverdrive.item.DataPadItem.Scan(java.util.List.of(net.minecraft.world.level.block.Blocks.CARROTS), true, true));
+        check(helper, matteroverdrive.item.DataPadItem.canScan(pad, net.minecraft.world.level.block.Blocks.CARROTS.defaultBlockState())
+                && !matteroverdrive.item.DataPadItem.canScan(pad, net.minecraft.world.level.block.Blocks.STONE.defaultBlockState())
+                && !matteroverdrive.item.DataPadItem.hasGui(pad), "scan whitelist");
+        player.discard();
         helper.succeed();
     }
 }

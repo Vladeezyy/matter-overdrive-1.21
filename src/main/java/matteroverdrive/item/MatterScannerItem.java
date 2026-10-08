@@ -137,7 +137,12 @@ public class MatterScannerItem extends Item {
     public ItemStack finishUsingItem(ItemStack scanner, Level level, LivingEntity user) {
         if (level instanceof ServerLevel server && user instanceof Player player) {
             BlockHitResult hit = trace(level, player);
-            if (hit.getType() == HitResult.Type.BLOCK) scan(server, scanner, player, hit.getBlockPos());
+            if (hit.getType() == HitResult.Type.BLOCK) {
+                // 1.7.10 MOEventScan before the scan itself
+                matteroverdrive.quest.QuestEvents.onEvent(player, new matteroverdrive.quest.QuestEvents.Scan(hit.getBlockPos(),
+                        server.getBlockState(hit.getBlockPos()), scanner));
+                scan(server, scanner, player, hit.getBlockPos());
+            }
         }
         return scanner;
     }

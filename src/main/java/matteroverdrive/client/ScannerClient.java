@@ -60,7 +60,8 @@ public final class ScannerClient {
 
         @Override
         public void tick() {
-            if (player.isRemoved() || !player.isUsingItem() || !(player.getUseItem().getItem() instanceof MatterScannerItem)) {
+            if (player.isRemoved() || !player.isUsingItem() || !(player.getUseItem().getItem() instanceof MatterScannerItem
+                    || player.getUseItem().getItem() instanceof matteroverdrive.item.DataPadItem)) {
                 stop();
                 return;
             }

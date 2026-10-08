@@ -188,6 +188,7 @@ public final class MOItems {
     public static final DeferredItem<BlockItem> ANDROID_SPAWNER = block("android_spawner", MOBlocks.ANDROID_SPAWNER);
     public static final DeferredItem<matteroverdrive.item.TransportFlashDriveItem> TRANSPORT_FLASH_DRIVE = item("transport_flash_drive",
             matteroverdrive.item.TransportFlashDriveItem::new, p -> p);
+    public static final DeferredItem<matteroverdrive.item.DataPadItem> DATA_PAD = item("data_pad", matteroverdrive.item.DataPadItem::new, p -> p);
     public static final DeferredItem<matteroverdrive.item.MatterScannerItem> MATTER_SCANNER = item("matter_scanner",
             matteroverdrive.item.MatterScannerItem::new, p -> p);
     public static final DeferredItem<matteroverdrive.item.PortableDecomposerItem> PORTABLE_DECOMPOSER = item("portable_decomposer",

@@ -51,6 +51,14 @@ public final class MODataComponents {
             COMPONENTS.registerComponentType("decompose_list", b -> b.persistent(net.minecraft.core.registries.BuiltInRegistries.ITEM.byNameCodec().listOf())
                     .networkSynchronized(ByteBufCodecs.registry(Registries.ITEM).apply(ByteBufCodecs.list())));
 
+    /** Data Pad: screen state (page, selected quest, scroll) and the mad scientist's scan settings. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<matteroverdrive.item.DataPadItem.State>> DATA_PAD =
+            COMPONENTS.registerComponentType("data_pad", b -> b.persistent(matteroverdrive.item.DataPadItem.State.CODEC)
+                    .networkSynchronized(matteroverdrive.item.DataPadItem.State.STREAM_CODEC));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<matteroverdrive.item.DataPadItem.Scan>> DATA_PAD_SCAN =
+            COMPONENTS.registerComponentType("data_pad_scan", b -> b.persistent(matteroverdrive.item.DataPadItem.Scan.CODEC)
+                    .networkSynchronized(matteroverdrive.item.DataPadItem.Scan.STREAM_CODEC));
+
     /** Matter scanner: the pattern storage it is linked to and the pattern it last selected (1.7.10 link_x/y/z, lastSelected). */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<net.minecraft.core.GlobalPos>> SCANNER_LINK =
             COMPONENTS.registerComponentType("scanner_link", b -> b.persistent(net.minecraft.core.GlobalPos.CODEC)

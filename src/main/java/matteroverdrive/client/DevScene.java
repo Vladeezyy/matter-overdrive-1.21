@@ -703,7 +703,30 @@ public final class DevScene {
             p.onUpdateAbilities();
             p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 0f, false);
         }));
-        at(2074, mc -> mc.stop());
+        // 7o: the Data Pad's quest log with two quests (the cocktail half done), then the other one selected
+        at(2076, mc -> server(mc, p -> {
+            var quests = matteroverdrive.quest.PlayerQuests.get(p);
+            quests.getActiveQuests().clear();
+            quests.getCompletedQuests().clear();
+            var cocktail = new matteroverdrive.quest.QuestStack(matteroverdrive.quest.Quests.COCKTAIL_OF_ASCENSION);
+            cocktail.getData().putByte("CreeperKills", (byte) 3);
+            cocktail.getData().putByte("GunpowderCount", (byte) 5);
+            quests.getActiveQuests().add(cocktail);
+            quests.getActiveQuests().add(new matteroverdrive.quest.QuestStack(matteroverdrive.quest.Quests.PUNY_HUMANS));
+            matteroverdrive.quest.PlayerQuests.sync(p);
+            p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(MOItems.DATA_PAD.get()));
+        }));
+        at(2082, mc -> mc.setScreen(new matteroverdrive.client.quest.DataPadScreen(net.minecraft.world.InteractionHand.MAIN_HAND)));
+        at(2090, mc -> shot(mc, "data_pad_quests"));
+        at(2091, mc -> {
+            mc.setScreen(null);
+            server(mc, p -> p.getMainHandItem().set(matteroverdrive.init.MODataComponents.DATA_PAD.get(),
+                    new matteroverdrive.item.DataPadItem.State(0, 1, 0)));
+        });
+        at(2096, mc -> mc.setScreen(new matteroverdrive.client.quest.DataPadScreen(net.minecraft.world.InteractionHand.MAIN_HAND)));
+        at(2104, mc -> shot(mc, "data_pad_quests_2"));
+        at(2105, mc -> mc.setScreen(null));
+        at(2108, mc -> mc.stop());
     }
 
     private static void at(int t, Consumer<Minecraft> action) {

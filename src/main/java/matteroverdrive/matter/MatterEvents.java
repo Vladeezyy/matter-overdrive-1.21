@@ -24,6 +24,7 @@ public final class MatterEvents {
         matteroverdrive.network.AndroidPayloads.register(event.registrar("1"));
         matteroverdrive.network.ScannerPayloads.register(event.registrar("1"));
         matteroverdrive.dialog.DialogPayloads.register(event.registrar("1"));
+        matteroverdrive.quest.QuestPayloads.register(event.registrar("1"));
         event.registrar("1")
                 .playToClient(MatterValuesPayload.TYPE, MatterValuesPayload.STREAM_CODEC, MatterValuesPayload::handle)
                 .playToClient(PatternListPayload.TYPE, PatternListPayload.STREAM_CODEC, PatternListPayload::handle)

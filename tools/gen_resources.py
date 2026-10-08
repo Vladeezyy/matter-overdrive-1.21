@@ -25,7 +25,7 @@ ITEMS = {n: (n, "generated") for n in [
     "matter_dust", "matter_dust_refined", "machine_casing", "s_magnet", "h_compensator", "integration_matrix",
     "me_conversion_matrix", "forcefield_emitter", "weapon_handle", "weapon_receiver", "plasma_core",
     "isolinear_circuit_mk1", "isolinear_circuit_mk2", "isolinear_circuit_mk3", "isolinear_circuit_mk4",
-    "tritanium_helmet", "tritanium_chestplate", "tritanium_leggings", "tritanium_boots"]}
+    "tritanium_helmet", "tritanium_chestplate", "tritanium_leggings", "tritanium_boots", "data_pad"]}
 ITEMS.update({n: (n, "handheld") for n in ["tritanium_sword", "tritanium_pickaxe", "tritanium_axe", "tritanium_hoe",
                                             "tritanium_wrench"]})
 UPGRADES = ["base", "speed", "power", "failsafe", "range", "power_storage", "hyper_speed", "matter_storage"]
@@ -1171,6 +1171,15 @@ cp(ref / "textures/gui/elements/dialog_separator.png", A / "textures/gui/element
 for icon in ["trade", "mini_quit"]:                               # 1.7.10 HoloIcons used by dialog options
     cp(ref / "textures/gui/items" / f"{icon}.png", A / "textures/gui/holo" / f"{icon}.png")
 
+# --- phase 7o: Data Pad ------------------------------------------------------------------------------------
+# 1.7.10 GuiDataPad background: ScaleTexture(pad.png, 93x115).setOffsets(46, 46, 40, 73) as a nine-slice sprite
+cp(ref / "textures/gui/pad.png", GUI / "sprites/data_pad.png")
+w(GUI / "sprites/data_pad.png.mcmeta", {"gui": {"scaling": {"type": "nine_slice", "width": 93, "height": 115,
+    "border": {"left": 46, "right": 46, "top": 40, "bottom": 73}}}})
+for icon in ["question_mark", "tick"]:
+    cp(ref / "textures/gui/items" / f"{icon}.png", A / "textures/gui/holo" / f"{icon}.png")
+shapeless("data_pad", mid("data_pad"), ["minecraft:book", MK[1]])
+
 # --- phase 7b: mobs -----------------------------------------------------------------------------------------
 import zlib
 
@@ -1853,6 +1862,11 @@ for src_name, dst_name in [("en_US", "en_us"), ("ru_RU", "ru_ru")]:
                                            "ru_ru": "[Matter Overdrive] %1$s выполнил(а) %2$s"}[dst_name]
     lang[f"gui.{MOD}.quest.started"] = {"en_us": "Started:", "ru_ru": "Начато:"}[dst_name]
     lang[f"gui.{MOD}.quest.completed"] = {"en_us": "Completed:", "ru_ru": "Выполнено:"}[dst_name]
+    lang[f"item.{MOD}.data_pad.details"] = src.get("item.data_pad.details") or en["item.data_pad.details"]
+    for k, theirs in {"abandon": "abandon", "active_quests": "active_quests", "complete": "complete"}.items():
+        lang[f"gui.{MOD}.quest.{k}"] = src.get(f"gui.tooltip.quest.{theirs}") or en[f"gui.tooltip.quest.{theirs}"]
+    lang[f"gui.{MOD}.quest.rewards"] = {"en_us": "Rewards: +%sxp", "ru_ru": "Награды: +%s опыта"}[dst_name]
+    lang[f"gui.{MOD}.quest.none"] = {"en_us": "No active quests", "ru_ru": "Нет активных квестов"}[dst_name]
     for ours, theirs in GUI_KEYS.items():
         if isinstance(theirs, dict):
             lang[ours] = theirs[dst_name]

@@ -340,6 +340,15 @@
     per-village limit (1.7.10 PieceWeight 20 with max 0-2 + size): weight 6 of the plains pool's 87 aims at about one
     house per village. Only plains/desert villages (as 1.7.10). The crate's GMO contract and "Mad Scientist's Data Pad"
     come with the contracts / Data Pad.
+- **7o ✅** Data Pad (1.7.10 DataPad + GuiDataPad active quests page). `DataPadItem`: use opens `DataPadScreen` (300x240,
+  pad.png nine-slice with the 1.7.10 ScaleTexture offsets), use on a block = 2 s scan (scanner sound) that sends
+  `QuestEvents.Scan` (1.7.10 MOEventScan, also sent by the matter scanner before it scans); components `data_pad`
+  (page, selected quest, info scroll) and `data_pad_scan` (whitelist, destroys, no_gui: the mad scientist's pad).
+  Quest page: centred titles ("‣ " on the selected one), info, objectives (■ done green / □ dark green), "Rewards: +Nxp"
+  and reward items, scroller; Current Quests / Complete (only with every objective done, forced) / Abandon buttons
+  (`QuestPayloads`). The first quest ever gives a Data Pad. Recipe: book + isolinear circuit mk1 (shapeless). 79 GameTests.
+  - Deviations: 240 high instead of 260; the guide pages (entries, description) come next (7p), so the pad opens on
+    the quest log.
 - Cloud (Linux) notes: regenerating resources rewrites the .ogg and ffmpeg-made .png bytes (different ffmpeg/oggenc
   builds) - `git checkout` them. Screenshots: `Xvfb :99` + `DISPLAY=:99 ./gradlew runScene` (software GL is slow; give
   menus extra ticks), world created by `runServer` with a flat creative server.properties, then moved to run/saves;
