@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "CHC",
+    "2M3",
+    "CTC"
+  ],
+  "key": {
+    "C": "matteroverdrive:fusion_reactor_coil",
+    "H": "minecraft:glass_pane",
+    "2": "matteroverdrive:isolinear_circuit_mk2",
+    "3": "matteroverdrive:isolinear_circuit_mk3",
+    "M": "matteroverdrive:machine_casing",
+    "T": "#c:plates/tritanium"
+  },
+  "result": {
+    "id": "matteroverdrive:fusion_reactor_controller",
+    "count": 1
+  }
+}

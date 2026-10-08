@@ -17,6 +17,9 @@
     "matteroverdrive:network_switch",
     "matteroverdrive:network_pipe",
     "matteroverdrive:gravitational_stabilizer",
-    "matteroverdrive:machine_hull"
+    "matteroverdrive:machine_hull",
+    "matteroverdrive:fusion_reactor_coil",
+    "matteroverdrive:fusion_reactor_io",
+    "matteroverdrive:fusion_reactor_controller"
   ]
 }

@@ -56,6 +56,10 @@ public class MatterOverdrive {
         machine(event, MOBlockEntities.PATTERN_STORAGE.get());
         machine(event, MOBlockEntities.REPLICATOR.get());
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, MOBlockEntities.MATTER_PIPE.get(), (pipe, side) -> pipe.getTank());
+        machine(event, MOBlockEntities.GRAVITATIONAL_STABILIZER.get());
+        machine(event, MOBlockEntities.FUSION_REACTOR_CONTROLLER.get());
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, MOBlockEntities.FUSION_REACTOR_IO.get(), (io, side) -> io.getEnergy());
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, MOBlockEntities.FUSION_REACTOR_IO.get(), (io, side) -> io.getMatter());
     }
 
     private static <T extends MachineBlockEntity> void machine(RegisterCapabilitiesEvent event, BlockEntityType<T> type) {

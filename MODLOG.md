@@ -100,7 +100,29 @@
 16. Holo/overlay textures with transparency need `"render_type": "minecraft:cutout"` in the block model JSON.
 17. OBJ groups: insert `usemtl` per `g` line with one material per group; hide a group with `"visibility": {"group": false}`.
 
+## 2026-10-08 — phase 4: anomaly and fusion reactor ✅
+- **Gravitational anomaly**: the 1.7.10 physics (real mass ln(1 + mass·1e-5)·suppression, range sqrt(m·G/0.01), break range /2,
+  horizon max(2Gm/c², 0.5), strength 4m·suppression falloff). Pulls entities (server side, `hurtMarked` so players feel it),
+  swallows items (matter -> mass), falling blocks and living things (`matteroverdrive:black_hole` damage, original death message),
+  tears out up to 6 blocks / 6 ticks as no-gravity falling blocks, collapses with an explosion on a nether star.
+  World gen: rarity 1/200 chunks, y 4-63, mass 2048-10240. Rendered with the original sphere.obj + reverse-portal particles.
+- **Stabilizer**: 64-block beam along its facing; refreshes a 20-tick, x0.7 suppressor on the anomaly it hits; no energy, no GUI.
+- **Space-time equalizer**: chest equippable that cancels the pull. **Machine hull** block.
+- **Fusion reactor**: controller + 28-position ring (1.7.10 positions[]/blocks[], rotated by facing), anomaly within ±3 blocks above/below
+  the ring centre; 2048 FE/t × (1 - distance/4) × ln(1 + mass·1e-5); burns matter (1/80 per tick × the same factor); 100M FE buffer;
+  energy out through the controller and IO ports; battery slot charges the item. IO ports forward energy/matter capabilities.
+- Machine titles are cut with an ellipsis when too long.
+
+### Deviations
+- Stabilizer faces horizontally only (1.7.10 could aim up/down).
+- Fusion reactor GUI uses bars instead of the round gauges; the controller's text monitor isn't rendered in the world.
+- Stabilizer and reactor controller recipes use a glass pane for the holo sign (phase 7).
+
+### Gotchas
+18. An anomaly with large mass flings mobs straight through its core (no collision, momentum): measure pull over a few ticks.
+19. `Level.invalidateCapabilities(pos)` after an IO port links/unlinks so cached capability lookups see the change.
+
 ## Next
-- Phase 4: gravitational anomaly + stabilizer, fusion reactor multiblock.
+- Phase 5: weapons (phaser, phaser rifle, plasma shotgun, ion sniper, modules, weapon station, energy pack).
 - Polish later: machine item tooltip with stored energy, inscriber head animation, machine sounds, custom tritanium armor model,
   pattern storage drive rendering, replicator item animation, monitor hologram, router/switch filters, matter scanner.

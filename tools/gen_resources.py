@@ -37,7 +37,8 @@ BLOCKS = ["tritanium_ore", "dilithium_ore", "tritanium_block"]
 MACHINES = ["solar_panel", "inscriber"]
 MACHINES_P3 = ["decomposer", "matter_recycler", "matter_pipe", "heavy_matter_pipe", "matter_analyzer", "pattern_storage",
                "replicator", "pattern_monitor", "network_router", "network_switch", "network_pipe",
-               "gravitational_anomaly", "gravitational_stabilizer", "machine_hull"]
+               "gravitational_anomaly", "gravitational_stabilizer", "machine_hull", "fusion_reactor_coil", "fusion_reactor_io",
+               "fusion_reactor_controller"]
 
 # lang keys that don't follow item.<name>.name / tile.<name>.name in the 1.7.10 files
 LANG_KEYS = {f"isolinear_circuit_mk{i}": f"item.isolinear_circuit.mk{i}.name" for i in range(1, 5)}
@@ -585,6 +586,35 @@ shaped("gravitational_stabilizer", mid("gravitational_stabilizer"), [" H ", "TST
        {"H": "minecraft:glass_pane", "T": PLATE, "S": mid("spacetime_equalizer"), "C": mid("s_magnet"), "M": mid("machine_casing")})
 
 
+# --- phase 4: fusion reactor ---------------------------------------------------------------------------
+for n, tex in {"fusion_reactor_coil": "base_stripes", "fusion_reactor_io": "network_port"}.items():
+    w(A / f"models/block/{n}.json", {"parent": "minecraft:block/cube_all", "textures": {"all": f"{MOD}:block/{tex}"}})
+    w(A / f"blockstates/{n}.json", {"variants": {"": {"model": f"{MOD}:block/{n}"}}})
+    w(A / f"items/{n}.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:block/{n}"}})
+# 1.7.10 BlockFusionReactorController: a monitor in front (its holo_monitor frame corners), decomposer tops left and
+# right, yellow stripes elsewhere.
+front = [quad([8, 8, -0.01], [16, 16, -0.01], [0, 0, 2, 2], "#screen"), quad([0, 8, -0.01], [8, 16, -0.01], [14, 0, 16, 2], "#screen"),
+         quad([8, 0, -0.01], [16, 8, -0.01], [0, 14, 2, 16], "#screen"), quad([0, 0, -0.01], [8, 8, -0.01], [14, 14, 16, 16], "#screen")]
+w(A / "models/block/fusion_reactor_controller.json", {"parent": "minecraft:block/block", "textures": {
+    "stripes": f"{MOD}:block/base_stripes", "side": f"{MOD}:block/decomposer_top", "screen": f"{MOD}:block/holo_monitor",
+    "particle": f"{MOD}:block/base_stripes"}, "elements": [{"from": [0, 0, 0], "to": [16, 16, 16], "faces": {
+        "north": {"texture": "#stripes", "cullface": "north"}, "south": {"texture": "#stripes", "cullface": "south"},
+        "up": {"texture": "#stripes", "cullface": "up"}, "down": {"texture": "#stripes", "cullface": "down"},
+        "east": {"texture": "#side", "cullface": "east"}, "west": {"texture": "#side", "cullface": "west"}}}] + front})
+facing_blockstate("fusion_reactor_controller", f"{MOD}:block/fusion_reactor_controller")
+FUSION = ["fusion_reactor_coil", "fusion_reactor_io", "fusion_reactor_controller"]
+for n in FUSION:
+    w(D / f"loot_table/blocks/{n}.json", self_drop(n))
+for tag in ["mineable/pickaxe", "needs_iron_tool"]:
+    p = TAGS / f"minecraft/tags/block/{tag}.json"
+    w(p, {"values": json.loads(p.read_text())["values"] + [mid(n) for n in FUSION]})
+shaped("fusion_reactor_coil", mid("fusion_reactor_coil"), ["TMT", "M M", "CMC"], {"T": PLATE, "M": mid("s_magnet"), "C": MK[1]})
+shaped("fusion_reactor_io", mid("fusion_reactor_io"), ["TGT", "C C", "TGT"], {"T": PLATE, "G": "minecraft:gold_ingot", "C": MK[1]})
+# The holo sign (phase 7) isn't ported yet; a glass pane stands in for it until then.
+shaped("fusion_reactor_controller", mid("fusion_reactor_controller"), ["CHC", "2M3", "CTC"],
+       {"C": mid("fusion_reactor_coil"), "H": "minecraft:glass_pane", "2": MK[2], "3": MK[3], "M": mid("machine_casing"), "T": PLATE})
+
+
 # --- matter values (1.7.10 MatterOverdriveMatter.registerBasic*) -----------------------------------
 # Base values of the matteroverdrive:matter data map; everything else is calculated from recipes at runtime.
 # Ore dictionary names are mapped to today's tags. Tags come first so that single items can override them.
@@ -663,6 +693,7 @@ GUI_KEYS = {
     "item.matteroverdrive.matter_dust.details": "item.matter_dust.details",
     "item.matteroverdrive.pattern_drive.details": "item.pattern_drive.details",
     "gui.matteroverdrive.refresh": "gui.tooltip.button.refresh",
+    "gui.matteroverdrive.efficiency": {"en_us": "Efficiency %s%%", "ru_ru": "Эффективность %s%%"},
     "death.attack.matteroverdrive.black_hole": "death.attack.blackHole",
     "death.attack.matteroverdrive.black_hole.player": "death.attack.blackHole",
     "gui.matteroverdrive.request": "gui.tooltip.button.request",

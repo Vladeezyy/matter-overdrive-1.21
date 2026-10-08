@@ -3,6 +3,7 @@ package matteroverdrive.init;
 import matteroverdrive.MatterOverdrive;
 import matteroverdrive.menu.AnalyzerMenu;
 import matteroverdrive.menu.DecomposerMenu;
+import matteroverdrive.menu.FusionReactorMenu;
 import matteroverdrive.menu.InscriberMenu;
 import matteroverdrive.menu.PatternMonitorMenu;
 import matteroverdrive.menu.PatternStorageMenu;
@@ -37,6 +38,9 @@ public final class MOMenus {
             MENUS.register("pattern_monitor", () -> IMenuTypeExtension.create(PatternMonitorMenu::new));
     public static final DeferredHolder<MenuType<?>, MenuType<ReplicatorMenu>> REPLICATOR =
             MENUS.register("replicator", () -> IMenuTypeExtension.create(ReplicatorMenu::new));
+
+    public static final DeferredHolder<MenuType<?>, MenuType<FusionReactorMenu>> FUSION_REACTOR =
+            MENUS.register("fusion_reactor_controller", () -> IMenuTypeExtension.create(FusionReactorMenu::new));
 
     private MOMenus() {}
 }

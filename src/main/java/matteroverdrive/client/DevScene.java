@@ -46,7 +46,7 @@ public final class DevScene {
     private static int tick;
     /** Where the player stood when the scene started; restored before quitting so every run builds in one place. */
     private static BlockPos origin;
-    private static BlockPos inscriberPos, solarPos, decomposerPos, recyclerPos, analyzerPos, storagePos, monitorPos, replicatorPos;
+    private static BlockPos inscriberPos, solarPos, decomposerPos, recyclerPos, analyzerPos, storagePos, monitorPos, replicatorPos, reactorPos;
 
     private record Step(int at, Consumer<Minecraft> action) {}
 
@@ -89,8 +89,13 @@ public final class DevScene {
         at(378, mc -> shot(mc, "network"));
         at(379, mc -> server(mc, p -> p.teleportTo(p.level(), origin.getX() + 3.5, origin.getY() + 3, origin.getZ() - 7.5, Set.of(), 120f, 5f, false)));
         at(386, mc -> shot(mc, "anomaly"));
-        at(388, mc -> server(mc, p -> p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 35f, false)));
-        at(396, mc -> mc.stop());
+        at(387, mc -> openMachine(mc, reactorPos));
+        at(400, mc -> shot(mc, "reactor_gui"));
+        at(402, mc -> mc.player.closeContainer());
+        at(404, mc -> server(mc, p -> p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY() + 14, origin.getZ() - 6.5, Set.of(), 180f, 60f, false)));
+        at(414, mc -> shot(mc, "reactor"));
+        at(416, mc -> server(mc, p -> p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 35f, false)));
+        at(424, mc -> mc.stop());
     }
 
     private static void at(int t, Consumer<Minecraft> action) {
@@ -192,6 +197,7 @@ public final class DevScene {
         // phase 4: an anomaly above the far end with a stabilizer aiming at it from the floor
         level.setBlockAndUpdate(base.offset(0, 3, -10), MOBlocks.GRAVITATIONAL_ANOMALY.get().defaultBlockState());
         level.setBlockAndUpdate(base.offset(0, 3, -6), MOBlocks.GRAVITATIONAL_STABILIZER.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.NORTH));
+        buildReactor(level, base.offset(0, 0, -13));
         level.setBlockAndUpdate(base.offset(0, 0, -5), MOBlocks.TRITANIUM_ORE.get().defaultBlockState());
         level.setBlockAndUpdate(base.offset(-2, 0, -5), MOBlocks.DILITHIUM_ORE.get().defaultBlockState());
         level.setBlockAndUpdate(base.offset(2, 0, -5), MOBlocks.TRITANIUM_BLOCK.get().defaultBlockState());
@@ -220,6 +226,30 @@ public final class DevScene {
         player.setItemSlot(EquipmentSlot.CHEST, new ItemStack(MOItems.TRITANIUM_CHESTPLATE.get()));
         inv.setSelectedSlot(6);
         player.teleportTo(level, base.getX() + 0.5, base.getY(), base.getZ() + 0.5, Set.of(), 180f, 35f, false);
+    }
+
+    /** A complete fusion reactor: controller facing the player, the ring and an anomaly behind it. */
+    private static void buildReactor(ServerLevel level, BlockPos controller) {
+        for (BlockPos p : BlockPos.betweenClosed(controller.offset(-6, -1, -11), controller.offset(6, -1, 1))) {
+            level.setBlock(p, Blocks.SMOOTH_STONE.defaultBlockState(), Block.UPDATE_CLIENTS);
+        }
+        for (BlockPos p : BlockPos.betweenClosed(controller.offset(-6, 0, -11), controller.offset(6, 4, 1))) {
+            level.setBlock(p, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
+        }
+        reactorPos = controller;
+        level.setBlockAndUpdate(controller, MOBlocks.FUSION_REACTOR_CONTROLLER.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
+        var reactor = (matteroverdrive.block.entity.FusionReactorControllerBlockEntity) level.getBlockEntity(controller);
+        for (int i = 0; i < matteroverdrive.block.entity.FusionReactorControllerBlockEntity.POSITION_COUNT; i++) {
+            int want = matteroverdrive.block.entity.FusionReactorControllerBlockEntity.BLOCKS[i];
+            var block = want == 255 ? MOBlocks.GRAVITATIONAL_ANOMALY.get() : want == 0 ? MOBlocks.MACHINE_HULL.get()
+                    : want == 1 ? MOBlocks.FUSION_REACTOR_COIL.get() : MOBlocks.FUSION_REACTOR_IO.get();
+            level.setBlockAndUpdate(reactor.getPosition(i), block.defaultBlockState());
+            if (level.getBlockEntity(reactor.getPosition(i)) instanceof matteroverdrive.block.entity.GravitationalAnomalyBlockEntity a) {
+                a.setMass(100000);
+            }
+        }
+        reactor.getMatterTank().setMatter(1500);
+        reactor.getInventory().setStack(reactor.getBatterySlot(), new ItemStack(MOItems.HC_BATTERY.get()));
     }
 
     private static void openMachine(Minecraft mc, BlockPos pos) {

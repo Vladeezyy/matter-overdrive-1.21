@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "TMT",
+    "M M",
+    "CMC"
+  ],
+  "key": {
+    "T": "#c:plates/tritanium",
+    "M": "matteroverdrive:s_magnet",
+    "C": "matteroverdrive:isolinear_circuit_mk1"
+  },
+  "result": {
+    "id": "matteroverdrive:fusion_reactor_coil",
+    "count": 1
+  }
+}

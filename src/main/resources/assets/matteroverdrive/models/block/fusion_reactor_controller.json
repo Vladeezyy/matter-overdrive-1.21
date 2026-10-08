@@ -1,0 +1,141 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "stripes": "matteroverdrive:block/base_stripes",
+    "side": "matteroverdrive:block/decomposer_top",
+    "screen": "matteroverdrive:block/holo_monitor",
+    "particle": "matteroverdrive:block/base_stripes"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#stripes",
+          "cullface": "north"
+        },
+        "south": {
+          "texture": "#stripes",
+          "cullface": "south"
+        },
+        "up": {
+          "texture": "#stripes",
+          "cullface": "up"
+        },
+        "down": {
+          "texture": "#stripes",
+          "cullface": "down"
+        },
+        "east": {
+          "texture": "#side",
+          "cullface": "east"
+        },
+        "west": {
+          "texture": "#side",
+          "cullface": "west"
+        }
+      }
+    },
+    {
+      "from": [
+        8,
+        8,
+        -0.01
+      ],
+      "to": [
+        16,
+        16,
+        -0.01
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            2,
+            2
+          ],
+          "texture": "#screen"
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        8,
+        -0.01
+      ],
+      "to": [
+        8,
+        16,
+        -0.01
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            14,
+            0,
+            16,
+            2
+          ],
+          "texture": "#screen"
+        }
+      }
+    },
+    {
+      "from": [
+        8,
+        0,
+        -0.01
+      ],
+      "to": [
+        16,
+        8,
+        -0.01
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            14,
+            2,
+            16
+          ],
+          "texture": "#screen"
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        0,
+        -0.01
+      ],
+      "to": [
+        8,
+        8,
+        -0.01
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            14,
+            14,
+            16,
+            16
+          ],
+          "texture": "#screen"
+        }
+      }
+    }
+  ]
+}

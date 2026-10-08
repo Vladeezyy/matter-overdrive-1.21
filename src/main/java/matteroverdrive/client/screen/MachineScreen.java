@@ -203,7 +203,13 @@ public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractCo
 
     @Override
     protected void renderLabels(GuiGraphics g, int mouseX, int mouseY) {
-        g.drawString(font, title, 125 - font.width(title) / 2, 7, COLOR_TITLE, false);
+        // the title bar runs from about x = 50 to the close button at 208; long names are cut with an ellipsis
+        String text = title.getString();
+        int max = 150;
+        if (font.width(text) > max) {
+            text = font.plainSubstrByWidth(text, max - font.width("…")) + "…";
+        }
+        g.drawString(font, text, 128 - font.width(text) / 2, 7, COLOR_TITLE, false);
     }
 
     protected static boolean in(double mx, double my, int x, int y, int w, int h) {

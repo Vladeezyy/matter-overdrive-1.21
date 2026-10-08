@@ -28,7 +28,7 @@ Each feature is rewritten against the 1.7.10 code as the spec and keeps its numb
 3. **Matter core** ✅ — matter values (data map + recipe calculation), Decomposer, Matter Recycler, matter pipes,
    pattern drives, Matter Analyzer, network (pipes, router, switch), Pattern Storage, Pattern Monitor, **Replicator**.
    Matter Scanner and router/switch filters still to do.
-4. **Power endgame** — Gravitational anomaly + stabilizer, Fusion reactor multiblock.
+4. **Power endgame** ✅ — Gravitational anomaly (+ world gen) and stabilizer, space-time equalizer, Fusion reactor multiblock.
 5. **Weapons** — Phaser, Phaser Rifle, Plasma Shotgun, Ion Sniper, modules, Weapon Station, energy pack.
 6. **Androids** — player attachment for android state, biotic stats tree, Android Station, HUD, abilities,
    charging station (it only charges androids).

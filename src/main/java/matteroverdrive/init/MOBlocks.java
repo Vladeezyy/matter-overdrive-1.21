@@ -3,6 +3,8 @@ package matteroverdrive.init;
 import matteroverdrive.MatterOverdrive;
 import matteroverdrive.block.AnalyzerBlock;
 import matteroverdrive.block.DecomposerBlock;
+import matteroverdrive.block.FusionReactorControllerBlock;
+import matteroverdrive.block.FusionReactorIOBlock;
 import matteroverdrive.block.GravitationalAnomalyBlock;
 import matteroverdrive.block.GravitationalStabilizerBlock;
 import matteroverdrive.block.InscriberBlock;
@@ -78,6 +80,14 @@ public final class MOBlocks {
     // 1.7.10 machine_hull: tritanium plating for the fusion reactor ring
     public static final DeferredBlock<Block> MACHINE_HULL = BLOCKS.registerSimpleBlock("machine_hull",
             p -> p.mapColor(MapColor.METAL).strength(15f, 8f).sound(SoundType.METAL).requiresCorrectToolForDrops());
+
+    public static final DeferredBlock<Block> FUSION_REACTOR_COIL = BLOCKS.registerSimpleBlock("fusion_reactor_coil",
+            p -> p.mapColor(MapColor.METAL).strength(30f, 10f).sound(SoundType.METAL).requiresCorrectToolForDrops());
+    public static final DeferredBlock<FusionReactorIOBlock> FUSION_REACTOR_IO = BLOCKS.registerBlock("fusion_reactor_io", FusionReactorIOBlock::new,
+            p -> p.mapColor(MapColor.METAL).strength(30f, 10f).sound(SoundType.METAL).requiresCorrectToolForDrops());
+    public static final DeferredBlock<FusionReactorControllerBlock> FUSION_REACTOR_CONTROLLER = BLOCKS.registerBlock("fusion_reactor_controller",
+            FusionReactorControllerBlock::new, p -> p.mapColor(MapColor.METAL).strength(30f, 10f).sound(SoundType.METAL)
+                    .requiresCorrectToolForDrops().lightLevel(s -> 10));
 
     private MOBlocks() {}
 }

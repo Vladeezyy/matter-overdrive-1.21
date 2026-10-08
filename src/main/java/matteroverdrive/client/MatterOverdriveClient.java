@@ -3,6 +3,7 @@ package matteroverdrive.client;
 import matteroverdrive.MatterOverdrive;
 import matteroverdrive.client.screen.AnalyzerScreen;
 import matteroverdrive.client.screen.DecomposerScreen;
+import matteroverdrive.client.screen.FusionReactorScreen;
 import matteroverdrive.client.screen.InscriberScreen;
 import matteroverdrive.client.screen.PatternMonitorScreen;
 import matteroverdrive.client.screen.PatternStorageScreen;
@@ -33,6 +34,7 @@ public class MatterOverdriveClient {
         event.register(MOMenus.PATTERN_STORAGE.get(), PatternStorageScreen::new);
         event.register(MOMenus.PATTERN_MONITOR.get(), PatternMonitorScreen::new);
         event.register(MOMenus.REPLICATOR.get(), ReplicatorScreen::new);
+        event.register(MOMenus.FUSION_REACTOR.get(), FusionReactorScreen::new);
     }
 
     /** Matter Plasma textures (1.7.10 matter_plasma_still / _flowing), shown by tanks of other mods. */

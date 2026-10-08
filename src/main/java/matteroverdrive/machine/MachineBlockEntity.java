@@ -102,7 +102,16 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
         ItemStack stack = inventory.getStack(batterySlot);
         if (stack.isEmpty()) return;
         EnergyHandler battery = ItemAccess.forHandlerIndex(inventory, batterySlot).getCapability(Capabilities.Energy.ITEM);
-        EnergyHandlerUtil.move(battery, energy, Integer.MAX_VALUE, null);
+        if (batteryChargesItem()) {
+            EnergyHandlerUtil.move(energy, battery, Integer.MAX_VALUE, null);
+        } else {
+            EnergyHandlerUtil.move(battery, energy, Integer.MAX_VALUE, null);
+        }
+    }
+
+    /** Generators fill the item in their battery slot instead of draining it (1.7.10 fusion reactor manageCharging). */
+    protected boolean batteryChargesItem() {
+        return false;
     }
 
     // --- upgrades ----------------------------------------------------------------------------------

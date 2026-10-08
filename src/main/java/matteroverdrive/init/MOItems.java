@@ -90,6 +90,9 @@ public final class MOItems {
     public static final DeferredItem<BlockItem> GRAVITATIONAL_ANOMALY = block("gravitational_anomaly", MOBlocks.GRAVITATIONAL_ANOMALY);
     public static final DeferredItem<BlockItem> GRAVITATIONAL_STABILIZER = block("gravitational_stabilizer", MOBlocks.GRAVITATIONAL_STABILIZER);
     public static final DeferredItem<BlockItem> MACHINE_HULL = block("machine_hull", MOBlocks.MACHINE_HULL);
+    public static final DeferredItem<BlockItem> FUSION_REACTOR_COIL = block("fusion_reactor_coil", MOBlocks.FUSION_REACTOR_COIL);
+    public static final DeferredItem<BlockItem> FUSION_REACTOR_IO = block("fusion_reactor_io", MOBlocks.FUSION_REACTOR_IO);
+    public static final DeferredItem<BlockItem> FUSION_REACTOR_CONTROLLER = block("fusion_reactor_controller", MOBlocks.FUSION_REACTOR_CONTROLLER);
     /** 1.7.10 SpacetimeEqualizer: worn on the chest, it cancels a gravitational anomaly's pull. */
     public static final DeferredItem<Item> SPACETIME_EQUALIZER = item("spacetime_equalizer", Item::new,
             p -> p.stacksTo(1).component(DataComponents.EQUIPPABLE, Equippable.builder(EquipmentSlot.CHEST).build()));

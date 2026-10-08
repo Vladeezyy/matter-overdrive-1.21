@@ -3,6 +3,8 @@ package matteroverdrive.init;
 import matteroverdrive.MatterOverdrive;
 import matteroverdrive.block.entity.AnalyzerBlockEntity;
 import matteroverdrive.block.entity.DecomposerBlockEntity;
+import matteroverdrive.block.entity.FusionReactorControllerBlockEntity;
+import matteroverdrive.block.entity.FusionReactorIOBlockEntity;
 import matteroverdrive.block.entity.GravitationalAnomalyBlockEntity;
 import matteroverdrive.block.entity.GravitationalStabilizerBlockEntity;
 import matteroverdrive.block.entity.InscriberBlockEntity;
@@ -48,6 +50,11 @@ public final class MOBlockEntities {
             BLOCK_ENTITIES.register("gravitational_anomaly", () -> new BlockEntityType<>(GravitationalAnomalyBlockEntity::new, MOBlocks.GRAVITATIONAL_ANOMALY.get()));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<GravitationalStabilizerBlockEntity>> GRAVITATIONAL_STABILIZER =
             BLOCK_ENTITIES.register("gravitational_stabilizer", () -> new BlockEntityType<>(GravitationalStabilizerBlockEntity::new, MOBlocks.GRAVITATIONAL_STABILIZER.get()));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<FusionReactorControllerBlockEntity>> FUSION_REACTOR_CONTROLLER =
+            BLOCK_ENTITIES.register("fusion_reactor_controller", () -> new BlockEntityType<>(FusionReactorControllerBlockEntity::new, MOBlocks.FUSION_REACTOR_CONTROLLER.get()));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<FusionReactorIOBlockEntity>> FUSION_REACTOR_IO =
+            BLOCK_ENTITIES.register("fusion_reactor_io", () -> new BlockEntityType<>(FusionReactorIOBlockEntity::new, MOBlocks.FUSION_REACTOR_IO.get()));
 
     private MOBlockEntities() {}
 }
