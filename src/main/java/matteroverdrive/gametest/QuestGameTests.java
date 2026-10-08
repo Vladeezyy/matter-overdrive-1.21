@@ -29,6 +29,7 @@ final class QuestGameTests {
         MOGameTests.add("quest_cocktail_of_ascension", 20, false, QuestGameTests::cocktail);
         MOGameTests.add("mad_scientist_house", 20, false, QuestGameTests::house);
         MOGameTests.add("data_pad", 20, false, QuestGameTests::dataPad);
+        MOGameTests.add("guide", 20, false, QuestGameTests::guide);
     }
 
     private static void check(GameTestHelper helper, boolean ok, String message) {
@@ -185,5 +186,68 @@ final class QuestGameTests {
                 && !matteroverdrive.item.DataPadItem.hasGui(pad), "scan whitelist");
         player.discard();
         helper.succeed();
+    }
+
+    /** Guide: the server finds recipes for recipe elements; every entry parses and its item shortcodes resolve. */
+    private static void guide(GameTestHelper helper) {
+        ServerPlayer player = AndroidGameTests.player(helper);
+        var grid = matteroverdrive.network.GuideRecipePayload.find(player, MOItems.DECOMPOSER.get());
+        check(helper, grid != null && grid.size() == 9 && grid.stream().anyMatch(slot -> !slot.isEmpty()), "no decomposer recipe " + grid);
+        var dataPad = matteroverdrive.network.GuideRecipePayload.find(player, MOItems.DATA_PAD.get());
+        check(helper, dataPad != null && dataPad.get(0).stream().anyMatch(s -> s.is(Items.BOOK)), "data pad shapeless recipe " + dataPad);
+        // not ported yet: the contract, contract market and security protocol
+        var missing = java.util.Set.of("contract", "contract_market", "security_protocol");
+        var shortcode = java.util.regex.Pattern.compile("\\[(?:item|block)([^\\]]*)\\]");
+        int files = 0;
+        java.util.Set<String> unknown = new java.util.TreeSet<>();
+        for (String lang : new String[] {"en_us", "ru_ru"}) {
+            for (String name : guideFiles(lang)) {
+                String path = "assets/matteroverdrive/guide/" + lang + "/" + name;
+                try {
+                    byte[] bytes = guideFile(path);
+                    javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new java.io.ByteArrayInputStream(bytes));
+                    var m = shortcode.matcher(new String(bytes, java.nio.charset.StandardCharsets.UTF_8));
+                    while (m.find()) {
+                        var params = new java.util.HashMap<String, String>();
+                        for (String kv : m.group(1).trim().split(" ")) {
+                            String[] p = kv.split("=", 2);
+                            if (p.length == 2) params.put(p[0], p[1]);
+                        }
+                        String item = params.get("name");
+                        if (item == null || missing.contains(item)) continue;
+                        int damage = Integer.parseInt(params.getOrDefault("damage", "0"));
+                        if (matteroverdrive.client.guide.LegacyNames.stack(params.getOrDefault("mod", "mo"), item, damage) == null) {
+                            unknown.add(m.group());
+                        }
+                    }
+                    files++;
+                } catch (Exception e) {
+                    throw new IllegalStateException(path + ": " + e, e);
+                }
+            }
+        }
+        check(helper, unknown.isEmpty(), "unknown shortcodes " + unknown);
+        check(helper, files == 43, "guide files " + files);
+        player.discard();
+        helper.succeed();
+    }
+
+    private static java.util.List<String> guideFiles(String lang) {
+        var contents = net.neoforged.fml.ModList.get().getModFileById(matteroverdrive.MatterOverdrive.MODID).getFile().getContents();
+        java.util.List<String> names = new java.util.ArrayList<>();
+        for (java.nio.file.Path root : contents.getContentRoots()) {
+            java.nio.file.Path dir = root.resolve("assets/matteroverdrive/guide/" + lang);
+            if (!java.nio.file.Files.isDirectory(dir)) continue;
+            try (var stream = java.nio.file.Files.list(dir)) {
+                stream.map(p -> p.getFileName().toString()).filter(n -> n.endsWith(".xml")).forEach(names::add);
+            } catch (java.io.IOException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+        return names.stream().sorted().toList();
+    }
+
+    private static byte[] guideFile(String path) throws java.io.IOException {
+        return net.neoforged.fml.ModList.get().getModFileById(matteroverdrive.MatterOverdrive.MODID).getFile().getContents().readFile(path);
     }
 }

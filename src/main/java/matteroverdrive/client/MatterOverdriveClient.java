@@ -52,6 +52,7 @@ public class MatterOverdriveClient {
         };
         // 1.7.10 AndroidPlayer.playTransformMusic
         matteroverdrive.quest.PlayerQuests.clientUpdated = matteroverdrive.client.quest.QuestHud::onSync;
+        matteroverdrive.network.GuideRecipePayload.onGrid = matteroverdrive.client.guide.GuideRecipes::receive;
         matteroverdrive.item.DataPadItem.openScreen = hand -> net.minecraft.client.Minecraft.getInstance().setScreen(
                 new matteroverdrive.client.quest.DataPadScreen(hand));
         matteroverdrive.dialog.DialogPayloads.openScreen = npc -> net.minecraft.client.Minecraft.getInstance().setScreen(

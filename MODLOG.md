@@ -347,8 +347,22 @@
   Quest page: centred titles ("‣ " on the selected one), info, objectives (■ done green / □ dark green), "Rewards: +Nxp"
   and reward items, scroller; Current Quests / Complete (only with every objective done, forced) / Abandon buttons
   (`QuestPayloads`). The first quest ever gives a Data Pad. Recipe: book + isolinear circuit mk1 (shapeless). 79 GameTests.
-  - Deviations: 240 high instead of 260; the guide pages (entries, description) come next (7p), so the pad opens on
-    the quest log.
+  - Deviations: 240 high instead of 260.
+- **7p ✅** Data Pad guide (1.7.10 guide/, MatterOverdriveGuides, PageGuideEntries, PageGuideDescription). The generator
+  copies info/<lang>/*.xml (en 32, ru 11, zh) to `assets/matteroverdrive/guide/<lang>/`, guide.css to `guide/styles/`,
+  textures/guide (58 pictures) and the guide element textures. `client/guide`: `Guides` (general / weapons / android
+  categories, entries at the 1.7.10 grid positions and groups), `GuideEntry`, `GuideDocument` (XML + stylesheet,
+  falls back to en_us), `GuideElement` (margins, width/height px/%, text-align, float, color; uniform font = 1.7.10
+  setUnicodeFlag), `GuideElements` (page layout with float left/right, text with word wrap and [item]/[block]/[rf]/
+  [guide] shortcodes as green/yellow links, title, image scaled to fit, preview, recipe, details, tooltip, depth and
+  creates infograms), `LegacyNames` (1.7.10 names + damage -> items: upgrade, rouge_android_part, android_pill,
+  weapon_module_barrel, isolinear_circuit, recycler). Recipes come from the server (`GuideRecipePayload`; 1.21
+  clients have no recipe list). `DataPadScreen` pages: entries (category buttons, search, list / grid / grouped
+  ordering, drag + wheel scroll with the 1.7.10 wheel quirk, parallax circuit background), description (page arrows,
+  links with history, back), quests. 80 GameTests (every guide XML parses, every shortcode resolves).
+  - Deviations: the depth infogram uses a scissor instead of a stencil; recipes are drawn by their real width
+    (1.7.10 packed narrow shaped recipes into the 3x3 grid row-first); no contract / contract market / security
+    protocol entries yet (shortcodes to them drop out of the text, like unknown items did in 1.7.10).
 - Cloud (Linux) notes: regenerating resources rewrites the .ogg and ffmpeg-made .png bytes (different ffmpeg/oggenc
   builds) - `git checkout` them. Screenshots: `Xvfb :99` + `DISPLAY=:99 ./gradlew runScene` (software GL is slow; give
   menus extra ticks), world created by `runServer` with a flat creative server.properties, then moved to run/saves;

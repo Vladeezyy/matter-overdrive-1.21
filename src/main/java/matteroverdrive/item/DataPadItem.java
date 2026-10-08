@@ -56,15 +56,46 @@ public class DataPadItem extends Item {
                 ByteBufCodecs.BOOL, Scan::destroys, ByteBufCodecs.BOOL, Scan::noGui, Scan::new);
     }
 
-    /** 1.7.10 page / SelectedActiveQuest / QuestInfoScroll (+ guide state in 7p). */
-    public record State(int page, int selectedQuest, int scroll) {
-        public static final State DEFAULT = new State(0, 0, 0);
+    /**
+     * 1.7.10 page / SelectedActiveQuest / QuestInfoScroll / guideID + its page / Ordering / Category. Pages: 0 guide
+     * entries, 1 guide description, 2 active quests.
+     */
+    public record State(int page, int selectedQuest, int scroll, String guide, int guidePage, int ordering, String category) {
+        public static final int PAGE_ENTRIES = 0, PAGE_DESCRIPTION = 1, PAGE_QUESTS = 2;
+        /** 1.7.10 getOrdering: 2 (the hand-placed groups) by default. */
+        public static final State DEFAULT = new State(0, 0, 0, "", 0, 2, "general");
         public static final Codec<State> CODEC = RecordCodecBuilder.create(i -> i.group(
                 Codec.INT.optionalFieldOf("page", 0).forGetter(State::page),
                 Codec.INT.optionalFieldOf("selected_quest", 0).forGetter(State::selectedQuest),
-                Codec.INT.optionalFieldOf("scroll", 0).forGetter(State::scroll)).apply(i, State::new));
+                Codec.INT.optionalFieldOf("scroll", 0).forGetter(State::scroll),
+                Codec.STRING.optionalFieldOf("guide", "").forGetter(State::guide),
+                Codec.INT.optionalFieldOf("guide_page", 0).forGetter(State::guidePage),
+                Codec.INT.optionalFieldOf("ordering", 2).forGetter(State::ordering),
+                Codec.STRING.optionalFieldOf("category", "general").forGetter(State::category)).apply(i, State::new));
         public static final StreamCodec<RegistryFriendlyByteBuf, State> STREAM_CODEC = StreamCodec.composite(
-                ByteBufCodecs.VAR_INT, State::page, ByteBufCodecs.VAR_INT, State::selectedQuest, ByteBufCodecs.VAR_INT, State::scroll, State::new);
+                ByteBufCodecs.VAR_INT, State::page, ByteBufCodecs.VAR_INT, State::selectedQuest, ByteBufCodecs.VAR_INT, State::scroll,
+                ByteBufCodecs.stringUtf8(128), State::guide, ByteBufCodecs.VAR_INT, State::guidePage, ByteBufCodecs.VAR_INT, State::ordering,
+                ByteBufCodecs.stringUtf8(64), State::category, State::new);
+
+        public State withPage(int page) {
+            return new State(page, selectedQuest, scroll, guide, guidePage, ordering, category);
+        }
+
+        public State withQuest(int selectedQuest, int scroll) {
+            return new State(page, selectedQuest, scroll, guide, guidePage, ordering, category);
+        }
+
+        public State withGuide(String guide, int guidePage) {
+            return new State(page, selectedQuest, scroll, guide, guidePage, ordering, category);
+        }
+
+        public State withOrdering(int ordering) {
+            return new State(page, selectedQuest, scroll, guide, guidePage, ordering, category);
+        }
+
+        public State withCategory(String category) {
+            return new State(page, selectedQuest, scroll, guide, guidePage, ordering, category);
+        }
     }
 
     public DataPadItem(Properties properties) {

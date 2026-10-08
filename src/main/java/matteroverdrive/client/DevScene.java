@@ -716,17 +716,54 @@ public final class DevScene {
             matteroverdrive.quest.PlayerQuests.sync(p);
             p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(MOItems.DATA_PAD.get()));
         }));
-        at(2082, mc -> mc.setScreen(new matteroverdrive.client.quest.DataPadScreen(net.minecraft.world.InteractionHand.MAIN_HAND)));
-        at(2090, mc -> shot(mc, "data_pad_quests"));
-        at(2091, mc -> {
-            mc.setScreen(null);
-            server(mc, p -> p.getMainHandItem().set(matteroverdrive.init.MODataComponents.DATA_PAD.get(),
-                    new matteroverdrive.item.DataPadItem.State(0, 1, 0)));
-        });
-        at(2096, mc -> mc.setScreen(new matteroverdrive.client.quest.DataPadScreen(net.minecraft.world.InteractionHand.MAIN_HAND)));
-        at(2104, mc -> shot(mc, "data_pad_quests_2"));
-        at(2105, mc -> mc.setScreen(null));
-        at(2108, mc -> mc.stop());
+        // close first: the closing screen sends its own state, which would overwrite the next one
+        at(2082, mc -> mc.setScreen(null));
+        at(2088, mc -> server(mc, p -> p.getMainHandItem().set(matteroverdrive.init.MODataComponents.DATA_PAD.get(),
+                matteroverdrive.item.DataPadItem.State.DEFAULT)));
+        at(2094, mc -> mc.setScreen(new matteroverdrive.client.quest.DataPadScreen(net.minecraft.world.InteractionHand.MAIN_HAND)));
+        at(2102, mc -> shot(mc, "data_pad_guide"));
+        at(2106, mc -> mc.setScreen(null));
+        at(2112, mc -> server(mc, p -> p.getMainHandItem().set(matteroverdrive.init.MODataComponents.DATA_PAD.get(),
+                matteroverdrive.item.DataPadItem.State.DEFAULT.withOrdering(0))));
+        at(2118, mc -> mc.setScreen(new matteroverdrive.client.quest.DataPadScreen(net.minecraft.world.InteractionHand.MAIN_HAND)));
+        at(2126, mc -> shot(mc, "data_pad_guide_list"));
+        at(2130, mc -> mc.setScreen(null));
+        at(2136, mc -> server(mc, p -> p.getMainHandItem().set(matteroverdrive.init.MODataComponents.DATA_PAD.get(),
+                matteroverdrive.item.DataPadItem.State.DEFAULT.withPage(1).withGuide("tile.decomposer", 0))));
+        at(2142, mc -> mc.setScreen(new matteroverdrive.client.quest.DataPadScreen(net.minecraft.world.InteractionHand.MAIN_HAND)));
+        at(2150, mc -> shot(mc, "data_pad_guide_decomposer"));
+        at(2154, mc -> mc.setScreen(null));
+        at(2160, mc -> server(mc, p -> p.getMainHandItem().set(matteroverdrive.init.MODataComponents.DATA_PAD.get(),
+                matteroverdrive.item.DataPadItem.State.DEFAULT.withPage(1).withGuide("tile.decomposer", 1))));
+        at(2166, mc -> mc.setScreen(new matteroverdrive.client.quest.DataPadScreen(net.minecraft.world.InteractionHand.MAIN_HAND)));
+        at(2174, mc -> shot(mc, "data_pad_guide_decomposer_2"));
+        at(2178, mc -> mc.setScreen(null));
+        at(2184, mc -> server(mc, p -> p.getMainHandItem().set(matteroverdrive.init.MODataComponents.DATA_PAD.get(),
+                matteroverdrive.item.DataPadItem.State.DEFAULT.withPage(1).withGuide("tile.decomposer", 2))));
+        at(2190, mc -> mc.setScreen(new matteroverdrive.client.quest.DataPadScreen(net.minecraft.world.InteractionHand.MAIN_HAND)));
+        at(2198, mc -> shot(mc, "data_pad_guide_recipe"));
+        at(2202, mc -> mc.setScreen(null));
+        at(2208, mc -> server(mc, p -> p.getMainHandItem().set(matteroverdrive.init.MODataComponents.DATA_PAD.get(),
+                matteroverdrive.item.DataPadItem.State.DEFAULT.withPage(1).withGuide("tile.dilithium_ore", 0))));
+        at(2214, mc -> mc.setScreen(new matteroverdrive.client.quest.DataPadScreen(net.minecraft.world.InteractionHand.MAIN_HAND)));
+        at(2222, mc -> shot(mc, "data_pad_guide_ore"));
+        at(2226, mc -> mc.setScreen(null));
+        at(2232, mc -> server(mc, p -> p.getMainHandItem().set(matteroverdrive.init.MODataComponents.DATA_PAD.get(),
+                matteroverdrive.item.DataPadItem.State.DEFAULT.withCategory("weapons"))));
+        at(2238, mc -> mc.setScreen(new matteroverdrive.client.quest.DataPadScreen(net.minecraft.world.InteractionHand.MAIN_HAND)));
+        at(2246, mc -> shot(mc, "data_pad_guide_weapons"));
+        at(2250, mc -> mc.setScreen(null));
+        at(2256, mc -> server(mc, p -> p.getMainHandItem().set(matteroverdrive.init.MODataComponents.DATA_PAD.get(),
+                matteroverdrive.item.DataPadItem.State.DEFAULT.withPage(2))));
+        at(2262, mc -> mc.setScreen(new matteroverdrive.client.quest.DataPadScreen(net.minecraft.world.InteractionHand.MAIN_HAND)));
+        at(2270, mc -> shot(mc, "data_pad_quests"));
+        at(2274, mc -> mc.setScreen(null));
+        at(2280, mc -> server(mc, p -> p.getMainHandItem().set(matteroverdrive.init.MODataComponents.DATA_PAD.get(),
+                matteroverdrive.item.DataPadItem.State.DEFAULT.withPage(2).withQuest(1, 0))));
+        at(2286, mc -> mc.setScreen(new matteroverdrive.client.quest.DataPadScreen(net.minecraft.world.InteractionHand.MAIN_HAND)));
+        at(2294, mc -> shot(mc, "data_pad_quests_2"));
+        at(2298, mc -> mc.setScreen(null));
+        at(2301, mc -> mc.stop());
     }
 
     private static void at(int t, Consumer<Minecraft> action) {

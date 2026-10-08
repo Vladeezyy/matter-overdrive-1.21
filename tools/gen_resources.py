@@ -1180,6 +1180,23 @@ for icon in ["question_mark", "tick"]:
     cp(ref / "textures/gui/items" / f"{icon}.png", A / "textures/gui/holo" / f"{icon}.png")
 shapeless("data_pad", mid("data_pad"), ["minecraft:book", MK[1]])
 
+# --- phase 7p: Data Pad guide (1.7.10 info/<lang>/*.xml, info/styles/guide.css, textures/guide) ------------------
+for lang_dir in sorted((ref / "info").iterdir()):
+    if lang_dir.is_dir() and lang_dir.name != "styles":
+        for xml in sorted(lang_dir.glob("*.xml")):
+            cp(xml, A / "guide" / lang_dir.name.lower() / xml.name)
+cp(ref / "info/styles/guide.css", A / "guide/styles/guide.css")
+for png in sorted((ref / "textures/guide").glob("*.png")):
+    cp(png, A / "textures/guide" / png.name)
+for t in ["guide_recipe", "guide_info_depth_terrain", "guide_info_depth_terrain_stripes", "guide_info_depth_ore_lense",
+          "guide_info_creates", "quide_element_bg", "guide_cuircit_background", "scroll_left", "scroll_right", "return_arrow"]:
+    cp(ref / "textures/gui/elements" / f"{t}.png", A / "textures/gui/elements" / f"{t}.png")
+# 1.7.10 ScaleTexture(guide_group.png, 16, 16).setOffsets(5, 5, 5, 5)
+cp(ref / "textures/gui/elements/guide_group.png", GUI / "sprites/guide_group.png")
+w(GUI / "sprites/guide_group.png.mcmeta", {"gui": {"scaling": {"type": "nine_slice", "width": 16, "height": 16, "border": 5}}})
+for icon in ["home_icon", "ammo", "android_slot_arms", "list", "grid", "sort_random", "page_icon_search"]:
+    cp(ref / "textures/gui/items" / f"{icon}.png", A / "textures/gui/holo" / f"{icon}.png")
+
 # --- phase 7b: mobs -----------------------------------------------------------------------------------------
 import zlib
 
@@ -1843,6 +1860,9 @@ for src_name, dst_name in [("en_US", "en_us"), ("ru_RU", "ru_ru")]:
     lang[f"death.attack.{MOD}.android_transformation"] = src.get("death.attack.android_transformation") or en["death.attack.android_transformation"]
     lang[f"attribute.name.{MOD}.android_glitch_time"] = {"en_us": "Glitch Time", "ru_ru": "Длительность сбоев"}[dst_name]
     lang[f"attribute.name.{MOD}.android_battery_use"] = {"en_us": "Battery Use", "ru_ru": "Расход батареи"}[dst_name]
+    # 7p: guide categories, groups and named entries: guide.<kind>.<name>.name -> guide.matteroverdrive.<kind>.<name>
+    for k in [k for k in en if k.startswith("guide.") and k.endswith(".name")]:
+        lang["guide." + MOD + "." + k[len("guide."):-len(".name")]] = src.get(k) or en[k]
     # 7m: dialog and quest texts under the mod namespace (ru falls back to en where the original lacks them)
     for k in [k for k in en if k.startswith("dialog.") or k.startswith("quest.")]:
         first, rest = k.split(".", 1)
