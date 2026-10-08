@@ -609,11 +609,11 @@ public final class DevScene {
         });
         at(1680, mc -> shot(mc, "dialog_puny_humans"));
         at(1681, mc -> mc.setScreen(null));
-        at(1684, mc -> server(mc, p -> p.level().getEntitiesOfClass(matteroverdrive.entity.MadScientist.class, p.getBoundingBox().inflate(6))
-                .forEach(npc -> {
-                    npc.setJunkie(true);
-                    matteroverdrive.dialog.DialogPayloads.startConversation(p, npc);
-                })));
+        at(1682, mc -> server(mc, p -> p.level().getEntitiesOfClass(matteroverdrive.entity.MadScientist.class, p.getBoundingBox().inflate(6))
+                .forEach(npc -> npc.setJunkie(true))));
+        // the junkie flag reaches the client first: both sides build the same start message
+        at(1686, mc -> server(mc, p -> p.level().getEntitiesOfClass(matteroverdrive.entity.MadScientist.class, p.getBoundingBox().inflate(6))
+                .forEach(npc -> matteroverdrive.dialog.DialogPayloads.startConversation(p, npc))));
         at(1692, mc -> shot(mc, "dialog_junkie"));
         // the cocktail story: its first line, then on to the last line with Accept / Decline
         at(1693, mc -> {
