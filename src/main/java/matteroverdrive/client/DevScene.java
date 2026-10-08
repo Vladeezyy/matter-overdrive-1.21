@@ -644,7 +644,66 @@ public final class DevScene {
         at(1750, mc -> mc.options.hideGui = true);
         at(1760, mc -> shot(mc, "mad_scientist"));
         at(1761, mc -> mc.options.hideGui = false);
-        at(1764, mc -> mc.stop());
+        // 7n: plains villages placed far east until one has the mad scientist's house; a view from above and one inside
+        for (int i = 0; i < 8; i++) {
+            int n = i;
+            // the player goes first so the village's chunks (and its entities) are loaded, then the village is placed
+            at(1766 + i * 30, mc -> server(mc, p -> {
+                if (!p.level().getEntities(matteroverdrive.init.MOEntities.MAD_SCIENTIST.get(), e -> e.getX() > origin.getX() + 1000).isEmpty()) return;
+                BlockPos at = origin.offset(2000 + n * 300, 0, 0);
+                p.teleportTo(p.level(), at.getX(), at.getY() + 40, at.getZ(), Set.of(), 0, 90f, false);
+                p.getAbilities().flying = true;
+                p.onUpdateAbilities();
+            }));
+            // /place needs every chunk of the village loaded: force-load 15 x 15 chunks around it first
+            at(1770 + i * 30, mc -> server(mc, p -> {
+                if (!p.level().getEntities(matteroverdrive.init.MOEntities.MAD_SCIENTIST.get(), e -> e.getX() > origin.getX() + 1000).isEmpty()) return;
+                BlockPos at = origin.offset(2000 + n * 300, 0, 0);
+                p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
+                        "forceload add " + (at.getX() - 112) + " " + (at.getZ() - 112) + " " + (at.getX() + 112) + " " + (at.getZ() + 112));
+            }));
+            at(1786 + i * 30, mc -> server(mc, p -> {
+                if (!p.level().getEntities(matteroverdrive.init.MOEntities.MAD_SCIENTIST.get(), e -> e.getX() > origin.getX() + 1000).isEmpty()) return;
+                BlockPos at = origin.offset(2000 + n * 300, 0, 0);
+                p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4)
+                        .withCallback((ok, result) -> MatterOverdrive.LOGGER.info("[scene] village at {}: {}", at, ok)),
+                        "place structure minecraft:village_plains " + at.getX() + " " + at.getY() + " " + at.getZ());
+                MatterOverdrive.LOGGER.info("[scene] scientists loaded: {}", p.level().getEntities(
+                        matteroverdrive.init.MOEntities.MAD_SCIENTIST.get(), e -> e.getX() > origin.getX() + 1000).size());
+            }));
+        }
+        at(2010, mc -> server(mc, p -> {
+            var found = p.level().getEntities(matteroverdrive.init.MOEntities.MAD_SCIENTIST.get(), e -> e.getX() > origin.getX() + 1000);
+            MatterOverdrive.LOGGER.info("[scene] mad scientists in villages: {}", found.size());
+            if (found.isEmpty()) return;
+            var npc = found.get(0);
+            npc.setNoAi(true);
+            p.teleportTo(p.level(), npc.getX() + 6, npc.getY() + 14, npc.getZ() + 6, Set.of(), 135f, 55f, false);
+        }));
+        at(2011, mc -> mc.options.hideGui = true);
+        at(2050, mc -> shot(mc, "mad_scientist_house"));
+        at(2051, mc -> server(mc, p -> {
+            var found = p.level().getEntities(matteroverdrive.init.MOEntities.MAD_SCIENTIST.get(), e -> e.getX() > origin.getX() + 1000);
+            if (found.isEmpty()) return;
+            var npc = found.get(0);
+            // inside: from the scientist's spot, looking around the room towards the bookshelves
+            BlockPos crate = BlockPos.betweenClosedStream(npc.blockPosition().offset(-4, -1, -4), npc.blockPosition().offset(4, 1, 4))
+                    .filter(b -> p.level().getBlockState(b).getBlock() instanceof matteroverdrive.block.TritaniumCrateBlock)
+                    .map(BlockPos::immutable).findFirst().orElse(npc.blockPosition());
+            var eye = npc.position().add(npc.position().subtract(crate.getCenter()).normalize().scale(2.5));
+            p.teleportTo(p.level(), eye.x, npc.getY(), eye.z, Set.of(), 0, 15f, false);
+            p.lookAt(net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES, crate.getCenter());
+        }));
+        at(2070, mc -> shot(mc, "mad_scientist_house_inside"));
+        at(2071, mc -> mc.options.hideGui = false);
+        at(2072, mc -> server(mc, p -> {
+            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
+                    "forceload remove all");
+            p.getAbilities().flying = false;
+            p.onUpdateAbilities();
+            p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 0f, false);
+        }));
+        at(2074, mc -> mc.stop());
     }
 
     private static void at(int t, Consumer<Minecraft> action) {

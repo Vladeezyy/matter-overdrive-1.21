@@ -327,6 +327,19 @@
   - Deviations: no cinematic dialog camera (1.7.10 DialogShot close-ups); he isn't a villager profession (no job,
     village brain, breeding or restocking); the first quest doesn't give a Data Pad yet (Data Pad not ported); the
     1.7.10 "line.fail" chat lines had no translation (raw keys) → written; the contract quests come with the market.
+- **7n ✅** Mad scientist's house (1.7.10 MadScientistHouse + VillageCreatationMadScientist). The generator builds jigsaw
+  templates `structure/village/mad_scientist_house(_desert).nbt` from the 1.7.10 addComponentParts calls (9x9x6:
+  cobblestone/planks, stair roof, glass panes, bookshelves, stair benches, fence+plate tables, inscriber, tritanium crate,
+  door) plus an entrance jigsaw on the 1.7.10 step (cobblestone stairs) and the mad scientist entity; the desert variant
+  uses the 1.7.10 desert swaps (sandstone, cut sandstone, sandstone stairs). `VillageHouses` adds it to the plains and
+  desert house pools at server start (AT on `StructureTemplatePool.templates`), weight 6. Processor lists: crate colour
+  random (`RandomCrateProcessor`, 1.7.10 random crate), plains also mossify 10%. Mad scientists no longer despawn.
+  78 GameTests.
+  - Deviations: 1.7.10 `return true` after placing the crate skipped the door, the step, the foundation and the
+    scientist whenever the house sat in one chunk (most houses) — not ported, the house is always complete. No
+    per-village limit (1.7.10 PieceWeight 20 with max 0-2 + size): weight 6 of the plains pool's 87 aims at about one
+    house per village. Only plains/desert villages (as 1.7.10). The crate's GMO contract and "Mad Scientist's Data Pad"
+    come with the contracts / Data Pad.
 - Cloud (Linux) notes: regenerating resources rewrites the .ogg and ffmpeg-made .png bytes (different ffmpeg/oggenc
   builds) - `git checkout` them. Screenshots: `Xvfb :99` + `DISPLAY=:99 ./gradlew runScene` (software GL is slow; give
   menus extra ticks), world created by `runServer` with a flat creative server.properties, then moved to run/saves;

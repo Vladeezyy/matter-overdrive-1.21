@@ -1511,6 +1511,139 @@ with gzip.GzipFile(D / "structure/gametest_area.nbt", "wb", mtime=0) as f:
     f.write(area)
 
 
+# --- phase 7n: the mad scientist's house (1.7.10 MadScientistHouse village piece) -----------------------------
+def nbt_bytes(value, name=""):
+    """Minimal NBT writer: dict = compound, ("list", type, items), ("int", v), ("double", v), str = string."""
+    def tag_type(v):
+        if isinstance(v, dict): return 10
+        if isinstance(v, str): return 8
+        if isinstance(v, tuple): return {"int": 3, "double": 6, "list": 9, "byte": 1}[v[0]]
+        raise TypeError(v)
+    def payload(v):
+        t = tag_type(v)
+        if t == 10:
+            out = b""
+            for k, x in v.items():
+                kb = k.encode()
+                out += bytes([tag_type(x)]) + struct.pack(">H", len(kb)) + kb + payload(x)
+            return out + b"\0"
+        if t == 8:
+            b = v.encode()
+            return struct.pack(">H", len(b)) + b
+        kind, *rest = v
+        if kind == "int": return struct.pack(">i", rest[0])
+        if kind == "byte": return struct.pack(">b", rest[0])
+        if kind == "double": return struct.pack(">d", rest[0])
+        item_type, items = rest
+        return bytes([item_type]) + struct.pack(">i", len(items)) + b"".join(payload(i) for i in items)
+    nb = name.encode()
+    return bytes([10]) + struct.pack(">H", len(nb)) + nb + payload(value)
+
+def house_blocks():
+    """1.7.10 addComponentParts in piece coordinates (x 0-8, y 0-8, z 0-5, door at z = 0 facing -z)."""
+    b = {}
+    def fill(x0, y0, z0, x1, y1, z1, state):
+        for x in range(x0, x1 + 1):
+            for y in range(y0, y1 + 1):
+                for z in range(z0, z1 + 1):
+                    b[(x, y, z)] = state
+    def put(x, y, z, state):
+        b[(x, y, z)] = state
+    stairs = lambda facing, block="minecraft:oak_stairs": f"{block}[facing={facing},half=bottom,shape=straight,waterlogged=false]"
+    fill(1, 1, 1, 7, 5, 4, "minecraft:air")
+    fill(0, 0, 0, 8, 0, 5, "minecraft:cobblestone")
+    fill(0, 5, 0, 8, 5, 5, "minecraft:cobblestone")
+    fill(0, 6, 1, 8, 6, 4, "minecraft:cobblestone")
+    fill(0, 7, 2, 8, 7, 3, "minecraft:cobblestone")
+    for k in range(-1, 3):                                       # roof: getMetadataWithOffset(stairs, 3/2) = south / north
+        for l in range(9):
+            put(l, 6 + k, k, stairs("south"))
+            put(l, 6 + k, 5 - k, stairs("north"))
+    fill(0, 1, 0, 0, 1, 5, "minecraft:cobblestone")
+    fill(1, 1, 5, 8, 1, 5, "minecraft:cobblestone")
+    fill(8, 1, 0, 8, 1, 4, "minecraft:cobblestone")
+    fill(2, 1, 0, 7, 1, 0, "minecraft:cobblestone")
+    for x, z in [(0, 0), (0, 5), (8, 5), (8, 0)]:
+        fill(x, 2, z, x, 4, z, "minecraft:cobblestone")
+    fill(0, 2, 1, 0, 4, 4, "minecraft:oak_planks")
+    fill(1, 2, 5, 7, 4, 5, "minecraft:oak_planks")
+    fill(8, 2, 1, 8, 4, 4, "minecraft:oak_planks")
+    fill(1, 2, 0, 7, 4, 0, "minecraft:oak_planks")
+    ew = "minecraft:glass_pane[east=true,north=false,south=false,waterlogged=false,west=true]"
+    ns = "minecraft:glass_pane[east=false,north=true,south=true,waterlogged=false,west=false]"
+    for x in (4, 5, 6):
+        for y in (2, 3):
+            put(x, y, 0, ew)
+    for x in (0, 8):
+        for y in (2, 3):
+            for z in (2, 3):
+                put(x, y, z, ns)
+    for x in (2, 3, 5, 6):
+        put(x, 2, 5, ew)
+    fill(1, 4, 1, 7, 4, 1, "minecraft:oak_planks")
+    fill(1, 4, 4, 7, 4, 4, "minecraft:oak_planks")
+    fill(1, 3, 4, 7, 3, 4, "minecraft:bookshelf")
+    put(7, 1, 4, "minecraft:oak_planks")
+    put(7, 1, 3, stairs("east"))                                 # getMetadataWithOffset(stairs, 0) = east
+    for x in (6, 5, 4, 3):
+        put(x, 1, 4, stairs("south"))
+    for x in (6, 4):                                             # tables: fence + pressure plate
+        put(x, 1, 3, "minecraft:oak_fence[east=false,north=false,south=false,waterlogged=false,west=false]")
+        put(x, 2, 3, "minecraft:oak_pressure_plate[powered=false]")
+    put(7, 1, 1, f"{MOD}:inscriber[active=false,facing=south]")
+    put(1, 1, 4, f"{MOD}:tritanium_crate_white[facing=north]")  # colour picked by the house processor (1.7.10: random)
+    put(1, 1, 0, "minecraft:oak_door[facing=south,half=lower,hinge=left,open=false,powered=false]")
+    put(1, 2, 0, "minecraft:oak_door[facing=south,half=upper,hinge=left,open=false,powered=false]")
+    return b
+
+DESERT = {"minecraft:cobblestone": "minecraft:sandstone", "minecraft:oak_planks": "minecraft:cut_sandstone",
+          "minecraft:oak_stairs": "minecraft:sandstone_stairs"}   # 1.7.10 Village.func_151558_b in deserts
+
+def house_template(desert):
+    blocks = house_blocks()
+    palette, entries = [], []
+    def state_index(state):
+        if desert:
+            name, _, props = state.partition("[")
+            state = DESERT.get(name, name) + (("[" + props) if props else "")
+        if state not in palette: palette.append(state)
+        return palette.index(state)
+    def state_tag(state):
+        name, _, props = state.partition("[")
+        tag = {"Name": name}
+        if props:
+            tag["Properties"] = {k: v for k, v in (kv.split("=") for kv in props.rstrip("]").split(","))}
+        return tag
+    # template z = piece z + 1: row 0 holds the street entrance jigsaw in front of the door (1.7.10 placed a step there)
+    for (x, y, z), state in sorted(blocks.items()):
+        entries.append({"pos": ("list", 3, [("int", x), ("int", y), ("int", z + 1)]), "state": ("int", state_index(state))})
+    street = "desert" if desert else "plains"
+    jigsaw = state_index("minecraft:jigsaw[orientation=north_up]")
+    step = "minecraft:sandstone_stairs" if desert else "minecraft:cobblestone_stairs"
+    entries.append({"pos": ("list", 3, [("int", 1), ("int", 0), ("int", 0)]), "state": ("int", jigsaw), "nbt": {
+        "final_state": f"{step}[facing=south,half=bottom,shape=straight,waterlogged=false]", "name": "minecraft:building_entrance",
+        "pool": f"minecraft:village/{street}/streets", "joint": "aligned", "id": "minecraft:jigsaw",
+        "target": "minecraft:building_entrance", "selection_priority": ("int", 0), "placement_priority": ("int", 0)}})
+    entity = {"pos": ("list", 6, [("double", 2.5), ("double", 1.0), ("double", 3.5)]),
+              "blockPos": ("list", 3, [("int", 2), ("int", 1), ("int", 3)]),
+              "nbt": {"id": f"{MOD}:mad_scientist", "Pos": ("list", 6, [("double", 2.5), ("double", 1.0), ("double", 3.5)]),
+                      "PersistenceRequired": ("byte", 1)}}
+    return {"size": ("list", 3, [("int", 9), ("int", 9), ("int", 7)]), "entities": ("list", 10, [entity]),
+            "blocks": ("list", 10, entries), "palette": ("list", 10, [state_tag(p) for p in palette]),
+            "DataVersion": ("int", 4556)}
+
+for desert in (False, True):
+    name = "mad_scientist_house_desert" if desert else "mad_scientist_house"
+    (D / "structure/village").mkdir(parents=True, exist_ok=True)
+    with gzip.GzipFile(D / "structure/village" / f"{name}.nbt", "wb", mtime=0) as f:
+        f.write(nbt_bytes(house_template(desert)))
+# the crate's colour (1.7.10 picked a random crate), plains houses also get the village moss
+w(D / "worldgen/processor_list/mad_scientist_house.json", {"processors": [{"processor_type": f"{MOD}:random_crate"},
+    {"processor_type": "minecraft:rule", "rules": [{"input_predicate": {"predicate_type": "minecraft:random_block_match",
+        "block": "minecraft:cobblestone", "probability": 0.1}, "location_predicate": {"predicate_type": "minecraft:always_true"},
+        "output_state": {"Name": "minecraft:mossy_cobblestone"}}]}]})
+w(D / "worldgen/processor_list/mad_scientist_house_desert.json", {"processors": [{"processor_type": f"{MOD}:random_crate"}]})
+
 # --- lang ------------------------------------------------------------------------------------
 def parse_lang(p):
     d = {}

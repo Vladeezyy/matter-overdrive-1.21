@@ -165,6 +165,12 @@ public class MadScientist extends AbstractVillager implements DialogNpc {
         level().addFreshEntity(new net.minecraft.world.entity.ExperienceOrb(level(), getX(), getY() + 0.5, getZ(), 3 + random.nextInt(4)));
     }
 
+    /** A villager: never despawns (his house would be empty). */
+    @Override
+    public boolean removeWhenFarAway(double distanceToClosestPlayer) {
+        return false;
+    }
+
     @Override
     public boolean showProgressBar() {
         return false;

@@ -18,5 +18,11 @@ public final class MOStructures {
     public static final DeferredHolder<StructurePieceType, StructurePieceType> IMAGE_PIECE = PIECES.register("image",
             () -> (StructurePieceType.ContextlessType) ImageStructurePiece::new);
 
+    public static final DeferredRegister<net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType<?>> PROCESSORS =
+            DeferredRegister.create(Registries.STRUCTURE_PROCESSOR, MatterOverdrive.MODID);
+    public static final DeferredHolder<net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType<?>,
+            net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType<matteroverdrive.world.RandomCrateProcessor>> RANDOM_CRATE =
+            PROCESSORS.register("random_crate", () -> () -> matteroverdrive.world.RandomCrateProcessor.CODEC);
+
     private MOStructures() {}
 }

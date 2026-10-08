@@ -27,6 +27,7 @@ final class QuestGameTests {
         MOGameTests.add("mad_scientist_trades", 20, false, QuestGameTests::trades);
         MOGameTests.add("quest_puny_humans", 20, false, QuestGameTests::punyHumans);
         MOGameTests.add("quest_cocktail_of_ascension", 20, false, QuestGameTests::cocktail);
+        MOGameTests.add("mad_scientist_house", 20, false, QuestGameTests::house);
     }
 
     private static void check(GameTestHelper helper, boolean ok, String message) {
@@ -128,6 +129,32 @@ final class QuestGameTests {
         check(helper, player.getInventory().contains(new ItemStack(MOItems.ANDROID_PILL_YELLOW.get())), "no pill rewards");
         mutants.forEach(m -> m.discard());
         player.discard();
+        helper.succeed();
+    }
+
+    /** The house is in the plains and desert village house pools, and its template builds the 1.7.10 house with him. */
+    private static void house(GameTestHelper helper) {
+        var level = helper.getLevel();
+        var pools = level.registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.TEMPLATE_POOL);
+        for (String pool : new String[] {"village/plains/houses", "village/desert/houses"}) {
+            var templates = pools.getValue(net.minecraft.resources.ResourceLocation.withDefaultNamespace(pool)).templates;
+            long ours = templates.stream().filter(e -> e.toString().contains("mad_scientist_house")).count();
+            check(helper, ours == matteroverdrive.world.VillageHouses.WEIGHT, pool + ": " + ours);
+        }
+        var template = level.getStructureManager().get(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(
+                matteroverdrive.MatterOverdrive.MODID, "village/mad_scientist_house")).orElseThrow();
+        check(helper, template.getSize().equals(new net.minecraft.core.Vec3i(9, 9, 7)), "size " + template.getSize());
+        BlockPos origin = helper.absolutePos(new BlockPos(1, 1, 1));
+        var settings = new net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings()
+                .addProcessor(matteroverdrive.world.RandomCrateProcessor.INSTANCE).setFinalizeEntities(true);
+        template.placeInWorld(level, origin, origin, settings, level.random, 2);
+        check(helper, level.getBlockState(origin.offset(7, 1, 2)).is(matteroverdrive.init.MOBlocks.INSCRIBER.get()), "no inscriber");
+        check(helper, level.getBlockState(origin.offset(1, 3, 5)).is(net.minecraft.world.level.block.Blocks.BOOKSHELF), "no bookshelves");
+        check(helper, level.getBlockState(origin.offset(1, 1, 5)).getBlock() instanceof matteroverdrive.block.TritaniumCrateBlock, "no crate");
+        check(helper, level.getBlockState(origin.offset(1, 1, 1)).is(net.minecraft.world.level.block.Blocks.OAK_DOOR), "no door");
+        var scientists = level.getEntitiesOfClass(MadScientist.class, new net.minecraft.world.phys.AABB(origin).inflate(10));
+        check(helper, scientists.size() == 1 && !scientists.get(0).removeWhenFarAway(1000), "scientists " + scientists.size());
+        scientists.forEach(MadScientist::discard);
         helper.succeed();
     }
 }
