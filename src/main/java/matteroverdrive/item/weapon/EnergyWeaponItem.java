@@ -145,7 +145,8 @@ public abstract class EnergyWeaponItem extends Item {
 
     public float getDamage(ItemStack weapon, LivingEntity shooter) {
         float damage = modifyStat(WeaponStat.DAMAGE, weapon, baseDamage);
-        return damage + (float) shooter.getAttributeValue(Attributes.ATTACK_DAMAGE);
+        damage += (float) shooter.getAttributeValue(Attributes.ATTACK_DAMAGE);
+        return shooter instanceof WeaponShooter mob ? damage * mob.weaponDamageScale() : damage;
     }
 
     /** 1.7.10 getAccuracy: base + 10 x movement, x0.6 sneaking, then modules and the scope. */
@@ -156,6 +157,7 @@ public abstract class EnergyWeaponItem extends Item {
         accuracy = modifyStat(WeaponStat.ACCURACY, weapon, accuracy);
         ItemStack sights = getModule(weapon, WeaponModule.SLOT_SIGHTS);
         if (sights.getItem() instanceof WeaponScope scope) accuracy = scope.getAccuracyModify(sights, weapon, zoomed, accuracy);
+        if (shooter instanceof WeaponShooter mob) accuracy += mob.weaponAccuracyAdd();
         return accuracy;
     }
 
@@ -276,10 +278,20 @@ public abstract class EnergyWeaponItem extends Item {
         player.getCooldowns().addCooldown(weapon, getShootCooldown(weapon));
     }
 
-    protected abstract void fire(ServerLevel level, Player shooter, ItemStack weapon, boolean zoomed);
+    /**
+     * 1.7.10 EntityRangedRogueAndroidMob.attackEntityWithRangedAttack: a mob fires along its look (zoomed), the
+     * weapon is cooled at once and, with unlimited ammo, kept charged.
+     */
+    public void fireFromMob(ServerLevel level, LivingEntity mob, ItemStack weapon) {
+        fire(level, mob, weapon, true);
+        setHeat(weapon, 0);
+        setEnergy(weapon, getCapacity(weapon));
+    }
+
+    protected abstract void fire(ServerLevel level, LivingEntity shooter, ItemStack weapon, boolean zoomed);
 
     /** Spawns one bolt along the shooter's look; 1.7.10 spread was gaussian * 0.0075 * accuracy. */
-    protected PlasmaBolt spawnBolt(ServerLevel level, Player shooter, ItemStack weapon, float damage, float accuracy) {
+    protected PlasmaBolt spawnBolt(ServerLevel level, LivingEntity shooter, ItemStack weapon, float damage, float accuracy) {
         PlasmaBolt bolt = new PlasmaBolt(level, shooter, damage, getRange(weapon), getColor(weapon));
         bolt.setFireMultiplier(modifyStat(WeaponStat.FIRE_DAMAGE, weapon, 0));
         Vec3 look = shooter.getLookAngle();
@@ -289,7 +301,7 @@ public abstract class EnergyWeaponItem extends Item {
         return bolt;
     }
 
-    protected void playShot(ServerLevel level, Player shooter, SoundEvent sound) {
+    protected void playShot(ServerLevel level, LivingEntity shooter, SoundEvent sound) {
         level.playSound(null, shooter.getX(), shooter.getY(), shooter.getZ(), sound, SoundSource.PLAYERS, 1, 0.9f + level.getRandom().nextFloat() * 0.2f);
     }
 

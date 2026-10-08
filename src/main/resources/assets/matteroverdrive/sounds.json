@@ -136,5 +136,20 @@
     "sounds": [
       "matteroverdrive:shockwave"
     ]
+  },
+  "rogue_android_say": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:entities/rogue_android_say_0",
+      "matteroverdrive:entities/rogue_android_say_1",
+      "matteroverdrive:entities/rogue_android_say_2"
+    ]
+  },
+  "rogue_android_death": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:entities/rogue_android_death_0",
+      "matteroverdrive:entities/rogue_android_death_1"
+    ]
   }
 }

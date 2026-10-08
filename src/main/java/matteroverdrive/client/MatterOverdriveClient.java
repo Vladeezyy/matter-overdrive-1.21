@@ -85,6 +85,15 @@ public class MatterOverdriveClient {
         event.registerEntityRenderer(matteroverdrive.init.MOEntities.PLASMA_BOLT.get(), PlasmaBoltRenderer::new);
         event.registerBlockEntityRenderer(matteroverdrive.init.MOBlockEntities.WEAPON_STATION.get(), WeaponStationRenderer::new);
         event.registerBlockEntityRenderer(matteroverdrive.init.MOBlockEntities.HOLO_SIGN.get(), HoloSignRenderer::new);
+        event.registerEntityRenderer(matteroverdrive.init.MOEntities.ROGUE_ANDROID.get(), RogueAndroidRenderer::melee);
+        event.registerEntityRenderer(matteroverdrive.init.MOEntities.RANGED_ROGUE_ANDROID.get(), RogueAndroidRenderer::ranged);
+    }
+
+    @SubscribeEvent
+    static void registerLayers(net.neoforged.neoforge.client.event.EntityRenderersEvent.RegisterLayerDefinitions event) {
+        event.registerLayerDefinition(RogueAndroidRenderer.MELEE, RogueAndroidRenderer::meleeLayer);
+        event.registerLayerDefinition(RogueAndroidRenderer.RANGED, RogueAndroidRenderer::rangedLayer);
+        event.registerLayerDefinition(RogueAndroidRenderer.VISOR, RogueAndroidRenderer::visorLayer);
     }
 
     /** Matter Plasma textures (1.7.10 matter_plasma_still / _flowing), shown by tanks of other mods. */

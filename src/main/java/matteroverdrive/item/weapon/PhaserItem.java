@@ -87,7 +87,7 @@ public class PhaserItem extends EnergyWeaponItem {
     public void tryFire(ServerPlayer player, ItemStack weapon, boolean zoomed) {}
 
     @Override
-    protected void fire(ServerLevel level, Player shooter, ItemStack weapon, boolean zoomed) {}
+    protected void fire(ServerLevel level, LivingEntity shooter, ItemStack weapon, boolean zoomed) {}
 
     /** 1.7.10 Phaser: no sights slot; barrels (all four) and colour modules only. */
     @Override

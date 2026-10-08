@@ -24,6 +24,7 @@ final class AndroidGameTests {
         MOGameTests.add("android_shield_and_shockwave", 20, false, AndroidGameTests::shieldAndShockwave);
         MOGameTests.add("android_teleport", 20, false, AndroidGameTests::teleport);
         MOGameTests.add("charging_station_charges_androids", 20, false, AndroidGameTests::chargingStation);
+        MOGameTests.add("rogue_androids", 20, false, AndroidGameTests::rogueAndroids);
     }
 
     private static void check(GameTestHelper helper, boolean ok, String message) {
@@ -258,5 +259,35 @@ final class AndroidGameTests {
         int gained = Android.getEnergy(player) - before;
         check(helper, gained > 0 && gained <= 512, "gained " + gained);
         helper.succeed();
+    }
+
+    /** Rogue androids: level stats, they hunt humans but not androids, the ranged one shoots its weapon. */
+    private static void rogueAndroids(GameTestHelper helper) {
+        var melee = helper.spawnWithNoFreeWill(matteroverdrive.init.MOEntities.ROGUE_ANDROID.get(), new BlockPos(3, 1, 3));
+        melee.setup(2, false);
+        check(helper, melee.getMaxHealth() == 52 && melee.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE) == 6,
+                "level 2: health " + melee.getMaxHealth());
+        melee.setup(3, true);
+        check(helper, melee.getMaxHealth() == 128, "legendary health " + melee.getMaxHealth());
+        ServerPlayer human = player(helper);
+        check(helper, matteroverdrive.entity.monster.RogueAndroid.isEnemy(human), "humans aren't targets");
+        Android.setAndroid(human, true);
+        check(helper, !matteroverdrive.entity.monster.RogueAndroid.isEnemy(human), "androids are targets");
+        var ranged = helper.spawnWithNoFreeWill(matteroverdrive.init.MOEntities.RANGED_ROGUE_ANDROID.get(), new BlockPos(6, 1, 6));
+        ItemStack rifle = new ItemStack(MOItems.PHASER_RIFLE.get());
+        ranged.setItemSlot(net.minecraft.world.entity.EquipmentSlot.MAINHAND, rifle);
+        var pig = helper.spawnWithNoFreeWill(net.minecraft.world.entity.EntityType.PIG, new BlockPos(6, 1, 10));
+        ranged.performRangedAttack(pig, 1);
+        var bolts = helper.getLevel().getEntitiesOfClass(matteroverdrive.entity.PlasmaBolt.class, ranged.getBoundingBox().inflate(8),
+                b -> b.getOwner() == ranged);
+        check(helper, bolts.size() == 1, "bolts " + bolts.size());
+        check(helper, EnergyWeaponItemAccess.full(ranged.getMainHandItem()), "weapon not kept charged");
+        helper.succeed();
+    }
+
+    private static final class EnergyWeaponItemAccess {
+        static boolean full(ItemStack weapon) {
+            return matteroverdrive.item.weapon.EnergyWeaponItem.getEnergy(weapon) == matteroverdrive.item.weapon.EnergyWeaponItem.getCapacity(weapon);
+        }
     }
 }

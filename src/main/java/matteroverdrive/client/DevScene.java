@@ -257,7 +257,28 @@ public final class DevScene {
             p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY() + 1, origin.getZ() - 4.5, Set.of(), 0f, 10f, false);
         }));
         at(568, mc -> shot(mc, "decorative"));
-        at(570, mc -> mc.stop());
+        // 7b: rogue androids of each level (one legendary), melee and ranged
+        at(570, mc -> server(mc, p -> {
+            int[][] spec = {{0, 0}, {1, 0}, {2, 0}, {3, 1}};
+            for (int i = 0; i < 4; i++) {
+                for (boolean ranged : new boolean[] {false, true}) {
+                    var type = ranged ? matteroverdrive.init.MOEntities.RANGED_ROGUE_ANDROID.get() : matteroverdrive.init.MOEntities.ROGUE_ANDROID.get();
+                    var android = type.create(p.level(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+                    android.snapTo(origin.getX() - 4.5 + i * 3 + (ranged ? 1.2 : 0), origin.getY(), origin.getZ() - 8.5, 0, 0);
+                    android.finalizeSpawn(p.level(), p.level().getCurrentDifficultyAt(android.blockPosition()),
+                            net.minecraft.world.entity.EntitySpawnReason.COMMAND, null);
+                    android.setup(spec[i][0], spec[i][1] == 1);
+                    android.setNoAi(true);
+                    android.setYRot(0);
+                    android.setYHeadRot(0);
+                    android.yBodyRot = 0;
+                    p.level().addFreshEntity(android);
+                }
+            }
+            p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY() + 1, origin.getZ() - 1.5, Set.of(), 180f, 10f, false);
+        }));
+        at(578, mc -> shot(mc, "rogue_androids"));
+        at(580, mc -> mc.stop());
     }
 
     private static void at(int t, Consumer<Minecraft> action) {

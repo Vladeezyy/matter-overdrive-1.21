@@ -36,6 +36,10 @@ public final class MOSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> POWER_DOWN = sound("power_down");
     public static final DeferredHolder<SoundEvent, SoundEvent> SHOCKWAVE = sound("shockwave");
 
+    // Mobs (phase 7b)
+    public static final DeferredHolder<SoundEvent, SoundEvent> ROGUE_ANDROID_SAY = sound("rogue_android_say");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ROGUE_ANDROID_DEATH = sound("rogue_android_death");
+
     private static DeferredHolder<SoundEvent, SoundEvent> sound(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, name)));
     }

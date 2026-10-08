@@ -49,6 +49,8 @@ public class MatterOverdrive {
         MOCreativeTabs.TABS.register(modEventBus);
         MOGameTests.register(modEventBus);
         modEventBus.addListener(MatterOverdrive::registerCapabilities);
+        modEventBus.addListener(MatterOverdrive::registerAttributes);
+        modEventBus.addListener(MatterOverdrive::registerSpawnPlacements);
     }
 
     private static void registerCapabilities(RegisterCapabilitiesEvent event) {
@@ -72,6 +74,18 @@ public class MatterOverdrive {
         machine(event, MOBlockEntities.FUSION_REACTOR_CONTROLLER.get());
         event.registerBlockEntity(Capabilities.Energy.BLOCK, MOBlockEntities.FUSION_REACTOR_IO.get(), (io, side) -> io.getEnergy());
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, MOBlockEntities.FUSION_REACTOR_IO.get(), (io, side) -> io.getMatter());
+    }
+
+    private static void registerAttributes(net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent event) {
+        event.put(MOEntities.ROGUE_ANDROID.get(), matteroverdrive.entity.monster.MeleeRogueAndroid.createAttributes().build());
+        event.put(MOEntities.RANGED_ROGUE_ANDROID.get(), matteroverdrive.entity.monster.RangedRogueAndroid.createAttributes().build());
+    }
+
+    private static void registerSpawnPlacements(net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent event) {
+        for (var type : java.util.List.of(MOEntities.ROGUE_ANDROID.get(), MOEntities.RANGED_ROGUE_ANDROID.get())) {
+            event.register(type, net.minecraft.world.entity.SpawnPlacementTypes.ON_GROUND, net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                    matteroverdrive.entity.monster.RogueAndroid::checkSpawnRules, net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
+        }
     }
 
     private static <T extends MachineBlockEntity> void machine(RegisterCapabilitiesEvent event, BlockEntityType<T> type) {

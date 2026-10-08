@@ -2,6 +2,7 @@ package matteroverdrive.item.weapon;
 
 import matteroverdrive.init.MOSounds;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
@@ -30,7 +31,7 @@ public class PlasmaShotgunItem extends EnergyWeaponItem {
     }
 
     @Override
-    protected void fire(ServerLevel level, Player shooter, ItemStack weapon, boolean zoomed) {
+    protected void fire(ServerLevel level, LivingEntity shooter, ItemStack weapon, boolean zoomed) {
         float damage = getDamage(weapon, shooter) / SHOTS;
         float accuracy = getAccuracy(weapon, shooter, zoomed);
         for (int i = 0; i < SHOTS; i++) {

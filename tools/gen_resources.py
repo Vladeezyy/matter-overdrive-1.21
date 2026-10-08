@@ -711,7 +711,9 @@ SOUNDS = {"phaser_rifle_shot": ["weapon/phaser_rifle_shot"], "plasma_shotgun_sho
           "biotic_stat_unlock": ["gui/biotic_stat_unlock"], "android_teleport": ["entities/android_teleport"],
           "shield_loop": ["shield_loop"], "shield_hit": ["shield_hit_0", "shield_hit_1"], "shield_power_up": ["shield_power_up"],
           "shield_power_down": ["shield_power_up"], "cloak_on": ["entities/cloak_on"], "cloak_off": ["entities/cloak_off"],
-          "night_vision": ["night_vision"], "power_down": ["power_down"], "shockwave": ["shockwave"]}
+          "night_vision": ["night_vision"], "power_down": ["power_down"], "shockwave": ["shockwave"],
+          "rogue_android_say": [f"entities/rogue_android_say_{i}" for i in range(3)],
+          "rogue_android_death": [f"entities/rogue_android_death_{i}" for i in range(2)]}
 for files in SOUNDS.values():
     for f in files:
         dst = A / "sounds" / f"{f}.ogg"
@@ -1021,6 +1023,45 @@ for item_id, tex in {"emergency_ration": "emergency_ration", "earl_gray_tea": "e
     w(A / "items" / f"{item_id}.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:item/{item_id}"}})
 
 
+# --- phase 7b: mobs -----------------------------------------------------------------------------------------
+import zlib
+
+def write_png(path, rows):
+    """rows: list of lists of (r, g, b, a)"""
+    h, w_ = len(rows), len(rows[0])
+    raw = b"".join(b"\x00" + bytes(c for px in row for c in px) for row in rows)
+    def chunk(tag, data):
+        return struct.pack(">I", len(data)) + tag + data + struct.pack(">I", zlib.crc32(tag + data) & 0xFFFFFFFF)
+    png = b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", w_, h, 8, 6, 0, 0, 0)) + \
+          chunk(b"IDAT", zlib.compress(raw, 9)) + chunk(b"IEND", b"")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(png)
+
+# Spawn eggs have one texture each since 1.21.5; drawn here in the 1.7.10 egg colours (o outline, b base, s spot, h highlight).
+EGG = ["................", "......oooo......", ".....obbbbo.....", "....obbhbbbo....", "...obbhbbsbbo...", "...obhbbbsbbo...",
+       "..obbbbbbbbbbo..", "..obbsbbbbbbbo..", "..obsssbbbsbbo..", ".obbbsbbbbssbbo.", ".obbbbbbbbbbbbo.", ".obbbbbbsbbbbbo.",
+       ".obbsbbbsssbbbo.", "..obbbbbbsbbbo..", "...obbbbbbbbo...", "....oooooooo...."]
+
+def egg(name, base, spot):
+    def rgb(c, f=1.0):
+        return tuple(min(255, int(((c >> sh) & 255) * f)) for sh in (16, 8, 0)) + (255,)
+    colors = {"o": rgb(base, 0.45), "b": rgb(base), "s": rgb(spot), "h": rgb(base, 1.3), ".": (0, 0, 0, 0)}
+    write_png(A / "textures/item" / f"{name}.png", [[colors[c] for c in row] for row in EGG])
+    w(A / "models/item" / f"{name}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{MOD}:item/{name}"}})
+    w(A / "items" / f"{name}.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:item/{name}"}})
+
+egg("rogue_android_spawn_egg", 0x0FFFFF, 0x000000)          # 1.7.10 addEntity(..., 0xFFFFF, 0)
+egg("ranged_rogue_android_spawn_egg", 0x0FFFFF, 0x000000)
+for t in ["android", "android_ranged"]:
+    cp(ref / "textures/entities" / f"{t}.png", A / "textures/entity" / f"{t}.png")
+# 1.7.10 EntityRogueAndroid.addAsBiomeGen: weight 15, groups of 1-2, all overworld biomes but the mushroom fields
+for n in ["rogue_android", "ranged_rogue_android"]:
+    w(D / f"neoforge/biome_modifier/{n}.json", {"type": "neoforge:add_spawns",
+        "biomes": {"type": "neoforge:and", "values": ["#minecraft:is_overworld",
+                   {"type": "neoforge:not", "value": "minecraft:mushroom_fields"}]},
+        "spawners": {"type": mid(n), "weight": 15, "minCount": 1, "maxCount": 2}})
+
+
 # --- matter values (1.7.10 MatterOverdriveMatter.registerBasic*) -----------------------------------
 # Base values of the matteroverdrive:matter data map; everything else is calculated from recipes at runtime.
 # Ore dictionary names are mapped to today's tags. Tags come first so that single items can override them.
@@ -1192,6 +1233,12 @@ for src_name, dst_name in [("en_US", "en_us"), ("ru_RU", "ru_ru")]:
     for item_id, key in {"emergency_ration": "emergency_ration", "earl_gray_tea": "earl_gray_tea", "romulan_ale": "romulan_ale",
                          "tritanium_spine": "tritainum_spine"}.items():
         lang[f"item.{MOD}.{item_id}"] = src.get(f"item.{key}.name") or en[f"item.{key}.name"]
+    lang[f"entity.{MOD}.rogue_android"] = src.get("entity.rogue_android.name") or en["entity.rogue_android.name"]
+    lang[f"entity.{MOD}.ranged_rogue_android"] = src.get("entity.ranged_rogue_android.name") or en["entity.ranged_rogue_android.name"]
+    for n in ["rogue_android", "ranged_rogue_android"]:
+        egg_word = {"en_us": "Spawn Egg", "ru_ru": "Яйцо призыва"}[dst_name]
+        lang[f"item.{MOD}.{n}_spawn_egg"] = f"{egg_word}: {lang[f'entity.{MOD}.{n}']}" if dst_name == "ru_ru" else f"{lang[f'entity.{MOD}.{n}']} {egg_word}"
+    lang[f"rarity.{MOD}.legendary"] = src.get("rarity.legendary") or en.get("rarity.legendary") or "Legendary"
     lang[f"block.{MOD}.charging_station"] = src.get("tile.charging_station.name") or en["tile.charging_station.name"]
     lang[f"block.{MOD}.android_station"] = src.get("tile.android_station.name") or en["tile.android_station.name"]
     for part in ["head", "arms", "legs", "chest"]:

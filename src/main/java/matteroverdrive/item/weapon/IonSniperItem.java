@@ -2,6 +2,7 @@ package matteroverdrive.item.weapon;
 
 import matteroverdrive.init.MOSounds;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
@@ -20,7 +21,7 @@ public class IonSniperItem extends EnergyWeaponItem {
     }
 
     @Override
-    protected void fire(ServerLevel level, Player shooter, ItemStack weapon, boolean zoomed) {
+    protected void fire(ServerLevel level, LivingEntity shooter, ItemStack weapon, boolean zoomed) {
         spawnBolt(level, shooter, weapon, getDamage(weapon, shooter), getAccuracy(weapon, shooter, zoomed)).setRenderSize(0.8f);
         playShot(level, shooter, MOSounds.SNIPER_RIFLE_FIRE.get());
         addHeatAfterShot(weapon, level, shooter, getHeat(weapon) + getMaxHeat(weapon) * 0.8f);
