@@ -673,7 +673,8 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
                     var stack = planet.getStackInSlot(i);
                     if (stack.isEmpty()) continue;
                     java.util.List<Component> info = new java.util.ArrayList<>();
-                    int itemY = y - itemCount * 18 - 21;
+                    // above the three stat rows (1.7.10 drew it at y - 21, over the happiness / power rows)
+                    int itemY = y - 2 * 20 - 21 - itemCount * 18;
                     item(ctx, stack, 0, itemY);
                     if (stack.getItem() instanceof matteroverdrive.starmap.Buildable b && planet.canBuild(b, stack, info)) {
                         text(ctx, stack.getHoverName().getString() + " - " + time(b.getRemainingBuildTimeTicks(stack, planet, level)), 18, itemY + 5,

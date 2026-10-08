@@ -445,8 +445,9 @@
   - Deviations (1.7.10 bugs that made the feature unusable, fixed - say if they should be restored): ships need a free
     fleet space (1.7.10 compared the fleet size with itself, so no ship could ever be built or sent anywhere but the
     owner's homeworld); a base doesn't need a base (1.7.10 asked for one, so colonizers never claimed anything); the
-    attack packet checks that the sender owns the ship. Kept: without a base the slot lists both "No Base building"
-    and "Not enough building spaces"; the planet panel's construction list overlaps the happiness / power rows; the
+    attack packet checks that the sender owns the ship; the planet panel's construction list sits above the happiness /
+    power rows (1.7.10 drew it over them, unreadable). Kept: without a base the slot lists both "No Base building"
+    and "Not enough building spaces"; the
     galaxy hologram's travelling ship moves away from its destination (from + (from - to) * progress).
 - Cloud (Linux) notes: regenerating resources rewrites the .ogg and ffmpeg-made .png bytes (different ffmpeg/oggenc
   builds) - `git checkout` them. Screenshots: `Xvfb :99` + `DISPLAY=:99 ./gradlew runScene` (software GL is slow; give
