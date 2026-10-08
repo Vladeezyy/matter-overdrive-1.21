@@ -13,6 +13,7 @@ import matteroverdrive.quest.logic.CollectItemLogic;
 import matteroverdrive.quest.logic.CraftLogic;
 import matteroverdrive.quest.logic.KillCreatureLogic;
 import matteroverdrive.quest.logic.MineLogic;
+import matteroverdrive.quest.logic.PlaceBlockLogic;
 import matteroverdrive.quest.logic.ScanBlockLogic;
 import matteroverdrive.quest.logic.SingleEventLogic;
 import net.minecraft.world.entity.EntityType;
@@ -61,6 +62,20 @@ public final class Quests {
             new ScanBlockLogic(() -> Blocks.CARROTS, 12, 24, 10).onlyDestroyable(),
             new ScanBlockLogic(() -> Blocks.POTATOES, 12, 24, 10).onlyDestroyable()).sequential().autoComplete()
             .rewards(Quests::hardenedSpine));
+
+    /** 1.7.10 we_must_know: place the Communication Relay within 4 blocks of the crashed ship's crate ("Pos"). */
+    public static final Quest WE_MUST_KNOW = register(new Quest("we_must_know", new PlaceBlockLogic(4, Quests::communicationRelay, 1, 1)
+            .autoComplete(true), 120).rewards(() -> new ItemStack(Items.EMERALD, 8)));
+    /** 1.7.10 crash_landing (the crashed ship's crates): craft a security protocol; the relay and we_must_know (with "Pos"). */
+    public static final Quest CRASH_LANDING = register(new Quest("crash_landing", new CraftLogic(
+            List.of(() -> new ItemStack(MOItems.SECURITY_PROTOCOL.get())), 0, 0, 0).autoComplete(true), 60)
+            .rewards(Quests::communicationRelay).questReward(() -> WE_MUST_KNOW, "Pos"));
+
+    private static ItemStack communicationRelay() {
+        ItemStack relay = new ItemStack(matteroverdrive.init.MODecorative.COILS.get());
+        relay.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME, net.minecraft.network.chat.Component.literal("Communication Relay"));
+        return relay;
+    }
 
     private static ItemStack hardenedSpine() {
         ItemStack spine = new ItemStack(MOItems.TRITANIUM_SPINE.get());

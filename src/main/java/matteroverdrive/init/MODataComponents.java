@@ -86,5 +86,12 @@ public final class MODataComponents {
             COMPONENTS.registerComponentType("transport_target", b -> b.persistent(net.minecraft.core.BlockPos.CODEC)
                     .networkSynchronized(net.minecraft.core.BlockPos.STREAM_CODEC));
 
+    /** Security protocol (1.7.10 damage 0-3 + "Owner"): its type, and the owner it carries - also a claimed machine's owner on its item. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> SECURITY_TYPE =
+            COMPONENTS.registerComponentType("security_type", b -> b.persistent(Codec.intRange(0, 3)).networkSynchronized(ByteBufCodecs.VAR_INT));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<java.util.UUID>> SECURITY_OWNER =
+            COMPONENTS.registerComponentType("security_owner", b -> b.persistent(net.minecraft.core.UUIDUtil.CODEC)
+                    .networkSynchronized(net.minecraft.core.UUIDUtil.STREAM_CODEC));
+
     private MODataComponents() {}
 }

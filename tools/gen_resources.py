@@ -1218,6 +1218,19 @@ for tag in ["mineable/pickaxe", "needs_iron_tool"]:
 shaped("contract_market", mid("contract_market"), [" T ", "GEG", " M "],
        {"T": mid("tritanium_ingot"), "G": "minecraft:gold_ingot", "E": "minecraft:emerald", "M": mid("machine_casing")})
 
+# --- phase 7r: security protocol ----------------------------------------------------------------------------
+# 1.7.10 SecurityProtocol damage 0-3 = empty / claim / access / remove icons -> component matteroverdrive:security_type
+SECURITY = ["empty", "claim", "access", "remove"]
+for i, t in enumerate(SECURITY):
+    cp(ref / "textures/items" / f"security_protocol_{t}.png", A / "textures/item" / f"security_protocol_{t}.png")
+    w(A / "models/item" / f"security_protocol_{t}.json", {"parent": "minecraft:item/generated",
+                                                           "textures": {"layer0": f"{MOD}:item/security_protocol_{t}"}})
+w(A / "items/security_protocol.json", {"model": {"type": "minecraft:select", "property": "minecraft:component",
+    "component": f"{MOD}:security_type",
+    "cases": [{"when": i, "model": {"type": "minecraft:model", "model": f"{MOD}:item/security_protocol_{t}"}} for i, t in enumerate(SECURITY)],
+    "fallback": {"type": "minecraft:model", "model": f"{MOD}:item/security_protocol_empty"}}})
+shaped("security_protocol", mid("security_protocol"), ["PP", "CP"], {"P": "minecraft:paper", "C": mid("isolinear_circuit_mk1")})
+
 # --- phase 7b: mobs -----------------------------------------------------------------------------------------
 import zlib
 
@@ -1891,6 +1904,15 @@ for src_name, dst_name in [("en_US", "en_us"), ("ru_RU", "ru_ru")]:
     # 7p: guide categories, groups and named entries: guide.<kind>.<name>.name -> guide.matteroverdrive.<kind>.<name>
     for k in [k for k in en if k.startswith("guide.") and k.endswith(".name")]:
         lang["guide." + MOD + "." + k[len("guide."):-len(".name")]] = src.get(k) or en[k]
+    # 7r: security protocol names / details and the machine rights alerts ($0 = the machine)
+    for t in ["empty", "claim", "access", "remove"]:
+        lang[f"item.{MOD}.security_protocol.{t}"] = src.get(f"item.security_protocol.{t}.name") or en[f"item.security_protocol.{t}.name"]
+        if f"item.security_protocol.{t}.details" in en:
+            lang[f"item.{MOD}.security_protocol.{t}.details"] = src.get(f"item.security_protocol.{t}.details") or en[f"item.security_protocol.{t}.details"]
+    lang[f"item.{MOD}.security_protocol"] = lang[f"item.{MOD}.security_protocol.empty"]
+    lang[f"item.{MOD}.security_protocol.owner"] = {"en_us": "Owner: %s", "ru_ru": "Владелец: %s"}[dst_name]
+    for k in ["", ".break", ".dismantle"]:
+        lang[f"alert.{MOD}.no_rights{k}"] = (src.get(f"alert.no_rights{k}") or en[f"alert.no_rights{k}"]).replace("$0", "%s")
     # 7m: dialog and quest texts under the mod namespace (ru falls back to en where the original lacks them)
     for k in [k for k in en if k.startswith("dialog.") or k.startswith("quest.")]:
         first, rest = k.split(".", 1)

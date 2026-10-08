@@ -31,6 +31,9 @@ public final class QuestEvents {
     public record AnomalyConsume(net.minecraft.core.BlockPos anomaly) {}
 
     /** 1.7.10 MOEventScan: a Data Pad or matter scanner finished scanning a block. */
+    /** 1.7.10 BlockEvent.PlaceEvent: the block placed and the stack it was placed from. */
+    public record Place(net.minecraft.core.BlockPos pos, net.minecraft.world.level.block.state.BlockState state, ItemStack itemInHand) {}
+
     public record Scan(net.minecraft.core.BlockPos pos, net.minecraft.world.level.block.state.BlockState state, ItemStack scanner) {}
 
     /** 1.7.10 MOExtendedProperties.addQuest (server). */
@@ -74,6 +77,17 @@ public final class QuestEvents {
     @SubscribeEvent
     static void onBreak(net.neoforged.neoforge.event.level.BlockEvent.BreakEvent event) {
         if (event.getPlayer() instanceof ServerPlayer player) onEvent(player, event);
+    }
+
+    /** NeoForge restores the stack as it was before placing while the event fires. */
+    @SubscribeEvent
+    static void onPlace(net.neoforged.neoforge.event.level.BlockEvent.EntityPlaceEvent event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        ItemStack inHand = player.getMainHandItem();
+        if (!(inHand.getItem() instanceof net.minecraft.world.item.BlockItem block) || block.getBlock() != event.getPlacedBlock().getBlock()) {
+            inHand = player.getOffhandItem();
+        }
+        onEvent(player, new Place(event.getPos(), event.getPlacedBlock(), inHand));
     }
 
     @SubscribeEvent

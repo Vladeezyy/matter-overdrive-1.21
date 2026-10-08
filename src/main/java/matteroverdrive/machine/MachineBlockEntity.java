@@ -44,6 +44,8 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
     private final Set<UpgradeType> affectedBy;
     private RedstoneMode redstoneMode = RedstoneMode.LOW;
     private boolean active;
+    /** 1.7.10 MOTileEntityMachine.owner: set by a [Claim] security protocol. */
+    private java.util.@Nullable UUID owner;
 
     /**
      * @param slots         the machine's own slots; the battery slot (if any) and the upgrade slots are appended
@@ -208,6 +210,52 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
     };
     public static final int DATA_COUNT = 11;
 
+    // --- security (1.7.10 MOTileEntityMachine owner / claim / unclaim / isUseableByPlayer) ---------
+
+    public java.util.@Nullable UUID getOwner() {
+        return owner;
+    }
+
+    public boolean hasOwner() {
+        return owner != null;
+    }
+
+    /** A [Claim] protocol claims an unowned machine for its owner. */
+    public boolean claim(ItemStack protocol) {
+        java.util.UUID protocolOwner = matteroverdrive.item.SecurityProtocolItem.getOwner(protocol);
+        if (owner != null || protocolOwner == null) return false;
+        owner = protocolOwner;
+        ownerChanged();
+        return true;
+    }
+
+    /** A [Remove] protocol of the owner removes the claim. */
+    public boolean unclaim(ItemStack protocol) {
+        if (owner == null || !owner.equals(matteroverdrive.item.SecurityProtocolItem.getOwner(protocol))) return false;
+        owner = null;
+        ownerChanged();
+        return true;
+    }
+
+    private void ownerChanged() {
+        setChanged();
+        if (level != null) level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+    }
+
+    /** Unclaimed, or the owner, a creative player or someone carrying the owner's [Access] protocol. */
+    public boolean isUseableByPlayer(net.minecraft.world.entity.player.Player player) {
+        if (owner == null || owner.equals(player.getUUID()) || player.getAbilities().instabuild) return true;
+        for (ItemStack stack : player.getInventory()) {
+            if (matteroverdrive.item.SecurityProtocolItem.is(stack, matteroverdrive.item.SecurityProtocolItem.ACCESS, owner)) return true;
+        }
+        return false;
+    }
+
+    /** Only the owner (or a creative player) may break or dismantle a claimed machine (1.7.10 canRemoveMachine / canDismantle). */
+    public boolean canRemove(net.minecraft.world.entity.player.Player player) {
+        return owner == null || owner.equals(player.getUUID()) || player.getAbilities().instabuild;
+    }
+
     // --- persistence -----------------------------------------------------------------------------
 
     @Override
@@ -218,6 +266,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
         if (matter != null) matter.serialize(output.child("matter"));
         output.putString("redstone_mode", redstoneMode.name());
         output.putBoolean("active", active);
+        output.storeNullable("owner", net.minecraft.core.UUIDUtil.CODEC, owner);
     }
 
     @Override
@@ -235,6 +284,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
             }
         }).orElse(RedstoneMode.LOW);
         active = input.getBooleanOr("active", false);
+        owner = input.read("owner", net.minecraft.core.UUIDUtil.CODEC).orElse(null);
     }
 
     @Override
@@ -243,6 +293,8 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
         if (energy.getEnergy() > 0) {
             components.set(MODataComponents.ENERGY.get(), energy.getEnergy());
         }
+        // 1.7.10 writeToDropItem kept the owner on the machine's item
+        if (owner != null) components.set(MODataComponents.SECURITY_OWNER.get(), owner);
     }
 
     @Override
@@ -253,12 +305,14 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
             energy.refresh();
             energy.set(Math.min(stored, energy.getCapacity()));
         }
+        owner = components.get(MODataComponents.SECURITY_OWNER.get());
     }
 
     @Override
     public void removeComponentsFromTag(ValueOutput output) {
         super.removeComponentsFromTag(output);
         output.discard("energy");
+        output.discard("owner");
     }
 
     @Override

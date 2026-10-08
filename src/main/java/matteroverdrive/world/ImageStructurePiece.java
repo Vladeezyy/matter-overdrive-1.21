@@ -110,9 +110,15 @@ public class ImageStructurePiece extends StructurePiece {
         }
         if (entry.has("crate_loot") && level.getBlockEntity(pos) instanceof TritaniumCrateBlockEntity crate) {
             RandomizableContainer.setBlockEntityLootTable(level, random, pos, ANDROID_HOUSE_LOOT);
-            // android house: 10 in 200 crates also hold a level 3 legendary weapon (the crashed ship's quest contract isn't ported)
+            // android house: 10 in 200 crates also hold a level 3 legendary weapon
             if (building == Building.ANDROID_HOUSE && random.nextInt(200) < 10) {
                 crate.setItem(0, WeaponFactory.randomDecorated(random, 3, true));
+            }
+            // 1.7.10 MOWorldGenCrashedSpaceShip: every crate holds a crash landing contract that remembers the crate
+            if (building == Building.CRASHED_SHIP) {
+                matteroverdrive.quest.QuestStack contract = matteroverdrive.quest.Quests.CRASH_LANDING.generate(random);
+                contract.getData().putIntArray("Pos", new int[] {pos.getX(), pos.getY(), pos.getZ()});
+                crate.setItem(0, matteroverdrive.item.ContractItem.of(contract));
             }
         }
         if (entry.has("weapon") && random.nextInt(200) < 10 && level.getBlockEntity(pos) instanceof WeaponStationBlockEntity station) {

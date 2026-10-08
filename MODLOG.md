@@ -379,6 +379,20 @@
   tintindex 0). 83 GameTests.
   - Deviations: the holo is a static model quad (1.7.10 TESR); still no crash_landing / we_must_know contracts (need
     the security protocol, 7r).
+- **7r ✅** Security protocol + machine claims (1.7.10 SecurityProtocol, MOTileEntityMachine owner / claim / unclaim /
+  isUseableByPlayer, MachineHelper, MOBlockMachine.canDismantle). `SecurityProtocolItem` (stacks of 16; components
+  `security_type` 0-3 = empty / claim / access / remove, `security_owner`; item model picks the icon by type): sneak-use an
+  empty one to own it ([Claim]), the owner (or creative) sneak-uses to cycle claim -> access -> remove -> claim; used on a
+  machine (`onItemUseFirst`, before its screen) [Claim] claims an unowned machine, the owner's [Remove] removes the claim,
+  each using up one. Claimed machines open only for the owner, creative players or someone carrying the owner's [Access]
+  protocol ("[Matter Overdrive] No Rights to Access the ..."), menus close for anyone else, only the owner breaks
+  (`onDestroyedByPlayer`) or wrench-dismantles them; the owner is saved and kept on the machine's item. Contracts:
+  crash_landing (craft a security protocol; the "Communication Relay" coils + we_must_know with the crate's "Pos") and
+  we_must_know (`PlaceBlockLogic`: place that exact relay within 4 blocks of "Pos", $distance in the objective; 8
+  emeralds); every crashed ship crate holds a crash landing contract. Recipe PP/CP, guide entry (1, 6). 85 GameTests.
+  - Deviations: the holo sign isn't a machine in this port, so it can't be claimed (1.7.10 checked its owner too);
+    the protocol's type is a component instead of the damage value; we_must_know's info text shows "$block" like
+    1.7.10 (only the objective replaced it).
 - Cloud (Linux) notes: regenerating resources rewrites the .ogg and ffmpeg-made .png bytes (different ffmpeg/oggenc
   builds) - `git checkout` them. Screenshots: `Xvfb :99` + `DISPLAY=:99 ./gradlew runScene` (software GL is slow; give
   menus extra ticks), world created by `runServer` with a flat creative server.properties, then moved to run/saves;
@@ -391,10 +405,10 @@
 3. ~~Structures~~ ✅ 7f (the mad scientist house is a village piece: comes with the mad scientist in item 5).
 4. ~~Transporter, omni tool, matter scanner, portable decomposer, matter container, microwave~~ ✅ 7g-7k.
 5. Star map / galaxy / ships / buildings; quests / dialogs / mad scientist ✅ 7m-7p, contract market ✅ 7q, android
-   spawner ✅ 7l. Next: 7r security protocol + crash_landing / we_must_know contracts (crashed ship contract).
+   spawner ✅ 7l. Security protocol + crash landing ✅ 7r.
 - Deviations so far: legendary rogue android parts drop without bonus attributes; no rogue android teams/paths;
   legendary weapons have no stat bonuses; buildings: star map → holo matrix stand-in (swap STAR_MAP in
-  gen_resources.py when ported), no crashed-ship quest contract, underwater base needs 16+ water (1.7.10: 27+, rare in today's deep
+  gen_resources.py when ported), underwater base needs 16+ water (1.7.10: 27+, rare in today's deep
   oceans) and sinks into the floor to stay submerged, no "generate buildings" config (use a datapack), not rotated
   (1.7.10 never rotated them either).
 
@@ -402,7 +416,7 @@
 **Workflow**
 - Resources: never hand-edit `src/main/resources/{assets,data}` — regenerate:
   `rm -rf src/main/resources/{assets,data} && python3 -I tools/gen_resources.py ~/mo-reference/mo-1.7.10/src/main/resources/assets/mo src/main/resources`
-- Tests: `./gradlew runGameTestServer` (83 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
+- Tests: `./gradlew runGameTestServer` (85 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
   `FunctionGameTestInstance`, custom 12³ structure `matteroverdrive:gametest_area`, time-of-day via `TestEnvironmentDefinition.TimeOfDay`,
   `makeMockServerPlayerInLevel`). Visual: `./gradlew runScene` → `run/screenshots/scene_*.png` (DevScene, world `run/saves/mo_scene`;
   pristine copy = "Новый мир (2)"; needs `pauseOnLostFocus=false`; selected hotbar slot is client-side; place blocks with

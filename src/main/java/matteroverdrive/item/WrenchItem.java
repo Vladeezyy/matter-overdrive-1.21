@@ -30,6 +30,11 @@ public class WrenchItem extends Item {
             return InteractionResult.SUCCESS;
         }
         if (player != null && player.isShiftKeyDown()) {
+            // 1.7.10 MOBlockMachine.canDismantle
+            if (level.getBlockEntity(pos) instanceof matteroverdrive.machine.MachineBlockEntity machine && !machine.canRemove(player)) {
+                MachineBlock.alert(player, "alert.matteroverdrive.no_rights.dismantle", state);
+                return InteractionResult.SUCCESS;
+            }
             MachineBlock.dismantle((ServerLevel) level, pos, state, player);
         } else {
             level.setBlock(pos, state.rotate(level, pos, Rotation.CLOCKWISE_90), 3);

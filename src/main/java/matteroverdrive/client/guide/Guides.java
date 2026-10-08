@@ -16,7 +16,7 @@ import net.minecraft.world.level.ItemLike;
 
 /**
  * 1.7.10 MatterOverdriveGuides + MatterOverdriveGuide: the three categories and their entries at the 1.7.10 grid
- * positions (18 + x * 28, 16 + y * 28). The security protocol entry comes with the security protocol.
+ * positions (18 + x * 28, 16 + y * 28).
  */
 public final class Guides {
     public record Category(String name, String icon, List<GuideEntry> entries) {}
@@ -61,6 +61,7 @@ public final class Guides {
         add(general, item(MOItems.NETWORK_FLASH_DRIVE.get()), "matter_network", 6, 5);
         add(general, block(MOBlocks.NETWORK_ROUTER.get()), "matter_network", 7, 5);
         add(general, item(MOItems.SPACETIME_EQUALIZER.get()), "items", 0, 6);
+        add(general, item(MOItems.SECURITY_PROTOCOL.get()), "items", 1, 6);
         add(general, named("upgrades", LegacyNames.upgrades()), "items", 2, 6);
         add(general, named("drinks", MOItems.ROMULAN_ALE.get(), MOItems.EARL_GRAY_TEA.get()), "items", 3, 6);
         add(general, named("food", MOItems.EMERGENCY_RATION.get()), "items", 4, 6);

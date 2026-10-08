@@ -79,9 +79,31 @@ public abstract class MachineBlock extends BaseEntityBlock {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof MachineBlockEntity machine) {
-            player.openMenu(machine, pos);
+            // 1.7.10 MachineHelper.canOpenMachine
+            if (machine.isUseableByPlayer(player)) {
+                player.openMenu(machine, pos);
+            } else {
+                alert(player, "alert.matteroverdrive.no_rights", state);
+            }
         }
         return InteractionResult.SUCCESS;
+    }
+
+    /** 1.7.10 "[Matter Overdrive] ..." chat alert naming the machine. */
+    public static void alert(Player player, String key, BlockState state) {
+        player.displayClientMessage(net.minecraft.network.chat.Component.literal("[Matter Overdrive] ").withStyle(net.minecraft.ChatFormatting.GOLD)
+                .append(net.minecraft.network.chat.Component.translatable(key, state.getBlock().getName()).withStyle(net.minecraft.ChatFormatting.RED)), false);
+    }
+
+    /** 1.7.10 MachineHelper.canRemoveMachine: only the owner breaks a claimed machine. */
+    @Override
+    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, ItemStack toolStack, boolean willHarvest,
+                                       net.minecraft.world.level.material.FluidState fluid) {
+        if (level.getBlockEntity(pos) instanceof MachineBlockEntity machine && !machine.canRemove(player)) {
+            if (!level.isClientSide()) alert(player, "alert.matteroverdrive.no_rights.break", state);
+            return false;
+        }
+        return super.onDestroyedByPlayer(state, level, pos, player, toolStack, willHarvest, fluid);
     }
 
     /** Wrench sneak-use: break the machine as if mined, so it drops itself with its stored energy, plus its contents. */

@@ -141,7 +141,7 @@ public abstract class MachineMenu<T extends MachineBlockEntity> extends Abstract
 
     @Override
     public boolean stillValid(Player player) {
-        return stillValid(access, player, machine.getBlockState().getBlock());
+        return stillValid(access, player, machine.getBlockState().getBlock()) && machine.isUseableByPlayer(player);
     }
 
     @Override

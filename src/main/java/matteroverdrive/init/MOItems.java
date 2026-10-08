@@ -190,6 +190,8 @@ public final class MOItems {
     public static final DeferredItem<matteroverdrive.item.TransportFlashDriveItem> TRANSPORT_FLASH_DRIVE = item("transport_flash_drive",
             matteroverdrive.item.TransportFlashDriveItem::new, p -> p);
     public static final DeferredItem<matteroverdrive.item.ContractItem> CONTRACT = item("contract", matteroverdrive.item.ContractItem::new, p -> p);
+    public static final DeferredItem<matteroverdrive.item.SecurityProtocolItem> SECURITY_PROTOCOL = item("security_protocol",
+            matteroverdrive.item.SecurityProtocolItem::new, p -> p);
     public static final DeferredItem<matteroverdrive.item.DataPadItem> DATA_PAD = item("data_pad", matteroverdrive.item.DataPadItem::new, p -> p);
     public static final DeferredItem<matteroverdrive.item.MatterScannerItem> MATTER_SCANNER = item("matter_scanner",
             matteroverdrive.item.MatterScannerItem::new, p -> p);

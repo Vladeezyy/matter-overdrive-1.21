@@ -48,6 +48,8 @@ public final class DevScene {
     private static int tick;
     /** Where the player stood when the scene started; restored before quitting so every run builds in one place. */
     private static BlockPos origin;
+    private static final java.util.UUID STRANGER = java.util.UUID.fromString("00000000-0000-4000-8000-00000000beef");
+    private static BlockPos crashCrate;
     private static BlockPos inscriberPos, solarPos, decomposerPos, recyclerPos, analyzerPos, storagePos, monitorPos, replicatorPos, reactorPos;
 
     private record Step(int at, Consumer<Minecraft> action) {}
@@ -805,7 +807,115 @@ public final class DevScene {
         at(2356, mc -> shot(mc, "contract_screen_gmo"));
         at(2357, mc -> mc.setScreen(null));
         at(2362, mc -> shot(mc, "contract_market_world"));
-        at(2366, mc -> mc.stop());
+        // 7r: the security protocol types, a machine claimed by someone else, crash landing -> we must know, a crashed ship's crate
+        at(2370, mc -> server(mc, p -> {
+            var quests = matteroverdrive.quest.PlayerQuests.get(p);
+            quests.getActiveQuests().clear();
+            quests.getCompletedQuests().clear();
+            matteroverdrive.quest.PlayerQuests.sync(p);
+            for (int i = 0; i < 4; i++) {
+                ItemStack protocol = new ItemStack(MOItems.SECURITY_PROTOCOL.get(), 16);
+                if (i > 0) {
+                    protocol.set(matteroverdrive.init.MODataComponents.SECURITY_OWNER.get(), p.getUUID());
+                    protocol.set(matteroverdrive.init.MODataComponents.SECURITY_TYPE.get(), i);
+                }
+                p.getInventory().setItem(i, protocol);
+            }
+            p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, p.getInventory().getItem(1).copy());
+        }));
+        at(2378, mc -> shot(mc, "security_protocol_hand"));
+        at(2380, mc -> server(mc, p -> {
+            BlockPos market = origin.above(30).offset(0, 0, -3);
+            if (p.level().getBlockEntity(market) instanceof matteroverdrive.machine.MachineBlockEntity m) {
+                ItemStack foreign = new ItemStack(MOItems.SECURITY_PROTOCOL.get());
+                foreign.set(matteroverdrive.init.MODataComponents.SECURITY_OWNER.get(), STRANGER);
+                m.claim(foreign);
+            }
+            p.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            p.level().getBlockState(market).useWithoutItem(p.level(), p,
+                    new net.minecraft.world.phys.BlockHitResult(market.getCenter(), net.minecraft.core.Direction.SOUTH, market, false));
+        }));
+        at(2388, mc -> shot(mc, "security_no_rights"));
+        at(2390, mc -> server(mc, p -> {
+            BlockPos market = origin.above(30).offset(0, 0, -3);
+            if (p.level().getBlockEntity(market) instanceof matteroverdrive.machine.MachineBlockEntity m) {
+                ItemStack remove = new ItemStack(MOItems.SECURITY_PROTOCOL.get());
+                remove.set(matteroverdrive.init.MODataComponents.SECURITY_OWNER.get(), STRANGER);
+                m.unclaim(remove);
+            }
+            p.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
+            BlockPos crate = origin.above(30).offset(6, 0, -6);
+            var contract = matteroverdrive.quest.Quests.CRASH_LANDING.generate(p.level().random);
+            contract.getData().putIntArray("Pos", new int[] {crate.getX(), crate.getY(), crate.getZ()});
+            p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, matteroverdrive.item.ContractItem.of(contract));
+        }));
+        at(2396, mc -> mc.setScreen(new matteroverdrive.client.quest.ContractScreen(net.minecraft.world.InteractionHand.MAIN_HAND)));
+        at(2404, mc -> shot(mc, "contract_crash_landing"));
+        at(2405, mc -> mc.setScreen(null));
+        at(2408, mc -> server(mc, p -> {
+            var contract = matteroverdrive.item.ContractItem.getQuest(p.getMainHandItem());
+            if (contract == null) return;
+            matteroverdrive.quest.QuestEvents.addQuest(p, contract.copy());
+            matteroverdrive.quest.QuestEvents.onEvent(p, new net.neoforged.neoforge.event.entity.player.PlayerEvent.ItemCraftedEvent(p,
+                    new ItemStack(MOItems.SECURITY_PROTOCOL.get()), new net.minecraft.world.SimpleContainer(1)));
+            matteroverdrive.quest.QuestEvents.manageQuestCompletion(p);
+            p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+        }));
+        at(2416, mc -> shot(mc, "crash_landing_completed"));
+        at(2420, mc -> server(mc, p -> p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(MOItems.DATA_PAD.get()))));
+        at(2426, mc -> server(mc, p -> p.getMainHandItem().set(matteroverdrive.init.MODataComponents.DATA_PAD.get(),
+                matteroverdrive.item.DataPadItem.State.DEFAULT.withPage(2))));
+        at(2432, mc -> mc.setScreen(new matteroverdrive.client.quest.DataPadScreen(net.minecraft.world.InteractionHand.MAIN_HAND)));
+        at(2440, mc -> shot(mc, "we_must_know_pad"));
+        at(2442, mc -> mc.setScreen(null));
+        // a crashed ship far south: player first (loads the chunks), force-load, place, then look at it and open a crate
+        at(2446, mc -> server(mc, p -> {
+            BlockPos at = origin.offset(0, 0, 3000);
+            p.teleportTo(p.level(), at.getX(), at.getY() + 40, at.getZ(), Set.of(), 0, 90f, false);
+            p.getAbilities().flying = true;
+            p.onUpdateAbilities();
+        }));
+        at(2450, mc -> server(mc, p -> {
+            BlockPos at = origin.offset(0, 0, 3000);
+            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
+                    "forceload add " + (at.getX() - 64) + " " + (at.getZ() - 64) + " " + (at.getX() + 64) + " " + (at.getZ() + 64));
+        }));
+        at(2466, mc -> server(mc, p -> {
+            BlockPos at = origin.offset(0, 0, 3000);
+            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4)
+                    .withCallback((ok, result) -> MatterOverdrive.LOGGER.info("[scene] crashed ship at {}: {}", at, ok)),
+                    "place structure matteroverdrive:crashed_ship " + at.getX() + " " + at.getY() + " " + at.getZ());
+        }));
+        at(2472, mc -> server(mc, p -> {
+            BlockPos at = origin.offset(0, 0, 3000);
+            BlockPos crate = BlockPos.betweenClosedStream(new BlockPos(at.getX() - 48, p.level().getMinY(), at.getZ() - 48), new BlockPos(at.getX() + 48, at.getY() + 30, at.getZ() + 48))
+                    .filter(b -> p.level().getBlockState(b).getBlock() instanceof matteroverdrive.block.TritaniumCrateBlock)
+                    .map(BlockPos::immutable).findFirst().orElse(null);
+            MatterOverdrive.LOGGER.info("[scene] crashed ship crate: {}", crate);
+            if (crate == null) return;
+            crashCrate = crate;
+            p.teleportTo(p.level(), crate.getX() + 9.5, crate.getY() + 9, crate.getZ() + 9.5, Set.of(), 135f, 35f, false);
+            p.lookAt(net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES, crate.getCenter());
+        }));
+        at(2473, mc -> mc.options.hideGui = true);
+        at(2500, mc -> shot(mc, "crashed_ship"));
+        at(2501, mc -> mc.options.hideGui = false);
+        at(2502, mc -> server(mc, p -> {
+            if (crashCrate == null) return;
+            p.teleportTo(p.level(), crashCrate.getX() + 0.5, crashCrate.getY() + 1, crashCrate.getZ() + 0.5, Set.of(), 0, 60f, false);
+            p.level().getBlockState(crashCrate).useWithoutItem(p.level(), p,
+                    new net.minecraft.world.phys.BlockHitResult(crashCrate.getCenter(), net.minecraft.core.Direction.UP, crashCrate, false));
+        }));
+        at(2510, mc -> shot(mc, "crashed_ship_crate"));
+        at(2511, mc -> server(mc, p -> {
+            p.closeContainer();
+            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
+                    "forceload remove all");
+            p.getAbilities().flying = false;
+            p.onUpdateAbilities();
+            p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 0f, false);
+        }));
+        at(2516, mc -> mc.stop());
     }
 
     private static void at(int t, Consumer<Minecraft> action) {
