@@ -136,4 +136,14 @@ public class AnalyzerBlockEntity extends MachineBlockEntity {
     public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
         return new AnalyzerMenu(id, inventory, this, dataAccess);
     }
+
+    @Override
+    public net.minecraft.sounds.SoundEvent getLoopSound() {
+        return matteroverdrive.init.MOSounds.ANALYZER.get();
+    }
+
+    @Override
+    public float getLoopVolume() {
+        return 0.3f;
+    }
 }

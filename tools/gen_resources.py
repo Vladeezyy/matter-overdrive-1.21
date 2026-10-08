@@ -777,9 +777,13 @@ SOUNDS = {"phaser_rifle_shot": ["weapon/phaser_rifle_shot"], "plasma_shotgun_sho
           "scanner_fail": ["matter_scanner/scanner_fail"], "scanner_beep": ["matter_scanner/scanner_beep"],
           "transporter": ["transporter/transporter_0"],
           "quest_started": ["gui/quest_started"], "quest_complete": ["gui/quest_complete"],
-          "button_soft": ["gui/button_soft_0", "gui/button_soft_1"]}
+          "button_soft": ["gui/button_soft_0", "gui/button_soft_1"],
+          # machine loops (1.7.10 MOTileEntityMachine.getSound), replication, the anomaly's wind
+          "machine": ["blocks/machine"], "analyzer": ["blocks/analyzer"], "force_field": ["force_field"],
+          "replicate_success": ["replicator/replicate_success"], "windy": ["windy"]}
 SOUND_CATEGORY = {k: "neutral" for k in SOUNDS if k.startswith("failed_animal")} | {k: "hostile" for k in SOUNDS if k.startswith("rogue_android")} | \
-                 {k: "block" for k in SOUNDS if k.startswith("crate_")}
+                 {k: "block" for k in SOUNDS if k.startswith("crate_")} | \
+                 {k: "block" for k in ["transporter", "machine", "analyzer", "force_field", "replicate_success", "windy"]}
 for files in SOUNDS.values():
     for f in files:
         dst = A / "sounds" / f"{f}.ogg"

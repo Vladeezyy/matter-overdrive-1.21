@@ -9,6 +9,7 @@ import matteroverdrive.init.MOBlockEntities;
 import matteroverdrive.machine.MachineBlock;
 import matteroverdrive.machine.MachineBlockEntity;
 import matteroverdrive.machine.MachineInventory;
+import matteroverdrive.util.MOMath;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Inventory;
@@ -51,6 +52,29 @@ public class GravitationalStabilizerBlockEntity extends MachineBlockEntity {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public net.minecraft.sounds.SoundEvent getLoopSound() {
+        return matteroverdrive.init.MOSounds.FORCE_FIELD.get();
+    }
+
+    /** 1.7.10: half the brightest channel of the beam colour, which drifts with the time of day. */
+    @Override
+    public float getLoopVolume() {
+        return (float) Math.max(Math.max(getBeamColorR(), getBeamColorG()), getBeamColorB()) * 0.5f;
+    }
+
+    public double getBeamColorR() {
+        return MOMath.noise(0, getBlockPos().getY(), getLevel().getDayTime() * 0.01);
+    }
+
+    public double getBeamColorG() {
+        return MOMath.noise(getBlockPos().getX(), 0, getLevel().getDayTime() * 0.01);
+    }
+
+    public double getBeamColorB() {
+        return MOMath.noise(0, 0, getBlockPos().getZ() + getLevel().getDayTime() * 0.01);
     }
 
     @Override

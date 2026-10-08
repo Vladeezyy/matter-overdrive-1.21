@@ -120,6 +120,8 @@ public class ReplicatorBlockEntity extends MachineBlockEntity {
         if (++replicateTime >= getSpeed(m)) {
             replicateTime = 0;
             replicate(product, m);
+            // played whether the replication worked or failed, like 1.7.10
+            getLevel().playSound(null, getBlockPos(), matteroverdrive.init.MOSounds.REPLICATE_SUCCESS.get(), net.minecraft.sounds.SoundSource.BLOCKS, 0.25f, 1);
         }
         setChanged();
         return true;
@@ -217,5 +219,10 @@ public class ReplicatorBlockEntity extends MachineBlockEntity {
     @Override
     public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
         return new ReplicatorMenu(id, inventory, this, dataAccess);
+    }
+
+    @Override
+    public net.minecraft.sounds.SoundEvent getLoopSound() {
+        return matteroverdrive.init.MOSounds.MACHINE.get();
     }
 }

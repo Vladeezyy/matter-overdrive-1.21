@@ -150,8 +150,14 @@ public class GravitationalAnomalyBlockEntity extends BlockEntity {
         }
     }
 
+    /** Set by the client: keeps the anomaly's wind sound going (1.7.10 manageSound). */
+    public static java.util.function.Consumer<GravitationalAnomalyBlockEntity> clientSoundTick = anomaly -> {};
+    /** The client's playing wind sound. */
+    public @org.jetbrains.annotations.Nullable Object clientSound;
+
     /** 1.7.10 spawnParticles: one particle per tick from a random point in break range, drawn to the core. */
     public static void clientTick(Level level, BlockPos pos, BlockState state, GravitationalAnomalyBlockEntity anomaly) {
+        clientSoundTick.accept(anomaly);
         RandomSource r = level.getRandom();
         double radius = Math.max(1, anomaly.getBlockBreakRange());
         Vec3 dir = new Vec3(r.nextGaussian(), r.nextGaussian(), r.nextGaussian()).normalize().scale(radius);

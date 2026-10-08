@@ -479,6 +479,17 @@
   - Deviation: 1.7.10 turned the replicator's item 90 degrees in world space, edge-on through the window; it faces the
     window here. Items in the replicator are lit from the block in front (the machine's own light can be 0).
   - DevScene: the scene origin is the world spawn on the flat surface (the saved player position drifted between runs).
+- **Leftovers: machine sounds ✅** (1.7.10 MOTileEntityMachine.getSound / soundVolume / manageSound, MachineSound,
+  GravitationalAnomalySound). `MachineBlockEntity.getLoopSound()` / `getLoopVolume()`; machines now tick on the client too
+  and `client/MachineSounds` keeps a looping, tickable sound at an active machine (restarted if the engine drops it, stops
+  when the machine goes idle or is removed): replicator, decomposer, recycler, inscriber "machine" (1), analyzer
+  "analyzer" (0.3), transporter "transporter" (0.5, while charging), gravitational stabilizer "force_field" (half the
+  brightest beam colour channel, 1.7.10 Perlin noise of the time of day: `util/MOMath.noise`). The replicator plays
+  "replicate_success" (0.25) after every replication, failed ones too (1.7.10). A gravitational anomaly always blows
+  "windy" with no attenuation: 1 - distance / max range (the 1.7.10 sound's update overrode its MAX_VOLUME). New sounds
+  machine, analyzer, force_field, replicate_success, windy; transporter is a block sound now.
+  - The transporter no longer plays a one-shot at both ends on teleport (1.7.10 only had the loop).
+  - Deviations: no per-machine "volume" config (the port has no config file); sounds sit at the block centre.
 - Cloud (Linux) notes: regenerating resources rewrites the .ogg and ffmpeg-made .png bytes (different ffmpeg/oggenc
   builds) - `git checkout` them. Screenshots: `Xvfb :99` + `DISPLAY=:99 ./gradlew runScene` (software GL is slow; give
   menus extra ticks), world created by `runServer` with a flat creative server.properties, then moved to run/saves;
@@ -550,9 +561,9 @@
 - Sounds must be mono ogg: ffmpeg → mono wav → `oggenc` (vorbis-tools); ffmpeg's built-in vorbis is stereo-only.
 
 ## Next
-- Phase 7 ✅. Leftovers done: legendary bonuses, network destination filters, machine renderers.
+- Phase 7 ✅. Leftovers done: legendary bonuses, network destination filters, machine renderers, machine sounds.
 - Leftovers still to do (user: any order):
-  1. machine sounds + the machine item tooltip with stored energy;
+  1. the machine item tooltip with stored energy;
   2. android shield bubble, hit flash and shield loop sound; teleport target marker;
   3. custom tritanium armor model (1.7.10 Tritanium_Armor2_*).
 

@@ -91,6 +91,26 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
         }
     }
 
+    /** Client ticker: keeps the machine's loop sound going while it is active. */
+    public static void clientTick(Level level, BlockPos pos, BlockState state, MachineBlockEntity be) {
+        if (be.getLoopSound() != null) clientSoundTick.accept(be);
+    }
+
+    /** Set by the client: starts the loop sound of an active machine (1.7.10 MOTileEntityMachine.manageSound). */
+    public static java.util.function.Consumer<MachineBlockEntity> clientSoundTick = be -> {};
+    /** The client's playing loop sound (a MachineLoopSound). */
+    public @Nullable Object clientSound;
+
+    /** 1.7.10 getSound/hasSound: the sound looped while the machine is active, or null for a silent one. */
+    public net.minecraft.sounds.@Nullable SoundEvent getLoopSound() {
+        return null;
+    }
+
+    /** 1.7.10 soundVolume. */
+    public float getLoopVolume() {
+        return 1;
+    }
+
     /** Runs one tick of the machine's work. Returns whether it is actively working. */
     protected abstract boolean tickMachine(boolean redstoneAllows);
 

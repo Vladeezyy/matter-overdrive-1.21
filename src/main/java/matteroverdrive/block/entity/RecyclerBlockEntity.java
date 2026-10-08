@@ -107,4 +107,9 @@ public class RecyclerBlockEntity extends MachineBlockEntity {
     public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
         return new RecyclerMenu(id, inventory, this, dataAccess);
     }
+
+    @Override
+    public net.minecraft.sounds.SoundEvent getLoopSound() {
+        return matteroverdrive.init.MOSounds.MACHINE.get();
+    }
 }

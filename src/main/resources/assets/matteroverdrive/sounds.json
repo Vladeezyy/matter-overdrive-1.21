@@ -232,7 +232,7 @@
     ]
   },
   "transporter": {
-    "category": "player",
+    "category": "block",
     "sounds": [
       "matteroverdrive:transporter/transporter_0"
     ]
@@ -254,6 +254,36 @@
     "sounds": [
       "matteroverdrive:gui/button_soft_0",
       "matteroverdrive:gui/button_soft_1"
+    ]
+  },
+  "machine": {
+    "category": "block",
+    "sounds": [
+      "matteroverdrive:blocks/machine"
+    ]
+  },
+  "analyzer": {
+    "category": "block",
+    "sounds": [
+      "matteroverdrive:blocks/analyzer"
+    ]
+  },
+  "force_field": {
+    "category": "block",
+    "sounds": [
+      "matteroverdrive:force_field"
+    ]
+  },
+  "replicate_success": {
+    "category": "block",
+    "sounds": [
+      "matteroverdrive:replicator/replicate_success"
+    ]
+  },
+  "windy": {
+    "category": "block",
+    "sounds": [
+      "matteroverdrive:windy"
     ]
   }
 }

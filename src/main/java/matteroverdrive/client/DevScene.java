@@ -1182,7 +1182,29 @@ public final class DevScene {
         }));
         at(3160, mc -> shot(mc, "replicator_item"));
         at(3161, mc -> mc.options.hideGui = false);
-        at(3164, mc -> mc.stop());
+        // leftovers: machine sounds - the inscriber at work and the stabilizer aiming at the anomaly loop their sounds
+        at(3162, mc -> server(mc, p -> {
+            if (p.level().getBlockEntity(inscriberPos) instanceof matteroverdrive.block.entity.InscriberBlockEntity inscriber) {
+                inscriber.getEnergy().set(inscriber.getEnergy().getCapacity());
+                inscriber.getInventory().setStack(matteroverdrive.block.entity.InscriberBlockEntity.MAIN, new ItemStack(MOItems.ISOLINEAR_CIRCUIT_MK1.get(), 4));
+                inscriber.getInventory().setStack(matteroverdrive.block.entity.InscriberBlockEntity.SECONDARY, new ItemStack(Items.GOLD_INGOT, 4));
+            }
+            // the anomaly may have pulled a block into the beam
+            for (int z = -9; z <= -7; z++) p.level().setBlockAndUpdate(origin.offset(0, 3, z), Blocks.AIR.defaultBlockState());
+            p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() - 4.5, Set.of(), 180f, 0f, false);
+        }));
+        at(3180, mc -> {
+            var sounds = mc.getSoundManager();
+            for (BlockPos pos : List.of(inscriberPos, origin.offset(0, 3, -6), origin.offset(0, 3, -10))) {
+                Object sound = mc.level.getBlockEntity(pos) instanceof matteroverdrive.machine.MachineBlockEntity m ? m.clientSound
+                        : mc.level.getBlockEntity(pos) instanceof matteroverdrive.block.entity.GravitationalAnomalyBlockEntity a ? a.clientSound : null;
+                MatterOverdrive.LOGGER.info("[scene] sound at {}: {} active={} playing={} volume={}", pos, mc.level.getBlockState(pos).getBlock(),
+                        mc.level.getBlockEntity(pos) instanceof matteroverdrive.machine.MachineBlockEntity m && m.isActive(),
+                        sound instanceof net.minecraft.client.resources.sounds.SoundInstance s && sounds.isActive(s),
+                        sound instanceof net.minecraft.client.resources.sounds.SoundInstance s ? s.getVolume() : 0);
+            }
+        });
+        at(3184, mc -> mc.stop());
     }
 
     /** Shows one item's tooltip in the middle of the screen. */

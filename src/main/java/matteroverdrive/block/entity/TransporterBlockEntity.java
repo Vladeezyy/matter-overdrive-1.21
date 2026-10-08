@@ -14,7 +14,6 @@ import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Relative;
@@ -190,8 +189,6 @@ public class TransporterBlockEntity extends MachineBlockEntity {
                     matteroverdrive.quest.QuestEvents.onEvent(player, new matteroverdrive.quest.QuestEvents.Transport(getBlockPos(), target.pos()));
                 }
             }
-            level.playSound(null, getBlockPos(), MOSounds.TRANSPORTER.get(), SoundSource.BLOCKS, 0.5f, 1);
-            level.playSound(null, target.pos(), MOSounds.TRANSPORTER.get(), SoundSource.BLOCKS, 0.5f, 1);
             energy.add(-getEnergyDrain());
             transportTracker = level.getGameTime() + getTransportDelay();
             transportTimer = 0;
@@ -252,5 +249,15 @@ public class TransporterBlockEntity extends MachineBlockEntity {
     @Override
     public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
         return new TransporterMenu(id, inventory, this, dataAccess);
+    }
+
+    @Override
+    public net.minecraft.sounds.SoundEvent getLoopSound() {
+        return MOSounds.TRANSPORTER.get();
+    }
+
+    @Override
+    public float getLoopVolume() {
+        return 0.5f;
     }
 }

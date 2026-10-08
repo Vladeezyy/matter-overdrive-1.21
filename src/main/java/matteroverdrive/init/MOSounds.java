@@ -58,6 +58,13 @@ public final class MOSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> SCANNER_BEEP = sound("scanner_beep");
     public static final DeferredHolder<SoundEvent, SoundEvent> CRATE_CLOSE = sound("crate_close");
 
+    // Machines: loops while active (1.7.10 MOTileEntityMachine.getSound), replication, the anomaly's wind
+    public static final DeferredHolder<SoundEvent, SoundEvent> MACHINE = sound("machine");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ANALYZER = sound("analyzer");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FORCE_FIELD = sound("force_field");
+    public static final DeferredHolder<SoundEvent, SoundEvent> REPLICATE_SUCCESS = sound("replicate_success");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WINDY = sound("windy");
+
     private static DeferredHolder<SoundEvent, SoundEvent> sound(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, name)));
     }
