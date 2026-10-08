@@ -72,5 +72,9 @@ public final class MOBlockEntities {
             BLOCK_ENTITIES.register("tritanium_crate", () -> new BlockEntityType<>(matteroverdrive.block.entity.TritaniumCrateBlockEntity::new,
                     MOBlocks.TRITANIUM_CRATES.stream().map(b -> (net.minecraft.world.level.block.Block) b.get()).collect(java.util.stream.Collectors.toSet())));
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<matteroverdrive.block.entity.TransporterBlockEntity>> TRANSPORTER =
+            BLOCK_ENTITIES.register("transporter", () -> new BlockEntityType<>(matteroverdrive.block.entity.TransporterBlockEntity::new,
+                    MOBlocks.TRANSPORTER.get()));
+
     private MOBlockEntities() {}
 }

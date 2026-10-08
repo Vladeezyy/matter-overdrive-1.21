@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "TGT",
+    "CMC",
+    "NBH"
+  ],
+  "key": {
+    "T": "matteroverdrive:tritanium_plate",
+    "G": "minecraft:glowstone",
+    "C": "matteroverdrive:isolinear_circuit_mk2",
+    "M": "matteroverdrive:me_conversion_matrix",
+    "N": "matteroverdrive:integration_matrix",
+    "B": "matteroverdrive:hc_battery",
+    "H": "matteroverdrive:h_compensator"
+  },
+  "result": {
+    "id": "matteroverdrive:transporter",
+    "count": 1
+  }
+}

@@ -116,6 +116,10 @@ public final class MOBlocks {
         return TRITANIUM_CRATES.get(color.getId());
     }
 
+    public static final DeferredBlock<matteroverdrive.block.TransporterBlock> TRANSPORTER = BLOCKS.registerBlock("transporter",
+            matteroverdrive.block.TransporterBlock::new, p -> p.mapColor(MapColor.METAL).strength(20f, 9f).sound(SoundType.METAL)
+                    .requiresCorrectToolForDrops());
+
     /** 1.7.10 BlockMicrowave: hardness 10, resistance 9, iron pickaxe. */
     public static final DeferredBlock<matteroverdrive.block.MicrowaveBlock> MICROWAVE = BLOCKS.registerBlock("microwave",
             matteroverdrive.block.MicrowaveBlock::new, p -> p.mapColor(MapColor.METAL).strength(10f, 9f).sound(SoundType.METAL)

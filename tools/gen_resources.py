@@ -748,7 +748,8 @@ SOUNDS = {"phaser_rifle_shot": ["weapon/phaser_rifle_shot"], "plasma_shotgun_sho
           "failed_animal_die": [f"entities/failed_animal_die_{i}" for i in range(2)],
           "crate_open": ["blocks/crate_open"], "crate_close": ["blocks/crate_close"],
           "scanner_scanning": ["matter_scanner/scanner_scanning"], "scanner_success": ["matter_scanner/scanner_success_2"],
-          "scanner_fail": ["matter_scanner/scanner_fail"], "scanner_beep": ["matter_scanner/scanner_beep"]}
+          "scanner_fail": ["matter_scanner/scanner_fail"], "scanner_beep": ["matter_scanner/scanner_beep"],
+          "transporter": ["transporter/transporter_0"]}
 SOUND_CATEGORY = {k: "neutral" for k in SOUNDS if k.startswith("failed_animal")} | {k: "hostile" for k in SOUNDS if k.startswith("rogue_android")} | \
                  {k: "block" for k in SOUNDS if k.startswith("crate_")}
 for files in SOUNDS.values():
@@ -1126,6 +1127,37 @@ shaped("matter_scanner", mid("matter_scanner"), ["III", "GDG", "IRI"],
        {"I": "minecraft:iron_ingot", "D": MK[3], "R": "minecraft:redstone", "G": "minecraft:gold_ingot"}, category="equipment")
 
 
+# --- phase 7k: transporter + transport flash drive ----------------------------------------------------------
+# 1.7.10 BlockTransporter: transporter_top on top and bottom, transporter_front facing, transporter_side elsewhere
+for t in ["transporter_top", "transporter_front", "transporter_side"]:
+    cp(ref / "textures/blocks" / f"{t}.png", A / "textures/block" / f"{t}.png")
+w(A / "models/block/transporter.json", six_sided("transporter_front", "transporter_side", "transporter_side", "transporter_top",
+                                                "transporter_top"))
+machine_blockstate("transporter", f"{MOD}:block/transporter", f"{MOD}:block/transporter")
+w(D / "loot_table/blocks/transporter.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "bonus_rolls": 0,
+    "entries": [{"type": "minecraft:item", "name": mid("transporter"), "functions": [{"function": "minecraft:copy_components",
+        "source": "block_entity", "include": [mid("energy"), mid("transport_locations"), mid("transport_selected")]}]}],
+    "conditions": [{"condition": "minecraft:survives_explosion"}]}]})
+for tag in ["mineable/pickaxe", "needs_iron_tool"]:
+    p = TAGS / f"minecraft/tags/block/{tag}.json"
+    w(p, {"values": json.loads(p.read_text())["values"] + [mid("transporter")]})
+shaped("transporter", mid("transporter"), ["TGT", "CMC", "NBH"],
+       {"T": mid("tritanium_plate"), "G": "minecraft:glowstone", "C": MK[2], "M": mid("me_conversion_matrix"),
+        "N": mid("integration_matrix"), "B": mid("hc_battery"), "H": mid("h_compensator")})
+# 1.7.10 TransportFlashDrive: the flash drive in COLOR_HOLO_GREEN; its recipe had an undefined 'E' (ender pearl here)
+w(A / "models/item/transport_flash_drive.json", {"parent": "minecraft:item/generated", "textures": {
+    "layer0": f"{MOD}:item/flash_drive", "layer1": f"{MOD}:item/flash_drive_overlay"}})
+w(A / "items/transport_flash_drive.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:item/transport_flash_drive",
+    "tints": [{"type": "minecraft:constant", "value": -1},
+              {"type": "minecraft:constant", "value": (0xFF << 24 | 24 << 16 | 207 << 8 | 0) - (1 << 32)}]}})
+shaped("transport_flash_drive", mid("transport_flash_drive"), [" I ", "ECR", " I "],
+       {"I": "minecraft:iron_ingot", "E": "minecraft:ender_pearl", "C": MK[1], "R": "minecraft:redstone"})
+# 1.7.10 MOElementButton textures (ScaleTexture offsets 7) as nine-slice GUI sprites
+for t in ["button_normal", "button_over", "button_over_dark"]:
+    cp(ref / "textures/gui/elements" / f"{t}.png", GUI / "sprites" / f"{t}.png")
+    w(GUI / "sprites" / f"{t}.png.mcmeta", {"gui": {"scaling": {"type": "nine_slice", "width": 18, "height": 18, "border": 7}}})
+
+
 # --- phase 7b: mobs -----------------------------------------------------------------------------------------
 import zlib
 
@@ -1242,9 +1274,9 @@ DECOR_COLORS = {0xd4b108: k_plain(mid("decorative_stripes")), 0xb6621e: k_plain(
 CRATES_ALL = [k_facing(mid(f"tritanium_crate_{d}")) for d in ITEM_DYE]
 def crate(dye):
     return k_facing(mid(f"tritanium_crate_{dye}"))
-# Not ported yet: the star map and the transporter get stand-ins (swap them here when they exist).
+# Not ported yet: the star map gets a stand-in (swap it here when it exists).
 STAR_MAP = k_plain(mid("decorative_holo_matrix"))
-TRANSPORTER = k_plain(mid("machine_hull"))
+TRANSPORTER = k_facing(mid("transporter"))
 CONNECT = {mid("network_pipe"), mid("heavy_matter_pipe"), mid("matter_pipe"), "minecraft:oak_fence"}
 
 def m(kinds, noise=False, specials=()):
@@ -1510,6 +1542,19 @@ GUI_KEYS = {
     "gui.matteroverdrive.search": {"en_us": "Search", "ru_ru": "Поиск"},
     "gui.matteroverdrive.pattern": {"en_us": "%s (pattern %s%%)", "ru_ru": "%s (шаблон %s%%)"},
     "item.matteroverdrive.matter_scanner": {"en_us": "Matter Scanner", "ru_ru": "Сканер материи"},
+    "block.matteroverdrive.transporter": {"en_us": "Transporter", "ru_ru": "Транспортер"},
+    "item.matteroverdrive.transport_flash_drive": {"en_us": "Transport Flash Drive", "ru_ru": "Транспортный флэш-накопитель"},
+    "item.matteroverdrive.transport_flash_drive.details": {"en_us": "Used to mark locations for quick use with Teleporter",
+                                                           "ru_ru": "Используется для обозначения места для быстрого использования Транспортера"},
+    "gui.matteroverdrive.transporter.name": {"en_us": "Name", "ru_ru": "Название"},
+    "gui.matteroverdrive.transporter.new": {"en_us": "New", "ru_ru": "Новая"},
+    "gui.matteroverdrive.transporter.remove": {"en_us": "Remove", "ru_ru": "Удалить"},
+    "gui.matteroverdrive.transporter.import": {"en_us": "Import", "ru_ru": "Импорт"},
+    "gui.matteroverdrive.transporter.reset": {"en_us": "Reset", "ru_ru": "Сброс"},
+    "gui.matteroverdrive.transporter.too_far": {"en_us": "Destination Too Far", "ru_ru": "Точка слишком далеко"},
+    "gui.matteroverdrive.transporter.invalid": {"en_us": "Out of range or right above/below the transporter",
+                                                "ru_ru": "Вне радиуса или прямо над/под транспортером"},
+    "gui.matteroverdrive.transporter.cost": {"en_us": "%s FE per jump to %s", "ru_ru": "%s FE за прыжок до %s"},
     "key.matteroverdrive.matter_scanner": {"en_us": "Matter Scanner GUI", "ru_ru": "Экран сканера материи"},
     "tooltip.matteroverdrive.scanner.online": {"en_us": "Online (pattern storage at %s)", "ru_ru": "В сети (хранилище шаблонов в %s)"},
     "tooltip.matteroverdrive.scanner.offline": {"en_us": "Offline", "ru_ru": "Не в сети"},

@@ -51,5 +51,8 @@ public final class MOMenus {
     public static final DeferredHolder<MenuType<?>, MenuType<ChargingStationMenu>> CHARGING_STATION =
             MENUS.register("charging_station", () -> IMenuTypeExtension.create(ChargingStationMenu::new));
 
+    public static final DeferredHolder<MenuType<?>, MenuType<matteroverdrive.menu.TransporterMenu>> TRANSPORTER =
+            MENUS.register("transporter", () -> IMenuTypeExtension.create(matteroverdrive.menu.TransporterMenu::new));
+
     private MOMenus() {}
 }

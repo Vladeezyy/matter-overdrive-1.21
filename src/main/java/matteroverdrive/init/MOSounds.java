@@ -47,6 +47,7 @@ public final class MOSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> FAILED_ANIMAL_IDLE_SHEEP = sound("failed_animal_idle_sheep");
     public static final DeferredHolder<SoundEvent, SoundEvent> FAILED_ANIMAL_DIE = sound("failed_animal_die");
     public static final DeferredHolder<SoundEvent, SoundEvent> CRATE_OPEN = sound("crate_open");
+    public static final DeferredHolder<SoundEvent, SoundEvent> TRANSPORTER = sound("transporter");
     public static final DeferredHolder<SoundEvent, SoundEvent> SCANNER_SCANNING = sound("scanner_scanning");
     public static final DeferredHolder<SoundEvent, SoundEvent> SCANNER_SUCCESS = sound("scanner_success");
     public static final DeferredHolder<SoundEvent, SoundEvent> SCANNER_FAIL = sound("scanner_fail");

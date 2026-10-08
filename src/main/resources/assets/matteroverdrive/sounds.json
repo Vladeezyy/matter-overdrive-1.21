@@ -230,5 +230,11 @@
     "sounds": [
       "matteroverdrive:matter_scanner/scanner_beep"
     ]
+  },
+  "transporter": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:transporter/transporter_0"
+    ]
   }
 }

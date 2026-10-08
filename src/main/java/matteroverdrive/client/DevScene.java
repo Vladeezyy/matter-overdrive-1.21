@@ -504,7 +504,45 @@ public final class DevScene {
         at(1460, mc -> mc.setScreen(new matteroverdrive.client.screen.MatterScannerScreen(0)));
         at(1470, mc -> shot(mc, "matter_scanner"));
         at(1471, mc -> mc.setScreen(null));
-        at(1474, mc -> mc.stop());
+        // 7k: a transporter with two destinations: its screen, then the player on the pad mid-transport
+        at(1474, mc -> server(mc, p -> {
+            BlockPos base = origin.above(14);
+            BlockPos pad = base.offset(0, -1, -4);
+            // a clean floor (the plasma pool and the microwaves go)
+            for (BlockPos pos : BlockPos.betweenClosed(base.offset(-7, -2, -10), base.offset(7, 3, 1))) {
+                p.level().setBlock(pos, pos.getY() < base.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
+                        Block.UPDATE_CLIENTS | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
+            }
+            p.level().setBlockAndUpdate(pad, MOBlocks.TRANSPORTER.get().defaultBlockState());
+            if (p.level().getBlockEntity(pad) instanceof matteroverdrive.block.entity.TransporterBlockEntity t) {
+                t.getEnergy().set(1000000);
+                t.addLocation("Platform edge");
+                t.setSelected("Platform edge", base.offset(-5, 0, -8));
+                t.addLocation("Roof");
+                t.setSelected("Roof", base.offset(3, 6, -4));
+                t.select(0);
+                ItemStack drive = new ItemStack(MOItems.TRANSPORT_FLASH_DRIVE.get());
+                drive.set(matteroverdrive.init.MODataComponents.TRANSPORT_TARGET.get(), base.offset(4, -1, -9));
+                t.getInventory().setStack(matteroverdrive.block.entity.TransporterBlockEntity.FLASH_DRIVE, drive);
+            }
+        }));
+        // open the screen once the client has the new block entity
+        at(1478, mc -> server(mc, p -> {
+            BlockPos pad = origin.above(14).offset(0, -1, -4);
+            if (p.level().getBlockEntity(pad) instanceof matteroverdrive.block.entity.TransporterBlockEntity t) {
+                p.openMenu(t, buf -> buf.writeBlockPos(pad));
+            }
+        }));
+        at(1486, mc -> shot(mc, "transporter_gui"));
+        at(1485, mc -> server(mc, p -> {
+            p.closeContainer();
+            BlockPos base = origin.above(14);
+            p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() - 3.5, Set.of(), 180f, 30f, false);
+        }));
+        at(1488, mc -> mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT));
+        at(1540, mc -> shot(mc, "transporter_transport"));
+        at(1541, mc -> mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON));
+        at(1544, mc -> mc.stop());
     }
 
     private static void at(int t, Consumer<Minecraft> action) {

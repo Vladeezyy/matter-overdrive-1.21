@@ -58,5 +58,16 @@ public final class MODataComponents {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<ItemPattern>> SCANNER_SELECTED =
             COMPONENTS.registerComponentType("scanner_selected", b -> b.persistent(ItemPattern.CODEC).networkSynchronized(ItemPattern.STREAM_CODEC));
 
+    /** Transporter destinations carried by the block item (1.7.10 transportLocations / selectedTransport). */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<matteroverdrive.transport.TransportLocation>>> TRANSPORT_LOCATIONS =
+            COMPONENTS.registerComponentType("transport_locations", b -> b.persistent(matteroverdrive.transport.TransportLocation.CODEC.listOf())
+                    .networkSynchronized(matteroverdrive.transport.TransportLocation.STREAM_CODEC.apply(ByteBufCodecs.list())));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> TRANSPORT_SELECTED =
+            COMPONENTS.registerComponentType("transport_selected", b -> b.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
+    /** Transport flash drive: the block it marked (1.7.10 TargetX/Y/Z). */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<net.minecraft.core.BlockPos>> TRANSPORT_TARGET =
+            COMPONENTS.registerComponentType("transport_target", b -> b.persistent(net.minecraft.core.BlockPos.CODEC)
+                    .networkSynchronized(net.minecraft.core.BlockPos.STREAM_CODEC));
+
     private MODataComponents() {}
 }

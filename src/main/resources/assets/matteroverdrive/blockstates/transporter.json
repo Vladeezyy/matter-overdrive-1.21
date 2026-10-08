@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "active=false,facing=north": {
+      "model": "matteroverdrive:block/transporter"
+    },
+    "active=true,facing=north": {
+      "model": "matteroverdrive:block/transporter"
+    },
+    "active=false,facing=east": {
+      "model": "matteroverdrive:block/transporter",
+      "y": 90
+    },
+    "active=true,facing=east": {
+      "model": "matteroverdrive:block/transporter",
+      "y": 90
+    },
+    "active=false,facing=south": {
+      "model": "matteroverdrive:block/transporter",
+      "y": 180
+    },
+    "active=true,facing=south": {
+      "model": "matteroverdrive:block/transporter",
+      "y": 180
+    },
+    "active=false,facing=west": {
+      "model": "matteroverdrive:block/transporter",
+      "y": 270
+    },
+    "active=true,facing=west": {
+      "model": "matteroverdrive:block/transporter",
+      "y": 270
+    }
+  }
+}

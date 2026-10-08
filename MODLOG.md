@@ -283,18 +283,28 @@
   network). C (Android key category) opens `MatterScannerScreen`: storage patterns grid (click = select) + selected
   item, matter and progress; `ScannerPayloads` request/patterns/select. Icon offline until linked (has_component
   condition). Recipe III/GDG/IRI. 72 GameTests. Deviation: no IScannable blocks, no guide/info pages in the screen.
+- **7k ✅** Transporter (`TransporterBlockEntity`, 1024000 FE, 512 FE/t in, 5 upgrade slots, 512 mB matter tank unused
+  like 1.7.10): up to 3 entities on it go to the selected destination after 70 ticks (speed), then 80 ticks rest, for
+  16 FE per block (power usage); range 32 (range upgrades), not in its own column within 4. Destinations (name + pos,
+  `TransportLocation`) kept in the BE, synced by block updates, carried by the item (components). Transport flash
+  drive marks a block (use on it); Import puts the spot above it. `TransporterScreen` (225x220, hotbar only): list
+  (select, New, Remove), name + X/Y/Z fields (clamped to range server-side, offsets shown), Import, Reset, energy /
+  matter bars; `TransporterPayload`. MOElementButton textures as nine-slice sprites (button_normal/over/over_dark).
+  Effects: vanilla portal particles at both ends while charging + transporter sound (1.7.10 ReplicatorParticle not
+  ported). Cargo ship now places real transporters. Recipes TGT/CMC/NBH and " I /ECR/ I " (1.7.10's had an undefined
+  E → ender pearl). 73 GameTests. Deviations: entities land on the block centre (1.7.10: the block corner); no
+  ComputerCraft/OpenComputers peripheral.
 
 ### Next in phase 7 (start here)
 1. ~~Failed animals~~ ✅ 7c.
 2. ~~Mutant scientist~~ ✅ 7d (underwater base spawns one named "Mitko'Urrr", persistent, on the star map block).
 3. ~~Structures~~ ✅ 7f (the mad scientist house is a village piece: comes with the mad scientist in item 5).
-4. Transporter + transport flash drive; omni tool (also 30% of rogue android weapons); matter scanner; portable
-   decomposer; matter container tank; microwave.
+4. ~~Transporter, omni tool, matter scanner, portable decomposer, matter container, microwave~~ ✅ 7g-7k.
 5. Star map / galaxy / ships / buildings / quests / dialogs / contract market; mad scientist villager (dialog + trades:
    TradeHandlerMadScientist); android spawner block (teams + path drives, not used by worldgen).
 - Deviations so far: legendary rogue android parts drop without bonus attributes; no rogue android teams/paths;
-  legendary weapons have no stat bonuses; buildings: star map → holo matrix and transporter → machine hull stand-ins
-  (swap STAR_MAP/TRANSPORTER in gen_resources.py when ported), no crashed-ship quest contract, underwater base needs 16+ water (1.7.10: 27+, rare in today's deep
+  legendary weapons have no stat bonuses; buildings: star map → holo matrix stand-in (swap STAR_MAP in
+  gen_resources.py when ported), no crashed-ship quest contract, underwater base needs 16+ water (1.7.10: 27+, rare in today's deep
   oceans) and sinks into the floor to stay submerged, no "generate buildings" config (use a datapack), not rotated
   (1.7.10 never rotated them either).
 
@@ -302,7 +312,7 @@
 **Workflow**
 - Resources: never hand-edit `src/main/resources/{assets,data}` — regenerate:
   `rm -rf src/main/resources/{assets,data} && python3 -I tools/gen_resources.py ~/mo-reference/mo-1.7.10/src/main/resources/assets/mo src/main/resources`
-- Tests: `./gradlew runGameTestServer` (72 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
+- Tests: `./gradlew runGameTestServer` (73 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
   `FunctionGameTestInstance`, custom 12³ structure `matteroverdrive:gametest_area`, time-of-day via `TestEnvironmentDefinition.TimeOfDay`,
   `makeMockServerPlayerInLevel`). Visual: `./gradlew runScene` → `run/screenshots/scene_*.png` (DevScene, world `run/saves/mo_scene`;
   pristine copy = "Новый мир (2)"; needs `pauseOnLostFocus=false`; selected hotbar slot is client-side; place blocks with

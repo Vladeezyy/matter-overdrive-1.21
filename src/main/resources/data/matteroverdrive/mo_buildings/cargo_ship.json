@@ -326,7 +326,10 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:machine_hull"
+          "Name": "matteroverdrive:transporter",
+          "Properties": {
+            "facing": "west"
+          }
         }
       ],
       "noise": false,

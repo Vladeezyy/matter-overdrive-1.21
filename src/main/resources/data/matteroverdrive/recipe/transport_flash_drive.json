@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " I ",
+    "ECR",
+    " I "
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "E": "minecraft:ender_pearl",
+    "C": "matteroverdrive:isolinear_circuit_mk1",
+    "R": "minecraft:redstone"
+  },
+  "result": {
+    "id": "matteroverdrive:transport_flash_drive",
+    "count": 1
+  }
+}

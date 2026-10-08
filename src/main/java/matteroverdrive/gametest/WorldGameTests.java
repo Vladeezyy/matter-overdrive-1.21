@@ -18,6 +18,7 @@ final class WorldGameTests {
         MOGameTests.add("buildings", 20, false, WorldGameTests::buildings);
         MOGameTests.add("matter_container", 20, false, WorldGameTests::matterContainer);
         MOGameTests.add("portable_decomposer", 20, false, WorldGameTests::portableDecomposer);
+        MOGameTests.add("transporter", 120, false, WorldGameTests::transporter);
     }
 
     private static void check(GameTestHelper helper, boolean ok, String message) {
@@ -131,5 +132,24 @@ final class WorldGameTests {
                 && matteroverdrive.item.PortableDecomposerItem.getEnergy(decomposer) == 100000 - 3 * value,
                 "matter " + matter + ", energy " + matteroverdrive.item.PortableDecomposerItem.getEnergy(decomposer) + ", left " + ingots.getCount());
         helper.succeed();
+    }
+
+    /** Transporter: after 70 ticks the pig on it is at the destination, for 16 FE per block; the flash drive imports a spot. */
+    private static void transporter(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, matteroverdrive.init.MOBlocks.TRANSPORTER.get());
+        var t = helper.getBlockEntity(pos, matteroverdrive.block.entity.TransporterBlockEntity.class);
+        t.getEnergy().set(100000);
+        BlockPos abs = helper.absolutePos(pos);
+        var drive = new net.minecraft.world.item.ItemStack(matteroverdrive.init.MOItems.TRANSPORT_FLASH_DRIVE.get());
+        drive.set(matteroverdrive.init.MODataComponents.TRANSPORT_TARGET.get(), abs.offset(10, -1, 0));
+        t.getInventory().setStack(matteroverdrive.block.entity.TransporterBlockEntity.FLASH_DRIVE, drive);
+        check(helper, t.importFromFlashDrive("East") && t.getSelected().pos().equals(abs.offset(10, 0, 0)), "import " + t.getSelected());
+        var pig = helper.spawnWithNoFreeWill(EntityType.PIG, pos.above());
+        helper.runAfterDelay(80, () -> {
+            check(helper, pig.getBlockX() == abs.getX() + 10 && pig.getBlockZ() == abs.getZ(), "pig at " + pig.blockPosition() + ", expected " + abs.offset(10, 0, 0));
+            check(helper, t.getEnergy().getEnergy() == 100000 - 160, "energy " + t.getEnergy().getEnergy());
+            helper.succeed();
+        });
     }
 }
