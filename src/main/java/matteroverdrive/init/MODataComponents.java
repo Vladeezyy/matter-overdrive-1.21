@@ -51,5 +51,12 @@ public final class MODataComponents {
             COMPONENTS.registerComponentType("decompose_list", b -> b.persistent(net.minecraft.core.registries.BuiltInRegistries.ITEM.byNameCodec().listOf())
                     .networkSynchronized(ByteBufCodecs.registry(Registries.ITEM).apply(ByteBufCodecs.list())));
 
+    /** Matter scanner: the pattern storage it is linked to and the pattern it last selected (1.7.10 link_x/y/z, lastSelected). */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<net.minecraft.core.GlobalPos>> SCANNER_LINK =
+            COMPONENTS.registerComponentType("scanner_link", b -> b.persistent(net.minecraft.core.GlobalPos.CODEC)
+                    .networkSynchronized(net.minecraft.core.GlobalPos.STREAM_CODEC));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<ItemPattern>> SCANNER_SELECTED =
+            COMPONENTS.registerComponentType("scanner_selected", b -> b.persistent(ItemPattern.CODEC).networkSynchronized(ItemPattern.STREAM_CODEC));
+
     private MODataComponents() {}
 }

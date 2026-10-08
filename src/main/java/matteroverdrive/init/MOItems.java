@@ -184,6 +184,8 @@ public final class MOItems {
                     .usingConvertsTo(net.minecraft.world.item.Items.GLASS_BOTTLE).stacksTo(16));
     public static final DeferredItem<BlockItem> HOLO_SIGN = block("holo_sign", MOBlocks.HOLO_SIGN);
     public static final DeferredItem<BlockItem> MICROWAVE = block("microwave", MOBlocks.MICROWAVE);
+    public static final DeferredItem<matteroverdrive.item.MatterScannerItem> MATTER_SCANNER = item("matter_scanner",
+            matteroverdrive.item.MatterScannerItem::new, p -> p);
     public static final DeferredItem<matteroverdrive.item.PortableDecomposerItem> PORTABLE_DECOMPOSER = item("portable_decomposer",
             matteroverdrive.item.PortableDecomposerItem::new, p -> p);
     public static final List<DeferredItem<BlockItem>> TRITANIUM_CRATES = MOBlocks.TRITANIUM_CRATES.stream()

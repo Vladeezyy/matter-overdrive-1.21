@@ -21,10 +21,11 @@ import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * 1.7.10 TileEntityMachinePatternStorage: holds six pattern drives and offers their patterns to the matter network.
- * It works while it has energy (64000 FE buffer, 128 FE/t in).
+ * It works while it has energy (64000 FE buffer, 128 FE/t in). A matter scanner in its scanner slot gets linked to it.
  */
 public class PatternStorageBlockEntity extends MachineBlockEntity {
     public static final int DRIVES = 6;
+    public static final int SCANNER = DRIVES;
     public static final int ENERGY_CAPACITY = 64000;
     public static final int ENERGY_TRANSFER = 128;
 
@@ -38,6 +39,7 @@ public class PatternStorageBlockEntity extends MachineBlockEntity {
         for (int i = 0; i < DRIVES; i++) {
             b.add(MachineInventory.Role.OTHER, r -> r.getItem() instanceof PatternDriveItem, 1);
         }
+        b.add(MachineInventory.Role.OTHER, r -> r.getItem() instanceof matteroverdrive.item.MatterScannerItem, 1);
         return b;
     }
 
@@ -47,6 +49,14 @@ public class PatternStorageBlockEntity extends MachineBlockEntity {
 
     @Override
     protected boolean tickMachine(boolean redstoneAllows) {
+        // 1.7.10 manageLinking
+        ItemStack scanner = inventory.getStack(SCANNER);
+        if (scanner.getItem() instanceof matteroverdrive.item.MatterScannerItem
+                && !net.minecraft.core.GlobalPos.of(getLevel().dimension(), getBlockPos()).equals(matteroverdrive.item.MatterScannerItem.getLink(scanner))) {
+            ItemStack linked = scanner.copy();
+            matteroverdrive.item.MatterScannerItem.link(linked, getLevel(), getBlockPos());
+            inventory.setStack(SCANNER, linked);
+        }
         return isOnline();
     }
 

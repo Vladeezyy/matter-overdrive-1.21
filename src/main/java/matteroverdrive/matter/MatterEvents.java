@@ -22,6 +22,7 @@ public final class MatterEvents {
     @SubscribeEvent
     static void registerPayloads(RegisterPayloadHandlersEvent event) {
         matteroverdrive.network.AndroidPayloads.register(event.registrar("1"));
+        matteroverdrive.network.ScannerPayloads.register(event.registrar("1"));
         event.registrar("1")
                 .playToClient(MatterValuesPayload.TYPE, MatterValuesPayload.STREAM_CODEC, MatterValuesPayload::handle)
                 .playToClient(PatternListPayload.TYPE, PatternListPayload.STREAM_CODEC, PatternListPayload::handle)

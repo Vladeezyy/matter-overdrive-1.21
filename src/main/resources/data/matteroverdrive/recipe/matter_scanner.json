@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "III",
+    "GDG",
+    "IRI"
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "D": "matteroverdrive:isolinear_circuit_mk3",
+    "R": "minecraft:redstone",
+    "G": "minecraft:gold_ingot"
+  },
+  "result": {
+    "id": "matteroverdrive:matter_scanner",
+    "count": 1
+  }
+}

@@ -206,5 +206,29 @@
     "sounds": [
       "matteroverdrive:blocks/crate_close"
     ]
+  },
+  "scanner_scanning": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:matter_scanner/scanner_scanning"
+    ]
+  },
+  "scanner_success": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:matter_scanner/scanner_success_2"
+    ]
+  },
+  "scanner_fail": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:matter_scanner/scanner_fail"
+    ]
+  },
+  "scanner_beep": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:matter_scanner/scanner_beep"
+    ]
   }
 }

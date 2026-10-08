@@ -480,7 +480,31 @@ public final class DevScene {
             p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() - 1.0, Set.of(), 180f, 40f, false);
         }));
         at(1450, mc -> shot(mc, "microwave"));
-        at(1452, mc -> mc.stop());
+        // 7j: a matter scanner linked to a pattern storage with a few patterns, its screen open
+        at(1452, mc -> server(mc, p -> {
+            BlockPos base = origin.above(14);
+            BlockPos storagePos = base.offset(2, 0, -5);
+            p.level().setBlockAndUpdate(storagePos, MOBlocks.PATTERN_STORAGE.get().defaultBlockState());
+            if (p.level().getBlockEntity(storagePos) instanceof matteroverdrive.block.entity.PatternStorageBlockEntity storage) {
+                storage.getEnergy().set(64000);
+                ItemStack drive = new ItemStack(MOItems.PATTERN_DRIVE.get());
+                MOItems.PATTERN_DRIVE.get().addProgress(drive, net.minecraft.world.item.Items.DIAMOND, 100);
+                MOItems.PATTERN_DRIVE.get().addProgress(drive, net.minecraft.world.item.Items.IRON_BLOCK, 40);
+                ItemStack drive2 = new ItemStack(MOItems.PATTERN_DRIVE.get());
+                MOItems.PATTERN_DRIVE.get().addProgress(drive2, net.minecraft.world.item.Items.GOLD_INGOT, 70);
+                MOItems.PATTERN_DRIVE.get().addProgress(drive2, net.minecraft.world.item.Items.COBBLESTONE, 10);
+                storage.getInventory().setStack(0, drive);
+                storage.getInventory().setStack(1, drive2);
+            }
+            ItemStack scanner = new ItemStack(MOItems.MATTER_SCANNER.get());
+            matteroverdrive.item.MatterScannerItem.link(scanner, p.level(), storagePos);
+            matteroverdrive.item.MatterScannerItem.select(p.level(), scanner, net.minecraft.world.item.Items.IRON_BLOCK);
+            p.getInventory().setItem(0, scanner);
+        }));
+        at(1460, mc -> mc.setScreen(new matteroverdrive.client.screen.MatterScannerScreen(0)));
+        at(1470, mc -> shot(mc, "matter_scanner"));
+        at(1471, mc -> mc.setScreen(null));
+        at(1474, mc -> mc.stop());
     }
 
     private static void at(int t, Consumer<Minecraft> action) {

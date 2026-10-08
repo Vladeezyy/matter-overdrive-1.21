@@ -25,6 +25,7 @@ import net.minecraft.world.item.Items;
 final class NetworkGameTests {
     static void addAll() {
         MOGameTests.add("analyzer_stores_on_network", 200, false, NetworkGameTests::analyzerStoresOnNetwork);
+        MOGameTests.add("matter_scanner", 40, false, NetworkGameTests::matterScanner);
         MOGameTests.add("monitor_request_replicates", 400, false, NetworkGameTests::monitorRequestReplicates);
         MOGameTests.add("unconnected_replicator_idle", 60, false, NetworkGameTests::unconnectedReplicatorIdle);
         MOGameTests.add("replicator_fail_chance", 20, false, NetworkGameTests::replicatorFailChance);
@@ -66,6 +67,26 @@ final class NetworkGameTests {
             List<ItemPattern> patterns = s.getPatterns();
             helper.assertTrue(patterns.size() == 1 && patterns.get(0).is(Items.IRON_INGOT) && patterns.get(0).progress() == 20,
                     Component.literal("storage patterns: " + patterns));
+            helper.succeed();
+        });
+    }
+
+    /** Matter scanner: linked in the storage's scanner slot; scanning a block adds 10% to its pattern and removes it. */
+    private static void matterScanner(GameTestHelper helper) {
+        PatternStorageBlockEntity s = storage(helper, new BlockPos(1, 1, 1), null, 0);
+        s.getInventory().setStack(PatternStorageBlockEntity.SCANNER, new ItemStack(MOItems.MATTER_SCANNER.get()));
+        BlockPos target = new BlockPos(4, 1, 4);
+        helper.setBlock(target, net.minecraft.world.level.block.Blocks.IRON_BLOCK);
+        helper.runAfterDelay(5, () -> {
+            ItemStack scanner = s.getInventory().getStack(PatternStorageBlockEntity.SCANNER);
+            helper.assertTrue(matteroverdrive.item.MatterScannerItem.getDatabase(helper.getLevel(), scanner) == s,
+                    Component.literal("scanner not linked: " + matteroverdrive.item.MatterScannerItem.getLink(scanner)));
+            var player = helper.makeMockServerPlayerInLevel();
+            boolean ok = matteroverdrive.item.MatterScannerItem.scan(helper.getLevel(), scanner, player, helper.absolutePos(target));
+            List<ItemPattern> patterns = s.getPatterns();
+            helper.assertTrue(ok && helper.getLevel().getBlockState(helper.absolutePos(target)).isAir()
+                    && patterns.size() == 1 && patterns.get(0).is(Items.IRON_BLOCK) && patterns.get(0).progress() == 10,
+                    Component.literal("scan " + ok + ", patterns " + patterns));
             helper.succeed();
         });
     }

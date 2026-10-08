@@ -88,7 +88,7 @@
 ### Deviations from 1.7.10
 - The network is a shared bus: router and switch only connect; flash-drive filters are not ported.
 - Pattern monitor recipe uses a glass pane instead of the holo sign until the holo sign (phase 7) exists.
-- Matter Scanner (handheld) not ported yet; the analyzer's database slot takes a pattern drive directly.
+- The analyzer's database slot takes a pattern drive directly (or a matter scanner since 7j).
 - Pattern storage drives inside the block, replicator item animation, monitor hologram are renderer polish for later.
 
 ### Gotchas
@@ -275,6 +275,14 @@
   10% of the matter value per listed item for 1 FE per value point, as many as room and energy allow); use on a block
   with a fluid capability pours the matter in. List keyed by item only (1.7.10 compared NBT too). Microwave: decorative
   14x10x10 facing block (front/back/side textures, hardness 10, no recipe like 1.7.10). 71 GameTests.
+- **7j ✅** Matter scanner (`MatterScannerItem`, components `scanner_link` GlobalPos + `scanner_selected` ItemPattern):
+  linked by the new scanner slot of the pattern storage (slot 6, battery index shifted). Hold use on a block within 5:
+  looking at another block selects it (pattern from the storage or 0%); after 60 + matter value ticks it adds 10% to
+  the block's pattern in the linked storage and destroys the block without drops (1.7.10 chat messages, success/fail
+  sounds, looping scanning sound). The analyzer's database slot takes a scanner too (its storage first, then the
+  network). C (Android key category) opens `MatterScannerScreen`: storage patterns grid (click = select) + selected
+  item, matter and progress; `ScannerPayloads` request/patterns/select. Icon offline until linked (has_component
+  condition). Recipe III/GDG/IRI. 72 GameTests. Deviation: no IScannable blocks, no guide/info pages in the screen.
 
 ### Next in phase 7 (start here)
 1. ~~Failed animals~~ ✅ 7c.
@@ -294,7 +302,7 @@
 **Workflow**
 - Resources: never hand-edit `src/main/resources/{assets,data}` — regenerate:
   `rm -rf src/main/resources/{assets,data} && python3 -I tools/gen_resources.py ~/mo-reference/mo-1.7.10/src/main/resources/assets/mo src/main/resources`
-- Tests: `./gradlew runGameTestServer` (71 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
+- Tests: `./gradlew runGameTestServer` (72 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
   `FunctionGameTestInstance`, custom 12³ structure `matteroverdrive:gametest_area`, time-of-day via `TestEnvironmentDefinition.TimeOfDay`,
   `makeMockServerPlayerInLevel`). Visual: `./gradlew runScene` → `run/screenshots/scene_*.png` (DevScene, world `run/saves/mo_scene`;
   pristine copy = "Новый мир (2)"; needs `pauseOnLostFocus=false`; selected hotbar slot is client-side; place blocks with

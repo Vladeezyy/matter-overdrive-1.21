@@ -746,7 +746,9 @@ SOUNDS = {"phaser_rifle_shot": ["weapon/phaser_rifle_shot"], "plasma_shotgun_sho
           # failed animals (phase 7c)
           **{f"failed_animal_idle_{a}": [f"entities/failed_animal_idle_{a}"] for a in ["pig", "cow", "chicken", "sheep"]},
           "failed_animal_die": [f"entities/failed_animal_die_{i}" for i in range(2)],
-          "crate_open": ["blocks/crate_open"], "crate_close": ["blocks/crate_close"]}
+          "crate_open": ["blocks/crate_open"], "crate_close": ["blocks/crate_close"],
+          "scanner_scanning": ["matter_scanner/scanner_scanning"], "scanner_success": ["matter_scanner/scanner_success_2"],
+          "scanner_fail": ["matter_scanner/scanner_fail"], "scanner_beep": ["matter_scanner/scanner_beep"]}
 SOUND_CATEGORY = {k: "neutral" for k in SOUNDS if k.startswith("failed_animal")} | {k: "hostile" for k in SOUNDS if k.startswith("rogue_android")} | \
                  {k: "block" for k in SOUNDS if k.startswith("crate_")}
 for files in SOUNDS.values():
@@ -1110,6 +1112,18 @@ w(D / "loot_table/blocks/microwave.json", self_drop("microwave"))
 for tag in ["mineable/pickaxe", "needs_iron_tool"]:
     p = TAGS / f"minecraft/tags/block/{tag}.json"
     w(p, {"values": json.loads(p.read_text())["values"] + [mid("microwave")]})
+
+
+# --- phase 7j: matter scanner -------------------------------------------------------------------------------
+# 1.7.10 MatterScanner.getIconIndex: the "offline" icon until it is linked to a pattern storage
+for t in ["matter_scanner", "matter_scanner_offline"]:
+    cp(ref / "textures/items" / f"{t}.png", A / "textures/item" / f"{t}.png")
+    w(A / "models/item" / f"{t}.json", {"parent": "minecraft:item/handheld", "textures": {"layer0": f"{MOD}:item/{t}"}})
+w(A / "items/matter_scanner.json", {"model": {"type": "minecraft:condition", "property": "minecraft:has_component",
+    "component": mid("scanner_link"), "on_true": {"type": "minecraft:model", "model": f"{MOD}:item/matter_scanner"},
+    "on_false": {"type": "minecraft:model", "model": f"{MOD}:item/matter_scanner_offline"}}})
+shaped("matter_scanner", mid("matter_scanner"), ["III", "GDG", "IRI"],
+       {"I": "minecraft:iron_ingot", "D": MK[3], "R": "minecraft:redstone", "G": "minecraft:gold_ingot"}, category="equipment")
 
 
 # --- phase 7b: mobs -----------------------------------------------------------------------------------------
@@ -1495,6 +1509,22 @@ GUI_KEYS = {
     "gui.matteroverdrive.request": "gui.tooltip.button.request",
     "gui.matteroverdrive.search": {"en_us": "Search", "ru_ru": "Поиск"},
     "gui.matteroverdrive.pattern": {"en_us": "%s (pattern %s%%)", "ru_ru": "%s (шаблон %s%%)"},
+    "item.matteroverdrive.matter_scanner": {"en_us": "Matter Scanner", "ru_ru": "Сканер материи"},
+    "key.matteroverdrive.matter_scanner": {"en_us": "Matter Scanner GUI", "ru_ru": "Экран сканера материи"},
+    "tooltip.matteroverdrive.scanner.online": {"en_us": "Online (pattern storage at %s)", "ru_ru": "В сети (хранилище шаблонов в %s)"},
+    "tooltip.matteroverdrive.scanner.offline": {"en_us": "Offline", "ru_ru": "Не в сети"},
+    "tooltip.matteroverdrive.scanner.selected": {"en_us": "Selected: %s", "ru_ru": "Выбрано: %s"},
+    "tooltip.matteroverdrive.scanner.progress": {"en_us": "Progress: %s / 100 %%", "ru_ru": "Прогресс: %s / 100 %%"},
+    "tooltip.matteroverdrive.scanner.open": {"en_us": "Press '%s' to open GUI", "ru_ru": "Нажмите '%s', чтобы открыть экран"},
+    "gui.matteroverdrive.scanner.online": {"en_us": "Online", "ru_ru": "В сети"},
+    "gui.matteroverdrive.scanner.storage_offline": {"en_us": "Pattern storage unreachable", "ru_ru": "Хранилище шаблонов недоступно"},
+    "gui.matteroverdrive.scanner.nothing_selected": {"en_us": "Nothing selected. Point the scanner at a block and hold use.",
+                                                     "ru_ru": "Ничего не выбрано. Наведите сканер на блок и удерживайте ПКМ."},
+    "chat.matteroverdrive.scanner.cannot_analyze": {"en_us": "%s cannot be analyzed!", "ru_ru": "%s нельзя проанализировать!"},
+    "chat.matteroverdrive.scanner.fully_analyzed": {"en_us": "%s is fully analyzed!", "ru_ru": "%s полностью проанализирован!"},
+    "chat.matteroverdrive.scanner.added": {"en_us": "%s added to Pattern Storage. Progress is now at %s%%",
+                                           "ru_ru": "%s добавлен в хранилище шаблонов. Прогресс: %s%%"},
+    "chat.matteroverdrive.scanner.no_space": {"en_us": "No space available for '%s' !", "ru_ru": "Нет места для '%s'!"},
     "gui.matteroverdrive.queue": {"en_us": "Queue: %s requests, %s items", "ru_ru": "Очередь: %s заказов, %s предметов"},
     "gui.matteroverdrive.replicating": {"en_us": "%s x%s (pattern %s%%)", "ru_ru": "%s x%s (шаблон %s%%)"},
     "fluid.matteroverdrive.matter_plasma": {"en_us": "Matter Plasma", "ru_ru": "Плазменная материя"},
