@@ -51,6 +51,7 @@ public final class DevScene {
     private static final java.util.UUID STRANGER = java.util.UUID.fromString("00000000-0000-4000-8000-00000000beef");
     private static BlockPos crashCrate;
     private static matteroverdrive.starmap.GalacticPosition scoutTarget;
+    private static BlockPos galleryA, galleryMap, galleryAnomaly;
     private static BlockPos inscriberPos, solarPos, decomposerPos, recyclerPos, analyzerPos, storagePos, monitorPos, replicatorPos, reactorPos;
 
     private record Step(int at, Consumer<Minecraft> action) {}
@@ -1386,7 +1387,235 @@ public final class DevScene {
             p.removeEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION);
         }));
         at(3423, mc -> mc.options.hideGui = false);
-        at(3426, mc -> mc.stop());
+        // ---- gallery (Modrinth): daylight scenes on the surface, no GUI. ./gradlew runScene -PsceneFrom=3440 ----
+        at(3440, mc -> {
+            mc.options.hideGui = true;
+            mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+            server(mc, p -> {
+                galleryReset(p, 6000);
+                BlockPos c = gallerySite(p, 40);
+                galleryA = c;
+                ServerLevel level = p.level();
+                // the matter network row: analyzer - storage - monitor - replicator (network pipes), decomposer feeding it
+                BlockPos row = c.offset(0, 0, -2);
+                level.setBlockAndUpdate(row.offset(-4, 0, 0), MOBlocks.ANALYZER.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
+                level.setBlockAndUpdate(row.offset(-2, 0, 0), MOBlocks.PATTERN_STORAGE.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
+                level.setBlockAndUpdate(row, MOBlocks.PATTERN_MONITOR.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
+                level.setBlockAndUpdate(row.offset(2, 0, 0), MOBlocks.REPLICATOR.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
+                for (int x : new int[] {-3, -1, 1}) level.setBlockAndUpdate(row.offset(x, 0, 0), MOBlocks.NETWORK_PIPE.get().defaultBlockState());
+                level.setBlockAndUpdate(row.offset(3, 0, 0), MOBlocks.MATTER_PIPE.get().defaultBlockState());
+                level.setBlockAndUpdate(row.offset(4, 0, 0), MOBlocks.DECOMPOSER.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
+                level.setBlockAndUpdate(row.offset(-2, 0, -2), MOBlocks.INSCRIBER.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
+                level.setBlockAndUpdate(row.offset(2, 0, -2), MOBlocks.SOLAR_PANEL.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
+                for (int x : new int[] {-5, 5}) {
+                    level.setBlockAndUpdate(row.offset(x, 0, 1), matteroverdrive.init.MODecorative.TRITANIUM_LAMP.get().defaultBlockState());
+                }
+                var analyzer = (matteroverdrive.block.entity.AnalyzerBlockEntity) level.getBlockEntity(row.offset(-4, 0, 0));
+                analyzer.getEnergy().set(500000);
+                analyzer.getInventory().setStack(matteroverdrive.block.entity.AnalyzerBlockEntity.INPUT, new ItemStack(Items.DIAMOND, 8));
+                ItemStack aDrive = new ItemStack(MOItems.PATTERN_DRIVE.get());
+                MOItems.PATTERN_DRIVE.get().addProgress(aDrive, Items.EMERALD, 40);
+                analyzer.getInventory().setStack(matteroverdrive.block.entity.AnalyzerBlockEntity.DATABASE, aDrive);
+                var storage = (matteroverdrive.block.entity.PatternStorageBlockEntity) level.getBlockEntity(row.offset(-2, 0, 0));
+                storage.getEnergy().set(60000);
+                Item[][] drives = {{Items.IRON_INGOT, Items.DIAMOND}, {Items.GOLD_INGOT, Items.REDSTONE}, {Items.OAK_LOG, Items.COBBLESTONE},
+                        {Items.EMERALD, Items.LAPIS_LAZULI}};
+                for (int i = 0; i < drives.length; i++) {
+                    ItemStack d = new ItemStack(MOItems.PATTERN_DRIVE.get());
+                    for (Item it : drives[i]) MOItems.PATTERN_DRIVE.get().addProgress(d, it, 100);
+                    storage.getInventory().setStack(i, d);
+                }
+                var replicator = (matteroverdrive.block.entity.ReplicatorBlockEntity) level.getBlockEntity(row.offset(2, 0, 0));
+                replicator.getEnergy().set(1000000);
+                replicator.getMatterTank().setMatter(1000);
+                replicator.getInventory().setStack(matteroverdrive.block.entity.ReplicatorBlockEntity.SHIELDING, new ItemStack(MOItems.TRITANIUM_PLATE.get(), 5));
+                replicator.getInventory().setStack(matteroverdrive.block.entity.ReplicatorBlockEntity.OUTPUT, new ItemStack(Items.DIAMOND, 7));
+                replicator.setTask(new matteroverdrive.block.entity.ReplicatorBlockEntity.Task(
+                        new matteroverdrive.matter.ItemPattern(Items.DIAMOND.builtInRegistryHolder(), 100), 64));
+                var decomposer = (matteroverdrive.block.entity.DecomposerBlockEntity) level.getBlockEntity(row.offset(4, 0, 0));
+                decomposer.getEnergy().set(400000);
+                decomposer.getInventory().setStack(matteroverdrive.block.entity.DecomposerBlockEntity.INPUT, new ItemStack(Items.COBBLESTONE, 64));
+                if (level.getBlockEntity(row.offset(-2, 0, -2)) instanceof InscriberBlockEntity inscriber) {
+                    inscriber.getEnergy().set(300000);
+                    inscriber.getInventory().setStack(InscriberBlockEntity.MAIN, new ItemStack(MOItems.ISOLINEAR_CIRCUIT_MK1.get(), 16));
+                    inscriber.getInventory().setStack(InscriberBlockEntity.SECONDARY, new ItemStack(Items.GOLD_INGOT, 16));
+                }
+                galleryCamera(p, c.offset(0, 0, 3), 0.5, 1.6, 0.5, 180f, 22f);
+            });
+        });
+        // the first site is 1000 blocks away: give the client time to load and mesh the chunks
+        at(3490, mc -> shot(mc, "gallery_matter_network"));
+        at(3491, mc -> server(mc, p -> galleryCamera(p, galleryA.offset(4, 0, 2), 0.5, 1.6, 0.5, 150f, 22f)));
+        at(3500, mc -> shot(mc, "gallery_matter_network_2"));
+        // gravitational anomaly held by three stabilizers (1.7.10 guide picture)
+        at(3502, mc -> server(mc, p -> {
+            BlockPos c = gallerySite(p, 80);
+            ServerLevel level = p.level();
+            BlockPos a = c.offset(0, 2, -2);
+            level.setBlockAndUpdate(a, MOBlocks.GRAVITATIONAL_ANOMALY.get().defaultBlockState());
+            if (level.getBlockEntity(a) instanceof matteroverdrive.block.entity.GravitationalAnomalyBlockEntity anomaly) anomaly.setMass(4000);
+            Object[][] stabilizers = {{a.offset(0, 0, -6), Direction.SOUTH}, {a.offset(-6, 0, 0), Direction.EAST}, {a.offset(6, 0, 0), Direction.WEST}};
+            for (Object[] st : stabilizers) {
+                BlockPos sp = (BlockPos) st[0];
+                for (int y = 1; y <= 2; y++) level.setBlockAndUpdate(sp.below(y), matteroverdrive.init.MODecorative.CLEAN.get().defaultBlockState());
+                level.setBlockAndUpdate(sp, MOBlocks.GRAVITATIONAL_STABILIZER.get().defaultBlockState().setValue(MachineBlock.FACING, (Direction) st[1]));
+            }
+            galleryAnomaly = a;
+            // at sunset: unlit additive beams wash out on a sunlit floor (1.7.10 too); the time (synced to the client every
+            // 20 ticks) is picked so the noise gives all three beams some colour
+            level.setDayTime(12612);
+            galleryCamera(p, c.offset(2, 0, 4), 0.5, 2.6, 0.5, 160f, 6f);
+        }));
+        at(3534, mc -> server(mc, p -> {
+            for (BlockPos sp : new BlockPos[] {galleryAnomaly.offset(0, 0, -6), galleryAnomaly.offset(-6, 0, 0), galleryAnomaly.offset(6, 0, 0)}) {
+                if (p.level().getBlockEntity(sp) instanceof matteroverdrive.block.entity.GravitationalStabilizerBlockEntity st) {
+                    MatterOverdrive.LOGGER.info("[scene] stabilizer {} active={} rgb={},{},{}", sp, st.isActive(), st.getBeamColorR(), st.getBeamColorG(), st.getBeamColorB());
+                } else {
+                    MatterOverdrive.LOGGER.info("[scene] stabilizer {} missing: {}", sp, p.level().getBlockState(sp));
+                }
+            }
+            MatterOverdrive.LOGGER.info("[scene] anomaly: {}", p.level().getBlockState(galleryAnomaly));
+        }));
+        at(3535, mc -> shot(mc, "gallery_anomaly"));
+        // fusion reactor around an anomaly
+        at(3537, mc -> server(mc, p -> {
+            p.level().setDayTime(6000);
+            BlockPos c = gallerySite(p, 120);
+            BlockPos controller = c.offset(0, 0, 4);
+            buildReactor(p.level(), controller);
+            galleryCamera(p, controller.offset(6, 0, 4), 0.5, 4.5, 0.5, 145f, 28f);
+        }));
+        at(3566, mc -> server(mc, p -> p.level().getEntitiesOfClass(ItemEntity.class, p.getBoundingBox().inflate(24)).forEach(e -> e.discard())));
+        at(3570, mc -> shot(mc, "gallery_fusion_reactor"));
+        // an android with its shield up in front of the machines
+        at(3572, mc -> {
+            mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT);
+            server(mc, p -> {
+                matteroverdrive.android.Android.setAndroid(p, true);
+                var data = matteroverdrive.android.Android.get(p);
+                data.setStack(matteroverdrive.android.AndroidData.SLOT_BATTERY, MOItems.BATTERY.get().charged());
+                data.getStats().put(matteroverdrive.android.BioticStats.SHIELD.id(), 1);
+                data.setActiveStat(matteroverdrive.android.BioticStats.SHIELD.id());
+                data.setEffect("ShieldLastUse", 0);
+                matteroverdrive.android.Android.onActionKey(p);
+                matteroverdrive.android.Android.sync(p);
+                ItemStack rifle = new ItemStack(MOItems.PHASER_RIFLE.get());
+                matteroverdrive.item.weapon.EnergyWeaponItem.setEnergy(rifle, matteroverdrive.item.weapon.EnergyWeaponItem.CAPACITY);
+                p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, rifle);
+                galleryCamera(p, galleryA.offset(0, 0, 1), 0.5, 0, 0.5, 0f, 8f);
+            });
+        });
+        at(3590, mc -> shot(mc, "gallery_android_shield"));
+        // the android HUD in first person
+        at(3592, mc -> {
+            mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+            mc.options.hideGui = false;
+            server(mc, p -> {
+                var data = matteroverdrive.android.Android.get(p);
+                data.setEffect("Shield", 0);
+                for (var stat : new matteroverdrive.android.BioticStat[] {matteroverdrive.android.BioticStats.NANO_ARMOR,
+                        matteroverdrive.android.BioticStats.CLOAK, matteroverdrive.android.BioticStats.MINIMAP,
+                        matteroverdrive.android.BioticStats.TELEPORT, matteroverdrive.android.BioticStats.NIGHT_VISION}) {
+                    data.getStats().put(stat.id(), stat.maxLevel());
+                }
+                data.setStack(matteroverdrive.android.AndroidData.SLOT_HEAD, new ItemStack(MOItems.ROGUE_ANDROID_HEAD.get()));
+                matteroverdrive.android.Android.sync(p);
+                galleryCamera(p, galleryA.offset(0, 0, 4), 0.5, 0, 0.5, 180f, 12f);
+            });
+        });
+        at(3610, mc -> shot(mc, "gallery_android_hud"));
+        // a phaser beam on a rogue android
+        at(3612, mc -> {
+            // first person: the beam is a camera-facing ribbon, edge-on from behind; the hand needs the GUI shown
+            mc.options.hideGui = false;
+            mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+            server(mc, p -> {
+                matteroverdrive.android.Android.setAndroid(p, false);
+                ItemStack phaser = new ItemStack(MOItems.PHASER.get());
+                matteroverdrive.item.weapon.EnergyWeaponItem.setEnergy(phaser, 32000);
+                phaser.set(matteroverdrive.init.MODataComponents.PHASER_LEVEL.get(), 2);
+                p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, phaser);
+                var rogue = matteroverdrive.init.MOEntities.ROGUE_ANDROID.get().create(p.level(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+                rogue.snapTo(galleryA.getX() + 1.5, galleryA.getY(), galleryA.getZ() + 8.5, 180, 0);
+                rogue.setNoAi(true);
+                rogue.addTag("mo_gallery");
+                p.level().addFreshEntity(rogue);
+                galleryCamera(p, galleryA.offset(0, 0, 2), 0.5, 0, 0.5, -9.5f, 6f);
+            });
+        });
+        at(3622, mc -> mc.options.keyUse.setDown(true));
+        at(3628, mc -> {
+            shot(mc, "gallery_phaser");
+            MatterOverdrive.LOGGER.info("[scene] phaser: using={} item={} rogues={}", mc.player.isUsingItem(), mc.player.getMainHandItem(),
+                    mc.level.getEntitiesOfClass(matteroverdrive.entity.monster.RogueAndroid.class, new AABB(galleryA).inflate(20)).size());
+        });
+        at(3629, mc -> {
+            mc.options.keyUse.setDown(false);
+            mc.options.hideGui = true;
+        });
+        // the tritanium armor: the player in the full set between two armor stands
+        at(3631, mc -> {
+            mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT);
+            server(mc, p -> {
+                p.level().getEntitiesOfClass(net.minecraft.world.entity.Entity.class, new AABB(galleryA).inflate(20),
+                        e -> e.getTags().contains("mo_gallery")).forEach(net.minecraft.world.entity.Entity::discard);
+                p.setItemSlot(EquipmentSlot.HEAD, new ItemStack(MOItems.TRITANIUM_HELMET.get()));
+                p.setItemSlot(EquipmentSlot.CHEST, new ItemStack(MOItems.TRITANIUM_CHESTPLATE.get()));
+                p.setItemSlot(EquipmentSlot.LEGS, new ItemStack(MOItems.TRITANIUM_LEGGINGS.get()));
+                p.setItemSlot(EquipmentSlot.FEET, new ItemStack(MOItems.TRITANIUM_BOOTS.get()));
+                ItemStack shotgun = new ItemStack(MOItems.PLASMA_SHOTGUN.get());
+                matteroverdrive.item.weapon.EnergyWeaponItem.setEnergy(shotgun, matteroverdrive.item.weapon.EnergyWeaponItem.CAPACITY);
+                p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, shotgun);
+                for (int side : new int[] {-1, 1}) {
+                    var stand = net.minecraft.world.entity.EntityType.ARMOR_STAND.create(p.level(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+                    stand.snapTo(galleryA.getX() + 0.5 + side * 1.6, galleryA.getY(), galleryA.getZ() + 1.0, 0, 0);
+                    stand.setItemSlot(EquipmentSlot.HEAD, new ItemStack(MOItems.TRITANIUM_HELMET.get()));
+                    stand.setItemSlot(EquipmentSlot.CHEST, new ItemStack(MOItems.TRITANIUM_CHESTPLATE.get()));
+                    stand.setItemSlot(EquipmentSlot.LEGS, new ItemStack(MOItems.TRITANIUM_LEGGINGS.get()));
+                    stand.setItemSlot(EquipmentSlot.FEET, new ItemStack(MOItems.TRITANIUM_BOOTS.get()));
+                    stand.addTag("mo_gallery");
+                    p.level().addFreshEntity(stand);
+                }
+                galleryCamera(p, galleryA.offset(0, 0, 1), 0.5, 0, 0.5, 0f, 5f);
+            });
+        });
+        at(3650, mc -> shot(mc, "gallery_tritanium_armor"));
+        // the star map hologram at night
+        at(3652, mc -> {
+            mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+            server(mc, p -> {
+                p.level().getEntitiesOfClass(net.minecraft.world.entity.Entity.class, new AABB(galleryA).inflate(20),
+                        e -> e.getTags().contains("mo_gallery")).forEach(net.minecraft.world.entity.Entity::discard);
+                for (EquipmentSlot slot : new EquipmentSlot[] {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
+                    p.setItemSlot(slot, ItemStack.EMPTY);
+                }
+                p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+                BlockPos c = gallerySite(p, 160);
+                galleryMap = c.offset(0, 0, -2);
+                p.level().setBlockAndUpdate(galleryMap, MOBlocks.STAR_MAP.get().defaultBlockState());
+                if (p.level().getBlockEntity(galleryMap) instanceof matteroverdrive.block.entity.StarMapBlockEntity m) m.onPlaced(p);
+                p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
+                        "time set 18000");
+                galleryCamera(p, c.offset(0, 0, 1), 0.5, 0.0, 0.3, 180f, -22f);
+            });
+        });
+        at(3680, mc -> shot(mc, "gallery_star_map"));
+        for (int i = 0; i < 3; i++) {
+            int t = 3682 + i * 26;
+            at(t, mc -> server(mc, p -> {
+                if (p.level().getBlockEntity(galleryMap) instanceof matteroverdrive.block.entity.StarMapBlockEntity m) m.zoom();
+            }));
+            String name = "gallery_star_map_" + (i + 1);
+            at(t + 24, mc -> shot(mc, name));
+        }
+        at(3762, mc -> server(mc, p -> {
+            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
+                    "time set 6000");
+            p.getAbilities().flying = false;
+            p.onUpdateAbilities();
+        }));
+        at(3764, mc -> mc.options.hideGui = false);
+        at(3768, mc -> mc.stop());
     }
 
     /** Shows one item's tooltip in the middle of the screen. */
@@ -1568,6 +1797,54 @@ public final class DevScene {
         }
         reactor.getMatterTank().setMatter(1500);
         reactor.getInventory().setStack(reactor.getBatterySlot(), new ItemStack(MOItems.HC_BATTERY.get()));
+    }
+
+    /** Gallery: day or night, clear sky, a plain player (not an android, no effects or armor), flying. */
+    private static void galleryReset(ServerPlayer p, long time) {
+        ServerLevel level = p.level();
+        level.setDayTime(time);
+        level.setWeatherParameters(6000, 0, false, false);
+        p.removeAllEffects();
+        matteroverdrive.android.Android.setAndroid(p, false);
+        for (EquipmentSlot slot : new EquipmentSlot[] {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
+            p.setItemSlot(slot, ItemStack.EMPTY);
+        }
+        p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+        p.getAbilities().flying = true;
+        p.onUpdateAbilities();
+        level.getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
+                "difficulty normal");
+    }
+
+    /**
+     * Gallery: a 23 x 23 tiled platform on the surface, 1000 + dx blocks east and 1000 south of the spawn; returns its centre on
+     * the floor (the first air block). Everything above it is cleared, the ground below filled.
+     */
+    private static BlockPos gallerySite(ServerPlayer p, int dx) {
+        ServerLevel level = p.level();
+        BlockPos spawn = level.getRespawnData().pos();
+        // far from the spawn: fresh terrain, none of the older scene runs' leftovers in view
+        int x = spawn.getX() + 1000 + dx, z = spawn.getZ() + 1000;
+        level.getChunkSource().getChunk(x >> 4, z >> 4, true);
+        // the ground at the platform's corner: the centre may hold the previous run's machines
+        level.getChunkSource().getChunk((x - 11) >> 4, (z - 11) >> 4, true);
+        int y = level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x - 11, z - 11);
+        BlockPos c = new BlockPos(x, y, z);
+        for (BlockPos b : BlockPos.betweenClosed(c.offset(-11, -4, -11), c.offset(11, 48, 11))) {
+            int dy = b.getY() - y;
+            boolean edge = Math.abs(b.getX() - x) == 11 || Math.abs(b.getZ() - z) == 11;
+            var state = dy >= 0 ? Blocks.AIR.defaultBlockState()
+                    : dy == -1 ? (edge ? matteroverdrive.init.MODecorative.TRITANIUM_PLATE_STRIPE.get() : matteroverdrive.init.MODecorative.FLOOR_TILES.get()).defaultBlockState()
+                    : Blocks.STONE.defaultBlockState();
+            level.setBlock(b, state, Block.UPDATE_CLIENTS | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
+        }
+        level.getEntitiesOfClass(net.minecraft.world.entity.Entity.class, new AABB(c).inflate(14),
+                e -> !(e instanceof net.minecraft.world.entity.player.Player)).forEach(net.minecraft.world.entity.Entity::discard);
+        return c;
+    }
+
+    private static void galleryCamera(ServerPlayer p, BlockPos at, double dx, double dy, double dz, float yaw, float pitch) {
+        p.teleportTo(p.level(), at.getX() + dx, at.getY() + dy, at.getZ() + dz, Set.of(), yaw, pitch, false);
     }
 
     private static ItemStack findWeapon(ServerPlayer p, net.minecraft.world.item.Item item) {

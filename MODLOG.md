@@ -551,6 +551,15 @@
   transparent, no longer a bright glow; and the particles are 1.7.10 GravitationalAnomalyParticle (`client/AnomalyParticles`):
   one dark grey speck per tick from the break-range sphere, pulled to the core by a tenth of the distance per tick,
   generic sprites 7 to 0, instead of the vanilla purple reverse portal particles.
+- **Release 1.0.0 + Modrinth page** (project `matter-overdrive-1.21-unofficial-port`, id ahhDxumU, draft until submitted).
+  `docs/modrinth/`: icon and banner (`tools/make_modrinth_art.py` builds them from the original logo; needs Pillow),
+  description.md (as uploaded: gallery / banner images on the Modrinth CDN), changelog-1.0.0.md, gallery/*.jpg +
+  gallery.json (titles, descriptions, order). The gallery comes from DevScene's gallery steps
+  (`./gradlew runScene -PsceneFrom=3440`, English client): daylight platforms 1000 blocks from the spawn (fresh terrain),
+  the anomaly at sunset (unlit additive beams vanish on a sunlit floor; the time is picked from the noise), the phaser
+  in first person (its camera-facing ribbon is edge-on from behind). The mod now has a logo for the mods list
+  (`matteroverdrive_logo.png`, next release). Modrinth API: token in `~/.gradle/gradle.properties` (`modrinthToken`);
+  the client/server environment is set per version via v3 (`environment: client_and_server`).
 - Cloud (Linux) notes: regenerating resources rewrites the .ogg and ffmpeg-made .png bytes (different ffmpeg/oggenc
   builds) - `git checkout` them. Screenshots: `Xvfb :99` + `DISPLAY=:99 ./gradlew runScene` (software GL is slow; give
   menus extra ticks), world created by `runServer` with a flat creative server.properties, then moved to run/saves;

@@ -1,0 +1,107 @@
+[
+ {
+  "file": "matter_network.jpg",
+  "title": "Matter replication",
+  "description": "Analyzer, pattern storage, pattern monitor and replicator on one matter network, with a decomposer feeding it matter.",
+  "featured": true,
+  "ordering": 0
+ },
+ {
+  "file": "matter_network_front.jpg",
+  "title": "The matter network",
+  "description": "Scan items into patterns, then replicate them from Matter Plasma.",
+  "featured": false,
+  "ordering": 1
+ },
+ {
+  "file": "android.jpg",
+  "title": "Android shield",
+  "description": "Become an android: the biotic shield stops projectiles and explosions.",
+  "featured": false,
+  "ordering": 2
+ },
+ {
+  "file": "android_hud.jpg",
+  "title": "Android HUD",
+  "description": "Health, battery and speed, ability cooldowns and the radar.",
+  "featured": false,
+  "ordering": 3
+ },
+ {
+  "file": "weapons.jpg",
+  "title": "Phaser",
+  "description": "Energy weapons: the phaser beam on a rogue android.",
+  "featured": false,
+  "ordering": 4
+ },
+ {
+  "file": "tritanium_armor.jpg",
+  "title": "Tritanium armor",
+  "description": "The original 3D tritanium armor.",
+  "featured": false,
+  "ordering": 5
+ },
+ {
+  "file": "anomaly.jpg",
+  "title": "Gravitational anomaly",
+  "description": "Three gravitational stabilizers holding an anomaly in check.",
+  "featured": false,
+  "ordering": 6
+ },
+ {
+  "file": "fusion_reactor.jpg",
+  "title": "Fusion reactor",
+  "description": "A fusion reactor built around a gravitational anomaly.",
+  "featured": false,
+  "ordering": 7
+ },
+ {
+  "file": "star_map.jpg",
+  "title": "Star map",
+  "description": "The holographic star map showing the whole galaxy.",
+  "featured": false,
+  "ordering": 8
+ },
+ {
+  "file": "star_map_planet.jpg",
+  "title": "Your homeworld",
+  "description": "Build bases, factories and ship hangars on your planets.",
+  "featured": false,
+  "ordering": 9
+ },
+ {
+  "file": "android_station.jpg",
+  "title": "Android Station",
+  "description": "Unlock biotic abilities and fit bionic parts.",
+  "featured": false,
+  "ordering": 10
+ },
+ {
+  "file": "weapon_station.jpg",
+  "title": "Weapon Station",
+  "description": "Customise weapons with barrel, colour, sight and battery modules.",
+  "featured": false,
+  "ordering": 11
+ },
+ {
+  "file": "data_pad.jpg",
+  "title": "Data Pad guide",
+  "description": "The full in-game guide from the original mod.",
+  "featured": false,
+  "ordering": 12
+ },
+ {
+  "file": "world.jpg",
+  "title": "Underwater base",
+  "description": "Find android houses, crashed ships, an underwater base and more.",
+  "featured": false,
+  "ordering": 13
+ },
+ {
+  "file": "cargo_ship.jpg",
+  "title": "Crashed cargo ship",
+  "description": "Explore ruins full of loot and rogue androids.",
+  "featured": false,
+  "ordering": 14
+ }
+]
