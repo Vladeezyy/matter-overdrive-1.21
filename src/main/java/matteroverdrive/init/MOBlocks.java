@@ -121,6 +121,9 @@ public final class MOBlocks {
                     .requiresCorrectToolForDrops());
 
     /** 1.7.10 BlockContractMarket: a BlockMonitor, hardness 20. */
+    public static final DeferredBlock<matteroverdrive.block.StarMapBlock> STAR_MAP = BLOCKS.registerBlock("star_map",
+            matteroverdrive.block.StarMapBlock::new, p -> p.mapColor(MapColor.METAL).strength(20f, 9f).sound(SoundType.METAL)
+                    .requiresCorrectToolForDrops().noOcclusion().lightLevel(s -> 10));
     public static final DeferredBlock<matteroverdrive.block.ContractMarketBlock> CONTRACT_MARKET = BLOCKS.registerBlock("contract_market",
             matteroverdrive.block.ContractMarketBlock::new, p -> p.mapColor(MapColor.METAL).strength(20f, 9f).sound(SoundType.METAL)
                     .requiresCorrectToolForDrops().noOcclusion().lightLevel(s -> 8));

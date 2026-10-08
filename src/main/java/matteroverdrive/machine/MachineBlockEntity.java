@@ -237,6 +237,12 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
         return true;
     }
 
+    /** 1.7.10 onPlaced of machines that belong to whoever places them (the star map). */
+    protected void claimFor(net.minecraft.world.entity.player.Player player) {
+        owner = player.getUUID();
+        ownerChanged();
+    }
+
     private void ownerChanged() {
         setChanged();
         if (level != null) level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);

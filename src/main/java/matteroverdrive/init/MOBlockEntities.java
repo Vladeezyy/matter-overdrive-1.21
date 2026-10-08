@@ -84,5 +84,9 @@ public final class MOBlockEntities {
             BLOCK_ENTITIES.register("contract_market", () -> new BlockEntityType<>(matteroverdrive.block.entity.ContractMarketBlockEntity::new,
                     MOBlocks.CONTRACT_MARKET.get()));
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<matteroverdrive.block.entity.StarMapBlockEntity>> STAR_MAP =
+            BLOCK_ENTITIES.register("star_map", () -> new BlockEntityType<>(matteroverdrive.block.entity.StarMapBlockEntity::new,
+                    MOBlocks.STAR_MAP.get()));
+
     private MOBlockEntities() {}
 }

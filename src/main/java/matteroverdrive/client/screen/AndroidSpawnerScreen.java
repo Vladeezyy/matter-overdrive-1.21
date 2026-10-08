@@ -113,7 +113,7 @@ public class AndroidSpawnerScreen extends MachineScreen<AndroidSpawnerMenu> {
     }
 
     /** 1.7.10 MOStringHelper.formatRemainingTime. */
-    static String formatRemainingTime(float seconds) {
+    public static String formatRemainingTime(float seconds) {
         if (seconds > 3600) return Math.round(seconds / 3600) + " hr";
         if (seconds > 60) return Math.round(seconds / 60) + " min";
         return Math.round(seconds) + " sec";

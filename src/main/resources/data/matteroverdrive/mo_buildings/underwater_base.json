@@ -868,7 +868,10 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:decorative_holo_matrix"
+          "Name": "matteroverdrive:star_map",
+          "Properties": {
+            "facing": "west"
+          }
         }
       ],
       "noise": false,

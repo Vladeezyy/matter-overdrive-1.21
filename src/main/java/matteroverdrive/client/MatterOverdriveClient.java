@@ -33,6 +33,27 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 @Mod(value = MatterOverdrive.MODID, dist = Dist.CLIENT)
 @EventBusSubscriber(modid = MatterOverdrive.MODID, value = Dist.CLIENT)
 public class MatterOverdriveClient {
+    @SubscribeEvent
+    static void pipelines(net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent event) {
+        matteroverdrive.client.starmap.HoloRenderTypes.register(event);
+    }
+
+    /** 1.7.10 GalaxyClient.onClientTick: the client's galaxy runs its travel events too. */
+    @SubscribeEvent
+    static void galaxyTick(net.neoforged.neoforge.client.event.ClientTickEvent.Pre event) {
+        var mc = net.minecraft.client.Minecraft.getInstance();
+        var galaxy = matteroverdrive.starmap.GalaxyClient.getGalaxy();
+        if (galaxy != null && mc.level != null && !mc.isPaused() && mc.level.dimension() == net.minecraft.world.level.Level.OVERWORLD) {
+            galaxy.update(mc.level);
+        }
+    }
+
+    /** Leaving a world forgets its galaxy. */
+    @SubscribeEvent
+    static void loggedOut(net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.LoggingOut event) {
+        matteroverdrive.starmap.GalaxyClient.setGalaxy(null);
+    }
+
     /** 1.7.10 BlockDecorative.colorMultiplier / BlockTritaniumCrate.getBlockColor: plates and crate overlays take their dye colour. */
     @SubscribeEvent
     static void blockColors(net.neoforged.neoforge.client.event.RegisterColorHandlersEvent.Block event) {
@@ -109,6 +130,7 @@ public class MatterOverdriveClient {
     static void registerRenderers(net.neoforged.neoforge.client.event.EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(matteroverdrive.init.MOEntities.PLASMA_BOLT.get(), PlasmaBoltRenderer::new);
         event.registerBlockEntityRenderer(matteroverdrive.init.MOBlockEntities.WEAPON_STATION.get(), WeaponStationRenderer::new);
+        event.registerBlockEntityRenderer(matteroverdrive.init.MOBlockEntities.STAR_MAP.get(), matteroverdrive.client.starmap.StarMapRenderer::new);
         event.registerBlockEntityRenderer(matteroverdrive.init.MOBlockEntities.HOLO_SIGN.get(), HoloSignRenderer::new);
         event.registerBlockEntityRenderer(matteroverdrive.init.MOBlockEntities.GRAVITATIONAL_ANOMALY.get(), AnomalyRenderer::new);
         event.registerEntityRenderer(matteroverdrive.init.MOEntities.ROGUE_ANDROID.get(), RogueAndroidRenderer::melee);

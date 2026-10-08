@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "active=false,facing=north": {
+      "model": "matteroverdrive:block/star_map"
+    },
+    "active=true,facing=north": {
+      "model": "matteroverdrive:block/star_map"
+    },
+    "active=false,facing=east": {
+      "model": "matteroverdrive:block/star_map",
+      "y": 90
+    },
+    "active=true,facing=east": {
+      "model": "matteroverdrive:block/star_map",
+      "y": 90
+    },
+    "active=false,facing=south": {
+      "model": "matteroverdrive:block/star_map",
+      "y": 180
+    },
+    "active=true,facing=south": {
+      "model": "matteroverdrive:block/star_map",
+      "y": 180
+    },
+    "active=false,facing=west": {
+      "model": "matteroverdrive:block/star_map",
+      "y": 270
+    },
+    "active=true,facing=west": {
+      "model": "matteroverdrive:block/star_map",
+      "y": 270
+    }
+  }
+}

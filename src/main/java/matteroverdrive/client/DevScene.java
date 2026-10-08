@@ -915,7 +915,77 @@ public final class DevScene {
             p.onUpdateAbilities();
             p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 0f, false);
         }));
-        at(2516, mc -> mc.stop());
+        // 7s: a star map showing the galaxy, then zoomed to the quadrant, the star, the planet, planet stats; access denied
+        at(2520, mc -> server(mc, p -> {
+            BlockPos base = origin.above(30);
+            for (BlockPos pos : BlockPos.betweenClosed(base.offset(-8, -1, -14), base.offset(8, 8, 8))) {
+                p.level().setBlock(pos, pos.getY() < base.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
+                        Block.UPDATE_CLIENTS | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
+            }
+            BlockPos map = base.offset(0, 0, -4);
+            p.level().setBlockAndUpdate(map, matteroverdrive.init.MOBlocks.STAR_MAP.get().defaultBlockState());
+            if (p.level().getBlockEntity(map) instanceof matteroverdrive.block.entity.StarMapBlockEntity m) m.onPlaced(p);
+            MatterOverdrive.LOGGER.info("[scene] homeworld: {}", matteroverdrive.starmap.GalaxyServer.getHomeworld(p) == null ? null
+                    : matteroverdrive.starmap.GalaxyServer.getHomeworld(p).getName());
+            p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+            p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() + 1.5, Set.of(), 180f, -16f, false);
+            // the hologram is additive: night shows it like a dark room did in 1.7.10
+            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
+                    "time set 18000");
+        }));
+        at(2522, mc -> mc.options.hideGui = true);
+        String[] zooms = {"galaxy", "quadrant", "star", "planet", "planet_stats"};
+        for (int i = 0; i < zooms.length; i++) {
+            int t = 2540 + i * 30;
+            String name = zooms[i];
+            at(t, mc -> shot(mc, "star_map_" + name));
+            at(t + 2, mc -> server(mc, p -> {
+                if (p.level().getBlockEntity(origin.above(30).offset(0, 0, -4)) instanceof matteroverdrive.block.entity.StarMapBlockEntity m) m.zoom();
+            }));
+        }
+        // planet stats with another planet of the system selected: both planets side by side
+        at(2694, mc -> server(mc, p -> {
+            if (!(p.level().getBlockEntity(origin.above(30).offset(0, 0, -4)) instanceof matteroverdrive.block.entity.StarMapBlockEntity m)) return;
+            var home = matteroverdrive.starmap.GalaxyServer.getHomeworld(p);
+            if (home == null) return;
+            // another planet: of the home system, else of the nearest star with planets
+            var galaxy = matteroverdrive.starmap.GalaxyServer.getGalaxy();
+            matteroverdrive.starmap.Planet other = null;
+            double best = Double.MAX_VALUE;
+            for (var star : home.getStar().getQuadrant().getStars()) {
+                for (var planet : star.getPlanets()) {
+                    double d = star.getPosition().distanceTo(home.getStar().getPosition());
+                    if (planet != home && d < best) {
+                        best = d;
+                        other = planet;
+                    }
+                }
+            }
+            if (other != null) m.setDestination(matteroverdrive.starmap.GalacticPosition.of(other));
+            m.setZoomLevel(4);
+            m.sync();
+        }));
+        at(2725, mc -> shot(mc, "star_map_planet_pair"));
+        at(2728, mc -> server(mc, p -> {
+            if (!(p.level().getBlockEntity(origin.above(30).offset(0, 0, -4)) instanceof matteroverdrive.block.entity.StarMapBlockEntity m)) return;
+            ItemStack remove = new ItemStack(MOItems.SECURITY_PROTOCOL.get());
+            remove.set(matteroverdrive.init.MODataComponents.SECURITY_OWNER.get(), p.getUUID());
+            m.unclaim(remove);
+            ItemStack claim = new ItemStack(MOItems.SECURITY_PROTOCOL.get());
+            claim.set(matteroverdrive.init.MODataComponents.SECURITY_OWNER.get(), STRANGER);
+            m.claim(claim);
+            p.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY() + 30, origin.getZ() - 1.5, Set.of(), 180f, 15f, false);
+        }));
+        at(2745, mc -> shot(mc, "star_map_access_denied"));
+        at(2746, mc -> server(mc, p -> {
+            p.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
+            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
+                    "time set 6000");
+            p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 0f, false);
+        }));
+        at(2747, mc -> mc.options.hideGui = false);
+        at(2750, mc -> mc.stop());
     }
 
     private static void at(int t, Consumer<Minecraft> action) {

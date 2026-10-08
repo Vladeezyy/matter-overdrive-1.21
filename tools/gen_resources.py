@@ -1231,6 +1231,31 @@ w(A / "items/security_protocol.json", {"model": {"type": "minecraft:select", "pr
     "fallback": {"type": "minecraft:model", "model": f"{MOD}:item/security_protocol_empty"}}})
 shaped("security_protocol", mid("security_protocol"), ["PP", "CP"], {"P": "minecraft:paper", "C": mid("isolinear_circuit_mk1")})
 
+# --- phase 7s: star map --------------------------------------------------------------------------------------
+# 1.7.10 BlockStarMap: bounds 9/16 tall, weapon_station_top / _bottom and starmap_side; TESR hologram above it
+cp(ref / "textures/blocks/starmap_side.png", A / "textures/block/starmap_side.png")
+w(A / "models/block/star_map.json", {"parent": "minecraft:block/block", "textures": {
+    "top": f"{MOD}:block/weapon_station_top", "side": f"{MOD}:block/starmap_side", "bottom": f"{MOD}:block/weapon_station_bottom",
+    "particle": f"{MOD}:block/starmap_side"}, "elements": [{"from": [0, 0, 0], "to": [16, 9, 16], "faces": {
+        "up": {"texture": "#top"}, "down": {"texture": "#bottom", "cullface": "down"},
+        **{d: {"uv": [0, 7, 16, 16], "texture": "#side", **({"cullface": d})} for d in ["north", "south", "east", "west"]}}}]})
+facing_blockstate("star_map", f"{MOD}:block/star_map")
+w(D / "loot_table/blocks/star_map.json", self_drop("star_map"))
+for tag in ["mineable/pickaxe", "needs_iron_tool"]:
+    p = TAGS / f"minecraft/tags/block/{tag}.json"
+    w(p, {"values": json.loads(p.read_text())["values"] + [mid("star_map")]})
+shaped("star_map", mid("star_map"), [" S ", "CFC", "GMR"],
+       {"S": mid("security_protocol"), "C": mid("isolinear_circuit_mk3"), "F": mid("forcefield_emitter"),
+        "G": "minecraft:glowstone_dust", "M": mid("machine_casing"), "R": "minecraft:redstone"})
+# hologram: the beam texture, the additive particle sheet (star icons), holo icons; star names for the generator
+cp(ref / "textures/fx/hologram_beam.png", A / "textures/fx/hologram_beam.png")
+cp(ref / "textures/particle/particles_additive.png", A / "textures/particle/particles_additive.png")
+for icon in ["page_icon_star", "page_icon_planet", "page_icon_galaxy", "page_icon_quadrant", "icon_size", "holo_factory",
+             "icon_shuttle", "smile", "battery", "arrow_right"]:
+    cp(ref / "textures/gui/items" / f"{icon}.png", A / "textures/gui/holo" / f"{icon}.png")
+for f in ["star_names", "star_prefixes", "star_suffixes"]:
+    cp(ref / "info" / f"{f}.txt", A / "info" / f"{f}.txt")
+
 # --- phase 7b: mobs -----------------------------------------------------------------------------------------
 import zlib
 
@@ -1348,8 +1373,8 @@ DECOR_COLORS = {0xd4b108: k_plain(mid("decorative_stripes")), 0xb6621e: k_plain(
 CRATES_ALL = [k_facing(mid(f"tritanium_crate_{d}")) for d in ITEM_DYE]
 def crate(dye):
     return k_facing(mid(f"tritanium_crate_{dye}"))
-# Not ported yet: the star map gets a stand-in (swap it here when it exists).
-STAR_MAP = k_plain(mid("decorative_holo_matrix"))
+# 1.7.10 star map blocks (phase 7s).
+STAR_MAP = k_facing(mid("star_map"))
 TRANSPORTER = k_facing(mid("transporter"))
 CONNECT = {mid("network_pipe"), mid("heavy_matter_pipe"), mid("matter_pipe"), "minecraft:oak_fence"}
 
@@ -1904,6 +1929,10 @@ for src_name, dst_name in [("en_US", "en_us"), ("ru_RU", "ru_ru")]:
     # 7p: guide categories, groups and named entries: guide.<kind>.<name>.name -> guide.matteroverdrive.<kind>.<name>
     for k in [k for k in en if k.startswith("guide.") and k.endswith(".name")]:
         lang["guide." + MOD + "." + k[len("guide."):-len(".name")]] = src.get(k) or en[k]
+    # 7s: star map
+    lang[f"block.{MOD}.star_map"] = src.get("tile.star_map.name") or en["tile.star_map.name"]
+    lang[f"block.{MOD}.star_map.details"] = src.get("tile.star_map.details") or en["tile.star_map.details"]
+    lang[f"gui.{MOD}.hologram.access_denied"] = src.get("gui.hologram.access_denied") or en["gui.hologram.access_denied"]
     # 7r: security protocol names / details and the machine rights alerts ($0 = the machine)
     for t in ["empty", "claim", "access", "remove"]:
         lang[f"item.{MOD}.security_protocol.{t}"] = src.get(f"item.security_protocol.{t}.name") or en[f"item.security_protocol.{t}.name"]

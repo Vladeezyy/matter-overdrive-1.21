@@ -186,6 +186,7 @@ public final class MOItems {
     public static final DeferredItem<BlockItem> MICROWAVE = block("microwave", MOBlocks.MICROWAVE);
     public static final DeferredItem<BlockItem> TRANSPORTER = block("transporter", MOBlocks.TRANSPORTER);
     public static final DeferredItem<BlockItem> CONTRACT_MARKET = block("contract_market", MOBlocks.CONTRACT_MARKET);
+    public static final DeferredItem<BlockItem> STAR_MAP = block("star_map", MOBlocks.STAR_MAP);
     public static final DeferredItem<BlockItem> ANDROID_SPAWNER = block("android_spawner", MOBlocks.ANDROID_SPAWNER);
     public static final DeferredItem<matteroverdrive.item.TransportFlashDriveItem> TRANSPORT_FLASH_DRIVE = item("transport_flash_drive",
             matteroverdrive.item.TransportFlashDriveItem::new, p -> p);

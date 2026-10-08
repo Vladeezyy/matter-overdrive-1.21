@@ -78,6 +78,7 @@ public final class MOGameTests {
         QuestGameTests.addAll();
         ContractGameTests.addAll();
         SecurityGameTests.addAll();
+        StarMapGameTests.addAll();
         TESTS.forEach((name, spec) -> FUNCTIONS.register(name, () -> spec.body()));
     }
 

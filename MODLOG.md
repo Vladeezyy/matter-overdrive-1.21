@@ -393,6 +393,27 @@
   - Deviations: the holo sign isn't a machine in this port, so it can't be claimed (1.7.10 checked its owner too);
     the protocol's type is a component instead of the damage value; we_must_know's info text shows "$block" like
     1.7.10 (only the objective replaced it).
+- **7s ✅** Galaxy + star map block (1.7.10 starmap/: Galaxy, Quadrant, Star, Planet, TravelEvent, GalacticPosition,
+  GalaxyGenerator, StarGen, PlanetGen*, GalaxyServer / Client, PacketUpdateGalaxy / Planet / TravelEvents / StarLoading;
+  TileEntityMachineStarMap, BlockStarMap, TileEntityRendererStarMap + StarMapRender*). `matteroverdrive.starmap`: the
+  overworld's galaxy is generated from the world seed with java.util.Random exactly like 1.7.10 (2048-2303 stars,
+  gaussian sigma 1/3, 27 quadrants, 1-3 planets, 7 star types by weight, black body colours, names from
+  info/star_*.txt with prefixes / suffixes), saved to `<world>/galaxy.dat` (1.7.10 NBT keys) when dirty, one quadrant
+  updated per tick, travel events completed. A joining player gets the galaxy (stars without planets) and a homeworld
+  (random quadrant, first free system: 8 building / 10 fleet spaces). Star map block (9 px table, light 10, hardness
+  20, recipe " S "/"CFC"/"GMR"): placing it claims it and points it at the placer's homeworld; sneak-use zooms galaxy ->
+  quadrant -> star (-> planet -> planet stats when a planet is selected). `StarMapRenderer`: hologram beam, the stars
+  as additive particles (selected / current markers, route line, travelling ships), the quadrant, the star (wire sphere,
+  pulse, planets on orbits with names / [Home] / alien font for unknown ones), the planet (black core + wire sphere,
+  building cubes, ship paths), the two planets for planet stats, info panels (system counts, planet count, distance,
+  size, factories / fleet / happiness / population / power), red "ACCESS DENIED" for others. Custom additive pipelines
+  (`HoloRenderTypes`). The android house and underwater base now place real star maps (STAR_MAP stand-in gone). 87 GameTests.
+  - Deviations: new galaxies get version 1 (1.7.10 never set it, so every load "regenerated" the unclaimed stars with
+    a fresh random type); the client asks for a star's planets when it shows them (1.7.10's Star buffer didn't carry
+    planets and PacketStarLoading was never sent, so clients only knew changed planets) and gets every homeworld on
+    join; the star's sphere.obj is a 16x12 UV sphere (its points are small particles); the info panel is placed to be
+    readable from the player's side; animations use game time. The star map screen comes with 7t (plain use does nothing
+    yet), the homeworld's starting base and scout ship with 7u.
 - Cloud (Linux) notes: regenerating resources rewrites the .ogg and ffmpeg-made .png bytes (different ffmpeg/oggenc
   builds) - `git checkout` them. Screenshots: `Xvfb :99` + `DISPLAY=:99 ./gradlew runScene` (software GL is slow; give
   menus extra ticks), world created by `runServer` with a flat creative server.properties, then moved to run/saves;
@@ -404,11 +425,10 @@
 2. ~~Mutant scientist~~ ✅ 7d (underwater base spawns one named "Mitko'Urrr", persistent, on the star map block).
 3. ~~Structures~~ ✅ 7f (the mad scientist house is a village piece: comes with the mad scientist in item 5).
 4. ~~Transporter, omni tool, matter scanner, portable decomposer, matter container, microwave~~ ✅ 7g-7k.
-5. Star map / galaxy / ships / buildings; quests / dialogs / mad scientist ✅ 7m-7p, contract market ✅ 7q, android
+5. Star map ✅ 7s (galaxy + block + hologram); next 7t star map screen, 7u buildings / ships; quests / dialogs / mad scientist ✅ 7m-7p, contract market ✅ 7q, android
    spawner ✅ 7l. Security protocol + crash landing ✅ 7r.
 - Deviations so far: legendary rogue android parts drop without bonus attributes; no rogue android teams/paths;
-  legendary weapons have no stat bonuses; buildings: star map → holo matrix stand-in (swap STAR_MAP in
-  gen_resources.py when ported), underwater base needs 16+ water (1.7.10: 27+, rare in today's deep
+  legendary weapons have no stat bonuses; buildings: underwater base needs 16+ water (1.7.10: 27+, rare in today's deep
   oceans) and sinks into the floor to stay submerged, no "generate buildings" config (use a datapack), not rotated
   (1.7.10 never rotated them either).
 
@@ -416,7 +436,7 @@
 **Workflow**
 - Resources: never hand-edit `src/main/resources/{assets,data}` — regenerate:
   `rm -rf src/main/resources/{assets,data} && python3 -I tools/gen_resources.py ~/mo-reference/mo-1.7.10/src/main/resources/assets/mo src/main/resources`
-- Tests: `./gradlew runGameTestServer` (85 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
+- Tests: `./gradlew runGameTestServer` (87 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
   `FunctionGameTestInstance`, custom 12³ structure `matteroverdrive:gametest_area`, time-of-day via `TestEnvironmentDefinition.TimeOfDay`,
   `makeMockServerPlayerInLevel`). Visual: `./gradlew runScene` → `run/screenshots/scene_*.png` (DevScene, world `run/saves/mo_scene`;
   pristine copy = "Новый мир (2)"; needs `pauseOnLostFocus=false`; selected hotbar slot is client-side; place blocks with
