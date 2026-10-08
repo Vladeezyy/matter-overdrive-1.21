@@ -522,8 +522,10 @@
   `IClientItemExtensions.getGenericArmorModel` (not getHumanoidArmorModel: NeoForge copies the vanilla model's part
   visibility over) and `getArmorTexture`: layer 1 for helmet / chest / legs, layer 2 for the boots. The worn textures
   are now Tritanium_Armor2_layer_1/2 (the vanilla-layout tritanium_layer_* are no longer used).
-  - Note: the 1.7.10 textures leave the lower arms / legs bare, and the armor sits on the skin (inflate 0), so a modern
-    skin's outer layers (sleeves, jacket) show through where the armor texture is transparent.
+  - Modern skins: the model sits on the skin (inflate 0) like 1.7.10, whose skins had no outer layer; a modern skin's
+    outer layer (hat +0.5, jacket / sleeves / pants +0.25) would cover the armor. `RenderPlayerEvent.Pre` hides a
+    player's overlay under each worn piece (helmet: hat; chestplate: jacket + sleeves; leggings / boots: pants). The
+    base skin still shows through the transparent bands of the 1.7.10 texture (elbows, knees), as it did in 1.7.10.
 - Cloud (Linux) notes: regenerating resources rewrites the .ogg and ffmpeg-made .png bytes (different ffmpeg/oggenc
   builds) - `git checkout` them. Screenshots: `Xvfb :99` + `DISPLAY=:99 ./gradlew runScene` (software GL is slow; give
   menus extra ticks), world created by `runServer` with a flat creative server.properties, then moved to run/saves;

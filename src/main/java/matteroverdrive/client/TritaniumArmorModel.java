@@ -27,7 +27,12 @@ import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
  * only the head, the chestplate the body and arms, the leggings only the legs and the boots the legs (inflated by
  * 0.5) with the toes; the boots use layer 2, everything else layer 1. One baked model per slot: armor is drawn later
  * from the submitted model, so a shared model's visibility can't change between slots.
+ * <p>
+ * The model sits on the skin (inflate 0) like 1.7.10, where skins had no outer layer. A modern skin's outer layer
+ * (hat +0.5, jacket / sleeves / pants +0.25) would cover it, so a player's overlay is hidden under each worn piece:
+ * the helmet hides the hat, the chestplate the jacket and sleeves, the leggings and boots the pants.
  */
+@net.neoforged.fml.common.EventBusSubscriber(modid = MatterOverdrive.MODID, value = net.neoforged.api.distmarker.Dist.CLIENT)
 public final class TritaniumArmorModel {
     public static final ResourceLocation LAYER_1 = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/entity/equipment/humanoid/tritanium.png");
     public static final ResourceLocation LAYER_2 = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/entity/equipment/humanoid_leggings/tritanium.png");
@@ -91,6 +96,26 @@ public final class TritaniumArmorModel {
             return slot(stack) == EquipmentSlot.FEET ? LAYER_2 : LAYER_1;
         }
     };
+
+    @net.neoforged.bus.api.SubscribeEvent
+    static void hideSkinOverlay(net.neoforged.neoforge.client.event.RenderPlayerEvent.Pre<?> event) {
+        var state = event.getRenderState();
+        if (isTritanium(state.headEquipment)) state.showHat = false;
+        if (isTritanium(state.chestEquipment)) {
+            state.showJacket = false;
+            state.showLeftSleeve = false;
+            state.showRightSleeve = false;
+        }
+        if (isTritanium(state.legsEquipment) || isTritanium(state.feetEquipment)) {
+            state.showLeftPants = false;
+            state.showRightPants = false;
+        }
+    }
+
+    private static boolean isTritanium(ItemStack stack) {
+        return stack.is(matteroverdrive.init.MOItems.TRITANIUM_HELMET.get()) || stack.is(matteroverdrive.init.MOItems.TRITANIUM_CHESTPLATE.get())
+                || stack.is(matteroverdrive.init.MOItems.TRITANIUM_LEGGINGS.get()) || stack.is(matteroverdrive.init.MOItems.TRITANIUM_BOOTS.get());
+    }
 
     private static EquipmentSlot slot(ItemStack stack) {
         Equippable equippable = stack.get(DataComponents.EQUIPPABLE);
