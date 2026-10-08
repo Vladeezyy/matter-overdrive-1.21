@@ -550,5 +550,19 @@
 - Sounds must be mono ogg: ffmpeg → mono wav → `oggenc` (vorbis-tools); ffmpeg's built-in vorbis is stereo-only.
 
 ## Next
-- Phase 7: world & extras (rogue androids, mad scientist, structures, transporter, star map, quests, holo sign, crate, food).
-- Polish later: machine item tooltip with stored energy, machine sounds, custom tritanium armor model, matter scanner.
+- Phase 7 ✅. Leftovers done: legendary bonuses, network destination filters, machine renderers.
+- Leftovers still to do (user: any order):
+  1. machine sounds + the machine item tooltip with stored energy;
+  2. android shield bubble, hit flash and shield loop sound; teleport target marker;
+  3. custom tritanium armor model (1.7.10 Tritanium_Armor2_*).
+
+## Handover (2026-10-08, cloud -> local)
+- Branch `main-uvidhk`, everything committed and pushed. Last commit: "Leftovers: machine renderers ...". 93 GameTests
+  pass (`./gradlew runGameTestServer`).
+- DevScene now builds the scene at the world spawn on the flat surface (`level.getMinY() + 4`), not at the player's
+  saved position. A local mo_scene world that isn't a default superflat may put the floor elsewhere: adjust `build()`
+  if so. The latest scene steps are 3020-3164 (machine renderers); `-PsceneFrom=3000` reproduces them. Steps compress
+  when the client lags (several ticks per frame), so give teleports about 20 ticks before a shot.
+- Screenshots for the machine renderers were taken in the cloud (Xvfb). On Windows/macOS just run `./gradlew runScene`.
+- Regenerating resources on another machine changes .ogg/.png bytes: `git checkout` those, and commit only the
+  json/obj changes.
