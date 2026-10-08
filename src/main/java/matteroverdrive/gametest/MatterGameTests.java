@@ -1,11 +1,13 @@
 package matteroverdrive.gametest;
 
+import matteroverdrive.block.entity.AnalyzerBlockEntity;
 import matteroverdrive.block.entity.DecomposerBlockEntity;
 import matteroverdrive.block.entity.MatterPipeBlockEntity;
 import matteroverdrive.block.entity.RecyclerBlockEntity;
 import matteroverdrive.init.MOBlocks;
 import matteroverdrive.init.MOItems;
 import matteroverdrive.item.MatterDustItem;
+import matteroverdrive.item.PatternDriveItem;
 import matteroverdrive.machine.MachineInventory;
 import matteroverdrive.matter.MatterRegistry;
 import net.minecraft.core.BlockPos;
@@ -24,6 +26,8 @@ final class MatterGameTests {
         MOGameTests.add("decomposer_rejects_no_matter", 20, false, MatterGameTests::decomposerRejects);
         MOGameTests.add("recycler_refines_dust", 200, false, MatterGameTests::recyclerRefines);
         MOGameTests.add("pipes_carry_matter", 200, false, MatterGameTests::pipesCarryMatter);
+        MOGameTests.add("analyzer_builds_pattern", 300, false, MatterGameTests::analyzerBuildsPattern);
+        MOGameTests.add("pattern_drive_limits", 20, false, MatterGameTests::patternDriveLimits);
     }
 
     private static void matterValues(GameTestHelper helper) {
@@ -126,6 +130,41 @@ final class MatterGameTests {
                     Component.literal("matter not conserved: pipes " + inPipes + " decomposer " + d.getMatterTank().getMatter()));
             helper.succeed();
         });
+    }
+
+    private static void analyzerBuildsPattern(GameTestHelper helper) {
+        helper.setBlock(A, MOBlocks.ANALYZER.get());
+        AnalyzerBlockEntity a = helper.getBlockEntity(A, AnalyzerBlockEntity.class);
+        int placed = 0;
+        for (int i = 0; i < a.getInventory().size() && placed < 2; i++) {
+            if (a.getInventory().spec(i).role() == MachineInventory.Role.UPGRADE) {
+                a.getInventory().setStack(i, new ItemStack(MOItems.UPGRADE_HYPER_SPEED.get()));
+                placed++;
+            }
+        }
+        // two hyper speed upgrades: speed hits the 0.1 floor (80 ticks), power x4 (256000 FE per item)
+        a.getEnergy().set(a.getEnergy().getCapacity());
+        a.getInventory().setStack(AnalyzerBlockEntity.INPUT, new ItemStack(Items.IRON_INGOT, 2));
+        a.getInventory().setStack(AnalyzerBlockEntity.DATABASE, new ItemStack(MOItems.PATTERN_DRIVE.get()));
+        helper.runAfterDelay(200, () -> {
+            var patterns = PatternDriveItem.getPatterns(a.getInventory().getStack(AnalyzerBlockEntity.DATABASE));
+            helper.assertTrue(patterns.size() == 1 && patterns.get(0).is(Items.IRON_INGOT) && patterns.get(0).progress() == 40,
+                    Component.literal("patterns after two ingots: " + patterns));
+            helper.assertTrue(a.getInventory().getStack(AnalyzerBlockEntity.INPUT).isEmpty(), Component.literal("ingots not consumed"));
+            helper.succeed();
+        });
+    }
+
+    private static void patternDriveLimits(GameTestHelper helper) {
+        PatternDriveItem item = MOItems.PATTERN_DRIVE.get();
+        ItemStack drive = new ItemStack(item);
+        for (int i = 0; i < 5; i++) item.addProgress(drive, Items.DIAMOND, AnalyzerBlockEntity.PROGRESS_PER_ITEM);
+        helper.assertTrue(PatternDriveItem.getPatterns(drive).get(0).isComplete(), Component.literal("5 analyses don't complete a pattern"));
+        helper.assertFalse(item.canAccept(drive, Items.DIAMOND), Component.literal("complete pattern still accepts"));
+        helper.assertTrue(item.addProgress(drive, Items.GOLD_INGOT, 20), Component.literal("second pattern rejected"));
+        helper.assertFalse(item.canAccept(drive, Items.EMERALD), Component.literal("drive holds more than 2 patterns"));
+        helper.assertTrue(item.canAccept(drive, Items.GOLD_INGOT), Component.literal("incomplete pattern refuses progress"));
+        helper.succeed();
     }
 
     private static void expect(GameTestHelper helper, net.minecraft.server.MinecraftServer server, Item item, int value) {

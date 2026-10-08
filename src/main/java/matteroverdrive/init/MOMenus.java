@@ -1,6 +1,7 @@
 package matteroverdrive.init;
 
 import matteroverdrive.MatterOverdrive;
+import matteroverdrive.menu.AnalyzerMenu;
 import matteroverdrive.menu.DecomposerMenu;
 import matteroverdrive.menu.InscriberMenu;
 import matteroverdrive.menu.RecyclerMenu;
@@ -23,6 +24,9 @@ public final class MOMenus {
             MENUS.register("decomposer", () -> IMenuTypeExtension.create(DecomposerMenu::new));
     public static final DeferredHolder<MenuType<?>, MenuType<RecyclerMenu>> RECYCLER =
             MENUS.register("matter_recycler", () -> IMenuTypeExtension.create(RecyclerMenu::new));
+
+    public static final DeferredHolder<MenuType<?>, MenuType<AnalyzerMenu>> ANALYZER =
+            MENUS.register("matter_analyzer", () -> IMenuTypeExtension.create(AnalyzerMenu::new));
 
     private MOMenus() {}
 }

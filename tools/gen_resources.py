@@ -35,7 +35,7 @@ ITEMS.update({f"upgrade_{u}": (f"upgrade_{u}", "generated") for u in UPGRADES})
 BATTERIES = {"battery": (191, 228, 230), "hc_battery": (254, 203, 4), "creative_battery": (230, 80, 20)}
 BLOCKS = ["tritanium_ore", "dilithium_ore", "tritanium_block"]
 MACHINES = ["solar_panel", "inscriber"]
-MACHINES_P3 = ["decomposer", "matter_recycler", "matter_pipe", "heavy_matter_pipe"]
+MACHINES_P3 = ["decomposer", "matter_recycler", "matter_pipe", "heavy_matter_pipe", "matter_analyzer"]
 
 # lang keys that don't follow item.<name>.name / tile.<name>.name in the 1.7.10 files
 LANG_KEYS = {f"isolinear_circuit_mk{i}": f"item.isolinear_circuit.mk{i}.name" for i in range(1, 5)}
@@ -395,6 +395,57 @@ shaped("heavy_matter_pipe", mid("heavy_matter_pipe"), ["RMR", "TMT", "RMR"],
        {"R": "minecraft:redstone", "M": mid("s_magnet"), "T": PLATE}, count=8)
 
 
+# --- phase 3 step 3: patterns and the matter analyzer ------------------------------------------------
+for tex in ["analyzer_front", "analyzer_top", "network_port", "vent2"]:
+    cp(ref / "textures/blocks" / f"{tex}.png", A / "textures/block" / f"{tex}.png")
+cp(ref / "textures/blocks/analyzer_front_anim.png", A / "textures/block/analyzer_front_anim.png")
+cp(ref / "textures/blocks/analyzer_front_anim.png.mcmeta", A / "textures/block/analyzer_front_anim.png.mcmeta")
+cp(ref / "textures/gui/elements/screen.png", A / "textures/gui/elements/screen.png")
+
+
+def six_sided(front, back, sides, top, bottom="base"):
+    t = lambda n: f"{MOD}:block/{n}"
+    return {"parent": "minecraft:block/cube", "textures": {"north": t(front), "south": t(back), "east": t(sides),
+            "west": t(sides), "up": t(top), "down": t(bottom), "particle": t(sides)}}
+
+
+# 1.7.10 BlockMatterAnalyzer: front analyzer_front (animated while working), back network port, sides vent2.
+w(A / "models/block/matter_analyzer.json", six_sided("analyzer_front", "network_port", "vent2", "analyzer_top"))
+w(A / "models/block/matter_analyzer_active.json", six_sided("analyzer_front_anim", "network_port", "vent2", "analyzer_top"))
+machine_blockstate("matter_analyzer", f"{MOD}:block/matter_analyzer", f"{MOD}:block/matter_analyzer_active")
+w(D / "loot_table/blocks/matter_analyzer.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "bonus_rolls": 0,
+    "entries": [{"type": "minecraft:item", "name": mid("matter_analyzer"), "functions": [{"function": "minecraft:copy_components",
+        "source": "block_entity", "include": [mid("energy")]}]}],
+    "conditions": [{"condition": "minecraft:survives_explosion"}]}]})
+for tag in ["mineable/pickaxe", "needs_iron_tool"]:
+    p = TAGS / f"minecraft/tags/block/{tag}.json"
+    w(p, {"values": json.loads(p.read_text())["values"] + [mid("matter_analyzer")]})
+
+# Pattern drive: empty / partially full / full, chosen by custom model data set from the stored patterns.
+for state in ["pattern_drive", "pattern_drive_partially_full", "pattern_drive_full"]:
+    cp(ref / "textures/items" / f"{state}.png", A / "textures/item" / f"{state}.png")
+    w(A / "models/item" / f"{state}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{MOD}:item/{state}"}})
+w(A / "items/pattern_drive.json", {"model": {"type": "minecraft:range_dispatch", "property": "minecraft:custom_model_data",
+    "entries": [{"threshold": 1, "model": {"type": "minecraft:model", "model": f"{MOD}:item/pattern_drive_partially_full"}},
+                {"threshold": 2, "model": {"type": "minecraft:model", "model": f"{MOD}:item/pattern_drive_full"}}],
+    "fallback": {"type": "minecraft:model", "model": f"{MOD}:item/pattern_drive"}}})
+# Network flash drive: flash drive + overlay tinted COLOR_YELLOW_STRIPES (1.7.10 NetworkFlashDrive colour).
+cp(ref / "textures/items/flash_drive.png", A / "textures/item/flash_drive.png")
+cp(ref / "textures/items/flash_drive_overlay.png", A / "textures/item/flash_drive_overlay.png")
+w(A / "models/item/network_flash_drive.json", {"parent": "minecraft:item/generated", "textures": {
+    "layer0": f"{MOD}:item/flash_drive", "layer1": f"{MOD}:item/flash_drive_overlay"}})
+w(A / "items/network_flash_drive.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:item/network_flash_drive",
+    "tints": [{"type": "minecraft:constant", "value": -1},
+              {"type": "minecraft:constant", "value": (0xFF << 24 | 254 << 16 | 203 << 8 | 4) - (1 << 32)}]}})
+
+shaped("pattern_drive", mid("pattern_drive"), [" E ", "RMR", " C "],
+       {"E": "minecraft:ender_pearl", "R": "minecraft:redstone", "M": mid("machine_casing"), "C": MK[2]})
+shaped("network_flash_drive", mid("network_flash_drive"), ["RCR"], {"R": "minecraft:redstone", "C": MK[1]})
+shaped("matter_analyzer", mid("matter_analyzer"), [" C ", "PMF", "ONO"],
+       {"C": MK[3], "P": mid("pattern_drive"), "M": mid("me_conversion_matrix"), "F": mid("network_flash_drive"),
+        "O": "minecraft:iron_block", "N": mid("integration_matrix")})
+
+
 # --- matter values (1.7.10 MatterOverdriveMatter.registerBasic*) -----------------------------------
 # Base values of the matteroverdrive:matter data map; everything else is calculated from recipes at runtime.
 # Ore dictionary names are mapped to today's tags. Tags come first so that single items can override them.
@@ -471,6 +522,7 @@ GUI_KEYS = {
     "tooltip.matteroverdrive.matter": {"en_us": "Matter: %s kM", "ru_ru": "Материя: %s kM"},
     "tooltip.matteroverdrive.matter_stored": {"en_us": "Matter: %s / %s kM", "ru_ru": "Материя: %s / %s kM"},
     "item.matteroverdrive.matter_dust.details": "item.matter_dust.details",
+    "item.matteroverdrive.pattern_drive.details": "item.pattern_drive.details",
     "fluid.matteroverdrive.matter_plasma": {"en_us": "Matter Plasma", "ru_ru": "Плазменная материя"},
     "tooltip.matteroverdrive.energy_io": {"en_us": "Input/Output: %s/%s FE/t", "ru_ru": "Вход/выход: %s/%s FE/т"},
     "upgrade_type.matteroverdrive.speed": "upgradetype.Speed.name",
@@ -496,7 +548,7 @@ for src_name, dst_name in [("en_US", "en_us"), ("ru_RU", "ru_ru")]:
         lang[f"item.{MOD}.{n}"] = src.get(key) or EXTRA.get(dst_name, {}).get(n) or en.get(key) or n
         if key not in src and n not in EXTRA.get(dst_name, {}):
             fallback.append(n)
-    for n in BATTERIES:
+    for n in list(BATTERIES) + ["pattern_drive", "network_flash_drive"]:
         lang[f"item.{MOD}.{n}"] = src.get(f"item.{n}.name") or en.get(f"item.{n}.name")
     for n in BLOCKS + MACHINES + MACHINES_P3:
         key = LANG_KEYS.get(n, f"tile.{n}.name")

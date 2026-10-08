@@ -8,6 +8,7 @@
     "matteroverdrive:decomposer",
     "matteroverdrive:matter_recycler",
     "matteroverdrive:matter_pipe",
-    "matteroverdrive:heavy_matter_pipe"
+    "matteroverdrive:heavy_matter_pipe",
+    "matteroverdrive:matter_analyzer"
   ]
 }

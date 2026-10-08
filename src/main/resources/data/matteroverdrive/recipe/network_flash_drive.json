@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "RCR"
+  ],
+  "key": {
+    "R": "minecraft:redstone",
+    "C": "matteroverdrive:isolinear_circuit_mk1"
+  },
+  "result": {
+    "id": "matteroverdrive:network_flash_drive",
+    "count": 1
+  }
+}

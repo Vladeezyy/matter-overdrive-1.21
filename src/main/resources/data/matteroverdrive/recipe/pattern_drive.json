@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " E ",
+    "RMR",
+    " C "
+  ],
+  "key": {
+    "E": "minecraft:ender_pearl",
+    "R": "minecraft:redstone",
+    "M": "matteroverdrive:machine_casing",
+    "C": "matteroverdrive:isolinear_circuit_mk2"
+  },
+  "result": {
+    "id": "matteroverdrive:pattern_drive",
+    "count": 1
+  }
+}

@@ -43,7 +43,9 @@ public final class DevScene {
     private static final boolean ENABLED = System.getProperty("matteroverdrive.scene") != null;
     private static final List<Step> STEPS = new ArrayList<>();
     private static int tick;
-    private static BlockPos inscriberPos, solarPos, decomposerPos, recyclerPos;
+    /** Where the player stood when the scene started; restored before quitting so every run builds in one place. */
+    private static BlockPos origin;
+    private static BlockPos inscriberPos, solarPos, decomposerPos, recyclerPos, analyzerPos;
 
     private record Step(int at, Consumer<Minecraft> action) {}
 
@@ -68,9 +70,13 @@ public final class DevScene {
         at(225, mc -> openMachine(mc, recyclerPos));
         at(245, mc -> shot(mc, "recycler_home"));
         at(250, mc -> mc.player.closeContainer());
-        at(252, mc -> server(mc, p -> p.teleportTo(p.level(), p.getX() + 0.5, p.getY() + 1.5, p.getZ() + 1.5, Set.of(), 140f, 30f, false)));
-        at(260, mc -> shot(mc, "pipes"));
-        at(270, mc -> mc.stop());
+        at(253, mc -> openMachine(mc, analyzerPos));
+        at(275, mc -> shot(mc, "analyzer_home"));
+        at(280, mc -> mc.player.closeContainer());
+        at(282, mc -> server(mc, p -> p.teleportTo(p.level(), p.getX() + 0.5, p.getY() + 1.5, p.getZ() + 1.5, Set.of(), 140f, 30f, false)));
+        at(290, mc -> shot(mc, "pipes"));
+        at(292, mc -> server(mc, p -> p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 35f, false)));
+        at(300, mc -> mc.stop());
     }
 
     private static void at(int t, Consumer<Minecraft> action) {
@@ -108,6 +114,7 @@ public final class DevScene {
         level.setWeatherParameters(6000, 0, false, false);
         player.setGameMode(GameType.CREATIVE);
         BlockPos base = player.blockPosition();
+        origin = base;
         for (BlockPos p : BlockPos.betweenClosed(base.offset(-3, -1, -6), base.offset(3, -1, 0))) {
             level.setBlockAndUpdate(p, Blocks.SMOOTH_STONE.defaultBlockState());
         }
@@ -137,6 +144,14 @@ public final class DevScene {
         recycler.getEnergy().set(200000);
         recycler.getInventory().setStack(matteroverdrive.block.entity.RecyclerBlockEntity.INPUT,
                 matteroverdrive.item.MatterDustItem.withMatter(MOItems.MATTER_DUST.get(), 1).copyWithCount(16));
+        analyzerPos = base.offset(3, 0, -5);
+        level.setBlockAndUpdate(analyzerPos, MOBlocks.ANALYZER.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
+        var analyzer = (matteroverdrive.block.entity.AnalyzerBlockEntity) level.getBlockEntity(analyzerPos);
+        analyzer.getEnergy().set(500000);
+        analyzer.getInventory().setStack(matteroverdrive.block.entity.AnalyzerBlockEntity.INPUT, new ItemStack(Items.DIAMOND, 3));
+        ItemStack drive = new ItemStack(MOItems.PATTERN_DRIVE.get());
+        MOItems.PATTERN_DRIVE.get().addProgress(drive, Items.IRON_INGOT, 100);
+        analyzer.getInventory().setStack(matteroverdrive.block.entity.AnalyzerBlockEntity.DATABASE, drive);
         level.setBlockAndUpdate(base.offset(0, 0, -5), MOBlocks.TRITANIUM_ORE.get().defaultBlockState());
         level.setBlockAndUpdate(base.offset(-2, 0, -5), MOBlocks.DILITHIUM_ORE.get().defaultBlockState());
         level.setBlockAndUpdate(base.offset(2, 0, -5), MOBlocks.TRITANIUM_BLOCK.get().defaultBlockState());

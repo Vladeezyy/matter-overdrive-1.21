@@ -1,6 +1,7 @@
 package matteroverdrive.init;
 
 import matteroverdrive.MatterOverdrive;
+import matteroverdrive.block.AnalyzerBlock;
 import matteroverdrive.block.DecomposerBlock;
 import matteroverdrive.block.InscriberBlock;
 import matteroverdrive.block.MatterPipeBlock;
@@ -42,6 +43,9 @@ public final class MOBlocks {
             p -> new MatterPipeBlock(false, p), p -> p.mapColor(MapColor.METAL).strength(1f, 5f).sound(SoundType.METAL).noOcclusion());
     public static final DeferredBlock<MatterPipeBlock> HEAVY_MATTER_PIPE = BLOCKS.registerBlock("heavy_matter_pipe",
             p -> new MatterPipeBlock(true, p), p -> p.mapColor(MapColor.METAL).strength(1f, 5f).sound(SoundType.METAL).noOcclusion());
+
+    public static final DeferredBlock<AnalyzerBlock> ANALYZER = BLOCKS.registerBlock("matter_analyzer", AnalyzerBlock::new,
+            p -> p.mapColor(MapColor.METAL).strength(20f, 9f).sound(SoundType.METAL).requiresCorrectToolForDrops());
 
     private MOBlocks() {}
 }

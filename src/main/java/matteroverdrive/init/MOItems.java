@@ -9,6 +9,7 @@ import java.util.function.UnaryOperator;
 import matteroverdrive.MatterOverdrive;
 import matteroverdrive.item.BatteryItem;
 import matteroverdrive.item.MatterDustItem;
+import matteroverdrive.item.PatternDriveItem;
 import matteroverdrive.item.UpgradeItem;
 import matteroverdrive.item.WrenchItem;
 import matteroverdrive.machine.UpgradeType;
@@ -76,6 +77,10 @@ public final class MOItems {
     public static final DeferredItem<BlockItem> RECYCLER = block("matter_recycler", MOBlocks.RECYCLER);
     public static final DeferredItem<BlockItem> MATTER_PIPE = block("matter_pipe", MOBlocks.MATTER_PIPE);
     public static final DeferredItem<BlockItem> HEAVY_MATTER_PIPE = block("heavy_matter_pipe", MOBlocks.HEAVY_MATTER_PIPE);
+    public static final DeferredItem<BlockItem> ANALYZER = block("matter_analyzer", MOBlocks.ANALYZER);
+    // 1.7.10 PatternDrive("pattern_drive", 2)
+    public static final DeferredItem<PatternDriveItem> PATTERN_DRIVE = item("pattern_drive", p -> new PatternDriveItem(2, p), p -> p);
+    public static final DeferredItem<Item> NETWORK_FLASH_DRIVE = simple("network_flash_drive");
 
     // Energy (1.7.10: battery 2^19 FE 400/800, hc_battery 2^20 FE 4096/4096, creative 2^24 FE 8192/8192)
     public static final DeferredItem<BatteryItem> BATTERY = item("battery",

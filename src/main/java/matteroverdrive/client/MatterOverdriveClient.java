@@ -1,6 +1,7 @@
 package matteroverdrive.client;
 
 import matteroverdrive.MatterOverdrive;
+import matteroverdrive.client.screen.AnalyzerScreen;
 import matteroverdrive.client.screen.DecomposerScreen;
 import matteroverdrive.client.screen.InscriberScreen;
 import matteroverdrive.client.screen.RecyclerScreen;
@@ -25,6 +26,7 @@ public class MatterOverdriveClient {
         event.register(MOMenus.INSCRIBER.get(), InscriberScreen::new);
         event.register(MOMenus.DECOMPOSER.get(), DecomposerScreen::new);
         event.register(MOMenus.RECYCLER.get(), RecyclerScreen::new);
+        event.register(MOMenus.ANALYZER.get(), AnalyzerScreen::new);
     }
 
     /** Matter Plasma textures (1.7.10 matter_plasma_still / _flowing), shown by tanks of other mods. */

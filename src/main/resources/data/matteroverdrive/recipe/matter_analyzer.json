@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " C ",
+    "PMF",
+    "ONO"
+  ],
+  "key": {
+    "C": "matteroverdrive:isolinear_circuit_mk3",
+    "P": "matteroverdrive:pattern_drive",
+    "M": "matteroverdrive:me_conversion_matrix",
+    "F": "matteroverdrive:network_flash_drive",
+    "O": "minecraft:iron_block",
+    "N": "matteroverdrive:integration_matrix"
+  },
+  "result": {
+    "id": "matteroverdrive:matter_analyzer",
+    "count": 1
+  }
+}

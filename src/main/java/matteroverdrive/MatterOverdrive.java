@@ -50,6 +50,7 @@ public class MatterOverdrive {
         machine(event, MOBlockEntities.INSCRIBER.get());
         machine(event, MOBlockEntities.DECOMPOSER.get());
         machine(event, MOBlockEntities.RECYCLER.get());
+        machine(event, MOBlockEntities.ANALYZER.get());
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, MOBlockEntities.MATTER_PIPE.get(), (pipe, side) -> pipe.getTank());
     }
 

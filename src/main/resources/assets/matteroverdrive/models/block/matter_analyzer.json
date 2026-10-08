@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "matteroverdrive:block/analyzer_front",
+    "south": "matteroverdrive:block/network_port",
+    "east": "matteroverdrive:block/vent2",
+    "west": "matteroverdrive:block/vent2",
+    "up": "matteroverdrive:block/analyzer_top",
+    "down": "matteroverdrive:block/base",
+    "particle": "matteroverdrive:block/vent2"
+  }
+}

@@ -5,6 +5,7 @@
     "matteroverdrive:solar_panel",
     "matteroverdrive:inscriber",
     "matteroverdrive:decomposer",
-    "matteroverdrive:matter_recycler"
+    "matteroverdrive:matter_recycler",
+    "matteroverdrive:matter_analyzer"
   ]
 }

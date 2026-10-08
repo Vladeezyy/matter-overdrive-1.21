@@ -1,6 +1,7 @@
 package matteroverdrive.init;
 
 import matteroverdrive.MatterOverdrive;
+import matteroverdrive.block.entity.AnalyzerBlockEntity;
 import matteroverdrive.block.entity.DecomposerBlockEntity;
 import matteroverdrive.block.entity.InscriberBlockEntity;
 import matteroverdrive.block.entity.MatterPipeBlockEntity;
@@ -27,6 +28,9 @@ public final class MOBlockEntities {
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<MatterPipeBlockEntity>> MATTER_PIPE =
             BLOCK_ENTITIES.register("matter_pipe", () -> new BlockEntityType<>(MatterPipeBlockEntity::new,
                     MOBlocks.MATTER_PIPE.get(), MOBlocks.HEAVY_MATTER_PIPE.get()));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<AnalyzerBlockEntity>> ANALYZER =
+            BLOCK_ENTITIES.register("matter_analyzer", () -> new BlockEntityType<>(AnalyzerBlockEntity::new, MOBlocks.ANALYZER.get()));
 
     private MOBlockEntities() {}
 }
