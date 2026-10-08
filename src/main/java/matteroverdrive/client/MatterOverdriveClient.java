@@ -88,6 +88,10 @@ public class MatterOverdriveClient {
         event.registerBlockEntityRenderer(matteroverdrive.init.MOBlockEntities.GRAVITATIONAL_ANOMALY.get(), AnomalyRenderer::new);
         event.registerEntityRenderer(matteroverdrive.init.MOEntities.ROGUE_ANDROID.get(), RogueAndroidRenderer::melee);
         event.registerEntityRenderer(matteroverdrive.init.MOEntities.RANGED_ROGUE_ANDROID.get(), RogueAndroidRenderer::ranged);
+        event.registerEntityRenderer(matteroverdrive.init.MOEntities.FAILED_PIG.get(), FailedAnimalRenderers::pig);
+        event.registerEntityRenderer(matteroverdrive.init.MOEntities.FAILED_COW.get(), FailedAnimalRenderers::cow);
+        event.registerEntityRenderer(matteroverdrive.init.MOEntities.FAILED_CHICKEN.get(), FailedAnimalRenderers::chicken);
+        event.registerEntityRenderer(matteroverdrive.init.MOEntities.FAILED_SHEEP.get(), FailedAnimalRenderers::sheep);
     }
 
     @SubscribeEvent

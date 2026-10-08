@@ -138,7 +138,7 @@
     ]
   },
   "rogue_android_say": {
-    "category": "player",
+    "category": "hostile",
     "sounds": [
       "matteroverdrive:entities/rogue_android_say_0",
       "matteroverdrive:entities/rogue_android_say_1",
@@ -146,10 +146,41 @@
     ]
   },
   "rogue_android_death": {
-    "category": "player",
+    "category": "hostile",
     "sounds": [
       "matteroverdrive:entities/rogue_android_death_0",
       "matteroverdrive:entities/rogue_android_death_1"
+    ]
+  },
+  "failed_animal_idle_pig": {
+    "category": "neutral",
+    "sounds": [
+      "matteroverdrive:entities/failed_animal_idle_pig"
+    ]
+  },
+  "failed_animal_idle_cow": {
+    "category": "neutral",
+    "sounds": [
+      "matteroverdrive:entities/failed_animal_idle_cow"
+    ]
+  },
+  "failed_animal_idle_chicken": {
+    "category": "neutral",
+    "sounds": [
+      "matteroverdrive:entities/failed_animal_idle_chicken"
+    ]
+  },
+  "failed_animal_idle_sheep": {
+    "category": "neutral",
+    "sounds": [
+      "matteroverdrive:entities/failed_animal_idle_sheep"
+    ]
+  },
+  "failed_animal_die": {
+    "category": "neutral",
+    "sounds": [
+      "matteroverdrive:entities/failed_animal_die_0",
+      "matteroverdrive:entities/failed_animal_die_1"
     ]
   }
 }

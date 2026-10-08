@@ -715,7 +715,11 @@ SOUNDS = {"phaser_rifle_shot": ["weapon/phaser_rifle_shot"], "plasma_shotgun_sho
           "shield_power_down": ["shield_power_up"], "cloak_on": ["entities/cloak_on"], "cloak_off": ["entities/cloak_off"],
           "night_vision": ["night_vision"], "power_down": ["power_down"], "shockwave": ["shockwave"],
           "rogue_android_say": [f"entities/rogue_android_say_{i}" for i in range(3)],
-          "rogue_android_death": [f"entities/rogue_android_death_{i}" for i in range(2)]}
+          "rogue_android_death": [f"entities/rogue_android_death_{i}" for i in range(2)],
+          # failed animals (phase 7c)
+          **{f"failed_animal_idle_{a}": [f"entities/failed_animal_idle_{a}"] for a in ["pig", "cow", "chicken", "sheep"]},
+          "failed_animal_die": [f"entities/failed_animal_die_{i}" for i in range(2)]}
+SOUND_CATEGORY = {k: "neutral" for k in SOUNDS if k.startswith("failed_animal")} | {k: "hostile" for k in SOUNDS if k.startswith("rogue_android")}
 for files in SOUNDS.values():
     for f in files:
         dst = A / "sounds" / f"{f}.ogg"
@@ -726,7 +730,7 @@ for files in SOUNDS.values():
                         "-fflags", "+bitexact", "-flags:a", "+bitexact", str(wav)], check=True)
         subprocess.run(["oggenc", "-Q", "-q", "5", "-s", "1", "-o", str(dst), str(wav)], check=True)
         wav.unlink()
-w(A / "sounds.json", {k: {"category": "player", "sounds": [f"{MOD}:{f}" for f in v]} for k, v in SOUNDS.items()})
+w(A / "sounds.json", {k: {"category": SOUND_CATEGORY.get(k, "player"), "sounds": [f"{MOD}:{f}" for f in v]} for k, v in SOUNDS.items()})
 
 w(D / "damage_type/plasma.json", {"message_id": "matteroverdrive.plasma", "exhaustion": 0.1, "scaling": "when_caused_by_living_non_player"})
 w(TAGS / "minecraft/tags/damage_type/is_projectile.json", {"values": [mid("plasma")]})
@@ -1056,6 +1060,16 @@ egg("rogue_android_spawn_egg", 0x0FFFFF, 0x000000)          # 1.7.10 addEntity(.
 egg("ranged_rogue_android_spawn_egg", 0x0FFFFF, 0x000000)
 for t in ["android", "android_ranged"]:
     cp(ref / "textures/entities" / f"{t}.png", A / "textures/entity" / f"{t}.png")
+# 7c failed animals: 1.7.10 egg colours; the pig and cow textures are 64x32, today's models use the same UVs on 64x64
+for n, base in {"pig": 15771042, "cow": 4470310, "chicken": 10592673, "sheep": 15198183}.items():
+    egg(f"failed_{n}_spawn_egg", base, 0x33CC33)
+    src_png, dst_png = ref / "textures/entities" / f"failed_{n}.png", A / "textures/entity" / f"failed_{n}.png"
+    if n in ("pig", "cow"):
+        dst_png.parent.mkdir(parents=True, exist_ok=True)
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(src_png), "-vf", "pad=64:64:0:0:color=0x00000000", "-pix_fmt", "rgba",
+                        "-fflags", "+bitexact", "-flags", "+bitexact", str(dst_png)], check=True)
+    else:
+        cp(src_png, dst_png)
 # 1.7.10 EntityRogueAndroid.addAsBiomeGen: weight 15, groups of 1-2, all overworld biomes but the mushroom fields
 for n in ["rogue_android", "ranged_rogue_android"]:
     w(D / f"neoforge/biome_modifier/{n}.json", {"type": "neoforge:add_spawns",
@@ -1240,6 +1254,10 @@ for src_name, dst_name in [("en_US", "en_us"), ("ru_RU", "ru_ru")]:
     for n in ["rogue_android", "ranged_rogue_android"]:
         egg_word = {"en_us": "Spawn Egg", "ru_ru": "Яйцо призыва"}[dst_name]
         lang[f"item.{MOD}.{n}_spawn_egg"] = f"{egg_word}: {lang[f'entity.{MOD}.{n}']}" if dst_name == "ru_ru" else f"{lang[f'entity.{MOD}.{n}']} {egg_word}"
+    for n in ["pig", "cow", "chicken", "sheep"]:
+        lang[f"entity.{MOD}.failed_{n}"] = src.get(f"entity.failed_{n}.name") or en[f"entity.failed_{n}.name"]
+        egg_word = {"en_us": "Spawn Egg", "ru_ru": "Яйцо призыва"}[dst_name]
+        lang[f"item.{MOD}.failed_{n}_spawn_egg"] = f"{egg_word}: {lang[f'entity.{MOD}.failed_{n}']}" if dst_name == "ru_ru" else f"{lang[f'entity.{MOD}.failed_{n}']} {egg_word}"
     lang[f"rarity.{MOD}.legendary"] = src.get("rarity.legendary") or en.get("rarity.legendary") or "Legendary"
     lang[f"block.{MOD}.charging_station"] = src.get("tile.charging_station.name") or en["tile.charging_station.name"]
     lang[f"block.{MOD}.android_station"] = src.get("tile.android_station.name") or en["tile.android_station.name"]

@@ -278,7 +278,32 @@ public final class DevScene {
             p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY() + 1, origin.getZ() - 1.5, Set.of(), 180f, 10f, false);
         }));
         at(578, mc -> shot(mc, "rogue_androids"));
-        at(580, mc -> mc.stop());
+        // 7c: failed animals (adults and a piglet) on a platform above the scene
+        at(580, mc -> server(mc, p -> {
+            BlockPos base = origin.above(14);
+            for (int x = -7; x <= 7; x++) {
+                for (int z = -10; z <= 1; z++) {
+                    p.level().setBlockAndUpdate(base.offset(x, -1, z), Blocks.SMOOTH_STONE.defaultBlockState());
+                    for (int y = 0; y < 4; y++) p.level().setBlockAndUpdate(base.offset(x, y, z), Blocks.AIR.defaultBlockState());
+                }
+            }
+            var types = java.util.List.of(matteroverdrive.init.MOEntities.FAILED_PIG.get(), matteroverdrive.init.MOEntities.FAILED_COW.get(),
+                    matteroverdrive.init.MOEntities.FAILED_CHICKEN.get(), matteroverdrive.init.MOEntities.FAILED_SHEEP.get(),
+                    matteroverdrive.init.MOEntities.FAILED_PIG.get());
+            for (int i = 0; i < types.size(); i++) {
+                var animal = types.get(i).create(p.level(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+                animal.snapTo(base.getX() - 4.5 + i * 2.4, base.getY(), base.getZ() - 6.5, 0, 0);
+                if (i == 4) animal.setAge(-24000);
+                animal.setNoAi(true);
+                animal.setYRot(-40);
+                animal.setYHeadRot(-40);
+                animal.yBodyRot = -40;
+                p.level().addFreshEntity(animal);
+            }
+            p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() - 1.0, Set.of(), 180f, 20f, false);
+        }));
+        at(588, mc -> shot(mc, "failed_animals"));
+        at(590, mc -> mc.stop());
     }
 
     private static void at(int t, Consumer<Minecraft> action) {

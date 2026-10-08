@@ -220,11 +220,15 @@
   visor layer), random decorated weapon (`EnergyWeaponItem.fireFromMob`, `WeaponShooter` difficulty scaling), drops,
   natural spawns (biome modifier, weight 15, max 4/chunk). Spawn eggs drawn by the generator (`write_png`).
 - Fix: anomaly rendering (see phase 6 notes).
+- **7c ✅** Failed animals (`entity/animal`): pig/cow/chicken/sheep subclasses with the failed idle/hurt/death sounds that
+  breed failed young (sheep lambs mix the wool colour; `canMate` is class-based, so no mixing with vanilla animals).
+  `FailedAnimalRenderers` reuse the vanilla renderers: pig/cow/chicken get a fixed `*Variant` (normal model + failed
+  texture) in `extractRenderState`, the sheep overrides the texture (vanilla wool layer on top, like 1.7.10). Pig/cow
+  textures are padded to 64x64 by the generator (ffmpeg `pad`); the 1.21.5 cow muzzle (UV 1,33) is transparent → hidden.
+  Spawn eggs in the 1.7.10 colours. No natural spawns (1.7.10 had none either). 65 GameTests pass.
 
 ### Next in phase 7 (start here)
-1. Failed animals (pig/cow/chicken/sheep subclasses + renderers overriding the texture; pig/cow textures are 64x32 and
-   the 1.21 pig/cow models are 64x64 with the same UVs → pad the PNGs to 64x64; chicken/sheep meshes are 64x32).
-   Sounds failed_animal_*.
+1. ~~Failed animals~~ ✅ 7c.
 2. Mutant scientist (port ModelHulkingScientist, 256 HP) — used by the underwater base.
 3. Structures (world/MO*: android house, sand pit, crashed ship, cargo ship, underwater base, mad scientist house;
    1.7.10 MOImageGen builds them from images in textures/world).
@@ -238,7 +242,7 @@
 **Workflow**
 - Resources: never hand-edit `src/main/resources/{assets,data}` — regenerate:
   `rm -rf src/main/resources/{assets,data} && python3 -I tools/gen_resources.py ~/mo-reference/mo-1.7.10/src/main/resources/assets/mo src/main/resources`
-- Tests: `./gradlew runGameTestServer` (47 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
+- Tests: `./gradlew runGameTestServer` (65 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
   `FunctionGameTestInstance`, custom 12³ structure `matteroverdrive:gametest_area`, time-of-day via `TestEnvironmentDefinition.TimeOfDay`,
   `makeMockServerPlayerInLevel`). Visual: `./gradlew runScene` → `run/screenshots/scene_*.png` (DevScene, world `run/saves/mo_scene`;
   pristine copy = "Новый мир (2)"; needs `pauseOnLostFocus=false`; selected hotbar slot is client-side; place blocks with

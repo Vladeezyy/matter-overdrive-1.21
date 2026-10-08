@@ -183,6 +183,14 @@ public final class MOItems {
             net.minecraft.world.item.SpawnEggItem::new, p -> p.spawnEgg(MOEntities.ROGUE_ANDROID.get()));
     public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> RANGED_ROGUE_ANDROID_SPAWN_EGG = item("ranged_rogue_android_spawn_egg",
             net.minecraft.world.item.SpawnEggItem::new, p -> p.spawnEgg(MOEntities.RANGED_ROGUE_ANDROID.get()));
+    public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> FAILED_PIG_SPAWN_EGG = item("failed_pig_spawn_egg",
+            net.minecraft.world.item.SpawnEggItem::new, p -> p.spawnEgg(MOEntities.FAILED_PIG.get()));
+    public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> FAILED_COW_SPAWN_EGG = item("failed_cow_spawn_egg",
+            net.minecraft.world.item.SpawnEggItem::new, p -> p.spawnEgg(MOEntities.FAILED_COW.get()));
+    public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> FAILED_CHICKEN_SPAWN_EGG = item("failed_chicken_spawn_egg",
+            net.minecraft.world.item.SpawnEggItem::new, p -> p.spawnEgg(MOEntities.FAILED_CHICKEN.get()));
+    public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> FAILED_SHEEP_SPAWN_EGG = item("failed_sheep_spawn_egg",
+            net.minecraft.world.item.SpawnEggItem::new, p -> p.spawnEgg(MOEntities.FAILED_SHEEP.get()));
 
     public static final DeferredItem<AndroidPillItem> ANDROID_PILL_YELLOW = item("android_pill_yellow", p -> new AndroidPillItem(AndroidPillItem.Type.YELLOW, p), p -> p);
 

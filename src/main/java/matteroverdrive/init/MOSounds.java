@@ -39,6 +39,11 @@ public final class MOSounds {
     // Mobs (phase 7b)
     public static final DeferredHolder<SoundEvent, SoundEvent> ROGUE_ANDROID_SAY = sound("rogue_android_say");
     public static final DeferredHolder<SoundEvent, SoundEvent> ROGUE_ANDROID_DEATH = sound("rogue_android_death");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FAILED_ANIMAL_IDLE_PIG = sound("failed_animal_idle_pig");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FAILED_ANIMAL_IDLE_COW = sound("failed_animal_idle_cow");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FAILED_ANIMAL_IDLE_CHICKEN = sound("failed_animal_idle_chicken");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FAILED_ANIMAL_IDLE_SHEEP = sound("failed_animal_idle_sheep");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FAILED_ANIMAL_DIE = sound("failed_animal_die");
 
     private static DeferredHolder<SoundEvent, SoundEvent> sound(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, name)));
