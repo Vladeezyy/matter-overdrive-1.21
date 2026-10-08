@@ -16,6 +16,7 @@ final class WorldGameTests {
         MOGameTests.add("mutant_scientist", 20, false, WorldGameTests::mutantScientist);
         MOGameTests.add("tritanium_crate", 20, false, WorldGameTests::tritaniumCrate);
         MOGameTests.add("buildings", 20, false, WorldGameTests::buildings);
+        MOGameTests.add("matter_container", 20, false, WorldGameTests::matterContainer);
     }
 
     private static void check(GameTestHelper helper, boolean ok, String message) {
@@ -82,6 +83,31 @@ final class WorldGameTests {
             var key = net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("matteroverdrive", building.getSerializedName());
             check(helper, structures.get(key).isPresent(), "structure " + key + " missing");
         }
+        helper.succeed();
+    }
+
+    /** Matter container: holds exactly 32 mB of Matter Plasma through the fluid item capability; the plasma block is a source. */
+    private static void matterContainer(GameTestHelper helper) {
+        var plasma = net.neoforged.neoforge.transfer.fluid.FluidResource.of(matteroverdrive.init.MOFluids.MATTER_PLASMA.get());
+        var slots = new net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler(2);
+        slots.set(0, net.neoforged.neoforge.transfer.item.ItemResource.of(matteroverdrive.init.MOItems.MATTER_CONTAINER.get()), 1);
+        var access = net.neoforged.neoforge.transfer.access.ItemAccess.forHandlerIndex(slots, 0);
+        var tank = access.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Fluid.ITEM);
+        check(helper, tank != null, "no fluid capability");
+        int partial, full;
+        try (var tx = net.neoforged.neoforge.transfer.transaction.Transaction.openRoot()) {
+            partial = tank.insert(0, plasma, 10, tx);
+        }
+        try (var tx = net.neoforged.neoforge.transfer.transaction.Transaction.openRoot()) {
+            full = tank.insert(0, plasma, 100, tx);
+            tx.commit();
+        }
+        check(helper, partial == 0 && full == 32, "inserted " + partial + " / " + full);
+        check(helper, slots.getResource(0).is(matteroverdrive.init.MOItems.MATTER_CONTAINER_FULL.get()), "container not full: " + slots.getResource(0));
+        BlockPos pos = new BlockPos(3, 1, 3);
+        helper.setBlock(pos, matteroverdrive.init.MOBlocks.MATTER_PLASMA.get());
+        var fluid = helper.getLevel().getFluidState(helper.absolutePos(pos));
+        check(helper, fluid.isSource() && fluid.getType() == matteroverdrive.init.MOFluids.MATTER_PLASMA.get(), "plasma block " + fluid);
         helper.succeed();
     }
 }

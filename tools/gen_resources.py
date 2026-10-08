@@ -702,6 +702,17 @@ for n, c in zip(COLOR_NAMES, COLOR_VALUES):
     tinted_item(f"weapon_module_color_{n}", "weapon_module_color", "weapon_module_color_overlay", c)
 w(A / "models/item/matter_container.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{MOD}:item/container"}})
 w(A / "items/matter_container.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:item/matter_container"}})
+# 1.7.10 MatterContainer full: 3 render passes, the centre fill in COLOR_MATTER and the bottom fill in COLOR_YELLOW_STRIPES
+for t in ["container_center_fill", "container_bottom_fill"]:
+    cp(ref / "textures/items" / f"{t}.png", A / "textures/item" / f"{t}.png")
+w(A / "models/item/matter_container_full.json", {"parent": "minecraft:item/generated", "textures": {
+    "layer0": f"{MOD}:item/container", "layer1": f"{MOD}:item/container_center_fill", "layer2": f"{MOD}:item/container_bottom_fill"}})
+w(A / "items/matter_container_full.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:item/matter_container_full",
+    "tints": [{"type": "minecraft:constant", "value": -1}, {"type": "minecraft:constant", "value": (0xFFBFE4E6) - (1 << 32)},
+              {"type": "minecraft:constant", "value": (0xFFFECB04) - (1 << 32)}]}})
+# The placed Matter Plasma (rendered by the fluid renderer; the model only gives the break particles)
+w(A / "models/block/matter_plasma.json", {"textures": {"particle": f"{MOD}:block/matter_plasma_still"}})
+w(A / "blockstates/matter_plasma.json", {"variants": {"": {"model": f"{MOD}:block/matter_plasma"}}})
 cp(ref / "textures/entities/PlasmaFire.png", A / "textures/entity/plasma_fire.png")
 
 # Sounds: Minecraft only positions and attenuates mono sounds, so stereo originals are downmixed (needs ffmpeg + oggenc).
@@ -1323,7 +1334,7 @@ w(D / "loot_table/chests/android_house.json", {"type": "minecraft:chest", "pools
                 *[loot_item(mid(f"rogue_android_part_{p}"), 1, 2, 15) for p in ["head", "arms", "legs", "chest"]],
                 loot_item(mid("hc_battery"), 1, 1, 10), loot_item(mid("h_compensator"), 1, 2, 10),
                 loot_item(mid("me_conversion_matrix"), 1, 2, 10),
-                loot_item(mid("matter_container"), 4, 8, 20),         # 1.7.10 matter_container_full (not ported yet)
+                loot_item(mid("matter_container_full"), 4, 8, 20),
                 loot_item(mid("phaser"), 1, 1, 10)]}]})
 
 # Placement. 1.7.10 tried a building in 1% of chunks (weights android house 20, sand pit 100, crashed ship 60,
@@ -1444,6 +1455,7 @@ GUI_KEYS = {
     "gui.matteroverdrive.queue": {"en_us": "Queue: %s requests, %s items", "ru_ru": "Очередь: %s заказов, %s предметов"},
     "gui.matteroverdrive.replicating": {"en_us": "%s x%s (pattern %s%%)", "ru_ru": "%s x%s (шаблон %s%%)"},
     "fluid.matteroverdrive.matter_plasma": {"en_us": "Matter Plasma", "ru_ru": "Плазменная материя"},
+    "block.matteroverdrive.matter_plasma": {"en_us": "Matter Plasma", "ru_ru": "Плазменная материя"},
     "tooltip.matteroverdrive.energy_io": {"en_us": "Input/Output: %s/%s FE/t", "ru_ru": "Вход/выход: %s/%s FE/т"},
     "upgrade_type.matteroverdrive.speed": "upgradetype.Speed.name",
     "upgrade_type.matteroverdrive.power_usage": "upgradetype.PowerUsage.name",
@@ -1469,7 +1481,7 @@ for src_name, dst_name in [("en_US", "en_us"), ("ru_RU", "ru_ru")]:
         if key not in src and n not in EXTRA.get(dst_name, {}):
             fallback.append(n)
     for n in list(BATTERIES) + ["pattern_drive", "network_flash_drive", "spacetime_equalizer", "phaser", "phaser_rifle", "plasma_shotgun",
-                                "ion_sniper", "energy_pack", "matter_container"]:
+                                "ion_sniper", "energy_pack", "matter_container", "matter_container_full"]:
         lang[f"item.{MOD}.{n}"] = src.get(f"item.{n}.name") or en.get(f"item.{n}.name")
     for n in BLOCKS + MACHINES + MACHINES_P3:
         key = LANG_KEYS.get(n, f"tile.{n}.name")

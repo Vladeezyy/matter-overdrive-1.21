@@ -116,5 +116,12 @@ public final class MOBlocks {
         return TRITANIUM_CRATES.get(color.getId());
     }
 
+    /** 1.7.10 blockMatterPlasma: the placed fluid. */
+    public static final DeferredBlock<net.minecraft.world.level.block.LiquidBlock> MATTER_PLASMA = BLOCKS.registerBlock("matter_plasma",
+            p -> new net.minecraft.world.level.block.LiquidBlock(MOFluids.MATTER_PLASMA.get(), p),
+            p -> p.mapColor(MapColor.COLOR_LIGHT_BLUE).replaceable().noCollision().strength(100f).pushReaction(
+                    net.minecraft.world.level.material.PushReaction.DESTROY).noLootTable().liquid().lightLevel(s -> 15)
+                    .sound(SoundType.EMPTY));
+
     private MOBlocks() {}
 }

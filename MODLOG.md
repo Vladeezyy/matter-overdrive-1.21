@@ -257,6 +257,11 @@
     Step `top_layer_modification`: built after the trees like 1.7.10 (with surface_structures jungle trees grew through).
   - Verified: `/locate` finds all five; fresh chunks: android house with 6 androids and 2 looted crates, crashed ship
     with a looted crate. 68 GameTests.
+- **7g ✅** Matter container + placeable Matter Plasma: `matter_plasma` LiquidBlock (1.7.10 BlockFluidMatterPlasma:
+  water-like, light 15, viscosity 8000 → tick rate 40). `MatterContainerItem` (empty/full, stacks of 8): scoops a
+  plasma source / places one like a bucket; `Capabilities.Fluid.ITEM` handler swaps empty ↔ full for exactly 32 mB
+  (1.7.10 FluidContainerRegistry). Full icon = container + centre fill (COLOR_MATTER) + bottom fill (yellow stripes)
+  as tinted layers. Android house loot now has full containers. 69 GameTests.
 
 ### Next in phase 7 (start here)
 1. ~~Failed animals~~ ✅ 7c.
@@ -268,8 +273,7 @@
    TradeHandlerMadScientist); android spawner block (teams + path drives, not used by worldgen).
 - Deviations so far: legendary rogue android parts drop without bonus attributes; no rogue android teams/paths;
   legendary weapons have no stat bonuses; buildings: star map → holo matrix and transporter → machine hull stand-ins
-  (swap STAR_MAP/TRANSPORTER in gen_resources.py when ported), no crashed-ship quest contract, android house loot has
-  empty matter containers (1.7.10 full ones), underwater base needs 16+ water (1.7.10: 27+, rare in today's deep
+  (swap STAR_MAP/TRANSPORTER in gen_resources.py when ported), no crashed-ship quest contract, underwater base needs 16+ water (1.7.10: 27+, rare in today's deep
   oceans) and sinks into the floor to stay submerged, no "generate buildings" config (use a datapack), not rotated
   (1.7.10 never rotated them either).
 
@@ -277,7 +281,7 @@
 **Workflow**
 - Resources: never hand-edit `src/main/resources/{assets,data}` — regenerate:
   `rm -rf src/main/resources/{assets,data} && python3 -I tools/gen_resources.py ~/mo-reference/mo-1.7.10/src/main/resources/assets/mo src/main/resources`
-- Tests: `./gradlew runGameTestServer` (68 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
+- Tests: `./gradlew runGameTestServer` (69 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
   `FunctionGameTestInstance`, custom 12³ structure `matteroverdrive:gametest_area`, time-of-day via `TestEnvironmentDefinition.TimeOfDay`,
   `makeMockServerPlayerInLevel`). Visual: `./gradlew runScene` → `run/screenshots/scene_*.png` (DevScene, world `run/saves/mo_scene`;
   pristine copy = "Новый мир (2)"; needs `pauseOnLostFocus=false`; selected hotbar slot is client-side; place blocks with

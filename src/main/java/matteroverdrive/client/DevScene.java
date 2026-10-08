@@ -425,7 +425,27 @@ public final class DevScene {
             at(t0 + 150, mc -> shot(mc, "natural_" + id));
             at(t0 + 151, mc -> mc.options.hideGui = false);
         }
-        at(1340, mc -> mc.stop());
+        // 7g: a Matter Plasma pool on the platform, the containers in the hotbar
+        at(1340, mc -> server(mc, p -> {
+            BlockPos base = origin.above(14);
+            p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() - 1.0, Set.of(), 180f, 35f, false);
+            p.getAbilities().flying = false;
+            p.onUpdateAbilities();
+            for (BlockPos pos : BlockPos.betweenClosed(base.offset(-4, 0, -9), base.offset(4, 1, -4))) {
+                p.level().setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
+            }
+            for (BlockPos pos : BlockPos.betweenClosed(base.offset(-2, -1, -7), base.offset(2, -1, -5))) {
+                p.level().setBlockAndUpdate(pos, matteroverdrive.init.MODecorative.TRITANIUM_PLATE.get().defaultBlockState());
+                p.level().setBlockAndUpdate(pos.below(), matteroverdrive.init.MODecorative.TRITANIUM_PLATE.get().defaultBlockState());
+                p.level().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+            }
+            p.level().setBlockAndUpdate(base.offset(0, -1, -6), matteroverdrive.init.MOBlocks.MATTER_PLASMA.get().defaultBlockState());
+            p.level().setBlockAndUpdate(base.offset(-1, -1, -6), matteroverdrive.init.MOBlocks.MATTER_PLASMA.get().defaultBlockState());
+            p.getInventory().setItem(0, new ItemStack(MOItems.MATTER_CONTAINER.get(), 8));
+            p.getInventory().setItem(1, new ItemStack(MOItems.MATTER_CONTAINER_FULL.get(), 3));
+        }));
+        at(1400, mc -> shot(mc, "matter_plasma"));
+        at(1402, mc -> mc.stop());
     }
 
     private static void at(int t, Consumer<Minecraft> action) {

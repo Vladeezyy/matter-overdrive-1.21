@@ -255,7 +255,7 @@
         },
         {
           "type": "minecraft:item",
-          "name": "matteroverdrive:matter_container",
+          "name": "matteroverdrive:matter_container_full",
           "weight": 20,
           "functions": [
             {

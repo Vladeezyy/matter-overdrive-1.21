@@ -144,7 +144,10 @@ public final class MOItems {
     public static final DeferredItem<IonSniperItem> ION_SNIPER = item("ion_sniper", IonSniperItem::new, p -> p);
     public static final DeferredItem<EnergyPackItem> ENERGY_PACK = item("energy_pack", EnergyPackItem::new, p -> p);
     /** 1.7.10 MatterContainer: a portable matter tank; needed for the plasma core recipe (its tank isn't ported yet). */
-    public static final DeferredItem<Item> MATTER_CONTAINER = simple("matter_container");
+    public static final DeferredItem<matteroverdrive.item.MatterContainerItem> MATTER_CONTAINER = item("matter_container",
+            p -> new matteroverdrive.item.MatterContainerItem(false, p), p -> p.stacksTo(8));
+    public static final DeferredItem<matteroverdrive.item.MatterContainerItem> MATTER_CONTAINER_FULL = item("matter_container_full",
+            p -> new matteroverdrive.item.MatterContainerItem(true, p), p -> p.stacksTo(8));
     public static final List<DeferredItem<WeaponColorModuleItem>> COLOR_MODULES = colorModules();
     public static final DeferredItem<WeaponBarrelItem> BARREL_DAMAGE = barrel(WeaponBarrelItem.Type.DAMAGE);
     public static final DeferredItem<WeaponBarrelItem> BARREL_FIRE = barrel(WeaponBarrelItem.Type.FIRE);
