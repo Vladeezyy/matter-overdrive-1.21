@@ -232,9 +232,10 @@ public abstract class EnergyWeaponItem extends Item {
         return 72000;
     }
 
+    /** 1.7.10 kept the weapon's own pose while aiming or firing the beam (no bow draw). */
     @Override
     public ItemUseAnimation getUseAnimation(ItemStack stack) {
-        return ItemUseAnimation.BOW;
+        return ItemUseAnimation.NONE;
     }
 
     @Override

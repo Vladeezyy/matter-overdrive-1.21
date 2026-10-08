@@ -14,6 +14,7 @@ import matteroverdrive.item.UpgradeItem;
 import matteroverdrive.item.WrenchItem;
 import matteroverdrive.item.weapon.EnergyPackItem;
 import matteroverdrive.item.weapon.IonSniperItem;
+import matteroverdrive.item.weapon.PhaserItem;
 import matteroverdrive.item.weapon.PhaserRifleItem;
 import matteroverdrive.item.weapon.PlasmaShotgunItem;
 import matteroverdrive.item.weapon.WeaponColorModuleItem;
@@ -133,6 +134,7 @@ public final class MOItems {
     public static final DeferredItem<WrenchItem> TRITANIUM_WRENCH = item("tritanium_wrench", WrenchItem::new, p -> p);
 
     // Weapons (phase 5)
+    public static final DeferredItem<PhaserItem> PHASER = item("phaser", PhaserItem::new, p -> p);
     public static final DeferredItem<PhaserRifleItem> PHASER_RIFLE = item("phaser_rifle", PhaserRifleItem::new, p -> p);
     public static final DeferredItem<PlasmaShotgunItem> PLASMA_SHOTGUN = item("plasma_shotgun", PlasmaShotgunItem::new, p -> p);
     public static final DeferredItem<IonSniperItem> ION_SNIPER = item("ion_sniper", IonSniperItem::new, p -> p);

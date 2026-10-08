@@ -619,7 +619,7 @@ shaped("fusion_reactor_controller", mid("fusion_reactor_controller"), ["CHC", "2
 import subprocess
 
 
-def weapon_obj(name, src_name, texture, scale, flip=False):
+def weapon_obj(name, src_name, texture, scale, flip=False, hidden=(), display=None):
     """A 1.7.10 weapon .obj as an item model. Keeps the model's origin (the grip) at the block centre and the
     1.7.10 renderer's relative scale (SCALE / 0.06 rifle units; the rifle is ~1 block long); flip turns a model
     that 1.7.10 rendered facing the other way (the shotgun) by 180 degrees so one display transform fits all."""
@@ -644,7 +644,7 @@ def weapon_obj(name, src_name, texture, scale, flip=False):
     cp(ref / "textures/items" / f"{texture}.png", A / "textures/item" / f"{texture}.png")
     w(A / "models/item" / f"{name}.json", {"loader": "neoforge:obj", "model": f"{MOD}:models/item/{name}.obj", "flip_v": True,
         "textures": {"weapon": f"{MOD}:item/{texture}", "particle": f"{MOD}:item/{texture}"},
-        "display": WEAPON_DISPLAY})
+        "display": WEAPON_DISPLAY | (display or {})} | ({"visibility": {h: False for h in hidden}} if hidden else {}))
     w(A / "items" / f"{name}.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:item/{name}"}})
 
 
@@ -660,6 +660,12 @@ WEAPON_DISPLAY = {
 weapon_obj("phaser_rifle", "phaser_rifle", "phaser_rifle", 0.06)
 weapon_obj("plasma_shotgun", "plasma_shotgun", "plasma_shotgun", 0.85, flip=True)
 weapon_obj("ion_sniper", "ion_sniper", "ion_sniper", 0.06)
+# 1.7.10 ItemRendererPhaser: phaser2.obj at scale 6; it drew the barrel part matching the barrel module (none for now).
+weapon_obj("phaser", "phaser2", "phaser2", 6.0, hidden=("weapon_module_barrel_damage", "weapon_module_barrel_explosion",
+                                                        "weapon_module_barrel_fire", "weapon_module_barrel_heal"),
+           display={"firstperson_righthand": {"rotation": [0, 175, 0], "translation": [1, 1, 0], "scale": [0.75, 0.75, 0.75]},
+                    "firstperson_lefthand": {"rotation": [0, 185, 0], "translation": [1, 1, 0], "scale": [0.75, 0.75, 0.75]}})
+cp(ref / "textures/fx/plasmabeam.png", A / "textures/fx/plasmabeam.png")
 
 def tinted_item(name, base, overlay, rgb):
     w(A / "models/item" / f"{name}.json", {"parent": "minecraft:item/generated", "textures": {
@@ -683,7 +689,8 @@ cp(ref / "textures/entities/PlasmaFire.png", A / "textures/entity/plasma_fire.pn
 # Sounds: Minecraft only positions and attenuates mono sounds, so stereo originals are downmixed (needs ffmpeg + oggenc).
 SOUNDS = {"phaser_rifle_shot": ["weapon/phaser_rifle_shot"], "plasma_shotgun_shot": ["weapon/plasma_shotgun_shot"],
           "sniper_rifle_fire": ["weapon/sniper_rifle_fire"], "reload": ["weapon/reload"], "overheat": ["weapon/overheat_med"],
-          "overheat_alarm": ["weapon/overheat_alarm"]}
+          "overheat_alarm": ["weapon/overheat_alarm"], "phaser_beam": ["phaser/phaser_beam_0", "phaser/phaser_beam_1"],
+          "phaser_switch_mode": ["phaser/phaser_switch_mode"]}
 for files in SOUNDS.values():
     for f in files:
         dst = A / "sounds" / f"{f}.ogg"
@@ -699,6 +706,9 @@ w(A / "sounds.json", {k: {"category": "player", "sounds": [f"{MOD}:{f}" for f in
 w(D / "damage_type/plasma.json", {"message_id": "matteroverdrive.plasma", "exhaustion": 0.1, "scaling": "when_caused_by_living_non_player"})
 w(TAGS / "minecraft/tags/damage_type/is_projectile.json", {"values": [mid("plasma")]})
 
+shaped("phaser", mid("phaser"), ["IGI", "IPH", "WCW"],
+       {"I": "minecraft:iron_ingot", "G": "minecraft:glass", "P": mid("plasma_core"), "H": mid("weapon_handle"), "W": "#minecraft:wool",
+        "C": MK[3]}, category="equipment")
 shaped("phaser_rifle", mid("phaser_rifle"), ["III", "SPC", "WHB"],
        {"I": "minecraft:iron_ingot", "S": mid("weapon_receiver"), "P": mid("plasma_core"), "C": MK[3], "W": "#minecraft:wool",
         "H": mid("weapon_handle"), "B": mid("battery")}, category="equipment")
@@ -797,6 +807,9 @@ GUI_KEYS = {
     "death.attack.matteroverdrive.plasma": "death.attack.plasmaBolt",
     "death.attack.matteroverdrive.plasma.player": "death.attack.plasmaBolt",
     "death.attack.matteroverdrive.plasma.item": "death.attack.plasmaBolt.item",
+    "tooltip.matteroverdrive.phaser.stun": {"en_us": "Stun %s/%s", "ru_ru": "Оглушение %s/%s"},
+    "tooltip.matteroverdrive.phaser.kill": {"en_us": "Kill %s/%s", "ru_ru": "Поражение %s/%s"},
+    "tooltip.matteroverdrive.phaser.stun_time": {"en_us": "Stun: %ss", "ru_ru": "Оглушение: %s с"},
     "tooltip.matteroverdrive.weapon.power_use": {"en_us": "Power Use: %s/s", "ru_ru": "Расход энергии: %s/с"},
     "tooltip.matteroverdrive.weapon.damage": {"en_us": "Damage: %s", "ru_ru": "Урон: %s"},
     "tooltip.matteroverdrive.weapon.dps": {"en_us": "DPS: %s", "ru_ru": "Урон/с: %s"},
@@ -836,7 +849,7 @@ for src_name, dst_name in [("en_US", "en_us"), ("ru_RU", "ru_ru")]:
         lang[f"item.{MOD}.{n}"] = src.get(key) or EXTRA.get(dst_name, {}).get(n) or en.get(key) or n
         if key not in src and n not in EXTRA.get(dst_name, {}):
             fallback.append(n)
-    for n in list(BATTERIES) + ["pattern_drive", "network_flash_drive", "spacetime_equalizer", "phaser_rifle", "plasma_shotgun",
+    for n in list(BATTERIES) + ["pattern_drive", "network_flash_drive", "spacetime_equalizer", "phaser", "phaser_rifle", "plasma_shotgun",
                                 "ion_sniper", "energy_pack", "matter_container"]:
         lang[f"item.{MOD}.{n}"] = src.get(f"item.{n}.name") or en.get(f"item.{n}.name")
     for n in BLOCKS + MACHINES + MACHINES_P3:

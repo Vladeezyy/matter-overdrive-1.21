@@ -34,5 +34,18 @@
     "sounds": [
       "matteroverdrive:weapon/overheat_alarm"
     ]
+  },
+  "phaser_beam": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:phaser/phaser_beam_0",
+      "matteroverdrive:phaser/phaser_beam_1"
+    ]
+  },
+  "phaser_switch_mode": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:phaser/phaser_switch_mode"
+    ]
   }
 }

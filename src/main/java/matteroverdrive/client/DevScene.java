@@ -124,11 +124,27 @@ public final class DevScene {
         at(439, mc -> shot(mc, "shotgun_fire"));
         at(441, mc -> server(mc, p -> p.getInventory().setItem(0, findWeapon(p, MOItems.ION_SNIPER.get()))));
         at(447, mc -> shot(mc, "sniper_hand"));
-        at(449, mc -> mc.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player)));
-        at(456, mc -> shot(mc, "inventory"));
-        at(458, mc -> mc.setScreen(null));
-        at(460, mc -> server(mc, p -> p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 35f, false)));
-        at(468, mc -> mc.stop());
+        at(448, mc -> server(mc, p -> {
+            ItemStack phaser = new ItemStack(MOItems.PHASER.get());
+            matteroverdrive.item.weapon.EnergyWeaponItem.setEnergy(phaser, 32000);
+            phaser.set(matteroverdrive.init.MODataComponents.PHASER_LEVEL.get(), 4);
+            p.getInventory().setItem(0, phaser);
+            p.teleportTo(p.level(), p.getX(), p.getY(), p.getZ(), Set.of(), 180f, 25f, false);
+        }));
+        at(452, mc -> shot(mc, "phaser_hand"));
+        at(453, mc -> mc.gameMode.useItem(mc.player, net.minecraft.world.InteractionHand.MAIN_HAND));
+        at(456, mc -> shot(mc, "phaser_beam"));
+        at(457, mc -> mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_BACK));
+        at(459, mc -> shot(mc, "phaser_beam_third"));
+        at(460, mc -> {
+            mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+            mc.gameMode.releaseUsingItem(mc.player);
+        });
+        at(461, mc -> mc.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player)));
+        at(466, mc -> shot(mc, "inventory"));
+        at(468, mc -> mc.setScreen(null));
+        at(470, mc -> server(mc, p -> p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 35f, false)));
+        at(478, mc -> mc.stop());
     }
 
     private static void at(int t, Consumer<Minecraft> action) {

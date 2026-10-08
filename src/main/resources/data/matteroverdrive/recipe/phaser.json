@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "IGI",
+    "IPH",
+    "WCW"
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "G": "minecraft:glass",
+    "P": "matteroverdrive:plasma_core",
+    "H": "matteroverdrive:weapon_handle",
+    "W": "#minecraft:wool",
+    "C": "matteroverdrive:isolinear_circuit_mk3"
+  },
+  "result": {
+    "id": "matteroverdrive:phaser",
+    "count": 1
+  }
+}

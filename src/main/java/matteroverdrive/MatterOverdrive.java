@@ -52,7 +52,7 @@ public class MatterOverdrive {
         for (BatteryItem battery : new BatteryItem[] {MOItems.BATTERY.get(), MOItems.HC_BATTERY.get(), MOItems.CREATIVE_BATTERY.get()}) {
             event.registerItem(Capabilities.Energy.ITEM, (stack, access) -> battery.createEnergyHandler(access), battery);
         }
-        for (var weapon : new matteroverdrive.item.weapon.EnergyWeaponItem[] {MOItems.PHASER_RIFLE.get(), MOItems.PLASMA_SHOTGUN.get(), MOItems.ION_SNIPER.get()}) {
+        for (var weapon : new matteroverdrive.item.weapon.EnergyWeaponItem[] {MOItems.PHASER.get(), MOItems.PHASER_RIFLE.get(), MOItems.PLASMA_SHOTGUN.get(), MOItems.ION_SNIPER.get()}) {
             event.registerItem(Capabilities.Energy.ITEM, (stack, access) -> weapon.createEnergyHandler(access), weapon);
         }
         machine(event, MOBlockEntities.SOLAR_PANEL.get());

@@ -122,7 +122,84 @@
 18. An anomaly with large mass flings mobs straight through its core (no collision, momentum): measure pull over a few ticks.
 19. `Level.invalidateCapabilities(pos)` after an IO port links/unlinks so cached capability lookups see the change.
 
+## 2026-10-08 — phase 5: weapons (in progress)
+- **5a ✅ (committed f3c065b)**: EnergyWeaponItem base (32000 FE, 128 FE/t transfer, heat with quart-eased cooling, overheat,
+  modules in the `weapon_modules` component, energy pack reload), phaser rifle (32,11,8,1024,80,4,0.2), plasma shotgun
+  (16,22,16,2560,80,3,0; 10 bolts at damage/10), ion sniper (96,30,21,3072,100,8,0.4; zoom), PlasmaBolt entity,
+  colour modules, energy pack + its custom recipe, mono weapon sounds.
+  Numbers above are (damage, cooldown ticks, max heat, energy/shot base, range, ?, zoom) as in 1.7.10 constructors.
+- **5b (code done, NOT committed yet — commit WIP first in the next session)**: hand phaser (`PhaserItem`): range 18, levels 0-5
+  switched by sneak-use, energy 2.1^(level+1)/tick, damage 2^(level-2) at level ≥3 + attack attribute, stun (level+1)^5 ticks
+  slowness/mining fatigue (1.7.10 jump effect dropped), heat (h+1)·(1.1+0.05·(level+1)/6), fires every tick in `onUseTick`;
+  static `PhaserItem.trace(level, player, range)` = block clip + `ProjectileUtil.getEntityHitResult`; fire/heal/explosion barrel
+  branches already ported. OBJ model phaser2 (scale 6, barrel variants hidden). Sounds phaser_beam_0/1, phaser_switch_mode.
+  Client: `WeaponClient` (attack key → `FireWeaponPayload`, FOV zoom), `PlasmaBoltRenderer`, `PhaserBeamRenderer`.
+  All 47 GameTests passed before the beam renderer rewrite.
+
+### Open problems (start here)
+1. **Phaser beam is invisible.** Tried, all draw nothing on screen (event fires, verified by log):
+   a) `RenderLevelStageEvent.AfterParticles` + `renderBuffers().bufferSource()` with identity PoseStack + translate(-cam);
+   b) same with `pose.mulPose(event.getModelViewMatrix())`;
+   c) current code: `submitCustomGeometry` from `RenderPlayerEvent.Post` (pose = entity render origin) and `RenderHandEvent`
+      (camera space), `RenderType.energySwirl(plasmabeam.png, scroll, 0)`; screenshots `scene_phaser_beam*.png` still empty.
+   Ideas to check next: is `RenderHandEvent` fired for an item using a custom model / during use? Log inside the lambda to see
+   whether the geometry callback runs at all; try `RenderType.lightning()`/`entityTranslucentEmissive` and opaque colour to
+   rule out alpha/cull (quad winding: energySwirl has cull on → emit both windings); check `ARGB.color(alpha, rgb)` with rgb
+   that already has alpha 0 (getColor may return 0x00RRGGBB → fine, but verify not 0); check scroll uv (energySwirl uses
+   texture matrix offset). Look at vanilla `GuardianRenderer`/`BeaconRenderer` submitCustomGeometry usage as the template.
+2. Phaser first-person position while using drifts bottom-right — tune `display.firstperson_righthand` in
+   `tools/gen_resources.py` (`weapon_obj("phaser", ...)` display) after the beam works.
+3. Ask the user: 1.7.10 explosion barrel multiplies FIRE_RATE by 0.15 (almost no cooldown) — keep or fix?
+
+### Remaining phase 5 (5c)
+- Barrel modules (damage/fire/explosion/heal, 1.7.10 recipes) and sniper scope (accuracy ×0.8, range ×1.5; recipe IIC/GFG/III).
+- Weapon Station block: slots battery/colour/barrel/sights/other, reads/writes `weapon_modules` component.
+- Colour modules in chest loot (global loot modifier). Phaser barrel model variants (toggle OBJ group visibility per module).
+- Then update README/MODDING_PLAN, rerun `./gradlew runGameTestServer` + `./gradlew runScene`, commit, push.
+
+## 1.21.10 / NeoForge 21.10.64 API notes (learned the hard way)
+**Workflow**
+- Resources: never hand-edit `src/main/resources/{assets,data}` — regenerate:
+  `rm -rf src/main/resources/{assets,data} && python3 -I tools/gen_resources.py ~/mo-reference/mo-1.7.10/src/main/resources/assets/mo src/main/resources`
+- Tests: `./gradlew runGameTestServer` (47 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
+  `FunctionGameTestInstance`, custom 12³ structure `matteroverdrive:gametest_area`, time-of-day via `TestEnvironmentDefinition.TimeOfDay`,
+  `makeMockServerPlayerInLevel`). Visual: `./gradlew runScene` → `run/screenshots/scene_*.png` (DevScene, world `run/saves/mo_scene`;
+  pristine copy = "Новый мир (2)"; needs `pauseOnLostFocus=false`; selected hotbar slot is client-side; place blocks with
+  `UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS` and discard ItemEntities so nothing drops).
+- MC sources for lookup: `unzip build/moddev/artifacts/neoforge-21.10.64-sources.jar <path> -d build/tmp/src21`.
+- macOS has no `timeout`; run long gradle tasks in background.
+
+**Transfer / data**
+- Energy/items/fluids use the transactional API: `EnergyHandler`/`SimpleEnergyHandler`/`ItemAccessEnergyHandler`,
+  `ResourceHandler<ItemResource>` (`ItemStacksResourceHandler`), `FluidStacksResourceHandler`, `Transaction.openRoot()`,
+  `ItemAccess.forStack`; capabilities `Capabilities.Energy.BLOCK/ITEM`, `Item.BLOCK`, `Fluid.BLOCK`.
+- Item data in data components (`MODataComponents`); BE ↔ item via `collectImplicitComponents`/`applyImplicitComponents` +
+  `copy_components` loot function. BE save uses `ValueInput`/`ValueOutput`.
+- Payloads: only send to players with `player.connection.hasChannel(TYPE)` (mock gametest players don't have it).
+- Item stacks whose components change every tick need `shouldCauseReequipAnimation` → false (else the hand bobs).
+- `Item.inventoryTick(ItemStack, ServerLevel, Entity, EquipmentSlot)` is server-only now.
+
+**GUI**
+- `GuiGraphics.blit(RenderPipelines.GUI_TEXTURED, ...)`, nine-slice via sprite `.mcmeta` (`stretch_inner`), colours are ARGB
+  (alpha 0 = invisible!), `setTooltipForNextFrame`, input via `MouseButtonEvent`/`KeyEvent`. Tabs at x = WIDTH-14, y = 38.
+
+**Rendering**
+- Entity renderers: render state + `submit(state, pose, SubmitNodeCollector, CameraRenderState)`; draw custom quads with
+  `collector.submitCustomGeometry(pose, renderType, (pose, vc) -> ...)`.
+- `RenderType.eyes` is TRANSLUCENT now (draws black quads) — use `RenderType.energySwirl(tex, u, v)` for additive glow.
+- Immediate drawing in `RenderLevelStageEvent` via the main bufferSource shows nothing (frame-graph); prefer submit collectors.
+- `ItemInHandRenderer`/entity dispatcher translate the pose to the entity render origin before `RenderPlayerEvent`.
+- `renderOutline` → `submitOutline`.
+
+**Models / textures**
+- OBJ loader (`neoforge:obj`): needs `mtllib` + `usemtl` per group, block-corner coordinates (0..1, not centred),
+  `flip_v: true` for 1.7.10 textures, `visibility: {group: false}` hides groups, `render_type: minecraft:cutout` for alpha.
+- Weapon OBJs: `weapon_obj(name, src, texture, scale, flip, hidden, display)`; k = scale/(0.06·103.6) keeps 1.7.10 size,
+  origin at grip; plasma shotgun flipped 180°. Shared display in `WEAPON_DISPLAY`, phaser has its own.
+- 1.21.4+ items need `assets/<mod>/items/<id>.json` client item definitions.
+- Sounds must be mono ogg: ffmpeg → mono wav → `oggenc` (vorbis-tools); ffmpeg's built-in vorbis is stereo-only.
+
 ## Next
-- Phase 5: weapons (phaser, phaser rifle, plasma shotgun, ion sniper, modules, weapon station, energy pack).
+- Finish phase 5 (see Open problems + 5c above), then phase 6 androids, phase 7 world & extras.
 - Polish later: machine item tooltip with stored energy, inscriber head animation, machine sounds, custom tritanium armor model,
   pattern storage drive rendering, replicator item animation, monitor hologram, router/switch filters, matter scanner.

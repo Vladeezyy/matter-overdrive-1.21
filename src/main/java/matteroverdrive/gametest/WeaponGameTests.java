@@ -30,6 +30,9 @@ final class WeaponGameTests {
         MOGameTests.add("weapon_cools_down", 20, false, WeaponGameTests::coolsDown);
         MOGameTests.add("energy_pack_reloads", 20, false, WeaponGameTests::energyPackReloads);
         MOGameTests.add("energy_pack_recipe", 20, false, WeaponGameTests::energyPackRecipe);
+        MOGameTests.add("phaser_stuns", 20, false, h -> phaserHits(h, 2));
+        MOGameTests.add("phaser_kills", 20, false, h -> phaserHits(h, 5));
+        MOGameTests.add("phaser_levels_energy_heat", 20, false, WeaponGameTests::phaserLevels);
     }
 
     private static ServerPlayer shooter(GameTestHelper helper, ItemStack weapon) {
@@ -131,6 +134,48 @@ final class WeaponGameTests {
         CraftingInput empty = CraftingInput.of(3, 1, List.of(new ItemStack(MOItems.TRITANIUM_PLATE.get()),
                 new ItemStack(MOItems.BATTERY.get()), new ItemStack(Items.GUNPOWDER)));
         helper.assertFalse(recipe.matches(empty, helper.getLevel()), Component.literal("empty battery matches"));
+        helper.succeed();
+    }
+
+    private static void phaserHits(GameTestHelper helper, int level) {
+        ItemStack phaser = charged(MOItems.PHASER.get());
+        phaser.set(matteroverdrive.init.MODataComponents.PHASER_LEVEL.get(), level);
+        ServerPlayer player = shooter(helper, phaser);
+        var pig = helper.spawnWithNoFreeWill(EntityType.PIG, new BlockPos(6, 1, 5));
+        player.lookAt(net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES, pig.position().add(0, 0.4, 0));
+        MOItems.PHASER.get().onUseTick(helper.getLevel(), player, phaser, 1000);
+        if (level < 3) {
+            // stun: slowness for (level + 1)^5 ticks; 1.7.10 still dealt the shooter's base attack damage (1)
+            var slow = pig.getEffect(net.minecraft.world.effect.MobEffects.SLOWNESS);
+            helper.assertTrue(slow != null && slow.getDuration() == (int) Math.pow(level + 1, 5), Component.literal("slowness " + slow));
+            helper.assertTrue(pig.getHealth() == pig.getMaxHealth() - 1, Component.literal("stun damage: health " + pig.getHealth()));
+        } else {
+            // kill mode: 2^(level - 2) + 1
+            float expected = pig.getMaxHealth() - ((float) Math.pow(2, level - 2) + 1);
+            helper.assertTrue(pig.isDeadOrDying() || pig.getHealth() == expected, Component.literal("kill damage: health " + pig.getHealth()));
+            helper.assertTrue(pig.getEffect(net.minecraft.world.effect.MobEffects.SLOWNESS) == null, Component.literal("kill mode stunned"));
+        }
+        helper.succeed();
+    }
+
+    private static void phaserLevels(GameTestHelper helper) {
+        ItemStack phaser = charged(MOItems.PHASER.get());
+        ServerPlayer player = shooter(helper, phaser);
+        var item = MOItems.PHASER.get();
+        helper.assertTrue(item.getEnergyUse(phaser) == 2, Component.literal("level 0 energy " + item.getEnergyUse(phaser)));
+        item.onUseTick(helper.getLevel(), player, phaser, 1000);
+        helper.assertTrue(Math.abs(EnergyWeaponItem.getHeat(phaser) - 1.1f) < 1e-4, Component.literal("level 0 heat " + EnergyWeaponItem.getHeat(phaser)));
+        player.setShiftKeyDown(true);
+        for (int i = 0; i < 5; i++) item.use(helper.getLevel(), player, InteractionHand.MAIN_HAND);
+        helper.assertTrue(matteroverdrive.item.weapon.PhaserItem.getLevel(phaser) == 5, Component.literal("level " + matteroverdrive.item.weapon.PhaserItem.getLevel(phaser)));
+        helper.assertTrue(item.getEnergyUse(phaser) == 85, Component.literal("level 5 energy " + item.getEnergyUse(phaser)));
+        EnergyWeaponItem.setHeat(phaser, 0);
+        player.setShiftKeyDown(false);
+        item.onUseTick(helper.getLevel(), player, phaser, 1000);
+        helper.assertTrue(Math.abs(EnergyWeaponItem.getHeat(phaser) - 1.15f) < 1e-4, Component.literal("level 5 heat " + EnergyWeaponItem.getHeat(phaser)));
+        player.setShiftKeyDown(true);
+        item.use(helper.getLevel(), player, InteractionHand.MAIN_HAND);
+        helper.assertTrue(matteroverdrive.item.weapon.PhaserItem.getLevel(phaser) == 0, Component.literal("level didn't wrap"));
         helper.succeed();
     }
 

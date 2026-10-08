@@ -18,6 +18,9 @@ public final class MOSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> OVERHEAT = sound("overheat");
     public static final DeferredHolder<SoundEvent, SoundEvent> OVERHEAT_ALARM = sound("overheat_alarm");
 
+    public static final DeferredHolder<SoundEvent, SoundEvent> PHASER_BEAM = sound("phaser_beam");
+    public static final DeferredHolder<SoundEvent, SoundEvent> PHASER_SWITCH_MODE = sound("phaser_switch_mode");
+
     private static DeferredHolder<SoundEvent, SoundEvent> sound(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, name)));
     }

@@ -40,5 +40,9 @@ public final class MODataComponents {
             COMPONENTS.registerComponentType("weapon_modules", b -> b.persistent(ItemContainerContents.CODEC)
                     .networkSynchronized(ItemContainerContents.STREAM_CODEC));
 
+    /** Phaser power level 0-5 (1.7.10 "power" tag): 0-2 stun, 3-5 kill. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> PHASER_LEVEL =
+            COMPONENTS.registerComponentType("phaser_level", b -> b.persistent(Codec.intRange(0, 5)).networkSynchronized(ByteBufCodecs.VAR_INT));
+
     private MODataComponents() {}
 }
