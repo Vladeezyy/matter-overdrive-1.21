@@ -25,7 +25,7 @@
   configured + placed features and `neoforge/biome_modifier` add_features to `#minecraft:is_overworld`. Stone only (no deepslate textures in the original).
 - Dilithium ore: `DropExperienceBlock` 2-5 xp, loot like diamond ore (silk touch / fortune), needs diamond tool (1.7.10 harvest level 3).
 - Tritanium tools (sword, pickaxe, axe, hoe) — `ToolMaterial(INCORRECT_FOR_IRON_TOOL, 3122, 6, 2, 14)`; armor — `ArmorMaterial(66, 4/9/7/4, ench 20)`.
-  Armor worn uses the vanilla-layout `tritanium_layer_*` textures; the original custom 3D armor model (`Tritanium_Armor2_*`, 64x64) is a later render task.
+  Armor worn uses the vanilla-layout `tritanium_layer_*` textures; the original custom 3D armor model (`Tritanium_Armor2_*`, 64x64) is a later render task (done in the leftovers).
 - `isolinear_circuit` damage values 0-3 → items `isolinear_circuit_mk1..mk4`. Only mk1 is craftable now; mk2-4 come from the Inscriber (phase 2).
 - 26 recipes from MatterOverdriveRecipes whose inputs already exist (+ block→ingots, blasting). Inputs use `c:` tags.
 - `c:` tags for ores, ingots, nuggets, dusts, plates, gems, storage blocks.
@@ -515,6 +515,15 @@
     shield_loop follows the player (1.7.10 created it without a position, so it played at the world origin).
   - Kept quirks: the own bubble is centred 0.5 below the eyes, other players' 1 below their head top; the teleport
     glow sits at foot level and is half hidden by the floor.
+- **Leftovers: tritanium armor model ✅** (1.7.10 ModelTritaniumArmor, TritaniumArmor.getArmorModel / getArmorTexture).
+  `client/TritaniumArmorModel`: the Techne model as a `HumanoidModel` layer (biped boxes + visor, chest / back plates
+  and supports, shoulder pads, boot toes; 64x64), one baked model per slot with the 1.7.10 visibility (helmet: head;
+  chestplate: body + arms; leggings: legs only; boots: legs inflated by 0.5 + toes; never the hat layer). Hooked with
+  `IClientItemExtensions.getGenericArmorModel` (not getHumanoidArmorModel: NeoForge copies the vanilla model's part
+  visibility over) and `getArmorTexture`: layer 1 for helmet / chest / legs, layer 2 for the boots. The worn textures
+  are now Tritanium_Armor2_layer_1/2 (the vanilla-layout tritanium_layer_* are no longer used).
+  - Note: the 1.7.10 textures leave the lower arms / legs bare, and the armor sits on the skin (inflate 0), so a modern
+    skin's outer layers (sleeves, jacket) show through where the armor texture is transparent.
 - Cloud (Linux) notes: regenerating resources rewrites the .ogg and ffmpeg-made .png bytes (different ffmpeg/oggenc
   builds) - `git checkout` them. Screenshots: `Xvfb :99` + `DISPLAY=:99 ./gradlew runScene` (software GL is slow; give
   menus extra ticks), world created by `runServer` with a flat creative server.properties, then moved to run/saves;
@@ -587,15 +596,14 @@
 
 ## Next
 - Phase 7 ✅. Leftovers done: legendary bonuses, network destination filters, machine renderers, machine sounds,
-  machine item tooltip, android shield bubble + teleport marker.
+  machine item tooltip, android shield bubble + teleport marker, tritanium armor model.
 - Leftovers still to do (user: any order):
-  1. custom tritanium armor model (1.7.10 Tritanium_Armor2_*);
-  2. noticed while doing the sounds: the stabilizer's beam is END_ROD particles, not the 1.7.10 coloured beam
+  1. noticed while doing the sounds: the stabilizer's beam is END_ROD particles, not the 1.7.10 coloured beam
      (GravitationalStabilizerBeamParticle; colours are `getBeamColorR/G/B` now); missing weapon sounds sizzle,
      laser_ricochet (plasma bolt hits), plasma_shotgun_charging, gui button_expand.
 
 ## Handover (2026-10-08, cloud -> local)
-- Branch `main-uvidhk`, everything committed and pushed. Last commit: "Leftovers: android shield bubble ...". 94 GameTests
+- Branch `main-uvidhk`, everything committed and pushed. Last commit: "Leftovers: tritanium armor model ...". 94 GameTests
   pass (`./gradlew runGameTestServer`).
 - DevScene now builds the scene at the world spawn on the flat surface (`level.getMinY() + 4`), not at the player's
   saved position. A local mo_scene world that isn't a default superflat may put the floor elsewhere: adjust `build()`

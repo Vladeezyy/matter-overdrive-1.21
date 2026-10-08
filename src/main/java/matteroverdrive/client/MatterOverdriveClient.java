@@ -180,6 +180,9 @@ public class MatterOverdriveClient {
                 return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "block/matter_plasma_flowing");
             }
         }, MOFluids.MATTER_PLASMA_TYPE.get());
+        // 1.7.10 ModelTritaniumArmor
+        event.registerItem(TritaniumArmorModel.EXTENSIONS, MOItems.TRITANIUM_HELMET.get(), MOItems.TRITANIUM_CHESTPLATE.get(),
+                MOItems.TRITANIUM_LEGGINGS.get(), MOItems.TRITANIUM_BOOTS.get());
         // 1.7.10 weapons stayed raised while firing; vanilla drops the hand after every successful use (itemUsed)
         event.registerItem(new IClientItemExtensions() {
             @Override

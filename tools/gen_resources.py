@@ -85,13 +85,13 @@ for n in BLOCKS:
     w(A / "blockstates" / f"{n}.json", {"variants": {"": {"model": f"{MOD}:block/{n}"}}})
     w(A / "items" / f"{n}.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:block/{n}"}})
 
-# Armor worn on the player. The 1.7.10 mod rendered a custom model with 64x64 textures
-# (Tritanium_Armor2_layer_*); the vanilla-layout textures it also shipped are used until that model is ported.
+# Armor worn on the player: the 1.7.10 custom model (client/TritaniumArmorModel) with its 64x64 Tritanium_Armor2 textures;
+# the model picks layer 1 for helmet / chest / legs and layer 2 for the boots.
 w(A / "equipment/tritanium.json", {"layers": {
     "humanoid": [{"texture": mid("tritanium")}],
     "humanoid_leggings": [{"texture": mid("tritanium")}]}})
-cp(ref / "textures/armor/tritanium_layer_1.png", A / "textures/entity/equipment/humanoid/tritanium.png")
-cp(ref / "textures/armor/tritanium_layer_2.png", A / "textures/entity/equipment/humanoid_leggings/tritanium.png")
+cp(ref / "textures/armor/Tritanium_Armor2_layer_1.png", A / "textures/entity/equipment/humanoid/tritanium.png")
+cp(ref / "textures/armor/Tritanium_Armor2_layer_2.png", A / "textures/entity/equipment/humanoid_leggings/tritanium.png")
 
 # --- loot tables -----------------------------------------------------------------------------
 def self_drop(n):

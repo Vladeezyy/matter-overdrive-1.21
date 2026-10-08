@@ -1266,8 +1266,54 @@ public final class DevScene {
             MatterOverdrive.LOGGER.info("[scene] after teleport: {}", p.position());
             matteroverdrive.android.Android.setAndroid(p, false);
         }));
-        at(3258, mc -> mc.options.hideGui = false);
-        at(3262, mc -> mc.stop());
+        // leftovers: the 1.7.10 tritanium armor model - the player in the full set, armor stands with helmet + boots
+        // and chestplate + leggings
+        at(3258, mc -> server(mc, p -> {
+            BlockPos base = origin.above(30);
+            p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() + 0.5, Set.of(), 180f, 0f, false);
+            p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.HEAD, new ItemStack(MOItems.TRITANIUM_HELMET.get()));
+            p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, new ItemStack(MOItems.TRITANIUM_CHESTPLATE.get()));
+            p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.LEGS, new ItemStack(MOItems.TRITANIUM_LEGGINGS.get()));
+            p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.FEET, new ItemStack(MOItems.TRITANIUM_BOOTS.get()));
+            p.getInventory().setItem(p.getInventory().getSelectedSlot(), ItemStack.EMPTY);
+            // the platform is underground: light it up and clear the mobs that wandered in
+            p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION, 600, 0, false, false));
+            p.level().getEntitiesOfClass(net.minecraft.world.entity.monster.Monster.class, new AABB(base).inflate(24)).forEach(e -> e.discard());
+            for (int side : new int[] {-1, 1}) {
+                var stand = net.minecraft.world.entity.EntityType.ARMOR_STAND.create(p.level(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+                stand.snapTo(base.getX() + 0.5 + side * 1.6, base.getY(), base.getZ() - 0.5, 0, 0);
+                if (side < 0) {
+                    stand.setItemSlot(net.minecraft.world.entity.EquipmentSlot.HEAD, new ItemStack(MOItems.TRITANIUM_HELMET.get()));
+                    stand.setItemSlot(net.minecraft.world.entity.EquipmentSlot.FEET, new ItemStack(MOItems.TRITANIUM_BOOTS.get()));
+                } else {
+                    stand.setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, new ItemStack(MOItems.TRITANIUM_CHESTPLATE.get()));
+                    stand.setItemSlot(net.minecraft.world.entity.EquipmentSlot.LEGS, new ItemStack(MOItems.TRITANIUM_LEGGINGS.get()));
+                }
+                stand.addTag("mo_scene_armor");
+                p.level().addFreshEntity(stand);
+            }
+        }));
+        at(3260, mc -> {
+            mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT);
+            mc.options.hideGui = true;
+        });
+        at(3272, mc -> shot(mc, "tritanium_armor_front"));
+        at(3273, mc -> mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_BACK));
+        at(3282, mc -> shot(mc, "tritanium_armor_back"));
+        at(3283, mc -> server(mc, p -> {
+            for (var slot : new net.minecraft.world.entity.EquipmentSlot[] {net.minecraft.world.entity.EquipmentSlot.HEAD,
+                    net.minecraft.world.entity.EquipmentSlot.CHEST, net.minecraft.world.entity.EquipmentSlot.LEGS, net.minecraft.world.entity.EquipmentSlot.FEET}) {
+                p.setItemSlot(slot, ItemStack.EMPTY);
+            }
+            p.removeEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION);
+            p.level().getEntitiesOfClass(net.minecraft.world.entity.decoration.ArmorStand.class, new AABB(origin.above(30)).inflate(8),
+                    e -> e.getTags().contains("mo_scene_armor")).forEach(net.minecraft.world.entity.Entity::discard);
+        }));
+        at(3285, mc -> {
+            mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+            mc.options.hideGui = false;
+        });
+        at(3288, mc -> mc.stop());
     }
 
     /** Shows one item's tooltip in the middle of the screen. */
