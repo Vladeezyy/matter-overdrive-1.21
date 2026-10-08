@@ -33,6 +33,17 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 @Mod(value = MatterOverdrive.MODID, dist = Dist.CLIENT)
 @EventBusSubscriber(modid = MatterOverdrive.MODID, value = Dist.CLIENT)
 public class MatterOverdriveClient {
+    public MatterOverdriveClient() {
+        // 1.7.10 AndroidPlayer.playTransformMusic
+        matteroverdrive.android.AndroidClientHooks.transformationStarted = player -> {
+            var mc = net.minecraft.client.Minecraft.getInstance();
+            if (player == mc.player) {
+                mc.getSoundManager().play(net.minecraft.client.resources.sounds.SimpleSoundInstance.forMusic(
+                        matteroverdrive.init.MOSounds.TRANSFORMATION_MUSIC.get(), 1));
+            }
+        };
+    }
+
     @SubscribeEvent
     static void registerScreens(RegisterMenuScreensEvent event) {
         event.register(MOMenus.SOLAR_PANEL.get(), SolarPanelScreen::new);

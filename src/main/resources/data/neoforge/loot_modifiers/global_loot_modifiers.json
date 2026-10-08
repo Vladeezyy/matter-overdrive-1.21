@@ -1,6 +1,7 @@
 {
   "replace": false,
   "entries": [
-    "matteroverdrive:weapon_module_colors"
+    "matteroverdrive:weapon_module_colors",
+    "matteroverdrive:android_pill"
   ]
 }

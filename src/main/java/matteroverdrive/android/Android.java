@@ -1,0 +1,329 @@
+package matteroverdrive.android;
+
+import matteroverdrive.MatterOverdrive;
+import matteroverdrive.init.MOAttachments;
+import matteroverdrive.init.MOAttributes;
+import matteroverdrive.init.MOItems;
+import matteroverdrive.init.MOSounds;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageType;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.LivingEvent;
+import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+
+/**
+ * 1.7.10 AndroidPlayer's behaviour: energy (the battery slot, or the built-in store), the transformation, and what
+ * being an android changes every tick (food from energy, no potion effects, sinking, no drowning, jumps cost energy,
+ * half fall distance, glitching when hurt, slow when out of power).
+ */
+@EventBusSubscriber(modid = MatterOverdrive.MODID)
+public final class Android {
+    public static final int RECHARGE_AMOUNT_ON_RESPAWN = 64000;
+    public static final int BUILTIN_ENERGY_TRANSFER = 1024;
+    public static final int TRANSFORM_TIME = 20 * 34;
+    public static final int ENERGY_FOOD_MULTIPLY = 256;
+    public static final int ENERGY_PER_JUMP = 512;
+    public static final float FALL_NEGATE = 0.5f;
+    public static final boolean TRANSFORMATION_DEATH = true;
+    public static final boolean REMOVE_POTION_EFFECTS = true;
+    public static final ResourceKey<DamageType> TRANSFORMATION_DAMAGE = ResourceKey.create(Registries.DAMAGE_TYPE,
+            ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "android_transformation"));
+    private static final ResourceLocation OUT_OF_POWER = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "android_out_of_power");
+
+    public static AndroidData get(Player player) {
+        return player.getData(MOAttachments.ANDROID);
+    }
+
+    public static boolean isAndroid(Player player) {
+        return get(player).isAndroid();
+    }
+
+    /** Pushes a change to the player and everyone tracking them. */
+    public static void sync(Player player) {
+        get(player).dirty = false;
+        if (!player.level().isClientSide()) player.syncData(MOAttachments.ANDROID);
+    }
+
+    // --- energy -------------------------------------------------------------------------------------
+
+    private static EnergyHandler battery(AndroidData data) {
+        if (data.getStack(AndroidData.SLOT_BATTERY).isEmpty()) return null;
+        return ItemAccess.forHandlerIndex(data.inventory, AndroidData.SLOT_BATTERY).getCapability(Capabilities.Energy.ITEM);
+    }
+
+    public static int getEnergy(Player player) {
+        AndroidData data = get(player);
+        if (player.isCreative()) return getMaxEnergy(player);
+        EnergyHandler battery = battery(data);
+        return battery != null ? battery.getAmountAsInt() : data.energy;
+    }
+
+    public static int getMaxEnergy(Player player) {
+        EnergyHandler battery = battery(get(player));
+        return battery != null ? battery.getCapacityAsInt() : AndroidData.MAX_ENERGY;
+    }
+
+    /** 1.7.10 extractEnergyRaw: from the battery, else at most 1024 FE from the built-in store; free in creative. */
+    public static int extractEnergy(Player player, int amount, boolean simulate) {
+        if (player.isCreative()) return amount;
+        AndroidData data = get(player);
+        EnergyHandler battery = battery(data);
+        int extracted;
+        if (battery != null) {
+            try (Transaction tx = Transaction.openRoot()) {
+                extracted = battery.extract(amount, tx);
+                if (!simulate) tx.commit();
+            }
+        } else {
+            extracted = Math.min(Math.min(data.energy, amount), BUILTIN_ENERGY_TRANSFER);
+            if (!simulate) data.energy = Mth.clamp(data.energy - extracted, 0, AndroidData.MAX_ENERGY);
+        }
+        if (extracted > 0 && !simulate) data.dirty = true;
+        return extracted;
+    }
+
+    public static int receiveEnergy(Player player, int amount, boolean simulate) {
+        AndroidData data = get(player);
+        EnergyHandler battery = battery(data);
+        int received;
+        if (battery != null) {
+            try (Transaction tx = Transaction.openRoot()) {
+                received = battery.insert(amount, tx);
+                if (!simulate) tx.commit();
+            }
+        } else {
+            received = Math.min(Math.min(AndroidData.MAX_ENERGY - data.energy, amount), BUILTIN_ENERGY_TRANSFER);
+            if (!simulate) data.energy += received;
+        }
+        if (received > 0 && !simulate) data.dirty = true;
+        return received;
+    }
+
+    /** 1.7.10 extractEnergyScaled: scaled by the battery-use attribute. */
+    public static void extractEnergyScaled(Player player, int amount) {
+        extractEnergy(player, (int) (amount * player.getAttributeValue(MOAttributes.BATTERY_USE)), false);
+    }
+
+    public static boolean hasEnoughEnergyScaled(Player player, int amount) {
+        int needed = (int) Math.ceil(amount * player.getAttributeValue(MOAttributes.BATTERY_USE));
+        return extractEnergy(player, amount, true) >= needed;
+    }
+
+    // --- becoming (and stopping being) an android -------------------------------------------------------
+
+    /** 1.7.10 startConversion: the red pill starts a 34 s transformation. */
+    public static void startTransformation(ServerPlayer player) {
+        AndroidData data = get(player);
+        if (data.isAndroid() || data.isTurning()) return;
+        data.turning = TRANSFORM_TIME;
+        sync(player);
+    }
+
+    public static void setAndroid(Player player, boolean android) {
+        AndroidData data = get(player);
+        data.android = android;
+        if (!android) removeOutOfPower(player);
+        sync(player);
+    }
+
+    /** 1.7.10 resetUnlocked: forget every stat, returning half the XP levels they cost. */
+    public static int resetStats(Player player) {
+        AndroidData data = get(player);
+        int xp = getResetXP(data);
+        data.stats.clear();
+        sync(player);
+        return xp;
+    }
+
+    public static int getResetXP(AndroidData data) {
+        int xp = 0;
+        for (var entry : data.stats.entrySet()) {
+            BioticStat stat = BioticStats.get(entry.getKey());
+            if (stat != null) xp += stat.xp();
+        }
+        return xp / 2;
+    }
+
+    public static boolean tryUnlock(Player player, BioticStat stat, int level) {
+        AndroidData data = get(player);
+        if (!stat.canBeUnlocked(player, data, level)) return false;
+        data.stats.put(stat.id(), level);
+        stat.onUnlock(player, level);
+        sync(player);
+        return true;
+    }
+
+    /** Sets the transformation countdown (tests, commands). */
+    public static void setTurning(Player player, int ticks) {
+        get(player).turning = ticks;
+        sync(player);
+    }
+
+    public static void glitch(Player player, int ticks) {
+        get(player).glitchTime = ticks;
+    }
+
+    // --- ticking ------------------------------------------------------------------------------------
+
+    @SubscribeEvent
+    static void onPlayerTick(PlayerTickEvent.Post event) {
+        tick(event.getEntity());
+    }
+
+    /** One tick of android behaviour for this player (public for tests and commands). */
+    public static void tick(Player player) {
+        AndroidData data = get(player);
+        if (data.glitchTime > 0) data.glitchTime--;
+        if (!(player instanceof ServerPlayer server)) return;
+        if (data.isAndroid()) {
+            if (getEnergy(player) > 0) {
+                if (player.getFoodData().needsFood()) {
+                    int foodNeeded = 20 - player.getFoodData().getFoodLevel();
+                    int extracted = extractEnergy(player, foodNeeded * ENERGY_FOOD_MULTIPLY, false);
+                    player.getFoodData().eat(extracted / ENERGY_FOOD_MULTIPLY, 0);
+                }
+                removeOutOfPower(player);
+                if (REMOVE_POTION_EFFECTS && !player.getActiveEffects().isEmpty()) player.removeAllEffects();
+            } else {
+                manageOutOfPower(server);
+            }
+            manageCharging(player);
+            if (player.isInWater()) player.setDeltaMovement(player.getDeltaMovement().add(0, -0.007, 0));
+            if (player.getAirSupply() < 0) player.setAirSupply(0);
+            for (BioticStat stat : BioticStats.all()) {
+                int level = data.getUnlockedLevel(stat);
+                if (level > 0 && stat.isEnabled(player, data, level)) stat.onAndroidTick(server, data, level);
+            }
+        }
+        manageTurning(server, data);
+        if (data.dirty && player.tickCount % 10 == 0) sync(player);
+    }
+
+    /** 1.7.10 manageCharging: sneaking with a battery in hand drains it into the android. */
+    private static void manageCharging(Player player) {
+        ItemStack held = player.getMainHandItem();
+        if (!player.isShiftKeyDown() || !(held.is(MOItems.BATTERY.get()) || held.is(MOItems.HC_BATTERY.get()))) return;
+        EnergyHandler item = ItemAccess.forPlayerInteraction(player, net.minecraft.world.InteractionHand.MAIN_HAND).getCapability(Capabilities.Energy.ITEM);
+        if (item == null) return;
+        int free = getMaxEnergy(player) - getEnergy(player);
+        if (free <= 0) return;
+        int canTake = receiveEnergy(player, free, true);
+        try (Transaction tx = Transaction.openRoot()) {
+            int taken = item.extract(canTake, tx);
+            tx.commit();
+            receiveEnergy(player, taken, false);
+        }
+    }
+
+    /** 1.7.10 manageOutOfPower: half speed (the client glitches every 3 s, see the HUD). */
+    private static void manageOutOfPower(ServerPlayer player) {
+        AttributeInstance speed = player.getAttribute(Attributes.MOVEMENT_SPEED);
+        if (speed != null && !speed.hasModifier(OUT_OF_POWER)) {
+            speed.addTransientModifier(new AttributeModifier(OUT_OF_POWER, -0.5, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+        }
+    }
+
+    private static void removeOutOfPower(Player player) {
+        AttributeInstance speed = player.getAttribute(Attributes.MOVEMENT_SPEED);
+        if (speed != null) speed.removeModifier(OUT_OF_POWER);
+    }
+
+    /** 1.7.10 manageTurning: sickness while turning, a hit every 2 s, then android - and (by default) death. */
+    private static void manageTurning(ServerPlayer player, AndroidData data) {
+        if (data.turning <= 0) return;
+        ServerLevel level = player.level();
+        var damage = level.damageSources().source(TRANSFORMATION_DAMAGE);
+        data.turning--;
+        if (data.turning > 0) {
+            player.addEffect(new MobEffectInstance(MobEffects.NAUSEA, TRANSFORM_TIME));
+            player.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, TRANSFORM_TIME, 1));
+            player.addEffect(new MobEffectInstance(MobEffects.HUNGER, TRANSFORM_TIME));
+            player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, TRANSFORM_TIME));
+            if (data.turning % 40 == 0) {
+                player.hurtServer(level, damage, 0.1f);
+                playGlitch(player, 0.2f);
+            }
+        } else {
+            setAndroid(player, true);
+            playGlitch(player, 0.8f);
+            if (!player.isCreative() && !level.getLevelData().isHardcore() && TRANSFORMATION_DEATH) {
+                player.hurtServer(level, damage, Float.MAX_VALUE);
+            }
+        }
+        data.dirty = true;
+        sync(player);
+    }
+
+    public static void playGlitch(Player player, float volume) {
+        player.level().playSound(null, player.getX(), player.getY(), player.getZ(), MOSounds.GLITCH.get(), SoundSource.PLAYERS,
+                volume, 0.9f + player.getRandom().nextFloat() * 0.2f);
+    }
+
+    // --- events -------------------------------------------------------------------------------------
+
+    @SubscribeEvent
+    static void onJump(LivingEvent.LivingJumpEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player && isAndroid(player)) {
+            extractEnergyScaled(player, ENERGY_PER_JUMP);
+        }
+    }
+
+    @SubscribeEvent
+    static void onFall(LivingFallEvent event) {
+        if (event.getEntity() instanceof Player player && isAndroid(player)) {
+            event.setDistance(event.getDistance() * FALL_NEGATE);
+        }
+    }
+
+    /** 1.7.10 onEntityHurt: a short glitch (scaled by the glitch-time attribute) and its sound. */
+    @SubscribeEvent
+    static void onDamaged(LivingDamageEvent.Post event) {
+        if (event.getEntity() instanceof ServerPlayer player && isAndroid(player) && event.getNewDamage() > 0) {
+            glitch(player, (int) (10 * player.getAttributeValue(MOAttributes.GLITCH_TIME)));
+            sync(player);
+            playGlitch(player, 0.2f);
+        }
+    }
+
+    /** 1.7.10 onPlayerRespawn: androids come back with at least 64000 FE. */
+    @SubscribeEvent
+    static void onRespawn(PlayerEvent.PlayerRespawnEvent event) {
+        Player player = event.getEntity();
+        if (event.isEndConquered() || !isAndroid(player)) return;
+        for (int i = 0; i < 1000 && getEnergy(player) < RECHARGE_AMOUNT_ON_RESPAWN; i++) {
+            if (receiveEnergy(player, RECHARGE_AMOUNT_ON_RESPAWN, false) <= 0) break;
+        }
+        sync(player);
+    }
+
+    @SubscribeEvent
+    static void onAttributes(EntityAttributeModificationEvent event) {
+        event.add(EntityType.PLAYER, MOAttributes.GLITCH_TIME);
+        event.add(EntityType.PLAYER, MOAttributes.BATTERY_USE);
+    }
+
+    private Android() {}
+}

@@ -705,7 +705,13 @@ cp(ref / "textures/entities/PlasmaFire.png", A / "textures/entity/plasma_fire.pn
 SOUNDS = {"phaser_rifle_shot": ["weapon/phaser_rifle_shot"], "plasma_shotgun_shot": ["weapon/plasma_shotgun_shot"],
           "sniper_rifle_fire": ["weapon/sniper_rifle_fire"], "reload": ["weapon/reload"], "overheat": ["weapon/overheat_med"],
           "overheat_alarm": ["weapon/overheat_alarm"], "phaser_beam": ["phaser/phaser_beam_0", "phaser/phaser_beam_1"],
-          "phaser_switch_mode": ["phaser/phaser_switch_mode"]}
+          "phaser_switch_mode": ["phaser/phaser_switch_mode"],
+          # androids (phase 6)
+          "glitch": [f"gui/glitch_{i}" for i in range(11)], "transformation_music": ["music/transformation_music"],
+          "biotic_stat_unlock": ["gui/biotic_stat_unlock"], "android_teleport": ["entities/android_teleport"],
+          "shield_loop": ["shield_loop"], "shield_hit": ["shield_hit_0", "shield_hit_1"], "shield_power_up": ["shield_power_up"],
+          "shield_power_down": ["shield_power_up"], "cloak_on": ["entities/cloak_on"], "cloak_off": ["entities/cloak_off"],
+          "night_vision": ["night_vision"], "power_down": ["power_down"], "shockwave": ["shockwave"]}
 for files in SOUNDS.values():
     for f in files:
         dst = A / "sounds" / f"{f}.ogg"
@@ -785,7 +791,28 @@ w(D / "loot_table/chests/weapon_module_colors.json", {"type": "minecraft:chest",
 w(D / "loot_modifiers/weapon_module_colors.json", {"type": "neoforge:add_table", "table": mid("chests/weapon_module_colors"),
     "conditions": [{"condition": "minecraft:any_of", "terms": [
         {"condition": "neoforge:loot_table_id", "loot_table_id": f"minecraft:chests/{c}"} for c in CHESTS]}]})
-w(out / "data/neoforge/loot_modifiers/global_loot_modifiers.json", {"replace": False, "entries": [mid("weapon_module_colors")]})
+
+
+# --- phase 6: androids -------------------------------------------------------------------------------
+for t in ["pill_bottom", "pill_top"]:
+    cp(ref / "textures/items" / f"{t}.png", A / "textures/item" / f"{t}.png")
+for n, c in {"red": 0xD00000, "blue": 0x019FEA, "yellow": 0xFFE400}.items():     # 1.7.10 AndroidPill colours
+    tinted_item(f"android_pill_{n}", "pill_bottom", "pill_top", c)
+# 1.7.10 manageTurning: an absolute, armour-piercing hit.
+w(D / "damage_type/android_transformation.json", {"message_id": "matteroverdrive.android_transformation", "exhaustion": 0.0,
+                                                  "scaling": "never"})
+for tag in ["bypasses_armor", "bypasses_effects", "bypasses_enchantments", "bypasses_resistance"]:
+    p = TAGS / f"minecraft/tags/damage_type/{tag}.json"
+    values = json.loads(p.read_text())["values"] if p.exists() else []
+    w(p, {"values": values + [mid("android_transformation")]})
+# 1.7.10 AndroidPill.addToDunguns: the red pill in stronghold corridors (weight 1 there; 10% of chests here).
+w(D / "loot_table/chests/android_pill.json", {"type": "minecraft:chest", "pools": [{"rolls": 1, "bonus_rolls": 0,
+    "conditions": [{"condition": "minecraft:random_chance", "chance": 0.1}],
+    "entries": [{"type": "minecraft:item", "name": mid("android_pill_red")}]}]})
+w(D / "loot_modifiers/android_pill.json", {"type": "neoforge:add_table", "table": mid("chests/android_pill"),
+    "conditions": [{"condition": "neoforge:loot_table_id", "loot_table_id": "minecraft:chests/stronghold_corridor"}]})
+w(out / "data/neoforge/loot_modifiers/global_loot_modifiers.json", {"replace": False,
+    "entries": [mid("weapon_module_colors"), mid("android_pill")]})
 
 
 # --- matter values (1.7.10 MatterOverdriveMatter.registerBasic*) -----------------------------------
@@ -821,7 +848,9 @@ MATTER_ITEMS = {
     "iron_horse_armor": 32 * 5, "golden_horse_armor": 42 * 5, "diamond_horse_armor": 256 * 5, "experience_bottle": 32,
     "chicken": 2, "cooked_chicken": 3, "rotten_flesh": 1, "name_tag": 32, "glass_bottle": 3,
 }
-w(D / "data_maps/item/matter.json", {"values": {**MATTER_TAGS, **{f"minecraft:{k}": v for k, v in MATTER_ITEMS.items()}}})
+w(D / "data_maps/item/matter.json", {"values": {**MATTER_TAGS, **{f"minecraft:{k}": v for k, v in MATTER_ITEMS.items()},
+    # 1.7.10 MatterOverdriveMatter: blue and yellow android pills can be replicated, the red one can't
+    mid("android_pill_blue"): 64, mid("android_pill_yellow"): 32}})
 
 
 # --- game test area ---------------------------------------------------------------------------------
@@ -930,6 +959,14 @@ for src_name, dst_name in [("en_US", "en_us"), ("ru_RU", "ru_ru")]:
         lang[f"weapon_stat.{MOD}.{stat}"] = src.get(f"weaponstat.{i}.name") or en[f"weaponstat.{i}.name"]
     for m in ["battery", "color", "barrel", "sights", "other"]:
         lang[f"gui.{MOD}.module.{m}"] = src.get(f"module.{m}.name") or en[f"module.{m}.name"]
+    for c in ["red", "blue", "yellow"]:
+        lang[f"item.{MOD}.android_pill_{c}"] = src.get(f"item.android_pill_{c}.name") or en[f"item.android_pill_{c}.name"]
+        lang[f"item.{MOD}.android_pill_{c}.details"] = src.get(f"item.android_pill_{c}.details") or en[f"item.android_pill_{c}.details"]
+    for k in [k for k in en if k.startswith("biotic_stat.") or k.startswith("gui.android_hud.transforming")]:
+        lang[k.replace("biotic_stat.", f"biotic_stat.{MOD}.").replace("gui.android_hud.", f"gui.{MOD}.android_hud.")] = src.get(k) or en[k]
+    lang[f"death.attack.{MOD}.android_transformation"] = src.get("death.attack.android_transformation") or en["death.attack.android_transformation"]
+    lang[f"attribute.name.{MOD}.android_glitch_time"] = {"en_us": "Glitch Time", "ru_ru": "Длительность сбоев"}[dst_name]
+    lang[f"attribute.name.{MOD}.android_battery_use"] = {"en_us": "Battery Use", "ru_ru": "Расход батареи"}[dst_name]
     for ours, theirs in GUI_KEYS.items():
         if isinstance(theirs, dict):
             lang[ours] = theirs[dst_name]

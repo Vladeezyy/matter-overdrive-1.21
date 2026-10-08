@@ -1,0 +1,17 @@
+package matteroverdrive.android;
+
+import java.util.function.Consumer;
+
+import net.minecraft.world.entity.player.Player;
+
+/** Client callbacks set by the client setup, so common code never loads client classes. */
+public final class AndroidClientHooks {
+    /** The local player started turning into an android: 1.7.10 played the transformation music. */
+    public static Consumer<Player> transformationStarted = player -> {};
+
+    static void onTransformationStarted(Player player) {
+        transformationStarted.accept(player);
+    }
+
+    private AndroidClientHooks() {}
+}

@@ -20,6 +20,7 @@ import matteroverdrive.item.weapon.PlasmaShotgunItem;
 import matteroverdrive.item.weapon.WeaponColorModuleItem;
 import matteroverdrive.item.weapon.WeaponBarrelItem;
 import matteroverdrive.item.weapon.SniperScopeItem;
+import matteroverdrive.item.android.AndroidPillItem;
 import matteroverdrive.machine.UpgradeType;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.BlockItem;
@@ -150,6 +151,11 @@ public final class MOItems {
     public static final DeferredItem<WeaponBarrelItem> BARREL_HEAL = barrel(WeaponBarrelItem.Type.HEAL);
     public static final DeferredItem<SniperScopeItem> SNIPER_SCOPE = item("sniper_scope", SniperScopeItem::new, p -> p);
     public static final DeferredItem<BlockItem> WEAPON_STATION = block("weapon_station", MOBlocks.WEAPON_STATION);
+
+    // Androids (phase 6)
+    public static final DeferredItem<AndroidPillItem> ANDROID_PILL_RED = item("android_pill_red", p -> new AndroidPillItem(AndroidPillItem.Type.RED, p), p -> p);
+    public static final DeferredItem<AndroidPillItem> ANDROID_PILL_BLUE = item("android_pill_blue", p -> new AndroidPillItem(AndroidPillItem.Type.BLUE, p), p -> p);
+    public static final DeferredItem<AndroidPillItem> ANDROID_PILL_YELLOW = item("android_pill_yellow", p -> new AndroidPillItem(AndroidPillItem.Type.YELLOW, p), p -> p);
 
     private static DeferredItem<WeaponBarrelItem> barrel(WeaponBarrelItem.Type type) {
         return item("weapon_module_barrel_" + type.id(), p -> new WeaponBarrelItem(type, p), p -> p);

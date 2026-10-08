@@ -47,5 +47,94 @@
     "sounds": [
       "matteroverdrive:phaser/phaser_switch_mode"
     ]
+  },
+  "glitch": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:gui/glitch_0",
+      "matteroverdrive:gui/glitch_1",
+      "matteroverdrive:gui/glitch_2",
+      "matteroverdrive:gui/glitch_3",
+      "matteroverdrive:gui/glitch_4",
+      "matteroverdrive:gui/glitch_5",
+      "matteroverdrive:gui/glitch_6",
+      "matteroverdrive:gui/glitch_7",
+      "matteroverdrive:gui/glitch_8",
+      "matteroverdrive:gui/glitch_9",
+      "matteroverdrive:gui/glitch_10"
+    ]
+  },
+  "transformation_music": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:music/transformation_music"
+    ]
+  },
+  "biotic_stat_unlock": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:gui/biotic_stat_unlock"
+    ]
+  },
+  "android_teleport": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:entities/android_teleport"
+    ]
+  },
+  "shield_loop": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:shield_loop"
+    ]
+  },
+  "shield_hit": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:shield_hit_0",
+      "matteroverdrive:shield_hit_1"
+    ]
+  },
+  "shield_power_up": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:shield_power_up"
+    ]
+  },
+  "shield_power_down": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:shield_power_up"
+    ]
+  },
+  "cloak_on": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:entities/cloak_on"
+    ]
+  },
+  "cloak_off": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:entities/cloak_off"
+    ]
+  },
+  "night_vision": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:night_vision"
+    ]
+  },
+  "power_down": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:power_down"
+    ]
+  },
+  "shockwave": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:shockwave"
+    ]
   }
 }

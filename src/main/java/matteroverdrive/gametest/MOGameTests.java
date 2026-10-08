@@ -73,6 +73,7 @@ public final class MOGameTests {
         FusionGameTests.addAll();
         WeaponGameTests.addAll();
         ModuleGameTests.addAll();
+        AndroidGameTests.addAll();
         TESTS.forEach((name, spec) -> FUNCTIONS.register(name, () -> spec.body()));
     }
 
