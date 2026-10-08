@@ -86,7 +86,7 @@
    replicator (1.7.10 formulas, failure -> matter dust, radiation without 5 tritanium plates). OBJ models for storage and replicator.
 
 ### Deviations from 1.7.10
-- The network is a shared bus: router and switch only connect; flash-drive filters are not ported.
+- The network is a shared bus: router and switch only connect; destination filters came later (see the leftovers).
 - Pattern monitor recipe uses a glass pane instead of the holo sign until the holo sign (phase 7) exists.
 - The analyzer's database slot takes a pattern drive directly (or a matter scanner since 7j).
 - Pattern storage drives inside the block, replicator item animation, monitor hologram are renderer polish for later.
@@ -457,6 +457,14 @@
   x(1 + 0.15n) (`legendary_weapon`); 1.7.10 read the range multiplier as an int, so it never changed the range (kept).
   Both get the "✪ Legendary" gold name. Weapon tooltips show the 1.7.10 green / red percentages against the base and the
   Accuracy line; part tooltips list every attribute in the 1.7.10 format. 92 GameTests.
+- **Leftovers: network destination filters ✅** (1.7.10 NetworkFlashDrive, ComponentMatterNetworkConfigs / DestinationFilterSlot,
+  MatterNetworkConfigPage, packet filters in MatterNetworkComponentClient). The "router / switch filters" of the old
+  notes are really this: the analyzer, pattern storage, pattern monitor and replicator have a Destination Filter slot
+  on their Config page (`MachineInventory.Role.FILTER`); a network flash drive used on a matter network block adds or
+  removes it (`network_filter` component, tooltip "[x,y,z] Block"). With a drive in the slot the machine only reaches
+  the listed blocks: the analyzer stores into listed storages, the monitor lists listed storages' patterns and sends
+  tasks to listed replicators (the storage's and replicator's filters did nothing visible in 1.7.10 either). 93 GameTests.
+  - Deviation: 1.7.10's "Destination Address" text field (saved, never used) isn't ported.
 - Cloud (Linux) notes: regenerating resources rewrites the .ogg and ffmpeg-made .png bytes (different ffmpeg/oggenc
   builds) - `git checkout` them. Screenshots: `Xvfb :99` + `DISPLAY=:99 ./gradlew runScene` (software GL is slow; give
   menus extra ticks), world created by `runServer` with a flat creative server.properties, then moved to run/saves;
@@ -478,7 +486,7 @@
 **Workflow**
 - Resources: never hand-edit `src/main/resources/{assets,data}` — regenerate:
   `rm -rf src/main/resources/{assets,data} && python3 -I tools/gen_resources.py ~/mo-reference/mo-1.7.10/src/main/resources/assets/mo src/main/resources`
-- Tests: `./gradlew runGameTestServer` (92 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
+- Tests: `./gradlew runGameTestServer` (93 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
   `FunctionGameTestInstance`, custom 12³ structure `matteroverdrive:gametest_area`, time-of-day via `TestEnvironmentDefinition.TimeOfDay`,
   `makeMockServerPlayerInLevel`). Visual: `./gradlew runScene` → `run/screenshots/scene_*.png` (DevScene, world `run/saves/mo_scene`;
   pristine copy = "Новый мир (2)"; needs `pauseOnLostFocus=false`; selected hotbar slot is client-side; place blocks with
@@ -530,4 +538,4 @@
 ## Next
 - Phase 7: world & extras (rogue androids, mad scientist, structures, transporter, star map, quests, holo sign, crate, food).
 - Polish later: machine item tooltip with stored energy, inscriber head animation, machine sounds, custom tritanium armor model,
-  pattern storage drive rendering, replicator item animation, monitor hologram, router/switch filters, matter scanner.
+  pattern storage drive rendering, replicator item animation, monitor hologram, matter scanner.

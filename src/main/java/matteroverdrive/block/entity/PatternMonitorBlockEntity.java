@@ -36,13 +36,13 @@ public class PatternMonitorBlockEntity extends MachineBlockEntity {
     private final List<Task> queue = new ArrayList<>();
 
     public PatternMonitorBlockEntity(BlockPos pos, BlockState state) {
-        super(MOBlockEntities.PATTERN_MONITOR.get(), pos, state, MachineInventory.builder(), false, 0, 0, 0, 0, Set.of());
+        super(MOBlockEntities.PATTERN_MONITOR.get(), pos, state, withFilterSlot(MachineInventory.builder()), false, 0, 0, 0, 0, Set.of());
     }
 
     /** All patterns on the network, one per item (the most complete one wins). */
     public List<ItemPattern> networkPatterns() {
         Map<Item, ItemPattern> byItem = new LinkedHashMap<>();
-        for (PatternStorageBlockEntity storage : MatterNetwork.of(getLevel(), getBlockPos()).storages()) {
+        for (PatternStorageBlockEntity storage : MatterNetwork.of(getLevel(), getBlockPos(), getNetworkFilter()).storages()) {
             for (ItemPattern p : storage.getPatterns()) {
                 byItem.merge(p.item().value(), p, (a, b) -> a.progress() >= b.progress() ? a : b);
             }
@@ -70,7 +70,7 @@ public class PatternMonitorBlockEntity extends MachineBlockEntity {
     @Override
     protected boolean tickMachine(boolean redstoneAllows) {
         if (queue.isEmpty() || getLevel().getGameTime() % DISPATCH_DELAY != 0) return !queue.isEmpty();
-        for (ReplicatorBlockEntity replicator : MatterNetwork.of(getLevel(), getBlockPos()).replicators()) {
+        for (ReplicatorBlockEntity replicator : MatterNetwork.of(getLevel(), getBlockPos(), getNetworkFilter()).replicators()) {
             if (replicator.isIdle()) {
                 replicator.setTask(queue.remove(0));
                 setChanged();

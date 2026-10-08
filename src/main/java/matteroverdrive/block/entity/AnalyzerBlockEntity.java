@@ -39,7 +39,7 @@ public class AnalyzerBlockEntity extends MachineBlockEntity {
     private boolean networkAccepts;
 
     public AnalyzerBlockEntity(BlockPos pos, BlockState state) {
-        super(MOBlockEntities.ANALYZER.get(), pos, state, slots(), true, 4, ENERGY_STORAGE, ENERGY_TRANSFER, ENERGY_TRANSFER,
+        super(MOBlockEntities.ANALYZER.get(), pos, state, withFilterSlot(slots()), true, 4, ENERGY_STORAGE, ENERGY_TRANSFER, ENERGY_TRANSFER,
                 Set.of(UpgradeType.POWER_USAGE, UpgradeType.POWER_STORAGE, UpgradeType.FAIL, UpgradeType.OUTPUT, UpgradeType.SPEED));
     }
 
@@ -71,7 +71,7 @@ public class AnalyzerBlockEntity extends MachineBlockEntity {
         if (getLevel().getGameTime() % 20 == 0) {
             ItemStack input = inventory.getStack(INPUT);
             networkAccepts = !input.isEmpty()
-                    && MatterNetwork.of(getLevel(), getBlockPos()).storageAccepting(input.getItem()) != null;
+                    && MatterNetwork.of(getLevel(), getBlockPos(), getNetworkFilter()).storageAccepting(input.getItem()) != null;
         }
         if (!redstoneAllows || !canAnalyze()) {
             analyzeTime = 0;
@@ -100,7 +100,7 @@ public class AnalyzerBlockEntity extends MachineBlockEntity {
             PatternStorageBlockEntity linked = drive.getItem() instanceof MatterScannerItem ? MatterScannerItem.getDatabase(getLevel(), drive) : null;
             stored = linked != null && linked.canAccept(input.getItem()) && linked.addProgress(input.getItem(), PROGRESS_PER_ITEM);
             if (!stored) {
-                PatternStorageBlockEntity storage = MatterNetwork.of(getLevel(), getBlockPos()).storageAccepting(input.getItem());
+                PatternStorageBlockEntity storage = MatterNetwork.of(getLevel(), getBlockPos(), getNetworkFilter()).storageAccepting(input.getItem());
                 stored = storage != null && storage.addProgress(input.getItem(), PROGRESS_PER_ITEM);
             }
         }

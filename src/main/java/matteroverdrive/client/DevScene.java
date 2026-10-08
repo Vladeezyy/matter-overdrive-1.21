@@ -1111,7 +1111,26 @@ public final class DevScene {
         });
         at(2976, mc -> shot(mc, "legendary_part"));
         at(2978, mc -> mc.setScreen(null));
-        at(2982, mc -> mc.stop());
+        // leftovers: the analyzer's Config page with a network flash drive (two marked machines) in its destination filter
+        at(2984, mc -> server(mc, p -> {
+            if (!(p.level().getBlockEntity(analyzerPos) instanceof matteroverdrive.machine.MachineBlockEntity m)) return;
+            ItemStack drive = new ItemStack(MOItems.NETWORK_FLASH_DRIVE.get());
+            drive.set(matteroverdrive.init.MODataComponents.NETWORK_FILTER.get(), List.of(storagePos, replicatorPos));
+            var inv = m.getInventory();
+            for (int i = 0; i < inv.size(); i++) {
+                if (inv.spec(i).role() == matteroverdrive.machine.MachineInventory.Role.FILTER) inv.setStack(i, drive);
+            }
+            p.getInventory().setItem(p.getInventory().getSelectedSlot(), drive.copy());
+            p.teleportTo(p.level(), analyzerPos.getX() + 0.5, analyzerPos.getY(), analyzerPos.getZ() + 2.5, Set.of(), 180f, 20f, false);
+        }));
+        at(2988, mc -> openMachine(mc, analyzerPos));
+        at(2994, mc -> page(mc, MachineMenu.Page.CONFIG));
+        at(3002, mc -> shot(mc, "analyzer_destination_filter"));
+        at(3003, mc -> server(mc, ServerPlayer::closeContainer));
+        at(3005, mc -> mc.setScreen(new TooltipScreen(mc.player.getMainHandItem())));
+        at(3013, mc -> shot(mc, "network_flash_drive"));
+        at(3014, mc -> mc.setScreen(null));
+        at(3018, mc -> mc.stop());
     }
 
     /** Shows one item's tooltip in the middle of the screen. */

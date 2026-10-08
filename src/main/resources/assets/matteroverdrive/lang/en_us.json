@@ -431,6 +431,7 @@
   "tooltip.matteroverdrive.weapon.speed": "Speed: %s s/m",
   "tooltip.matteroverdrive.weapon.range": "Range: %s b",
   "tooltip.matteroverdrive.weapon.accuracy": "Accuracy: %s",
+  "gui.matteroverdrive.config.destination_filter": "Destination Filter",
   "tooltip.matteroverdrive.weapon.heat": "Heat: %s",
   "gui.matteroverdrive.efficiency": "Efficiency %s%%",
   "death.attack.matteroverdrive.black_hole": "%1$s was crushed by a Gravitational Anomaly",

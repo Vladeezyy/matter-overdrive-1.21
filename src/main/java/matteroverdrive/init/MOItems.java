@@ -108,7 +108,8 @@ public final class MOItems {
             p -> p.stacksTo(1).component(DataComponents.EQUIPPABLE, Equippable.builder(EquipmentSlot.CHEST).build()));
     // 1.7.10 PatternDrive("pattern_drive", 2)
     public static final DeferredItem<PatternDriveItem> PATTERN_DRIVE = item("pattern_drive", p -> new PatternDriveItem(2, p), p -> p);
-    public static final DeferredItem<Item> NETWORK_FLASH_DRIVE = simple("network_flash_drive");
+    public static final DeferredItem<matteroverdrive.item.NetworkFlashDriveItem> NETWORK_FLASH_DRIVE = item("network_flash_drive",
+            matteroverdrive.item.NetworkFlashDriveItem::new, p -> p);
 
     // Energy (1.7.10: battery 2^19 FE 400/800, hc_battery 2^20 FE 4096/4096, creative 2^24 FE 8192/8192)
     public static final DeferredItem<BatteryItem> BATTERY = item("battery",

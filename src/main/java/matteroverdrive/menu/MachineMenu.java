@@ -26,6 +26,8 @@ public abstract class MachineMenu<T extends MachineBlockEntity> extends Abstract
     public static final int WIDTH = 225;
     public static final int HEIGHT = 186;
     public static final int BUTTON_REDSTONE = 0;
+    /** The destination filter slot on the Config page, right of its label below the redstone mode. */
+    public static final int FILTER_X = 172, FILTER_Y = 78;
 
     protected final T machine;
     /** Set before {@link #addMachineSlots} runs, for menus whose slots belong to the player (android station). */
@@ -51,6 +53,9 @@ public abstract class MachineMenu<T extends MachineBlockEntity> extends Abstract
                 addSlot(new PageSlot(inv, i, 79 + (upgradeIndex % 5) * 24, 55 + (upgradeIndex / 5) * 24, Page.UPGRADES));
                 upgradeIndex++;
             }
+        }
+        for (int i = 0; i < inv.size(); i++) {
+            if (inv.spec(i).role() == MachineInventory.Role.FILTER) addSlot(new PageSlot(inv, i, FILTER_X, FILTER_Y, Page.CONFIG));
         }
         machineSlotCount = slots.size();
 
@@ -100,6 +105,12 @@ public abstract class MachineMenu<T extends MachineBlockEntity> extends Abstract
 
     public T getMachine() {
         return machine;
+    }
+
+    public boolean hasFilterSlot() {
+        MachineInventory inv = machine.getInventory();
+        for (int i = 0; i < inv.size(); i++) if (inv.spec(i).role() == MachineInventory.Role.FILTER) return true;
+        return false;
     }
 
     public int getEnergy() {

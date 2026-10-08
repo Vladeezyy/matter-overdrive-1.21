@@ -431,6 +431,7 @@
   "tooltip.matteroverdrive.weapon.speed": "Скорострельность: %s выстр./мин",
   "tooltip.matteroverdrive.weapon.range": "Дальность: %s бл.",
   "tooltip.matteroverdrive.weapon.accuracy": "Точность: %s",
+  "gui.matteroverdrive.config.destination_filter": "Фильтр назначения",
   "tooltip.matteroverdrive.weapon.heat": "Нагрев: %s",
   "gui.matteroverdrive.efficiency": "Эффективность %s%%",
   "death.attack.matteroverdrive.black_hole": "%1$s был раздавлен гравитационной аномалией",

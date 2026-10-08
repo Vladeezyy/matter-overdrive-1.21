@@ -174,6 +174,11 @@ public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractCo
         g.submitOutline(x + REDSTONE_X, y + REDSTONE_Y, REDSTONE_W, REDSTONE_H, 0xFF22282A);
         Component mode = Component.translatable(menu.getRedstoneMode().translationKey());
         g.drawString(font, mode, x + REDSTONE_X + (REDSTONE_W - font.width(mode)) / 2, y + REDSTONE_Y + 6, 0xFFFFFFFF, false);
+        if (menu.hasFilterSlot()) {
+            // 1.7.10 MatterNetworkConfigPage: the destination filter slot
+            g.drawString(font, Component.translatable("gui.matteroverdrive.config.destination_filter"), x + REDSTONE_X,
+                    y + MachineMenu.FILTER_Y + 5, COLOR_TEXT, false);
+        }
         renderConfigExtra(g, x, y, mx, my);
     }
 

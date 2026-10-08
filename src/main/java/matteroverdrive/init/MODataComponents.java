@@ -106,5 +106,10 @@ public final class MODataComponents {
             COMPONENTS.registerComponentType("legendary_weapon", b -> b.persistent(matteroverdrive.item.weapon.WeaponFactory.Legendary.CODEC)
                     .networkSynchronized(ByteBufCodecs.fromCodec(matteroverdrive.item.weapon.WeaponFactory.Legendary.CODEC)));
 
+    /** Network flash drive: the matter network blocks it lists (1.7.10 "CONNECTIONS"). */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<net.minecraft.core.BlockPos>>> NETWORK_FILTER =
+            COMPONENTS.registerComponentType("network_filter", b -> b.persistent(net.minecraft.core.BlockPos.CODEC.listOf())
+                    .networkSynchronized(net.minecraft.core.BlockPos.STREAM_CODEC.apply(ByteBufCodecs.list())));
+
     private MODataComponents() {}
 }

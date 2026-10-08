@@ -29,6 +29,16 @@ public final class MatterNetwork {
         this.nodes = nodes;
     }
 
+    /**
+     * The network with a destination filter (1.7.10 packets carrying a filter only reached the listed connections):
+     * null = every machine.
+     */
+    public static MatterNetwork of(Level level, BlockPos start, java.util.@org.jetbrains.annotations.Nullable List<BlockPos> filter) {
+        MatterNetwork network = of(level, start);
+        if (filter == null) return network;
+        return new MatterNetwork(network.nodes.stream().filter(n -> filter.contains(n.getBlockPos())).toList());
+    }
+
     public static MatterNetwork of(Level level, BlockPos start) {
         List<BlockEntity> nodes = new ArrayList<>();
         Set<BlockPos> seen = new HashSet<>();

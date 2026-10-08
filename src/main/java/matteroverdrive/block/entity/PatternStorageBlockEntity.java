@@ -30,7 +30,7 @@ public class PatternStorageBlockEntity extends MachineBlockEntity {
     public static final int ENERGY_TRANSFER = 128;
 
     public PatternStorageBlockEntity(BlockPos pos, BlockState state) {
-        super(MOBlockEntities.PATTERN_STORAGE.get(), pos, state, slots(), true, 4, ENERGY_CAPACITY, ENERGY_TRANSFER, ENERGY_TRANSFER,
+        super(MOBlockEntities.PATTERN_STORAGE.get(), pos, state, withFilterSlot(slots()), true, 4, ENERGY_CAPACITY, ENERGY_TRANSFER, ENERGY_TRANSFER,
                 Set.of(UpgradeType.POWER_STORAGE, UpgradeType.POWER_USAGE));
     }
 

@@ -1797,6 +1797,7 @@ GUI_KEYS = {
     "tooltip.matteroverdrive.weapon.speed": {"en_us": "Speed: %s s/m", "ru_ru": "Скорострельность: %s выстр./мин"},
     "tooltip.matteroverdrive.weapon.range": {"en_us": "Range: %s b", "ru_ru": "Дальность: %s бл."},
     "tooltip.matteroverdrive.weapon.accuracy": {"en_us": "Accuracy: %s", "ru_ru": "Точность: %s"},
+    "gui.matteroverdrive.config.destination_filter": {"en_us": "Destination Filter", "ru_ru": "Фильтр назначения"},
     "tooltip.matteroverdrive.weapon.heat": {"en_us": "Heat: %s", "ru_ru": "Нагрев: %s"},
     "gui.matteroverdrive.efficiency": {"en_us": "Efficiency %s%%", "ru_ru": "Эффективность %s%%"},
     "death.attack.matteroverdrive.black_hole": "death.attack.blackHole",

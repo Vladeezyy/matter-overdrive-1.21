@@ -62,7 +62,7 @@ public class ReplicatorBlockEntity extends MachineBlockEntity {
     private int replicateTime;
 
     public ReplicatorBlockEntity(BlockPos pos, BlockState state) {
-        super(MOBlockEntities.REPLICATOR.get(), pos, state, slots(), true, 4, ENERGY_STORAGE, ENERGY_STORAGE, ENERGY_STORAGE,
+        super(MOBlockEntities.REPLICATOR.get(), pos, state, withFilterSlot(slots()), true, 4, ENERGY_STORAGE, ENERGY_STORAGE, ENERGY_STORAGE,
                 Set.of(UpgradeType.POWER_STORAGE, UpgradeType.SPEED, UpgradeType.FAIL, UpgradeType.POWER_USAGE, UpgradeType.MATTER_STORAGE));
         initMatter(MATTER_STORAGE, MATTER_TRANSFER, 0);
     }

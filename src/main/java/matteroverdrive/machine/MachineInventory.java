@@ -16,7 +16,8 @@ import net.neoforged.neoforge.transfer.transaction.TransactionContext;
  * Slots are declared with a role; {@link #automation()} is the view exposed to hoppers and pipes.
  */
 public class MachineInventory extends ItemStacksResourceHandler {
-    public enum Role { INPUT, OUTPUT, ENERGY, UPGRADE, OTHER }
+    /** FILTER: the network destination filter (1.7.10 DestinationFilterSlot), shown on the Config page. */
+    public enum Role { INPUT, OUTPUT, ENERGY, UPGRADE, OTHER, FILTER }
 
     public record SlotSpec(Role role, Predicate<ItemResource> filter, int limit) {}
 

@@ -26,6 +26,7 @@ final class NetworkGameTests {
     static void addAll() {
         MOGameTests.add("analyzer_stores_on_network", 200, false, NetworkGameTests::analyzerStoresOnNetwork);
         MOGameTests.add("matter_scanner", 40, false, NetworkGameTests::matterScanner);
+        MOGameTests.add("network_destination_filter", 20, false, NetworkGameTests::destinationFilter);
         MOGameTests.add("monitor_request_replicates", 400, false, NetworkGameTests::monitorRequestReplicates);
         MOGameTests.add("unconnected_replicator_idle", 60, false, NetworkGameTests::unconnectedReplicatorIdle);
         MOGameTests.add("replicator_fail_chance", 20, false, NetworkGameTests::replicatorFailChance);
@@ -53,6 +54,32 @@ final class NetworkGameTests {
 
     private static void pipes(GameTestHelper helper, int y, int fromX, int toX) {
         for (int x = fromX; x <= toX; x++) helper.setBlock(new BlockPos(x, y, 1), MOBlocks.NETWORK_PIPE.get());
+    }
+
+    /** A network flash drive marks blocks; in the monitor's filter slot it only sees the marked storage. */
+    private static void destinationFilter(GameTestHelper helper) {
+        storage(helper, new BlockPos(1, 1, 1), Items.COBBLESTONE, 100);
+        pipes(helper, 1, 2, 2);
+        helper.setBlock(new BlockPos(3, 1, 1), MOBlocks.PATTERN_MONITOR.get());
+        pipes(helper, 1, 4, 4);
+        storage(helper, new BlockPos(5, 1, 1), Items.DIRT, 100);
+        PatternMonitorBlockEntity monitor = helper.getBlockEntity(new BlockPos(3, 1, 1), PatternMonitorBlockEntity.class);
+        helper.assertTrue(monitor.networkPatterns().size() == 2, Component.literal("unfiltered " + monitor.networkPatterns()));
+        // use the drive on the dirt storage (marks it), on a pipe twice (marks and unmarks it)
+        ItemStack drive = new ItemStack(MOItems.NETWORK_FLASH_DRIVE.get());
+        var player = helper.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
+        for (BlockPos rel : List.of(new BlockPos(5, 1, 1), new BlockPos(4, 1, 1), new BlockPos(4, 1, 1))) {
+            BlockPos abs = helper.absolutePos(rel);
+            player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, drive);
+            drive.getItem().onItemUseFirst(drive, new net.minecraft.world.item.context.UseOnContext(player, net.minecraft.world.InteractionHand.MAIN_HAND,
+                    new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(abs), net.minecraft.core.Direction.UP, abs, false)));
+        }
+        helper.assertTrue(matteroverdrive.item.NetworkFlashDriveItem.getConnections(drive).equals(List.of(helper.absolutePos(new BlockPos(5, 1, 1)))),
+                Component.literal("drive " + matteroverdrive.item.NetworkFlashDriveItem.getConnections(drive)));
+        monitor.getInventory().setStack(0, drive);
+        List<ItemPattern> seen = monitor.networkPatterns();
+        helper.assertTrue(seen.size() == 1 && seen.get(0).is(Items.DIRT), Component.literal("filtered " + seen));
+        helper.succeed();
     }
 
     private static void analyzerStoresOnNetwork(GameTestHelper helper) {

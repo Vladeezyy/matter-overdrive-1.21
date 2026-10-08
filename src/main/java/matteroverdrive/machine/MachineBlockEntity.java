@@ -210,6 +210,24 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
     };
     public static final int DATA_COUNT = 11;
 
+    // --- matter network destination filter (1.7.10 ComponentMatterNetworkConfigs) ------------------
+
+    /** Adds the destination filter slot (a network flash drive). */
+    protected static MachineInventory.Builder withFilterSlot(MachineInventory.Builder slots) {
+        slots.add(MachineInventory.Role.FILTER, r -> r.getItem() instanceof matteroverdrive.item.NetworkFlashDriveItem, 1);
+        return slots;
+    }
+
+    /** The positions in the filter slot's flash drive, or null when there's no filter (everything on the network). */
+    public java.util.@Nullable List<BlockPos> getNetworkFilter() {
+        for (int i = 0; i < inventory.size(); i++) {
+            if (inventory.spec(i).role() != MachineInventory.Role.FILTER) continue;
+            ItemStack stack = inventory.getStack(i);
+            if (stack.getItem() instanceof matteroverdrive.item.NetworkFlashDriveItem) return matteroverdrive.item.NetworkFlashDriveItem.getConnections(stack);
+        }
+        return null;
+    }
+
     // --- security (1.7.10 MOTileEntityMachine owner / claim / unclaim / isUseableByPlayer) ---------
 
     public java.util.@Nullable UUID getOwner() {
