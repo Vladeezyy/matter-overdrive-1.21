@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "matteroverdrive:block/beams",
+    "side": "matteroverdrive:block/beams"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "matteroverdrive:block/tritanium_plate",
+    "up": "matteroverdrive:block/tritanium_plate",
+    "north": "matteroverdrive:block/tritanium_plate_yellow_stripe",
+    "south": "matteroverdrive:block/tritanium_plate_yellow_stripe",
+    "west": "matteroverdrive:block/tritanium_plate_yellow_stripe",
+    "east": "matteroverdrive:block/tritanium_plate_yellow_stripe",
+    "particle": "matteroverdrive:block/tritanium_plate_yellow_stripe"
+  }
+}

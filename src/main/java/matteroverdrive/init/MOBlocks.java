@@ -20,6 +20,7 @@ import matteroverdrive.block.SolarPanelBlock;
 import matteroverdrive.block.WeaponStationBlock;
 import matteroverdrive.block.AndroidStationBlock;
 import matteroverdrive.block.ChargingStationBlock;
+import matteroverdrive.block.HoloSignBlock;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DropExperienceBlock;
@@ -101,6 +102,10 @@ public final class MOBlocks {
             p -> p.mapColor(MapColor.METAL).strength(20f, 9f).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion().lightLevel(s -> 10));
     public static final DeferredBlock<ChargingStationBlock> CHARGING_STATION = BLOCKS.registerBlock("charging_station", ChargingStationBlock::new,
             p -> p.mapColor(MapColor.METAL).strength(20f, 9f).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion().lightLevel(s -> 10));
+
+    // World & extras (phase 7): 1.7.10 BlockHoloSign hardness 20
+    public static final DeferredBlock<HoloSignBlock> HOLO_SIGN = BLOCKS.registerBlock("holo_sign", HoloSignBlock::new,
+            p -> p.mapColor(MapColor.METAL).strength(20f, 5f).sound(SoundType.METAL).noOcclusion().lightLevel(s -> 8));
 
     private MOBlocks() {}
 }

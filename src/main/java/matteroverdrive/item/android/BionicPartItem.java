@@ -17,10 +17,23 @@ import net.minecraft.world.item.component.TooltipDisplay;
  */
 public class BionicPartItem extends Item {
     private final int slot;
+    private final double health;
+    private final double glitch;
 
     public BionicPartItem(int slot, Properties properties) {
+        this(slot, 1, 0, properties);
+    }
+
+    /** @param glitch glitch-time change (multiplied in; 1.7.10 TritaniumSpine -0.5) */
+    public BionicPartItem(int slot, double health, double glitch, Properties properties) {
         super(properties.stacksTo(1));
         this.slot = slot;
+        this.health = health;
+        this.glitch = glitch;
+    }
+
+    public double glitchBonus() {
+        return glitch;
     }
 
     /** The android slot it fits: {@link matteroverdrive.android.AndroidData#SLOT_HEAD} etc. */
@@ -30,7 +43,7 @@ public class BionicPartItem extends Item {
 
     /** 1.7.10 getModifiers: max health +1 (one modifier per slot so parts stack). */
     public double maxHealthBonus() {
-        return 1;
+        return health;
     }
 
     public static ResourceLocation modifierId(int slot) {
@@ -39,7 +52,11 @@ public class BionicPartItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
-        tooltip.accept(Component.translatable("item." + MatterOverdrive.MODID + ".rogue_android_part.melee").withStyle(ChatFormatting.GOLD));
-        tooltip.accept(Component.translatable("attribute.name.generic.max_health").append(": +" + (int) maxHealthBonus()).withStyle(ChatFormatting.GREEN));
+        if (slot < 4) tooltip.accept(Component.translatable("item." + MatterOverdrive.MODID + ".rogue_android_part.melee").withStyle(ChatFormatting.GOLD));
+        tooltip.accept(Component.translatable("attribute.name.max_health").append(": +" + (int) maxHealthBonus()).withStyle(ChatFormatting.GREEN));
+        if (glitch != 0) {
+            tooltip.accept(Component.translatable("attribute.name." + MatterOverdrive.MODID + ".android_glitch_time")
+                    .append(": " + Math.round((1 + glitch) * 100) + "%").withStyle(ChatFormatting.GREEN));
+        }
     }
 }

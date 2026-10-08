@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    " G ",
+    "GTG",
+    " G "
+  ],
+  "key": {
+    "G": "minecraft:glass",
+    "T": "#c:plates/tritanium"
+  },
+  "result": {
+    "id": "matteroverdrive:force_glass",
+    "count": 4
+  }
+}

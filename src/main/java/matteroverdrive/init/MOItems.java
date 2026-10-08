@@ -162,6 +162,24 @@ public final class MOItems {
     public static final DeferredItem<BionicPartItem> ROGUE_ANDROID_ARMS = item("rogue_android_part_arms", p -> new BionicPartItem(1, p), p -> p);
     public static final DeferredItem<BionicPartItem> ROGUE_ANDROID_LEGS = item("rogue_android_part_legs", p -> new BionicPartItem(2, p), p -> p);
     public static final DeferredItem<BionicPartItem> ROGUE_ANDROID_CHEST = item("rogue_android_part_chest", p -> new BionicPartItem(3, p), p -> p);
+    /** 1.7.10 TritaniumSpine: the "other" bionic slot, +2 max health and half the glitch time. */
+    public static final DeferredItem<BionicPartItem> TRITANIUM_SPINE = item("tritanium_spine", p -> new BionicPartItem(4, 2, -0.5, p), p -> p);
+
+    // Food (phase 7a; 1.7.10 ItemFood values)
+    public static final DeferredItem<Item> EMERGENCY_RATION = item("emergency_ration", Item::new,
+            p -> p.food(new net.minecraft.world.food.FoodProperties.Builder().nutrition(8).saturationModifier(0.8f).build()));
+    /** 1.7.10 EarlGrayTea: 4 / 0.8, always drinkable, clears potion effects like milk, leaves the bottle. */
+    public static final DeferredItem<Item> EARL_GRAY_TEA = item("earl_gray_tea", Item::new,
+            p -> p.food(new net.minecraft.world.food.FoodProperties.Builder().nutrition(4).saturationModifier(0.8f).alwaysEdible().build(),
+                    net.minecraft.world.item.component.Consumables.defaultDrink()
+                            .onConsume(net.minecraft.world.item.consume_effects.ClearAllStatusEffectsConsumeEffect.INSTANCE).build())
+                    .usingConvertsTo(net.minecraft.world.item.Items.GLASS_BOTTLE).stacksTo(16));
+    public static final DeferredItem<matteroverdrive.item.food.RomulanAleItem> ROMULAN_ALE = item("romulan_ale", matteroverdrive.item.food.RomulanAleItem::new,
+            p -> p.food(new net.minecraft.world.food.FoodProperties.Builder().nutrition(4).saturationModifier(0.6f).alwaysEdible().build(),
+                    net.minecraft.world.item.component.Consumables.DEFAULT_DRINK)
+                    .usingConvertsTo(net.minecraft.world.item.Items.GLASS_BOTTLE).stacksTo(16));
+    public static final DeferredItem<BlockItem> HOLO_SIGN = block("holo_sign", MOBlocks.HOLO_SIGN);
+
     public static final DeferredItem<AndroidPillItem> ANDROID_PILL_YELLOW = item("android_pill_yellow", p -> new AndroidPillItem(AndroidPillItem.Type.YELLOW, p), p -> p);
 
     private static DeferredItem<WeaponBarrelItem> barrel(WeaponBarrelItem.Type type) {

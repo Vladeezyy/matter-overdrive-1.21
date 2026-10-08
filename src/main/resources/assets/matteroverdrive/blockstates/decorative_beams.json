@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=y": {
+      "model": "matteroverdrive:block/decorative_beams"
+    },
+    "axis=z": {
+      "model": "matteroverdrive:block/decorative_beams",
+      "x": 90
+    },
+    "axis=x": {
+      "model": "matteroverdrive:block/decorative_beams",
+      "x": 90,
+      "y": 90
+    }
+  }
+}

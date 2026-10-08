@@ -7,7 +7,7 @@
     "CMC"
   ],
   "key": {
-    "H": "minecraft:glass_pane",
+    "H": "matteroverdrive:holo_sign",
     "T": "#c:plates/tritanium",
     "S": "matteroverdrive:spacetime_equalizer",
     "C": "matteroverdrive:s_magnet",

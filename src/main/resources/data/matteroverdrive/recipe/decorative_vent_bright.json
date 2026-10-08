@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    " # ",
+    "T T",
+    " # "
+  ],
+  "key": {
+    "#": "#c:plates/tritanium",
+    "T": "#c:ingots/tritanium"
+  },
+  "result": {
+    "id": "matteroverdrive:decorative_vent_bright",
+    "count": 6
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#W#",
+    "###",
+    "#W#"
+  ],
+  "key": {
+    "#": "matteroverdrive:decorative_tritanium_plate",
+    "W": "#minecraft:wool"
+  },
+  "result": {
+    "id": "matteroverdrive:decorative_white_plate",
+    "count": 8
+  }
+}

@@ -8,7 +8,7 @@
   ],
   "key": {
     "C": "matteroverdrive:fusion_reactor_coil",
-    "H": "minecraft:glass_pane",
+    "H": "matteroverdrive:holo_sign",
     "2": "matteroverdrive:isolinear_circuit_mk2",
     "3": "matteroverdrive:isolinear_circuit_mk3",
     "M": "matteroverdrive:machine_casing",

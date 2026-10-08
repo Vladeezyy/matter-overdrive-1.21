@@ -543,7 +543,7 @@ shaped("pattern_storage", mid("pattern_storage"), ["B3B", "TCT", "2M1"],
        {"B": "minecraft:black_wool", "3": MK[3], "T": INGOT, "C": "minecraft:chest", "2": MK[2], "M": mid("machine_casing"), "1": MK[1]})
 # The holo sign (phase 7) isn't ported yet; a glass pane stands in for it until then.
 shaped("pattern_monitor", mid("pattern_monitor"), [" H ", "1N1", " F "],
-       {"H": "minecraft:glass_pane", "1": MK[2], "N": mid("network_switch"), "F": mid("network_flash_drive")})
+       {"H": mid("holo_sign"), "1": MK[2], "N": mid("network_switch"), "F": mid("network_flash_drive")})
 
 
 # --- phase 4: gravitational anomaly, stabilizer, machine hull ------------------------------------------
@@ -588,7 +588,7 @@ shaped("spacetime_equalizer", mid("spacetime_equalizer"), [" M ", "EHE", " M "],
 shaped("machine_hull", mid("machine_hull"), [" T ", "T T", " T "], {"T": PLATE}, category="building")
 # The holo sign (phase 7) isn't ported yet; a glass pane stands in for it until then.
 shaped("gravitational_stabilizer", mid("gravitational_stabilizer"), [" H ", "TST", "CMC"],
-       {"H": "minecraft:glass_pane", "T": PLATE, "S": mid("spacetime_equalizer"), "C": mid("s_magnet"), "M": mid("machine_casing")})
+       {"H": mid("holo_sign"), "T": PLATE, "S": mid("spacetime_equalizer"), "C": mid("s_magnet"), "M": mid("machine_casing")})
 
 
 # --- phase 4: fusion reactor ---------------------------------------------------------------------------
@@ -617,7 +617,7 @@ shaped("fusion_reactor_coil", mid("fusion_reactor_coil"), ["TMT", "M M", "CMC"],
 shaped("fusion_reactor_io", mid("fusion_reactor_io"), ["TGT", "C C", "TGT"], {"T": PLATE, "G": "minecraft:gold_ingot", "C": MK[1]})
 # The holo sign (phase 7) isn't ported yet; a glass pane stands in for it until then.
 shaped("fusion_reactor_controller", mid("fusion_reactor_controller"), ["CHC", "2M3", "CTC"],
-       {"C": mid("fusion_reactor_coil"), "H": "minecraft:glass_pane", "2": MK[2], "3": MK[3], "M": mid("machine_casing"), "T": PLATE})
+       {"C": mid("fusion_reactor_coil"), "H": mid("holo_sign"), "2": MK[2], "3": MK[3], "M": mid("machine_casing"), "T": PLATE})
 
 
 # --- phase 5a: energy weapons ---------------------------------------------------------------------------
@@ -890,6 +890,137 @@ cp(ref / "textures/gui/glitch.png", GUI / "glitch.png")
 cp(ref / "textures/gui/items/temperature.png", GUI / "elements/biotic_stat_flash_cooling.png")
 
 
+# --- phase 7a: decorative blocks, tritanium glass, holo sign, food, tritanium spine --------------------------------
+# 1.7.10 BlockDecorative: (id, textures [bottom, top, north, south, west, east] or one name, kind, harvest level, original key)
+DECOR = [
+    ("stripes", "base_stripes", "cube", 1), ("coils", "base_coil", "cube", 1), ("clean", "transporter_side", "cube", 1),
+    ("vent_dark", "vent", "cube", 1), ("vent_bright", "vent2", "cube", 1), ("holo_matrix", "weapon_station_top", "cube", 1),
+    ("tritanium_plate", "tritanium_plate", "cube", 1), ("carbon_fiber_plate", "carbon_fiber_plate", "cube", 1),
+    ("matter_tube", "matter_tube", "pillar", 1), ("beams", "beams", "pillar", 1), ("floor_tiles", "floor_tiles", "cube", 0),
+    ("floor_tiles_green", "floor_tiles_green", "cube", 0), ("floor_noise", "floor_noise", "cube", 0),
+    ("tritanium_plate_stripe", ["tritanium_plate", "tritanium_plate", "tritanium_plate_yellow_stripe",
+                                "tritanium_plate_yellow_stripe", "tritanium_plate_yellow_stripe", "tritanium_plate_yellow_stripe"], "faces", 1),
+    ("floor_tile_white", "floor_tile_white", "cube", 0), ("white_plate", "white_plate", "cube", 1),
+    ("separator", "separator", "pillar", 1),
+    ("tritanium_lamp", ["tritanium_lamp_bottom", "tritanium_lamp_top", "tritanium_plate_yellow_stripe",
+                        "tritanium_plate_yellow_stripe", "tritanium_lamp_sides", "tritanium_lamp_sides"], "faces", 1),
+    ("engine_exhaust_plasma", "engine_exhaust_plasma", "cube", 1),
+]
+DECOR_KEYS = {"vent_dark": "vent.dark", "vent_bright": "vent.bright"}
+DYES = ["white", "orange", "magenta", "light_blue", "yellow", "lime", "pink", "gray", "light_gray", "cyan", "purple", "blue",
+        "brown", "green", "red", "black"]
+DECOR_IDS = []
+
+def decor_block(n, model):
+    w(A / "blockstates" / f"{n}.json", {"variants": {"": {"model": model}}})
+    w(A / "items" / f"{n}.json", {"model": {"type": "minecraft:model", "model": model}})
+    w(D / f"loot_table/blocks/{n}.json", self_drop(n))
+    DECOR_IDS.append(n)
+
+for name, tex, kind, _lvl in DECOR:
+    n = f"decorative_{name}"
+    faces = tex if isinstance(tex, list) else [tex] * 6
+    for t in set(faces):
+        cp(ref / "textures/blocks" / f"{t}.png", A / "textures/block" / f"{t}.png")
+    extra = {"render_type": "minecraft:cutout"} if name == "matter_tube" else {}
+    if kind == "pillar":
+        w(A / "models/block" / f"{n}.json", {"parent": "minecraft:block/cube_column", "textures": {
+            "end": f"{MOD}:block/{tex}", "side": f"{MOD}:block/{tex}"}} | extra)
+        w(A / "blockstates" / f"{n}.json", {"variants": {"axis=y": {"model": f"{MOD}:block/{n}"},
+            "axis=z": {"model": f"{MOD}:block/{n}", "x": 90}, "axis=x": {"model": f"{MOD}:block/{n}", "x": 90, "y": 90}}})
+        w(A / "items" / f"{n}.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:block/{n}"}})
+        w(D / f"loot_table/blocks/{n}.json", self_drop(n))
+        DECOR_IDS.append(n)
+        continue
+    if kind == "faces":
+        w(A / "models/block" / f"{n}.json", {"parent": "minecraft:block/cube", "textures": {
+            "down": f"{MOD}:block/{faces[0]}", "up": f"{MOD}:block/{faces[1]}", "north": f"{MOD}:block/{faces[2]}",
+            "south": f"{MOD}:block/{faces[3]}", "west": f"{MOD}:block/{faces[4]}", "east": f"{MOD}:block/{faces[5]}",
+            "particle": f"{MOD}:block/{faces[2]}"}})
+    else:
+        w(A / "models/block" / f"{n}.json", {"parent": "minecraft:block/cube_all", "textures": {"all": f"{MOD}:block/{tex}"}} | extra)
+    decor_block(n, f"{MOD}:block/{n}")
+# 1.7.10 decorative.tritanium_plate_colored: one block per dye colour, the colorless plate tinted (block colour handler).
+cp(ref / "textures/blocks/tritanium_plate_colorless.png", A / "textures/block/tritanium_plate_colorless.png")
+w(A / "models/block/decorative_tritanium_plate_colored.json", {"parent": "minecraft:block/block", "textures": {
+    "all": f"{MOD}:block/tritanium_plate_colorless", "particle": f"{MOD}:block/tritanium_plate_colorless"},
+    "elements": [{"from": [0, 0, 0], "to": [16, 16, 16], "faces": {f: {"texture": "#all", "cullface": f, "tintindex": 0}
+                                                                    for f in ["down", "up", "north", "south", "west", "east"]}}]})
+DYE_RGB = {"white": 0xF9FFFE, "orange": 0xF9801D, "magenta": 0xC74EBD, "light_blue": 0x3AB3DA, "yellow": 0xFED83D, "lime": 0x80C71F,
+           "pink": 0xF38BAA, "gray": 0x474F52, "light_gray": 0x9D9D97, "cyan": 0x169C9C, "purple": 0x8932B8, "blue": 0x3C44AA,
+           "brown": 0x835432, "green": 0x5E7C16, "red": 0xB02E26, "black": 0x1D1D21}
+for dye in DYES:
+    n = f"decorative_tritanium_plate_{dye}"
+    w(A / "blockstates" / f"{n}.json", {"variants": {"": {"model": f"{MOD}:block/decorative_tritanium_plate_colored"}}})
+    w(A / "items" / f"{n}.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:block/decorative_tritanium_plate_colored",
+        "tints": [{"type": "minecraft:constant", "value": (0xFF << 24 | DYE_RGB[dye]) - (1 << 32)}]}})
+    w(D / f"loot_table/blocks/{n}.json", self_drop(n))
+    DECOR_IDS.append(n)
+    shaped(n, mid(n), ["###", "#D#", "###"], {"#": mid("decorative_tritanium_plate"), "D": f"minecraft:{dye}_dye"}, count=8,
+           category="building")
+# Tritanium glass (1.7.10 ForceGlass, connected textures in 1.7.10).
+cp(ref / "textures/blocks/force_glass.png", A / "textures/block/force_glass.png")
+w(A / "models/block/force_glass.json", {"parent": "minecraft:block/cube_all", "render_type": "minecraft:translucent",
+                                        "textures": {"all": f"{MOD}:block/force_glass"}})
+decor_block("force_glass", f"{MOD}:block/force_glass")
+for tag in ["mineable/pickaxe", "needs_stone_tool"]:
+    p = TAGS / f"minecraft/tags/block/{tag}.json"
+    values = json.loads(p.read_text())["values"] if p.exists() else []
+    stone_free = [f"decorative_{n}" for n, _, _, lvl in DECOR if lvl == 0]
+    w(p, {"values": values + [mid(n) for n in DECOR_IDS if not (tag == "needs_stone_tool" and n in stone_free)]})
+# 1.7.10 MatterOverdriveRecipes decorative recipes
+PLATE_BLOCK = mid("decorative_tritanium_plate")
+shaped("decorative_tritanium_plate", PLATE_BLOCK, ["##", "##"], {"#": PLATE}, count=12, category="building")
+shaped("decorative_beams", mid("decorative_beams"), ["#", "T", "#"], {"#": PLATE, "T": INGOT}, count=6, category="building")
+shaped("decorative_tritanium_plate_stripe", mid("decorative_tritanium_plate_stripe"), ["###", "#Y#", "###"],
+       {"#": PLATE_BLOCK, "Y": "minecraft:yellow_dye"}, count=8, category="building")
+shaped("decorative_holo_matrix", mid("decorative_holo_matrix"), ["###", "#I#", "###"], {"#": PLATE_BLOCK, "I": MK[1]}, count=8, category="building")
+shaped("decorative_carbon_fiber_plate", mid("decorative_carbon_fiber_plate"), ["###", "#C#", "###"], {"#": PLATE_BLOCK, "C": "minecraft:coal"},
+       count=8, category="building")
+shaped("decorative_vent_bright", mid("decorative_vent_bright"), [" # ", "T T", " # "], {"#": PLATE, "T": INGOT}, count=6, category="building")
+shaped("decorative_vent_dark", mid("decorative_vent_dark"), ["###", "#B#", "###"], {"#": mid("decorative_vent_bright"), "B": "minecraft:black_dye"},
+       count=8, category="building")
+shaped("decorative_clean", mid("decorative_clean"), ["TT", "TT"], {"T": INGOT}, count=8, category="building")
+shaped("decorative_floor_tiles", mid("decorative_floor_tiles"), ["###", "#Q#", "###"], {"#": "minecraft:clay", "Q": "minecraft:quartz"},
+       count=12, category="building")
+shaped("decorative_floor_tiles_green", mid("decorative_floor_tiles_green"), ["#G#", "#Q#", "#G#"],
+       {"#": "minecraft:clay", "Q": "minecraft:quartz", "G": "minecraft:green_dye"}, count=12, category="building")
+shaped("decorative_floor_tile_white", mid("decorative_floor_tile_white"), ["#W#", "#Q#", "#W#"],
+       {"#": "minecraft:clay", "Q": "minecraft:quartz", "W": "minecraft:white_dye"}, count=12, category="building")
+shaped("decorative_separator", mid("decorative_separator"), ["#N#", "#N#", "#N#"], {"#": PLATE_BLOCK, "N": NUGGET},
+       count=8, category="building")
+shaped("decorative_floor_noise", mid("decorative_floor_noise"), ["#G#", "#Q#", "#G#"],
+       {"#": "minecraft:clay", "Q": "minecraft:quartz", "G": "minecraft:gravel"}, count=12, category="building")
+shaped("decorative_white_plate", mid("decorative_white_plate"), ["#W#", "###", "#W#"], {"#": PLATE_BLOCK, "W": "#minecraft:wool"},
+       count=8, category="building")
+shaped("decorative_coils", mid("decorative_coils"), ["###", "#C#", "###"], {"#": PLATE_BLOCK, "C": mid("s_magnet")}, count=9, category="building")
+shaped("decorative_stripes", mid("decorative_stripes"), ["#B#", "###", "#Y#"],
+       {"#": PLATE_BLOCK, "B": "minecraft:black_dye", "Y": "minecraft:yellow_dye"}, count=8, category="building")
+shaped("force_glass", mid("force_glass"), [" G ", "GTG", " G "], {"G": "minecraft:glass", "T": PLATE}, count=4, category="building")
+shaped("holo_sign", mid("holo_sign"), ["GGG", "g0g", " T "],
+       {"G": "#c:glass_blocks", "g": "minecraft:glowstone_dust", "0": MK[1], "T": PLATE})
+# Holo sign: a 2 px panel at the back of the block, the holo monitor face to the front (facing north by default).
+w(A / "models/block/holo_sign.json", {"parent": "minecraft:block/block", "render_type": "minecraft:translucent", "textures": {
+    "front": f"{MOD}:block/holo_monitor", "side": f"{MOD}:block/base", "particle": f"{MOD}:block/base"},
+    "elements": [{"from": [0, 0, 14], "to": [16, 16, 16], "faces": {
+        "north": {"texture": "#front"}, "south": {"texture": "#side", "cullface": "south"},
+        "east": {"uv": [0, 0, 2, 16], "texture": "#side"}, "west": {"uv": [14, 0, 16, 16], "texture": "#side"},
+        "up": {"uv": [0, 14, 16, 16], "texture": "#side"}, "down": {"uv": [0, 0, 16, 2], "texture": "#side"}}}]})
+w(A / "blockstates/holo_sign.json", {"variants": {f"facing={f}": ({"model": f"{MOD}:block/holo_sign", "y": y} if y else
+                                                                {"model": f"{MOD}:block/holo_sign"}) for f, y in FACING_Y.items()}})
+w(A / "items/holo_sign.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:block/holo_sign"}})
+w(D / "loot_table/blocks/holo_sign.json", self_drop("holo_sign"))
+for tag in ["mineable/pickaxe"]:
+    p = TAGS / f"minecraft/tags/block/{tag}.json"
+    w(p, {"values": json.loads(p.read_text())["values"] + [mid("holo_sign")]})
+# Food and the tritanium spine (textures only; 1.7.10 had no recipes: replicator, trades and rogue androids).
+for item_id, tex in {"emergency_ration": "emergency_ration", "earl_gray_tea": "earl_gray_tea", "romulan_ale": "romulan_ale",
+                     "tritanium_spine": "tritainum_spine"}.items():
+    cp(ref / "textures/items" / f"{tex}.png", A / "textures/item" / f"{tex}.png")
+    w(A / "models/item" / f"{item_id}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{MOD}:item/{tex}"}})
+    w(A / "items" / f"{item_id}.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:item/{item_id}"}})
+
+
 # --- matter values (1.7.10 MatterOverdriveMatter.registerBasic*) -----------------------------------
 # Base values of the matteroverdrive:matter data map; everything else is calculated from recipes at runtime.
 # Ore dictionary names are mapped to today's tags. Tags come first so that single items can override them.
@@ -925,7 +1056,8 @@ MATTER_ITEMS = {
 }
 w(D / "data_maps/item/matter.json", {"values": {**MATTER_TAGS, **{f"minecraft:{k}": v for k, v in MATTER_ITEMS.items()},
     # 1.7.10 MatterOverdriveMatter: blue and yellow android pills can be replicated, the red one can't
-    mid("android_pill_blue"): 64, mid("android_pill_yellow"): 32}})
+    mid("android_pill_blue"): 64, mid("android_pill_yellow"): 32,
+    mid("emergency_ration"): 3, mid("earl_gray_tea"): 2, mid("romulan_ale"): 2}})
 
 
 # --- game test area ---------------------------------------------------------------------------------
@@ -1045,6 +1177,21 @@ for src_name, dst_name in [("en_US", "en_us"), ("ru_RU", "ru_ru")]:
     lang[f"key.category.{MOD}.android"] = "Matter Overdrive"
     lang[f"key.{MOD}.ability_use"] = {"en_us": "Android Ability key", "ru_ru": "Способность андроида"}[dst_name]
     lang[f"key.{MOD}.ability_switch"] = {"en_us": "Android Switch Ability key", "ru_ru": "Выбор способности андроида"}[dst_name]
+    for name, _, _, _ in DECOR:
+        key = f"tile.decorative.{DECOR_KEYS.get(name, name)}.name"
+        lang[f"block.{MOD}.decorative_{name}"] = src.get(key) or en[key]
+    DYE_WORDS = {"en_us": ["White", "Orange", "Magenta", "Light Blue", "Yellow", "Lime", "Pink", "Gray", "Light Gray", "Cyan", "Purple",
+                           "Blue", "Brown", "Green", "Red", "Black"],
+                 "ru_ru": ["белая", "оранжевая", "сиреневая", "голубая", "жёлтая", "лаймовая", "розовая", "серая", "светло-серая",
+                           "бирюзовая", "фиолетовая", "синяя", "коричневая", "зелёная", "красная", "чёрная"]}
+    colored = src.get("tile.decorative.tritanium_plate_colored.name") or en["tile.decorative.tritanium_plate_colored.name"]
+    for dye, word in zip(DYES, DYE_WORDS[dst_name]):
+        lang[f"block.{MOD}.decorative_tritanium_plate_{dye}"] = f"{colored} ({word})"
+    lang[f"block.{MOD}.force_glass"] = src.get("tile.force_glass.name") or en["tile.force_glass.name"]
+    lang[f"block.{MOD}.holo_sign"] = src.get("tile.holo_sign.name") or en["tile.holo_sign.name"]
+    for item_id, key in {"emergency_ration": "emergency_ration", "earl_gray_tea": "earl_gray_tea", "romulan_ale": "romulan_ale",
+                         "tritanium_spine": "tritainum_spine"}.items():
+        lang[f"item.{MOD}.{item_id}"] = src.get(f"item.{key}.name") or en[f"item.{key}.name"]
     lang[f"block.{MOD}.charging_station"] = src.get("tile.charging_station.name") or en["tile.charging_station.name"]
     lang[f"block.{MOD}.android_station"] = src.get("tile.android_station.name") or en["tile.android_station.name"]
     for part in ["head", "arms", "legs", "chest"]:

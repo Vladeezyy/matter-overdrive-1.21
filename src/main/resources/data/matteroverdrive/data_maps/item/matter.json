@@ -129,6 +129,9 @@
     "minecraft:name_tag": 32,
     "minecraft:glass_bottle": 3,
     "matteroverdrive:android_pill_blue": 64,
-    "matteroverdrive:android_pill_yellow": 32
+    "matteroverdrive:android_pill_yellow": 32,
+    "matteroverdrive:emergency_ration": 3,
+    "matteroverdrive:earl_gray_tea": 2,
+    "matteroverdrive:romulan_ale": 2
   }
 }

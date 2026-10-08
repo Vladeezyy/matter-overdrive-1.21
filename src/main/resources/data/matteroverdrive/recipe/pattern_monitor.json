@@ -7,7 +7,7 @@
     " F "
   ],
   "key": {
-    "H": "minecraft:glass_pane",
+    "H": "matteroverdrive:holo_sign",
     "1": "matteroverdrive:isolinear_circuit_mk2",
     "N": "matteroverdrive:network_switch",
     "F": "matteroverdrive:network_flash_drive"

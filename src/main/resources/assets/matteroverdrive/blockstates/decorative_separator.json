@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=y": {
+      "model": "matteroverdrive:block/decorative_separator"
+    },
+    "axis=z": {
+      "model": "matteroverdrive:block/decorative_separator",
+      "x": 90
+    },
+    "axis=x": {
+      "model": "matteroverdrive:block/decorative_separator",
+      "x": 90,
+      "y": 90
+    }
+  }
+}

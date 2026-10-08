@@ -33,7 +33,22 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 @Mod(value = MatterOverdrive.MODID, dist = Dist.CLIENT)
 @EventBusSubscriber(modid = MatterOverdrive.MODID, value = Dist.CLIENT)
 public class MatterOverdriveClient {
+    /** 1.7.10 BlockDecorative.colorMultiplier: the colored tritanium plates take their dye colour. */
+    @SubscribeEvent
+    static void blockColors(net.neoforged.neoforge.client.event.RegisterColorHandlersEvent.Block event) {
+        var colors = net.minecraft.world.item.DyeColor.values();
+        for (int i = 0; i < colors.length; i++) {
+            int rgb = colors[i].getTextureDiffuseColor();
+            event.register((state, level, pos, tint) -> rgb, matteroverdrive.init.MODecorative.COLORED_PLATES.get(i).get());
+        }
+    }
+
     public MatterOverdriveClient() {
+        matteroverdrive.block.HoloSignBlock.openEditor = pos -> {
+            var mc = net.minecraft.client.Minecraft.getInstance();
+            String text = mc.level.getBlockEntity(pos) instanceof matteroverdrive.block.entity.HoloSignBlockEntity sign ? sign.getText() : "";
+            mc.setScreen(new matteroverdrive.client.screen.HoloSignScreen(pos, text));
+        };
         // 1.7.10 AndroidPlayer.playTransformMusic
         matteroverdrive.android.AndroidClientHooks.transformationStarted = player -> {
             var mc = net.minecraft.client.Minecraft.getInstance();
@@ -69,6 +84,7 @@ public class MatterOverdriveClient {
     static void registerRenderers(net.neoforged.neoforge.client.event.EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(matteroverdrive.init.MOEntities.PLASMA_BOLT.get(), PlasmaBoltRenderer::new);
         event.registerBlockEntityRenderer(matteroverdrive.init.MOBlockEntities.WEAPON_STATION.get(), WeaponStationRenderer::new);
+        event.registerBlockEntityRenderer(matteroverdrive.init.MOBlockEntities.HOLO_SIGN.get(), HoloSignRenderer::new);
     }
 
     /** Matter Plasma textures (1.7.10 matter_plasma_still / _flowing), shown by tanks of other mods. */

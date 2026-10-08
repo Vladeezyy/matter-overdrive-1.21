@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#G#",
+    "#Q#",
+    "#G#"
+  ],
+  "key": {
+    "#": "minecraft:clay",
+    "Q": "minecraft:quartz",
+    "G": "minecraft:gravel"
+  },
+  "result": {
+    "id": "matteroverdrive:decorative_floor_noise",
+    "count": 12
+  }
+}

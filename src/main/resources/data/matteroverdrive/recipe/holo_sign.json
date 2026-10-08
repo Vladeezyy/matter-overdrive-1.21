@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "GGG",
+    "g0g",
+    " T "
+  ],
+  "key": {
+    "G": "#c:glass_blocks",
+    "g": "minecraft:glowstone_dust",
+    "0": "matteroverdrive:isolinear_circuit_mk1",
+    "T": "#c:plates/tritanium"
+  },
+  "result": {
+    "id": "matteroverdrive:holo_sign",
+    "count": 1
+  }
+}

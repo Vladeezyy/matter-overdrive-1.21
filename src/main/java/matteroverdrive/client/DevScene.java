@@ -239,7 +239,25 @@ public final class DevScene {
             state.getBlock().setPlacedBy(p.level(), charger, state, p, ItemStack.EMPTY);
         }));
         at(558, mc -> shot(mc, "charging_station"));
-        at(560, mc -> mc.stop());
+        // 7a: every decorative block in a wall, tritanium glass, a holo sign with text
+        at(560, mc -> server(mc, p -> {
+            var blocks = matteroverdrive.init.MODecorative.ALL;
+            for (int i = 0; i < blocks.size(); i++) {
+                BlockPos at = origin.offset(-9 + i % 19, i / 19, 3);
+                p.level().setBlockAndUpdate(at, blocks.get(i).get().defaultBlockState());
+            }
+            BlockPos wall = origin.offset(0, 2, 3);
+            p.level().setBlockAndUpdate(wall, matteroverdrive.init.MODecorative.TRITANIUM_PLATE.get().defaultBlockState());
+            BlockPos sign = wall.north();
+            p.level().setBlockAndUpdate(sign, MOBlocks.HOLO_SIGN.get().defaultBlockState()
+                    .setValue(matteroverdrive.block.HoloSignBlock.FACING, Direction.NORTH));
+            if (p.level().getBlockEntity(sign) instanceof matteroverdrive.block.entity.HoloSignBlockEntity holo) {
+                holo.setText("Matter\nOverdrive\n1.21.10");
+            }
+            p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY() + 1, origin.getZ() - 4.5, Set.of(), 0f, 10f, false);
+        }));
+        at(568, mc -> shot(mc, "decorative"));
+        at(570, mc -> mc.stop());
     }
 
     private static void at(int t, Consumer<Minecraft> action) {

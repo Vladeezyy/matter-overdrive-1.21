@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "###",
+    "#D#",
+    "###"
+  ],
+  "key": {
+    "#": "matteroverdrive:decorative_tritanium_plate",
+    "D": "minecraft:blue_dye"
+  },
+  "result": {
+    "id": "matteroverdrive:decorative_tritanium_plate_blue",
+    "count": 8
+  }
+}

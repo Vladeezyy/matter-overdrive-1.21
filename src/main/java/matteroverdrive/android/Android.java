@@ -234,18 +234,25 @@ public final class Android {
         if (data.dirty && player.tickCount % 10 == 0) sync(player);
     }
 
-    /** 1.7.10 manageEquipmentAttributeModifiers: each fitted bionic part adds its max health. */
+    /** 1.7.10 manageEquipmentAttributeModifiers: each fitted bionic part adds its max health (and glitch change). */
     private static void manageParts(Player player, AndroidData data) {
         AttributeInstance health = player.getAttribute(Attributes.MAX_HEALTH);
-        if (health == null) return;
+        AttributeInstance glitch = player.getAttribute(MOAttributes.GLITCH_TIME);
+        if (health == null || glitch == null) return;
         for (int slot = AndroidData.SLOT_HEAD; slot <= AndroidData.SLOT_OTHER; slot++) {
             var id = matteroverdrive.item.android.BionicPartItem.modifierId(slot);
             if (data.getStack(slot).getItem() instanceof matteroverdrive.item.android.BionicPartItem part) {
-                if (!health.hasModifier(id)) {
-                    health.addTransientModifier(new AttributeModifier(id, part.maxHealthBonus(), AttributeModifier.Operation.ADD_VALUE));
+                var healthModifier = new AttributeModifier(id, part.maxHealthBonus(), AttributeModifier.Operation.ADD_VALUE);
+                if (!healthModifier.equals(health.getModifier(id))) health.addOrUpdateTransientModifier(healthModifier);
+                if (part.glitchBonus() != 0) {
+                    var glitchModifier = new AttributeModifier(id, part.glitchBonus(), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+                    if (!glitchModifier.equals(glitch.getModifier(id))) glitch.addOrUpdateTransientModifier(glitchModifier);
+                } else {
+                    glitch.removeModifier(id);
                 }
             } else {
                 health.removeModifier(id);
+                glitch.removeModifier(id);
             }
         }
     }
@@ -271,8 +278,10 @@ public final class Android {
     private static void removeParts(Player player) {
         AttributeInstance health = player.getAttribute(Attributes.MAX_HEALTH);
         if (health == null) return;
+        AttributeInstance glitch = player.getAttribute(MOAttributes.GLITCH_TIME);
         for (int slot = AndroidData.SLOT_HEAD; slot <= AndroidData.SLOT_OTHER; slot++) {
             health.removeModifier(matteroverdrive.item.android.BionicPartItem.modifierId(slot));
+            if (glitch != null) glitch.removeModifier(matteroverdrive.item.android.BionicPartItem.modifierId(slot));
         }
     }
 

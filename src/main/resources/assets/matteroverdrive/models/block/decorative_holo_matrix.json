@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "matteroverdrive:block/weapon_station_top"
+  }
+}

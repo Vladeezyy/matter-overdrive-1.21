@@ -17,6 +17,7 @@ import matteroverdrive.block.entity.SolarPanelBlockEntity;
 import matteroverdrive.block.entity.WeaponStationBlockEntity;
 import matteroverdrive.block.entity.AndroidStationBlockEntity;
 import matteroverdrive.block.entity.ChargingStationBlockEntity;
+import matteroverdrive.block.entity.HoloSignBlockEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -62,6 +63,8 @@ public final class MOBlockEntities {
             BLOCK_ENTITIES.register("android_station", () -> new BlockEntityType<>(AndroidStationBlockEntity::new, MOBlocks.ANDROID_STATION.get()));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ChargingStationBlockEntity>> CHARGING_STATION =
             BLOCK_ENTITIES.register("charging_station", () -> new BlockEntityType<>(ChargingStationBlockEntity::new, MOBlocks.CHARGING_STATION.get()));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<HoloSignBlockEntity>> HOLO_SIGN =
+            BLOCK_ENTITIES.register("holo_sign", () -> new BlockEntityType<>(HoloSignBlockEntity::new, MOBlocks.HOLO_SIGN.get()));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<FusionReactorIOBlockEntity>> FUSION_REACTOR_IO =
             BLOCK_ENTITIES.register("fusion_reactor_io", () -> new BlockEntityType<>(FusionReactorIOBlockEntity::new, MOBlocks.FUSION_REACTOR_IO.get()));
 

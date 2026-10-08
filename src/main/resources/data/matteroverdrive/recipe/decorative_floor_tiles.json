@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "###",
+    "#Q#",
+    "###"
+  ],
+  "key": {
+    "#": "minecraft:clay",
+    "Q": "minecraft:quartz"
+  },
+  "result": {
+    "id": "matteroverdrive:decorative_floor_tiles",
+    "count": 12
+  }
+}

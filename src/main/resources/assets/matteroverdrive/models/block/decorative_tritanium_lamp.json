@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "matteroverdrive:block/tritanium_lamp_bottom",
+    "up": "matteroverdrive:block/tritanium_lamp_top",
+    "north": "matteroverdrive:block/tritanium_plate_yellow_stripe",
+    "south": "matteroverdrive:block/tritanium_plate_yellow_stripe",
+    "west": "matteroverdrive:block/tritanium_lamp_sides",
+    "east": "matteroverdrive:block/tritanium_lamp_sides",
+    "particle": "matteroverdrive:block/tritanium_plate_yellow_stripe"
+  }
+}

@@ -34,6 +34,7 @@ public class MatterOverdrive {
         MODataComponents.COMPONENTS.register(modEventBus);
         MOFluids.FLUID_TYPES.register(modEventBus);
         MOFluids.FLUIDS.register(modEventBus);
+        matteroverdrive.init.MODecorative.init();
         MOBlocks.BLOCKS.register(modEventBus);
         MOItems.ITEMS.register(modEventBus);
         MOBlockEntities.BLOCK_ENTITIES.register(modEventBus);
