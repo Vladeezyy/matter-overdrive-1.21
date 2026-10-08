@@ -18,6 +18,7 @@ import matteroverdrive.block.ReplicatorBlock;
 import matteroverdrive.block.RecyclerBlock;
 import matteroverdrive.block.SolarPanelBlock;
 import matteroverdrive.block.WeaponStationBlock;
+import matteroverdrive.block.AndroidStationBlock;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DropExperienceBlock;
@@ -92,6 +93,10 @@ public final class MOBlocks {
 
     // Weapons (phase 5c; 1.7.10 hardness 20, resistance 9, light 10)
     public static final DeferredBlock<WeaponStationBlock> WEAPON_STATION = BLOCKS.registerBlock("weapon_station", WeaponStationBlock::new,
+            p -> p.mapColor(MapColor.METAL).strength(20f, 9f).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion().lightLevel(s -> 10));
+
+    // Androids (phase 6)
+    public static final DeferredBlock<AndroidStationBlock> ANDROID_STATION = BLOCKS.registerBlock("android_station", AndroidStationBlock::new,
             p -> p.mapColor(MapColor.METAL).strength(20f, 9f).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion().lightLevel(s -> 10));
 
     private MOBlocks() {}

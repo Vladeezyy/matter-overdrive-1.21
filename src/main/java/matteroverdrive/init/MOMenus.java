@@ -11,6 +11,7 @@ import matteroverdrive.menu.ReplicatorMenu;
 import matteroverdrive.menu.RecyclerMenu;
 import matteroverdrive.menu.SolarPanelMenu;
 import matteroverdrive.menu.WeaponStationMenu;
+import matteroverdrive.menu.AndroidStationMenu;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.inventory.MenuType;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
@@ -44,6 +45,8 @@ public final class MOMenus {
             MENUS.register("fusion_reactor_controller", () -> IMenuTypeExtension.create(FusionReactorMenu::new));
     public static final DeferredHolder<MenuType<?>, MenuType<WeaponStationMenu>> WEAPON_STATION =
             MENUS.register("weapon_station", () -> IMenuTypeExtension.create(WeaponStationMenu::new));
+    public static final DeferredHolder<MenuType<?>, MenuType<AndroidStationMenu>> ANDROID_STATION =
+            MENUS.register("android_station", () -> IMenuTypeExtension.create(AndroidStationMenu::new));
 
     private MOMenus() {}
 }

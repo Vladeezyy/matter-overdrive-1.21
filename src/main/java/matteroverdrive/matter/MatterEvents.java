@@ -26,7 +26,9 @@ public final class MatterEvents {
                 .playToClient(PatternListPayload.TYPE, PatternListPayload.STREAM_CODEC, PatternListPayload::handle)
                 .playToServer(PatternRequestPayload.TYPE, PatternRequestPayload.STREAM_CODEC, PatternRequestPayload::handle)
                 .playToServer(matteroverdrive.network.FireWeaponPayload.TYPE, matteroverdrive.network.FireWeaponPayload.STREAM_CODEC,
-                        matteroverdrive.network.FireWeaponPayload::handle);
+                        matteroverdrive.network.FireWeaponPayload::handle)
+                .playToServer(matteroverdrive.network.UnlockStatPayload.TYPE, matteroverdrive.network.UnlockStatPayload.STREAM_CODEC,
+                        matteroverdrive.network.UnlockStatPayload::handle);
     }
 
     /** Recipes and data maps were (re)loaded on the server: recalculate on next use. */

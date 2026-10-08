@@ -1,0 +1,7 @@
+{
+  "parent": "matteroverdrive:block/weapon_station",
+  "textures": {
+    "side": "matteroverdrive:block/android_station_side",
+    "particle": "matteroverdrive:block/android_station_side"
+  }
+}

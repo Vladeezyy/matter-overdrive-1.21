@@ -18,6 +18,7 @@ final class AndroidGameTests {
         MOGameTests.add("android_battery_slot", 20, false, AndroidGameTests::batterySlot);
         MOGameTests.add("android_pills", 20, false, AndroidGameTests::pills);
         MOGameTests.add("android_stat_rules", 20, false, AndroidGameTests::statRules);
+        MOGameTests.add("android_station_parts", 20, false, AndroidGameTests::stationParts);
     }
 
     private static void check(GameTestHelper helper, boolean ok, String message) {
@@ -118,6 +119,27 @@ final class AndroidGameTests {
         player.getInventory().add(new ItemStack(net.minecraft.world.item.Items.COMPASS));
         check(helper, Android.tryUnlock(player, BioticStats.MINIMAP, 1), "minimap with a compass");
         check(helper, player.getInventory().countItem(net.minecraft.world.item.Items.COMPASS) == 0, "compass not consumed");
+        helper.succeed();
+    }
+
+    /** Android station: parts go in their own slot only; each fitted part adds a heart point; humans can't use it. */
+    private static void stationParts(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(2, 1, 2);
+        helper.setBlock(pos, matteroverdrive.init.MOBlocks.ANDROID_STATION.get());
+        var station = helper.getBlockEntity(pos, matteroverdrive.block.entity.AndroidStationBlockEntity.class);
+        ServerPlayer player = player(helper);
+        Android.setAndroid(player, true);
+        var menu = new matteroverdrive.menu.AndroidStationMenu(1, player.getInventory(), station, new net.minecraft.world.inventory.SimpleContainerData(11));
+        var head = (matteroverdrive.menu.AndroidStationMenu.PartSlot) menu.slots.stream()
+                .filter(s -> s instanceof matteroverdrive.menu.AndroidStationMenu.PartSlot p && p.part == AndroidData.SLOT_HEAD).findFirst().orElseThrow();
+        check(helper, !head.mayPlace(new ItemStack(MOItems.ROGUE_ANDROID_ARMS.get())), "head slot takes an arm");
+        head.set(new ItemStack(MOItems.ROGUE_ANDROID_HEAD.get()));
+        check(helper, Android.get(player).getStack(AndroidData.SLOT_HEAD).is(MOItems.ROGUE_ANDROID_HEAD.get()), "part not stored");
+        Android.tick(player);
+        check(helper, player.getMaxHealth() == 21, "max health " + player.getMaxHealth());
+        Android.setAndroid(player, false);
+        check(helper, player.getMaxHealth() == 20, "max health as human " + player.getMaxHealth());
+        check(helper, !menu.stillValid(player), "humans can use the android station");
         helper.succeed();
     }
 }

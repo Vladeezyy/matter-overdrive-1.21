@@ -21,6 +21,7 @@
     "matteroverdrive:fusion_reactor_coil",
     "matteroverdrive:fusion_reactor_io",
     "matteroverdrive:fusion_reactor_controller",
-    "matteroverdrive:weapon_station"
+    "matteroverdrive:weapon_station",
+    "matteroverdrive:android_station"
   ]
 }

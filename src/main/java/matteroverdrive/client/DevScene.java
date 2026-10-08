@@ -179,7 +179,33 @@ public final class DevScene {
             p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 0f, false);
         }));
         at(508, mc -> shot(mc, "phaser_barrel"));
-        at(512, mc -> mc.stop());
+        // phase 6: become an android, buy a few stats, fit parts, android station GUI
+        at(510, mc -> server(mc, p -> {
+            BlockPos station = origin.offset(0, 0, -2);
+            p.level().setBlock(station, MOBlocks.ANDROID_STATION.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH),
+                    Block.UPDATE_ALL | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
+            matteroverdrive.android.Android.setAndroid(p, true);
+            p.setExperienceLevels(200);
+            matteroverdrive.android.Android.tryUnlock(p, matteroverdrive.android.BioticStats.NANOBOTS, 1);
+            matteroverdrive.android.Android.tryUnlock(p, matteroverdrive.android.BioticStats.ATTACK, 1);
+            matteroverdrive.android.Android.tryUnlock(p, matteroverdrive.android.BioticStats.ATTACK, 2);
+            matteroverdrive.android.Android.tryUnlock(p, matteroverdrive.android.BioticStats.SPEED, 1);
+            matteroverdrive.android.Android.tryUnlock(p, matteroverdrive.android.BioticStats.NIGHT_VISION, 1);
+            matteroverdrive.android.Android.get(p).setStack(matteroverdrive.android.AndroidData.SLOT_HEAD, new ItemStack(MOItems.ROGUE_ANDROID_HEAD.get()));
+            matteroverdrive.android.Android.get(p).setStack(matteroverdrive.android.AndroidData.SLOT_BATTERY, MOItems.BATTERY.get().charged());
+            matteroverdrive.android.Android.sync(p);
+            p.getInventory().add(new ItemStack(MOItems.ROGUE_ANDROID_ARMS.get()));
+            p.getInventory().add(new ItemStack(MOItems.ANDROID_PILL_RED.get()));
+            p.getInventory().add(new ItemStack(MOItems.ANDROID_PILL_BLUE.get()));
+            p.getInventory().add(new ItemStack(MOItems.ANDROID_PILL_YELLOW.get()));
+            p.setExperienceLevels(40);
+            p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 30f, false);
+        }));
+        at(516, mc -> shot(mc, "android_station"));
+        at(517, mc -> openMachine(mc, origin.offset(0, 0, -2)));
+        at(524, mc -> shot(mc, "android_station_gui"));
+        at(526, mc -> mc.setScreen(null));
+        at(530, mc -> mc.stop());
     }
 
     private static void at(int t, Consumer<Minecraft> action) {

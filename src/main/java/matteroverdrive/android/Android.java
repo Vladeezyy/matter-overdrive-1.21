@@ -145,7 +145,10 @@ public final class Android {
     public static void setAndroid(Player player, boolean android) {
         AndroidData data = get(player);
         data.android = android;
-        if (!android) removeOutOfPower(player);
+        if (!android) {
+            removeOutOfPower(player);
+            removeParts(player);
+        }
         sync(player);
     }
 
@@ -211,6 +214,7 @@ public final class Android {
                 manageOutOfPower(server);
             }
             manageCharging(player);
+            manageParts(player, data);
             if (player.isInWater()) player.setDeltaMovement(player.getDeltaMovement().add(0, -0.007, 0));
             if (player.getAirSupply() < 0) player.setAirSupply(0);
             for (BioticStat stat : BioticStats.all()) {
@@ -220,6 +224,30 @@ public final class Android {
         }
         manageTurning(server, data);
         if (data.dirty && player.tickCount % 10 == 0) sync(player);
+    }
+
+    /** 1.7.10 manageEquipmentAttributeModifiers: each fitted bionic part adds its max health. */
+    private static void manageParts(Player player, AndroidData data) {
+        AttributeInstance health = player.getAttribute(Attributes.MAX_HEALTH);
+        if (health == null) return;
+        for (int slot = AndroidData.SLOT_HEAD; slot <= AndroidData.SLOT_OTHER; slot++) {
+            var id = matteroverdrive.item.android.BionicPartItem.modifierId(slot);
+            if (data.getStack(slot).getItem() instanceof matteroverdrive.item.android.BionicPartItem part) {
+                if (!health.hasModifier(id)) {
+                    health.addTransientModifier(new AttributeModifier(id, part.maxHealthBonus(), AttributeModifier.Operation.ADD_VALUE));
+                }
+            } else {
+                health.removeModifier(id);
+            }
+        }
+    }
+
+    private static void removeParts(Player player) {
+        AttributeInstance health = player.getAttribute(Attributes.MAX_HEALTH);
+        if (health == null) return;
+        for (int slot = AndroidData.SLOT_HEAD; slot <= AndroidData.SLOT_OTHER; slot++) {
+            health.removeModifier(matteroverdrive.item.android.BionicPartItem.modifierId(slot));
+        }
     }
 
     /** 1.7.10 manageCharging: sneaking with a battery in hand drains it into the android. */

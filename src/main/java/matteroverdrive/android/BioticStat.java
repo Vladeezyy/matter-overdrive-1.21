@@ -130,6 +130,11 @@ public class BioticStat {
         }
     }
 
+    /** Values for the %s placeholders of the stat's details text (1.7.10 getDetails). */
+    public Object[] detailArgs(int level) {
+        return new Object[0];
+    }
+
     // --- behaviour (1.7.10 IBionicStat hooks), overridden by the stats that do something ----------------
 
     /** 1.7.10 isEnabled: off while a blacklisted stat is active. */

@@ -28,6 +28,8 @@ public abstract class MachineMenu<T extends MachineBlockEntity> extends Abstract
     public static final int BUTTON_REDSTONE = 0;
 
     protected final T machine;
+    /** Set before {@link #addMachineSlots} runs, for menus whose slots belong to the player (android station). */
+    protected final Inventory playerInventory;
     private final ContainerData data;
     private final ContainerLevelAccess access;
     private final int machineSlotCount;
@@ -37,6 +39,7 @@ public abstract class MachineMenu<T extends MachineBlockEntity> extends Abstract
     protected MachineMenu(MenuType<?> type, int id, Inventory playerInventory, T machine, ContainerData data) {
         super(type, id);
         this.machine = machine;
+        this.playerInventory = playerInventory;
         this.data = data;
         this.access = ContainerLevelAccess.create(machine.getLevel(), machine.getBlockPos());
         MachineInventory inv = machine.getInventory();
@@ -54,14 +57,28 @@ public abstract class MachineMenu<T extends MachineBlockEntity> extends Abstract
         if (showMainInventory()) {
             for (int row = 0; row < 3; row++) {
                 for (int col = 0; col < 9; col++) {
-                    addSlot(new PlayerSlot(playerInventory, col + row * 9 + 9, 46 + col * 18, 99 + row * 18));
+                    addSlot(new PlayerSlot(playerInventory, col + row * 9 + 9, 46 + col * 18, inventoryY() + row * 18));
                 }
             }
         }
         for (int col = 0; col < 9; col++) {
-            addSlot(new Slot(playerInventory, col, 46 + col * 18, HEIGHT - 26));
+            addSlot(new Slot(playerInventory, col, 46 + col * 18, height() - 26));
         }
         addDataSlots(data);
+    }
+
+    /** GUI size; the background stretches (1.7.10 ScaleTexture). Read in the constructor, so it must not use fields. */
+    public int width() {
+        return WIDTH;
+    }
+
+    public int height() {
+        return HEIGHT;
+    }
+
+    /** Top of the main inventory rows. */
+    protected int inventoryY() {
+        return 99;
     }
 
     /** Whether the main inventory rows are part of this GUI (1.7.10 left them out of the pattern monitor). */

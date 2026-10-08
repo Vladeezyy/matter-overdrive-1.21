@@ -36,15 +36,23 @@ public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractCo
     private static final ResourceLocation[] PAGE_ICONS = {tex("page_icon_home"), tex("page_icon_upgrades"), tex("page_icon_config")};
     private static final int[] PAGE_ICON_SIZES = {14, 12, 16};
 
-    private static final int CLOSE_X = MachineMenu.WIDTH - 17, CLOSE_Y = 6;
+    private static final int CLOSE_Y = 6;
     // The background's right 12 px are transparent (1.7.10 kept its side panel there); the tabs hang off the frame edge, below the title bar (which reaches y = 35 there).
-    private static final int PAGES_X = MachineMenu.WIDTH - 14, PAGES_Y = 38;
+    private static final int PAGES_Y = 38;
     private static final int REDSTONE_X = 50, REDSTONE_Y = 50, REDSTONE_W = 140, REDSTONE_H = 20;
 
     protected MachineScreen(M menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
-        imageWidth = MachineMenu.WIDTH;
-        imageHeight = MachineMenu.HEIGHT;
+        imageWidth = menu.width();
+        imageHeight = menu.height();
+    }
+
+    private int closeX() {
+        return imageWidth - 17;
+    }
+
+    private int pagesX() {
+        return imageWidth - 14;
     }
 
     protected static ResourceLocation tex(String name) {
@@ -83,7 +91,7 @@ public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractCo
         g.blitSprite(RenderPipelines.GUI_TEXTURED, BACKGROUND, x, y, imageWidth, imageHeight);
 
         for (Slot slot : menu.slots) {
-            if (!slot.isActive()) continue;
+            if (!slot.isActive() || !drawSlotBackground(slot)) continue;
             if (slot instanceof MachineMenu<?>.PageSlot) {
                 g.blit(RenderPipelines.GUI_TEXTURED, SLOT_BIG, x + slot.x - 3, y + slot.y - 3, 0, 0, 22, 22, 22, 22);
             } else {
@@ -95,7 +103,7 @@ public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractCo
         List<MachineMenu.Page> pages = pages();
         for (int i = 0; i < pages.size(); i++) {
             MachineMenu.Page page = pages.get(i);
-            int bx = x + PAGES_X, by = y + PAGES_Y + i * 26;
+            int bx = x + pagesX(), by = y + PAGES_Y + i * 26;
             boolean selected = menu.page == page;
             g.blit(RenderPipelines.GUI_TEXTURED, PAGE_BUTTON, bx, by, selected ? 24 : 0, 0, 24, 24, 48, 24);
             int icon = page.ordinal();
@@ -108,14 +116,24 @@ public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractCo
         g.blit(RenderPipelines.GUI_TEXTURED, INDICATOR, x + 6, y + imageHeight - 18, 0, menu.isActive() ? 5 : 0, 21, 5, 21, 15);
 
         // close button
-        boolean overClose = in(mouseX - x, mouseY - y, CLOSE_X, CLOSE_Y, 9, 9);
-        g.blit(RenderPipelines.GUI_TEXTURED, CLOSE, x + CLOSE_X, y + CLOSE_Y, overClose ? 9 : 0, 0, 9, 9, 18, 9);
+        boolean overClose = in(mouseX - x, mouseY - y, closeX(), CLOSE_Y, 9, 9);
+        g.blit(RenderPipelines.GUI_TEXTURED, CLOSE, x + closeX(), y + CLOSE_Y, overClose ? 9 : 0, 0, 9, 9, 18, 9);
 
         switch (menu.page) {
             case HOME -> renderHome(g, x, y, mouseX - x, mouseY - y);
             case UPGRADES -> renderUpgrades(g, x, y);
             case CONFIG -> renderConfig(g, x, y, mouseX - x, mouseY - y);
         }
+    }
+
+    /** Whether the default slot frame is drawn for this slot (screens with holo slots draw their own). */
+    protected boolean drawSlotBackground(Slot slot) {
+        return true;
+    }
+
+    /** A click on the Home page (relative to the GUI origin); true if handled. */
+    protected boolean homeClicked(double mx, double my) {
+        return false;
     }
 
     /** Draws the machine's Home page; x/y are the GUI origin, mx/my the mouse relative to it. */
@@ -127,7 +145,7 @@ public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractCo
     private void renderExtraTooltips(GuiGraphics g, int mx, int my, int mouseX, int mouseY) {
         List<MachineMenu.Page> pages = pages();
         for (int i = 0; i < pages.size(); i++) {
-            if (in(mx, my, PAGES_X, PAGES_Y + i * 26, 24, 24)) {
+            if (in(mx, my, pagesX(), PAGES_Y + i * 26, 24, 24)) {
                 g.setTooltipForNextFrame(font, Component.translatable("gui.matteroverdrive.page." + pages.get(i).name().toLowerCase(java.util.Locale.ROOT)), mouseX, mouseY);
             }
         }
@@ -205,11 +223,11 @@ public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractCo
     protected void renderLabels(GuiGraphics g, int mouseX, int mouseY) {
         // the title bar runs from about x = 50 to the close button at 208; long names are cut with an ellipsis
         String text = title.getString();
-        int max = 150;
+        int max = 150 + imageWidth - MachineMenu.WIDTH;
         if (font.width(text) > max) {
             text = font.plainSubstrByWidth(text, max - font.width("…")) + "…";
         }
-        g.drawString(font, text, 128 - font.width(text) / 2, 7, COLOR_TITLE, false);
+        g.drawString(font, text, 128 + (imageWidth - MachineMenu.WIDTH) / 2 - font.width(text) / 2, 7, COLOR_TITLE, false);
     }
 
     protected static boolean in(double mx, double my, int x, int y, int w, int h) {
@@ -221,16 +239,19 @@ public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractCo
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
         double mx = event.x() - leftPos, my = event.y() - topPos;
-        if (in(mx, my, CLOSE_X, CLOSE_Y, 9, 9)) {
+        if (in(mx, my, closeX(), CLOSE_Y, 9, 9)) {
             onClose();
             return true;
         }
         List<MachineMenu.Page> pages = pages();
         for (int i = 0; i < pages.size(); i++) {
-            if (in(mx, my, PAGES_X, PAGES_Y + i * 26, 24, 24)) {
+            if (in(mx, my, pagesX(), PAGES_Y + i * 26, 24, 24)) {
                 menu.page = pages.get(i);
                 return true;
             }
+        }
+        if (menu.page == MachineMenu.Page.HOME && homeClicked(mx, my)) {
+            return true;
         }
         if (menu.page == MachineMenu.Page.CONFIG && in(mx, my, REDSTONE_X, REDSTONE_Y, REDSTONE_W, REDSTONE_H)) {
             minecraft.gameMode.handleInventoryButtonClick(menu.containerId, MachineMenu.BUTTON_REDSTONE);

@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "THA",
+    "2F3",
+    "GMR"
+  ],
+  "key": {
+    "T": "matteroverdrive:rogue_android_part_chest",
+    "H": "matteroverdrive:rogue_android_part_head",
+    "A": "matteroverdrive:rogue_android_part_arms",
+    "2": "matteroverdrive:isolinear_circuit_mk2",
+    "3": "matteroverdrive:isolinear_circuit_mk3",
+    "F": "matteroverdrive:forcefield_emitter",
+    "G": "minecraft:glowstone_dust",
+    "M": "matteroverdrive:machine_casing",
+    "R": "minecraft:redstone"
+  },
+  "result": {
+    "id": "matteroverdrive:android_station",
+    "count": 1
+  }
+}

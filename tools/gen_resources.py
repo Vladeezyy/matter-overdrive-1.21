@@ -814,6 +814,35 @@ w(D / "loot_modifiers/android_pill.json", {"type": "neoforge:add_table", "table"
 w(out / "data/neoforge/loot_modifiers/global_loot_modifiers.json", {"replace": False,
     "entries": [mid("weapon_module_colors"), mid("android_pill")]})
 
+# Android station (6b): the weapon station's table with its own sides; rogue android parts as bionic parts.
+cp(ref / "textures/blocks/android_station_side.png", A / "textures/block/android_station_side.png")
+w(A / "models/block/android_station.json", {"parent": f"{MOD}:block/weapon_station", "textures": {
+    "side": f"{MOD}:block/android_station_side", "particle": f"{MOD}:block/android_station_side"}})
+facing_blockstate("android_station", f"{MOD}:block/android_station")
+w(D / "loot_table/blocks/android_station.json", self_drop("android_station"))
+for tag in ["mineable/pickaxe", "needs_iron_tool"]:
+    p = TAGS / f"minecraft/tags/block/{tag}.json"
+    w(p, {"values": json.loads(p.read_text())["values"] + [mid("android_station")]})
+PARTS = ["head", "arms", "legs", "chest"]
+for part in PARTS:
+    cp(ref / "textures/items" / f"rouge_android_{part}.png", A / "textures/item" / f"rouge_android_{part}.png")
+    w(A / "models/item" / f"rogue_android_part_{part}.json", {"parent": "minecraft:item/generated",
+        "textures": {"layer0": f"{MOD}:item/rouge_android_{part}"}})
+    w(A / "items" / f"rogue_android_part_{part}.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:item/rogue_android_part_{part}"}})
+# 1.7.10 recipe: T torso, H head, A arm, 2/3 isolinear mk2/mk3, F force field emitter, G glowstone, M casing, R redstone.
+shaped("android_station", mid("android_station"), ["THA", "2F3", "GMR"],
+       {"T": mid("rogue_android_part_chest"), "H": mid("rogue_android_part_head"), "A": mid("rogue_android_part_arms"),
+        "2": MK[2], "3": MK[3], "F": mid("forcefield_emitter"), "G": "minecraft:glowstone_dust", "M": mid("machine_casing"),
+        "R": "minecraft:redstone"})
+for n in ["slot_holo"]:
+    cp(ref / "textures/gui/elements" / f"{n}.png", GUI / "elements" / f"{n}.png")
+for n in ["up_arrow", "black_circle"] + [f"android_slot_{p}" for p in PARTS + ["other"]] + \
+         [f"biotic_stat_{s}" for s in ["teleport", "nanobots", "nano_armor", "floatation", "speed", "high_jump", "equalizer",
+                                       "shield", "attack", "cloak", "nightvision", "minimap", "shockwave"]]:
+    cp(ref / "textures/gui/items" / f"{n}.png", GUI / "elements" / f"{n}.png")
+# 1.7.10 BioticStatFlashCooling used the "temperature" holo icon
+cp(ref / "textures/gui/items/temperature.png", GUI / "elements/biotic_stat_flash_cooling.png")
+
 
 # --- matter values (1.7.10 MatterOverdriveMatter.registerBasic*) -----------------------------------
 # Base values of the matteroverdrive:matter data map; everything else is calculated from recipes at runtime.
@@ -964,6 +993,16 @@ for src_name, dst_name in [("en_US", "en_us"), ("ru_RU", "ru_ru")]:
         lang[f"item.{MOD}.android_pill_{c}.details"] = src.get(f"item.android_pill_{c}.details") or en[f"item.android_pill_{c}.details"]
     for k in [k for k in en if k.startswith("biotic_stat.") or k.startswith("gui.android_hud.transforming")]:
         lang[k.replace("biotic_stat.", f"biotic_stat.{MOD}.").replace("gui.android_hud.", f"gui.{MOD}.android_hud.")] = src.get(k) or en[k]
+    lang[f"block.{MOD}.android_station"] = src.get("tile.android_station.name") or en["tile.android_station.name"]
+    for part in ["head", "arms", "legs", "chest"]:
+        lang[f"item.{MOD}.rogue_android_part_{part}"] = src.get(f"item.rouge_android_part.{part}.name") or en[f"item.rouge_android_part.{part}.name"]
+    for k in ["melee", "range"]:
+        lang[f"item.{MOD}.rogue_android_part.{k}"] = src.get(f"item.rouge_android_part.{k}") or en[f"item.rouge_android_part.{k}"]
+    for part in ["head", "arms", "legs", "chest", "other", "battery"]:
+        lang[f"gui.{MOD}.biopart.{part}"] = src.get(f"biopart.{part}.name") or en[f"biopart.{part}.name"]
+    lang[f"gui.{MOD}.requires"] = src.get("gui.tooltip.requires") or en["gui.tooltip.requires"]
+    lang[f"gui.{MOD}.locks"] = src.get("gui.tooltip.locks") or {"en_us": "Locks", "ru_ru": "Блокирует"}[dst_name]
+    lang[f"alert.{MOD}.not_android"] = src.get("alert.not_android") or en["alert.not_android"]
     lang[f"death.attack.{MOD}.android_transformation"] = src.get("death.attack.android_transformation") or en["death.attack.android_transformation"]
     lang[f"attribute.name.{MOD}.android_glitch_time"] = {"en_us": "Glitch Time", "ru_ru": "Длительность сбоев"}[dst_name]
     lang[f"attribute.name.{MOD}.android_battery_use"] = {"en_us": "Battery Use", "ru_ru": "Расход батареи"}[dst_name]
