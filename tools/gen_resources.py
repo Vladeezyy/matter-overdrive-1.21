@@ -456,7 +456,7 @@ shaped("matter_analyzer", mid("matter_analyzer"), [" C ", "PMF", "ONO"],
 
 
 # --- phase 3 step 4: the matter network -----------------------------------------------------------
-def obj_model(name, materials, shift_y=False, hidden=(), particle="base"):
+def obj_model(name, materials, shift_y=False, hidden=(), particle="base", tints=None):
     """Copy a 1.7.10 Wavefront model for NeoForge's OBJ loader: one material per group (as the 1.7.10 renderer
     picked an icon per group), block-corner coordinates (shift the centred models by half a block)."""
     lines = [f"mtllib {name}.mtl"]
@@ -472,7 +472,8 @@ def obj_model(name, materials, shift_y=False, hidden=(), particle="base"):
     (A / "models/block").mkdir(parents=True, exist_ok=True)
     (A / "models/block" / f"{name}.obj").write_text("\n".join(lines) + "\n")
     mats = sorted(set(materials.values()))
-    (A / "models/block" / f"{name}.mtl").write_text("".join(f"newmtl {m}\nmap_Kd #{m}\n" for m in mats))
+    (A / "models/block" / f"{name}.mtl").write_text("".join(
+        f"newmtl {m}\nmap_Kd #{m}\n" + (f"neoforge_TintIndex {tints[m]}\n" if tints and m in tints else "") for m in mats))
     model = {"loader": "neoforge:obj", "model": f"{MOD}:models/block/{name}.obj", "flip_v": True,
              "textures": {m: f"{MOD}:block/{m}" for m in mats} | {"particle": f"{MOD}:block/{particle}"}}
     if hidden:
@@ -718,8 +719,10 @@ SOUNDS = {"phaser_rifle_shot": ["weapon/phaser_rifle_shot"], "plasma_shotgun_sho
           "rogue_android_death": [f"entities/rogue_android_death_{i}" for i in range(2)],
           # failed animals (phase 7c)
           **{f"failed_animal_idle_{a}": [f"entities/failed_animal_idle_{a}"] for a in ["pig", "cow", "chicken", "sheep"]},
-          "failed_animal_die": [f"entities/failed_animal_die_{i}" for i in range(2)]}
-SOUND_CATEGORY = {k: "neutral" for k in SOUNDS if k.startswith("failed_animal")} | {k: "hostile" for k in SOUNDS if k.startswith("rogue_android")}
+          "failed_animal_die": [f"entities/failed_animal_die_{i}" for i in range(2)],
+          "crate_open": ["blocks/crate_open"], "crate_close": ["blocks/crate_close"]}
+SOUND_CATEGORY = {k: "neutral" for k in SOUNDS if k.startswith("failed_animal")} | {k: "hostile" for k in SOUNDS if k.startswith("rogue_android")} | \
+                 {k: "block" for k in SOUNDS if k.startswith("crate_")}
 for files in SOUNDS.values():
     for f in files:
         dst = A / "sounds" / f"{f}.ogg"
@@ -1029,6 +1032,32 @@ for item_id, tex in {"emergency_ration": "emergency_ration", "earl_gray_tea": "e
     w(A / "items" / f"{item_id}.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:item/{item_id}"}})
 
 
+# --- phase 7e: tritanium crate ------------------------------------------------------------------------------
+# 1.7.10 RendererBlockTritaniumCrate: OBJ base + overlay tinted with the crate's dye colour (block colour handler / item tint).
+for t in ["tritanium_crate_base", "tritanium_crate_overlay"]:   # 16-bit originals → 8-bit RGBA
+    dst_png = A / "textures/block" / f"{t}.png"
+    dst_png.parent.mkdir(parents=True, exist_ok=True)
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(ref / "textures/blocks" / f"{t}.png"), "-pix_fmt", "rgba",
+                    "-fflags", "+bitexact", "-flags", "+bitexact", str(dst_png)], check=True)
+obj_model("tritanium_crate", {"base": "tritanium_crate_base", "overlay": "tritanium_crate_overlay"},
+          particle="tritanium_crate_base", tints={"tritanium_crate_overlay": 0})
+CRATES = [f"tritanium_crate_{dye}" for dye in DYES]
+for dye, n in zip(DYES, CRATES):
+    w(A / "blockstates" / f"{n}.json", {"variants": {f"facing={f}": ({"model": f"{MOD}:block/tritanium_crate", "y": y} if y else
+                                                                    {"model": f"{MOD}:block/tritanium_crate"}) for f, y in FACING_Y.items()}})
+    w(A / "items" / f"{n}.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:block/tritanium_crate",
+        "tints": [{"type": "minecraft:constant", "value": (0xFF << 24 | DYE_RGB[dye]) - (1 << 32)}]}})
+    w(D / f"loot_table/blocks/{n}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "bonus_rolls": 0,
+        "entries": [{"type": "minecraft:item", "name": mid(n), "functions": [{"function": "minecraft:copy_components",
+            "source": "block_entity", "include": ["minecraft:container", "minecraft:custom_name"]}]}],
+        "conditions": [{"condition": "minecraft:survives_explosion"}]}]})
+    shaped(n, mid(n), [" D ", "TCT", " T "], {"D": f"minecraft:{dye}_dye", "T": mid("tritanium_plate"), "C": "minecraft:chest"})
+for tag in ["mineable/pickaxe", "needs_iron_tool"]:
+    p = TAGS / f"minecraft/tags/block/{tag}.json"
+    w(p, {"values": json.loads(p.read_text())["values"] + [mid(n) for n in CRATES]})
+w(D / "tags/item/tritanium_crates.json", {"values": [mid(n) for n in CRATES]})
+
+
 # --- phase 7b: mobs -----------------------------------------------------------------------------------------
 import zlib
 
@@ -1265,6 +1294,11 @@ for src_name, dst_name in [("en_US", "en_us"), ("ru_RU", "ru_ru")]:
         lang[f"entity.{MOD}.failed_{n}"] = src.get(f"entity.failed_{n}.name") or en[f"entity.failed_{n}.name"]
         egg_word = {"en_us": "Spawn Egg", "ru_ru": "Яйцо призыва"}[dst_name]
         lang[f"item.{MOD}.failed_{n}_spawn_egg"] = f"{egg_word}: {lang[f'entity.{MOD}.failed_{n}']}" if dst_name == "ru_ru" else f"{lang[f'entity.{MOD}.failed_{n}']} {egg_word}"
+    old_dye = {"light_gray": "silver", "light_blue": "lightBlue"}
+    for dye in DYES:
+        key = f"tile.tritanium_crate.{old_dye.get(dye, dye)}"
+        lang[f"block.{MOD}.tritanium_crate_{dye}"] = src.get(key + ".name") or src.get(key) or en.get(key + ".name") or en[key]
+    lang[f"container.{MOD}.tritanium_crate"] = src.get("container.tritanium_crate") or en["container.tritanium_crate"]
     lang[f"rarity.{MOD}.legendary"] = src.get("rarity.legendary") or en.get("rarity.legendary") or "Legendary"
     lang[f"block.{MOD}.charging_station"] = src.get("tile.charging_station.name") or en["tile.charging_station.name"]
     lang[f"block.{MOD}.android_station"] = src.get("tile.android_station.name") or en["tile.android_station.name"]

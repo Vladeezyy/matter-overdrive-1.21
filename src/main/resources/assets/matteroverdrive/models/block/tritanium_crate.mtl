@@ -1,0 +1,5 @@
+newmtl tritanium_crate_base
+map_Kd #tritanium_crate_base
+newmtl tritanium_crate_overlay
+map_Kd #tritanium_crate_overlay
+neoforge_TintIndex 0

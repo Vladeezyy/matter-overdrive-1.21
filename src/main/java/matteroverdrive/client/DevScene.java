@@ -316,7 +316,20 @@ public final class DevScene {
             p.level().addFreshEntity(mutant);
         }));
         at(598, mc -> shot(mc, "mutant_scientist"));
-        at(600, mc -> mc.stop());
+        // 7e: the 16 tritanium crates in two rows, facing the camera
+        at(600, mc -> server(mc, p -> {
+            BlockPos base = origin.above(14);
+            p.level().getEntitiesOfClass(matteroverdrive.entity.monster.MutantScientist.class, p.getBoundingBox().inflate(16)).forEach(e -> e.discard());
+            for (int i = 0; i < 16; i++) {
+                BlockPos pos = base.offset(-4 + i % 8, i < 8 ? 0 : 1, -5 - (i < 8 ? 0 : 1));
+                if (i >= 8) p.level().setBlockAndUpdate(pos.below(), matteroverdrive.init.MODecorative.TRITANIUM_PLATE.get().defaultBlockState());
+                p.level().setBlockAndUpdate(pos, matteroverdrive.init.MOBlocks.TRITANIUM_CRATES.get(i).get().defaultBlockState()
+                        .setValue(net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING, Direction.SOUTH));
+            }
+            p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() - 1.0, Set.of(), 180f, 25f, false);
+        }));
+        at(608, mc -> shot(mc, "tritanium_crates"));
+        at(610, mc -> mc.stop());
     }
 
     private static void at(int t, Consumer<Minecraft> action) {

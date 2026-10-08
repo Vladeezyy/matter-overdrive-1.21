@@ -182,5 +182,17 @@
       "matteroverdrive:entities/failed_animal_die_0",
       "matteroverdrive:entities/failed_animal_die_1"
     ]
+  },
+  "crate_open": {
+    "category": "block",
+    "sounds": [
+      "matteroverdrive:blocks/crate_open"
+    ]
+  },
+  "crate_close": {
+    "category": "block",
+    "sounds": [
+      "matteroverdrive:blocks/crate_close"
+    ]
   }
 }

@@ -1,0 +1,10 @@
+{
+  "loader": "neoforge:obj",
+  "model": "matteroverdrive:models/block/tritanium_crate.obj",
+  "flip_v": true,
+  "textures": {
+    "tritanium_crate_base": "matteroverdrive:block/tritanium_crate_base",
+    "tritanium_crate_overlay": "matteroverdrive:block/tritanium_crate_overlay",
+    "particle": "matteroverdrive:block/tritanium_crate_base"
+  }
+}

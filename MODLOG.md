@@ -232,6 +232,12 @@
   `mirror` after `addBox`, so nothing is mirrored; rotation order ZYX matches). Texture `hulking_scinetist.png` →
   `hulking_scientist.png`. ru name "Учёный-мутант" via EXTRA (missing in the original). No natural spawns: it comes
   from the underwater base and the mad scientist's cocktail. 66 GameTests pass.
+- **7e ✅** Tritanium crate: 16 blocks `tritanium_crate_<dye>` (1.7.10 had one per dye too), `RandomizableContainerBlockEntity`
+  with 54 slots in the vanilla 6-row chest screen, crate_open/close sounds (openers counter like the barrel), loot-table
+  capable (for structures), 13 px high / 12 px deep shape along the facing. Keeps its contents when broken (container
+  component copied to the item; `preRemoveSideEffects` overridden so nothing spills). OBJ base + overlay; the overlay
+  material has `neoforge_TintIndex 0` (new `tints` arg of `obj_model`) → dye colour from the block colour handler / item
+  tint. 16-bit textures converted to 8-bit by ffmpeg. Recipe " D /TCT/ T " (dye, tritanium plate, chest). 67 GameTests.
 
 ### Next in phase 7 (start here)
 1. ~~Failed animals~~ ✅ 7c.

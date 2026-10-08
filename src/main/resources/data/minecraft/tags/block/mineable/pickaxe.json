@@ -60,6 +60,22 @@
     "matteroverdrive:decorative_tritanium_plate_red",
     "matteroverdrive:decorative_tritanium_plate_black",
     "matteroverdrive:force_glass",
-    "matteroverdrive:holo_sign"
+    "matteroverdrive:holo_sign",
+    "matteroverdrive:tritanium_crate_white",
+    "matteroverdrive:tritanium_crate_orange",
+    "matteroverdrive:tritanium_crate_magenta",
+    "matteroverdrive:tritanium_crate_light_blue",
+    "matteroverdrive:tritanium_crate_yellow",
+    "matteroverdrive:tritanium_crate_lime",
+    "matteroverdrive:tritanium_crate_pink",
+    "matteroverdrive:tritanium_crate_gray",
+    "matteroverdrive:tritanium_crate_light_gray",
+    "matteroverdrive:tritanium_crate_cyan",
+    "matteroverdrive:tritanium_crate_purple",
+    "matteroverdrive:tritanium_crate_blue",
+    "matteroverdrive:tritanium_crate_brown",
+    "matteroverdrive:tritanium_crate_green",
+    "matteroverdrive:tritanium_crate_red",
+    "matteroverdrive:tritanium_crate_black"
   ]
 }

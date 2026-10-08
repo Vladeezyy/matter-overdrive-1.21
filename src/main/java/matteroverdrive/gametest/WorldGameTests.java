@@ -14,6 +14,7 @@ final class WorldGameTests {
     static void addAll() {
         MOGameTests.add("failed_animals", 20, false, WorldGameTests::failedAnimals);
         MOGameTests.add("mutant_scientist", 20, false, WorldGameTests::mutantScientist);
+        MOGameTests.add("tritanium_crate", 20, false, WorldGameTests::tritaniumCrate);
     }
 
     private static void check(GameTestHelper helper, boolean ok, String message) {
@@ -49,6 +50,22 @@ final class WorldGameTests {
         var mutant = helper.spawnWithNoFreeWill(MOEntities.MUTANT_SCIENTIST.get(), new BlockPos(3, 1, 3));
         check(helper, mutant.getMaxHealth() == 256 && mutant.getHealth() == 256, "health " + mutant.getMaxHealth());
         check(helper, matteroverdrive.entity.monster.RogueAndroid.isEnemy(mutant), "rogue androids ignore mutants");
+        helper.succeed();
+    }
+
+    /** Tritanium crate: 54 slots, keeps its contents in the dropped item. */
+    private static void tritaniumCrate(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(2, 1, 2);
+        helper.setBlock(pos, matteroverdrive.init.MOBlocks.crate(DyeColor.ORANGE).get());
+        var crate = (matteroverdrive.block.entity.TritaniumCrateBlockEntity) helper.getBlockEntity(pos, matteroverdrive.block.entity.TritaniumCrateBlockEntity.class);
+        check(helper, crate.getContainerSize() == 54, "size " + crate.getContainerSize());
+        crate.setItem(53, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DIAMOND, 7));
+        BlockPos abs = helper.absolutePos(pos);
+        var drops = net.minecraft.world.level.block.Block.getDrops(helper.getLevel().getBlockState(abs), helper.getLevel(), abs, crate,
+                null, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DIAMOND_PICKAXE));
+        check(helper, drops.size() == 1, "drops " + drops);
+        var contents = drops.get(0).get(net.minecraft.core.component.DataComponents.CONTAINER);
+        check(helper, contents != null && contents.nonEmptyStream().anyMatch(s -> s.getCount() == 7), "contents not kept: " + contents);
         helper.succeed();
     }
 }

@@ -106,6 +106,15 @@ public final class MOBlocks {
     // World & extras (phase 7): 1.7.10 BlockHoloSign hardness 20
     public static final DeferredBlock<HoloSignBlock> HOLO_SIGN = BLOCKS.registerBlock("holo_sign", HoloSignBlock::new,
             p -> p.mapColor(MapColor.METAL).strength(20f, 5f).sound(SoundType.METAL).noOcclusion().lightLevel(s -> 8));
+    /** 1.7.10 tritanium_crate.<dye>: hardness 20, resistance 9, iron pickaxe; one block per dye colour. */
+    public static final java.util.List<DeferredBlock<matteroverdrive.block.TritaniumCrateBlock>> TRITANIUM_CRATES =
+            java.util.Arrays.stream(net.minecraft.world.item.DyeColor.values()).map(color -> BLOCKS.registerBlock("tritanium_crate_" + color.getName(),
+                    matteroverdrive.block.TritaniumCrateBlock::new, p -> p.mapColor(color.getMapColor()).strength(20f, 9f).sound(SoundType.METAL)
+                            .requiresCorrectToolForDrops().noOcclusion())).toList();
+
+    public static DeferredBlock<matteroverdrive.block.TritaniumCrateBlock> crate(net.minecraft.world.item.DyeColor color) {
+        return TRITANIUM_CRATES.get(color.getId());
+    }
 
     private MOBlocks() {}
 }

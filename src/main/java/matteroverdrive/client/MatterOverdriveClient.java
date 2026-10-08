@@ -33,13 +33,14 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 @Mod(value = MatterOverdrive.MODID, dist = Dist.CLIENT)
 @EventBusSubscriber(modid = MatterOverdrive.MODID, value = Dist.CLIENT)
 public class MatterOverdriveClient {
-    /** 1.7.10 BlockDecorative.colorMultiplier: the colored tritanium plates take their dye colour. */
+    /** 1.7.10 BlockDecorative.colorMultiplier / BlockTritaniumCrate.getBlockColor: plates and crate overlays take their dye colour. */
     @SubscribeEvent
     static void blockColors(net.neoforged.neoforge.client.event.RegisterColorHandlersEvent.Block event) {
         var colors = net.minecraft.world.item.DyeColor.values();
         for (int i = 0; i < colors.length; i++) {
             int rgb = colors[i].getTextureDiffuseColor();
             event.register((state, level, pos, tint) -> rgb, matteroverdrive.init.MODecorative.COLORED_PLATES.get(i).get());
+            event.register((state, level, pos, tint) -> tint == 0 ? rgb : -1, matteroverdrive.init.MOBlocks.TRITANIUM_CRATES.get(i).get());
         }
     }
 

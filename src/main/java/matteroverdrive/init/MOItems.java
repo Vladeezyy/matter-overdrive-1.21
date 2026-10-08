@@ -179,6 +179,8 @@ public final class MOItems {
                     net.minecraft.world.item.component.Consumables.DEFAULT_DRINK)
                     .usingConvertsTo(net.minecraft.world.item.Items.GLASS_BOTTLE).stacksTo(16));
     public static final DeferredItem<BlockItem> HOLO_SIGN = block("holo_sign", MOBlocks.HOLO_SIGN);
+    public static final List<DeferredItem<BlockItem>> TRITANIUM_CRATES = MOBlocks.TRITANIUM_CRATES.stream()
+            .map(b -> block(b.getId().getPath(), b)).toList();
     public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> ROGUE_ANDROID_SPAWN_EGG = item("rogue_android_spawn_egg",
             net.minecraft.world.item.SpawnEggItem::new, p -> p.spawnEgg(MOEntities.ROGUE_ANDROID.get()));
     public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> RANGED_ROGUE_ANDROID_SPAWN_EGG = item("ranged_rogue_android_spawn_egg",

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " D ",
+    "TCT",
+    " T "
+  ],
+  "key": {
+    "D": "minecraft:green_dye",
+    "T": "matteroverdrive:tritanium_plate",
+    "C": "minecraft:chest"
+  },
+  "result": {
+    "id": "matteroverdrive:tritanium_crate_green",
+    "count": 1
+  }
+}

@@ -68,5 +68,9 @@ public final class MOBlockEntities {
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<FusionReactorIOBlockEntity>> FUSION_REACTOR_IO =
             BLOCK_ENTITIES.register("fusion_reactor_io", () -> new BlockEntityType<>(FusionReactorIOBlockEntity::new, MOBlocks.FUSION_REACTOR_IO.get()));
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<matteroverdrive.block.entity.TritaniumCrateBlockEntity>> TRITANIUM_CRATE =
+            BLOCK_ENTITIES.register("tritanium_crate", () -> new BlockEntityType<>(matteroverdrive.block.entity.TritaniumCrateBlockEntity::new,
+                    MOBlocks.TRITANIUM_CRATES.stream().map(b -> (net.minecraft.world.level.block.Block) b.get()).collect(java.util.stream.Collectors.toSet())));
+
     private MOBlockEntities() {}
 }

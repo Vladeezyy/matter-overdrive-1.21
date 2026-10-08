@@ -44,6 +44,8 @@ public final class MOSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> FAILED_ANIMAL_IDLE_CHICKEN = sound("failed_animal_idle_chicken");
     public static final DeferredHolder<SoundEvent, SoundEvent> FAILED_ANIMAL_IDLE_SHEEP = sound("failed_animal_idle_sheep");
     public static final DeferredHolder<SoundEvent, SoundEvent> FAILED_ANIMAL_DIE = sound("failed_animal_die");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CRATE_OPEN = sound("crate_open");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CRATE_CLOSE = sound("crate_close");
 
     private static DeferredHolder<SoundEvent, SoundEvent> sound(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, name)));
