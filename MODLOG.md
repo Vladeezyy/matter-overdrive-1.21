@@ -414,6 +414,21 @@
     join; the star's sphere.obj is a 16x12 UV sphere (its points are small particles); the info panel is placed to be
     readable from the player's side; animations use game time. The star map screen comes with 7t (plain use does nothing
     yet), the homeworld's starting base and scout ship with 7u.
+- **7t ✅** Star map screen (1.7.10 GuiStarMap, ContainerStarMap, SlotStarMap, Page*, Element*Entry, PacketStarMapClientCommands).
+  `StarMapScreen` is full screen: black, the map's hologram in a 75° perspective tilted 15° and slowly turning on the
+  first three pages (`StarMapPipRenderer`, a picture-in-picture renderer with its own projection), the star_map frame,
+  page tabs on the right (galaxy / quadrant / star / planet / planet stats, shown when the destination has them), a list
+  of quadrants / stars / planets (holo list entries tinted by the body's colour; selected = the map's destination, with
+  "Enter" and, for planets, "Travel To" = the map's position; home / factory / ship counts in circles; alien font for
+  unknown stars and planets; wheel scroll), the selected body's info panel at the bottom (the hologram's GUI info at
+  opacity 0.8), the inventory bottom left. Planet page: the planet's 2 building + 2 ship slots on an arc (own planet
+  only). Planet stats: the current planet's ships (attack comes with 7u). `StarMapMenu`: the 4 slots are the selected
+  planet's slots (the map's own without a planet), only the owner takes from them, stack size 1. `StarMapPayloads.Command`
+  sets zoom / position / destination. Button sound gui.button_soft. The world hologram hides while the screen is open.
+  88 GameTests.
+  - Deviations: the screen places its slots at runtime (access transformer makes Slot.x / y non-final); lists are
+    clipped with a scissor; on small GUI sizes the slot arc can overlap the inventory (1.7.10 used the same full-screen
+    layout); "Travel To" / "Enter" tooltips are plain text like 1.7.10.
 - Cloud (Linux) notes: regenerating resources rewrites the .ogg and ffmpeg-made .png bytes (different ffmpeg/oggenc
   builds) - `git checkout` them. Screenshots: `Xvfb :99` + `DISPLAY=:99 ./gradlew runScene` (software GL is slow; give
   menus extra ticks), world created by `runServer` with a flat creative server.properties, then moved to run/saves;
@@ -425,7 +440,7 @@
 2. ~~Mutant scientist~~ ✅ 7d (underwater base spawns one named "Mitko'Urrr", persistent, on the star map block).
 3. ~~Structures~~ ✅ 7f (the mad scientist house is a village piece: comes with the mad scientist in item 5).
 4. ~~Transporter, omni tool, matter scanner, portable decomposer, matter container, microwave~~ ✅ 7g-7k.
-5. Star map ✅ 7s (galaxy + block + hologram); next 7t star map screen, 7u buildings / ships; quests / dialogs / mad scientist ✅ 7m-7p, contract market ✅ 7q, android
+5. Star map ✅ 7s (galaxy + block + hologram), screen ✅ 7t; next 7u buildings / ships; quests / dialogs / mad scientist ✅ 7m-7p, contract market ✅ 7q, android
    spawner ✅ 7l. Security protocol + crash landing ✅ 7r.
 - Deviations so far: legendary rogue android parts drop without bonus attributes; no rogue android teams/paths;
   legendary weapons have no stat bonuses; buildings: underwater base needs 16+ water (1.7.10: 27+, rare in today's deep
@@ -436,7 +451,7 @@
 **Workflow**
 - Resources: never hand-edit `src/main/resources/{assets,data}` — regenerate:
   `rm -rf src/main/resources/{assets,data} && python3 -I tools/gen_resources.py ~/mo-reference/mo-1.7.10/src/main/resources/assets/mo src/main/resources`
-- Tests: `./gradlew runGameTestServer` (87 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
+- Tests: `./gradlew runGameTestServer` (88 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
   `FunctionGameTestInstance`, custom 12³ structure `matteroverdrive:gametest_area`, time-of-day via `TestEnvironmentDefinition.TimeOfDay`,
   `makeMockServerPlayerInLevel`). Visual: `./gradlew runScene` → `run/screenshots/scene_*.png` (DevScene, world `run/saves/mo_scene`;
   pristine copy = "Новый мир (2)"; needs `pauseOnLostFocus=false`; selected hotbar slot is client-side; place blocks with

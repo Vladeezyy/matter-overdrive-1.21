@@ -49,6 +49,8 @@ public final class MOSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> CRATE_OPEN = sound("crate_open");
     public static final DeferredHolder<SoundEvent, SoundEvent> TRANSPORTER = sound("transporter");
     public static final DeferredHolder<SoundEvent, SoundEvent> QUEST_STARTED = sound("quest_started");
+    /** 1.7.10 gui.button_soft (MOElementButton's click). */
+    public static final DeferredHolder<SoundEvent, SoundEvent> BUTTON_SOFT = sound("button_soft");
     public static final DeferredHolder<SoundEvent, SoundEvent> QUEST_COMPLETE = sound("quest_complete");
     public static final DeferredHolder<SoundEvent, SoundEvent> SCANNER_SCANNING = sound("scanner_scanning");
     public static final DeferredHolder<SoundEvent, SoundEvent> SCANNER_SUCCESS = sound("scanner_success");

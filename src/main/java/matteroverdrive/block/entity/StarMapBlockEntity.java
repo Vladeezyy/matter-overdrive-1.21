@@ -117,7 +117,7 @@ public class StarMapBlockEntity extends MachineBlockEntity {
 
     @Override
     public @Nullable AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
-        return null;   // the star map screen comes with phase 7t
+        return new matteroverdrive.menu.StarMapMenu(id, inventory, this);
     }
 
     @Override

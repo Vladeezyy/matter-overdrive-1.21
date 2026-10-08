@@ -985,7 +985,29 @@ public final class DevScene {
             p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 0f, false);
         }));
         at(2747, mc -> mc.options.hideGui = false);
-        at(2750, mc -> mc.stop());
+        // 7t: the star map screen, every page
+        at(2752, mc -> server(mc, p -> {
+            BlockPos map = origin.above(30).offset(0, 0, -4);
+            if (!(p.level().getBlockEntity(map) instanceof matteroverdrive.block.entity.StarMapBlockEntity m)) return;
+            ItemStack remove = new ItemStack(MOItems.SECURITY_PROTOCOL.get());
+            remove.set(matteroverdrive.init.MODataComponents.SECURITY_OWNER.get(), STRANGER);
+            m.unclaim(remove);
+            m.onPlaced(p);
+            p.teleportTo(p.level(), map.getX() + 0.5, map.getY(), map.getZ() + 2.5, Set.of(), 180f, 10f, false);
+        }));
+        at(2756, mc -> server(mc, p -> {
+            BlockPos map = origin.above(30).offset(0, 0, -4);
+            if (p.level().getBlockEntity(map) instanceof matteroverdrive.block.entity.StarMapBlockEntity m) p.openMenu(m, buf -> buf.writeBlockPos(map));
+        }));
+        for (int i = 0; i < 5; i++) {
+            int n = i;
+            at(2762 + i * 14, mc -> {
+                if (mc.screen instanceof matteroverdrive.client.screen.StarMapScreen screen) screen.setPage(n);
+            });
+            at(2774 + i * 14, mc -> shot(mc, "star_map_screen_" + n));
+        }
+        at(2832, mc -> server(mc, ServerPlayer::closeContainer));
+        at(2836, mc -> mc.stop());
     }
 
     private static void at(int t, Consumer<Minecraft> action) {

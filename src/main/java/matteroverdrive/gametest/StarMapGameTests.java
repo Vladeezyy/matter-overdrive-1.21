@@ -18,6 +18,7 @@ final class StarMapGameTests {
     static void addAll() {
         MOGameTests.add("galaxy_generation", 20, false, StarMapGameTests::generation);
         MOGameTests.add("galaxy_homeworld", 20, false, StarMapGameTests::homeworld);
+        MOGameTests.add("star_map_menu", 20, false, StarMapGameTests::menu);
     }
 
     private static void check(GameTestHelper helper, boolean ok, String message) {
@@ -49,6 +50,38 @@ final class StarMapGameTests {
         check(helper, loaded.toNBT(registries).equals(galaxy.toNBT(registries)) && loaded.getVersion() == GalaxyServer.GALAXY_VERSION,
                 "NBT round trip");
         check(helper, !galaxy.toNBT(registries).equals(GalaxyServer.createGalaxy(54321L).toNBT(registries)), "seed ignored");
+        helper.succeed();
+    }
+
+    /** The menu's 4 slots are the selected planet's construction slots; on someone else's planet nothing goes in or out. */
+    private static void menu(GameTestHelper helper) {
+        ServerPlayer player = AndroidGameTests.player(helper);
+        GalaxyServer.tryAndClaimPlanet(player);
+        Planet home = GalaxyServer.getHomeworld(player);
+        BlockPos pos = new BlockPos(2, 1, 2);
+        helper.setBlock(pos, MOBlocks.STAR_MAP.get());
+        var starMap = helper.getBlockEntity(pos, StarMapBlockEntity.class);
+        starMap.onPlaced(player);
+        var menu = new matteroverdrive.menu.StarMapMenu(0, player.getInventory(), starMap);
+        check(helper, menu.slots.size() == 4 + 36, "slots " + menu.slots.size());
+        var diamond = new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DIAMOND);
+        check(helper, !menu.getSlot(0).mayPlace(diamond), "only buildings / ships go in");
+        home.setStackInSlot(2, diamond);
+        check(helper, menu.getSlot(2).getItem().is(net.minecraft.world.item.Items.DIAMOND) && menu.getSlot(2).mayPickup(player), "planet slot");
+        // someone else's planet: the slots show it but can't be taken from
+        Planet other = null;
+        for (Quadrant quadrant : GalaxyServer.getGalaxy().getQuadrants()) {
+            for (Star star : quadrant.getStars()) for (Planet planet : star.getPlanets()) if (!planet.hasOwner() && other == null) other = planet;
+        }
+        other.setOwnerUUID(java.util.UUID.randomUUID());
+        starMap.setDestination(GalacticPosition.of(other));
+        check(helper, !menu.getSlot(0).mayPickup(player) && menu.getSlot(2).getItem().isEmpty(), "someone else's planet");
+        other.setOwnerUUID(null);
+        // no planet selected: the map's own slots
+        starMap.setDestination(GalacticPosition.NONE);
+        check(helper, menu.getSlot(2).getItem().isEmpty() && menu.getSlot(2).mayPickup(player), "the map's own slots");
+        home.setStackInSlot(2, net.minecraft.world.item.ItemStack.EMPTY);
+        player.discard();
         helper.succeed();
     }
 

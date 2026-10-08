@@ -66,6 +66,7 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
         float distance;
         Vec3 blockCenter = Vec3.ZERO;
         @Nullable StarMapBlockEntity starMap;
+        boolean hidden;
     }
 
     @Override
@@ -88,6 +89,8 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
         state.distance = (float) Math.max(0.1, camera.distanceTo(Vec3.atLowerCornerOf(pos)));
         state.blockCenter = Vec3.atCenterOf(pos);
         state.starMap = starMap;
+        // the star map screen shows the hologram itself (1.7.10 skipped the world one while GuiStarMap was open)
+        state.hidden = Minecraft.getInstance().screen instanceof matteroverdrive.client.screen.StarMapScreen;
     }
 
     @Override
@@ -109,8 +112,8 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
     // --- context ---------------------------------------------------------------------------------------
 
     /** What the body renderers need: the camera, time, viewer distance and the map's selection. */
-    record Ctx(State state, PoseStack pose, SubmitNodeCollector collector, Font font, float yaw, float pitch, Quaternionf orientation,
-               @Nullable Player player, Galaxy galaxy) {
+    public record Ctx(State state, PoseStack pose, HoloSink sink, Font font, float yaw, float pitch, Quaternionf orientation,
+                      @Nullable Player player, Galaxy galaxy) {
         double time() {
             return state.time;
         }
@@ -125,25 +128,20 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
         var mc = Minecraft.getInstance();
         var cam = mc.gameRenderer.getMainCamera();
         Galaxy galaxy = GalaxyClient.getGalaxy();
+        if (state.hidden) return;
         drawHoloLights(state, pose, collector);
         if (!state.usable) {
             drawAccessDenied(state, pose, collector);
             return;
         }
         if (galaxy == null) return;
-        Ctx ctx = new Ctx(state, pose, collector, font, cam.getYRot(), cam.getXRot(), camera.orientation, mc.player, galaxy);
+        Ctx ctx = new Ctx(state, pose, HoloSink.of(collector), font, cam.getYRot(), cam.getXRot(), camera.orientation, mc.player, galaxy);
         SpaceBody body = activeBody(state, galaxy);
-        // a planet the client hasn't loaded yet: ask for its star's planets
-        if (body == null && state.zoom >= 2) GalaxyClient.requestPlanets(galaxy.getStar(state.destination));
-        if (body == null) return;
-        Body renderer = rendererFor(state.zoom, body);
-        if (renderer == null) return;
+        Body renderer = body == null ? null : rendererFor(state.zoom, body);
+        if (!renderHologram(ctx)) return;
         pose.pushPose();
         pose.translate(0.5, 0.5, 0.5);
         pose.translate(0, renderer.height(), 0);
-        pose.pushPose();
-        renderer.renderBody(ctx, body);
-        pose.popPose();
         // 1.7.10 drawHoloGuiInfo: the side facing the player, snapped to 90 degrees
         Vec3 viewer = cam.position();
         double dx = viewer.x - state.blockCenter.x, dz = viewer.z - state.blockCenter.z;
@@ -158,6 +156,45 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
         renderer.renderGuiInfo(ctx, body, 0.5f);
         pose.popPose();
         pose.popPose();
+    }
+
+    /** 1.7.10 renderHologramBase without the info panel: the zoomed body above the table. False when there's nothing to draw. */
+    public static boolean renderHologram(Ctx ctx) {
+        State state = ctx.state();
+        SpaceBody body = activeBody(state, ctx.galaxy());
+        // a planet the client hasn't loaded yet: ask for its star's planets
+        if (body == null && state.zoom >= 2) GalaxyClient.requestPlanets(ctx.galaxy().getStar(state.destination));
+        if (body == null) return false;
+        Body renderer = rendererFor(state.zoom, body);
+        if (renderer == null) return false;
+        PoseStack pose = ctx.pose();
+        pose.pushPose();
+        pose.translate(0.5, 0.5, 0.5);
+        pose.translate(0, renderer.height(), 0);
+        renderer.renderBody(ctx, body);
+        pose.popPose();
+        return true;
+    }
+
+    /** The zoomed body's info panel (the star map screen draws it at the bottom). */
+    public static void renderGuiInfo(Ctx ctx, float opacity) {
+        SpaceBody body = activeBody(ctx.state(), ctx.galaxy());
+        Body renderer = body == null ? null : rendererFor(ctx.state().zoom, body);
+        if (renderer != null) renderer.renderGuiInfo(ctx, body, opacity);
+    }
+
+    /** The render state for a star map outside the world renderer (the screen). */
+    public static State stateOf(StarMapBlockEntity starMap, float partialTick, @Nullable Player player) {
+        State state = new State();
+        state.zoom = starMap.getZoomLevel();
+        state.position = starMap.getGalaxyPosition();
+        state.destination = starMap.getDestination();
+        state.usable = player != null && starMap.isUseableByPlayer(player);
+        state.time = starMap.getLevel() == null ? 0 : starMap.getLevel().getGameTime() + partialTick;
+        state.distance = 1;
+        state.blockCenter = Vec3.atCenterOf(starMap.getBlockPos());
+        state.starMap = starMap;
+        return state;
     }
 
     private static @Nullable SpaceBody activeBody(State state, Galaxy galaxy) {
@@ -223,13 +260,11 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
     static void text(Ctx ctx, String string, float x, float y, int rgb, float multiply, boolean alien) {
         var component = Component.literal(string);
         if (alien) component = component.withStyle(s -> s.withFont(ALT));
-        ctx.collector().submitText(ctx.pose(), x, y, component.getVisualOrderText(), false, Font.DisplayMode.NORMAL, 0xF000F0,
-                0xFF000000 | Holo.mul(rgb, multiply), 0, 0);
+        ctx.sink().text(ctx.pose(), x, y, component.getVisualOrderText(), 0xFF000000 | Holo.mul(rgb, multiply));
     }
 
     static void icon(Ctx ctx, String name, float x, float y, int size, int rgb) {
-        ctx.collector().submitCustomGeometry(ctx.pose(), HoloRenderTypes.textured(tex("textures/gui/holo/" + name + ".png")),
-                (p, vc) -> Holo.icon(p, vc, x, y, size, size, rgb));
+        ctx.sink().icon(ctx.pose(), tex("textures/gui/holo/" + name + ".png"), x, y, size, size, rgb);
     }
 
     static int iconSize(String name) {
@@ -263,7 +298,7 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
     static void renderStars(Ctx ctx, Quadrant quadrant, double distanceMultiply, double starSizeMultiply) {
         State state = ctx.state();
         Star[] fromTo = new Star[2];
-        ctx.collector().submitCustomGeometry(ctx.pose(), HoloRenderTypes.textured(PARTICLES), (p, vc) -> {
+        ctx.sink().geometry(ctx.pose(), HoloRenderTypes.textured(PARTICLES), (p, vc) -> {
             for (Star star : quadrant.getStars()) {
                 double x = star.getX() * distanceMultiply, y = star.getY() * distanceMultiply, z = star.getZ() * distanceMultiply;
                 int color = star.getColor();
@@ -287,7 +322,7 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
         }
         if (fromTo[0] != null && fromTo[1] != null && fromTo[0] != fromTo[1]) {
             Star from = fromTo[0], to = fromTo[1];
-            ctx.collector().submitCustomGeometry(ctx.pose(), HoloRenderTypes.LINE_TYPE, (p, vc) -> Holo.line(p, vc,
+            ctx.sink().geometry(ctx.pose(), HoloRenderTypes.LINE_TYPE, (p, vc) -> Holo.line(p, vc,
                     from.getX() * distanceMultiply, from.getY() * distanceMultiply, from.getZ() * distanceMultiply,
                     to.getX() * distanceMultiply, to.getY() * distanceMultiply, to.getZ() * distanceMultiply, Holo.mul(Galaxy.COLOR_HOLO, 0.3f)));
         }
@@ -320,10 +355,10 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
                 pose.translate(from.x + dir.x * percent, from.y + dir.y * percent, from.z + dir.z * percent);
                 Vec3 n = dir.normalize();
                 pose.mulPose(new Quaternionf().rotationTo(-1, 0, 0, (float) n.x, (float) n.y, (float) n.z));
-                ctx.collector().submitCustomGeometry(pose, HoloRenderTypes.COLOR_TRIANGLES,
+                ctx.sink().geometry(pose, HoloRenderTypes.COLOR_TRIANGLES,
                         (p, vc) -> Holo.ship(p, vc, 0.02f, Holo.mul(Galaxy.COLOR_HOLO, 0.5f)));
                 pose.popPose();
-                ctx.collector().submitCustomGeometry(pose, HoloRenderTypes.LINE_TYPE,
+                ctx.sink().geometry(pose, HoloRenderTypes.LINE_TYPE,
                         (p, vc) -> Holo.line(p, vc, from.x, from.y, from.z, to.x, to.y, to.z, Holo.mul(Galaxy.COLOR_HOLO_PURPLE, 0.5f)));
             }
         }
@@ -405,14 +440,14 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
             pose.pushPose();
             pose.scale(star.getSize(), star.getSize(), star.getSize());
             int yellow = Galaxy.COLOR_HOLO_YELLOW;
-            ctx.collector().submitCustomGeometry(pose, HoloRenderTypes.textured(PARTICLES), (p, vc) -> particle(ctx, p, vc, STAR_ICON,
+            ctx.sink().geometry(pose, HoloRenderTypes.textured(PARTICLES), (p, vc) -> particle(ctx, p, vc, STAR_ICON,
                     star.getSize(), 0, 0, 0, Holo.r(yellow) * 0.1f, Holo.g(yellow) * 0.1f, Holo.b(yellow) * 0.1f));
             int sphereColor = Holo.mul(star.getColor() & 0xFFFFFF, 0.25f * (1f / distance));
             float s = (float) (0.9 + Math.sin(time * 0.01) * 0.1);
             pose.scale(s, s, s);
-            ctx.collector().submitCustomGeometry(pose, HoloRenderTypes.LINE_TYPE, (p, vc) -> Holo.wireSphere(p, vc, 0.5, 16, 12, sphereColor));
+            ctx.sink().geometry(pose, HoloRenderTypes.LINE_TYPE, (p, vc) -> Holo.wireSphere(p, vc, 0.5, 16, 12, sphereColor));
             // 1.7.10 also drew the sphere's points (glPointSize(10 / distance))
-            ctx.collector().submitCustomGeometry(pose, HoloRenderTypes.textured(PARTICLES), (p, vc) -> {
+            ctx.sink().geometry(pose, HoloRenderTypes.textured(PARTICLES), (p, vc) -> {
                 for (int j = 1; j < 12; j++) {
                     double phi = Math.PI * j / 12;
                     for (int i = 0; i < 16; i++) {
@@ -428,7 +463,7 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
                 int pulse = Holo.mul(Galaxy.COLOR_HOLO_YELLOW, (float) easeIn(1 - t, 0, 0.1, 1));
                 float grow = (float) (1 + easeIn(t, 0, 10, 1));
                 pose.scale(grow, grow, grow);
-                ctx.collector().submitCustomGeometry(pose, HoloRenderTypes.LINE_TYPE, (p, vc) -> Holo.wireSphere(p, vc, 0.5, 16, 12, pulse));
+                ctx.sink().geometry(pose, HoloRenderTypes.LINE_TYPE, (p, vc) -> Holo.wireSphere(p, vc, 0.5, 16, 12, pulse));
             }
             pose.popPose();
             int planetID = 0;
@@ -441,7 +476,7 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
                 pose.mulPose(Axis.XP.rotationDegrees((float) axisRotation));
                 double radius = planet.getOrbit() * 2 + (star.getSize() / 2 + 0.1);
                 int orbitColor = Holo.mul(planetColor, 0.1f);
-                ctx.collector().submitCustomGeometry(pose, HoloRenderTypes.LINE_TYPE, (p, vc) -> {
+                ctx.sink().geometry(pose, HoloRenderTypes.LINE_TYPE, (p, vc) -> {
                     for (int i = 0; i < 32; i++) {
                         double a0 = Math.PI * 2 / 32 * i, a1 = Math.PI * 2 / 32 * (i + 1);
                         Holo.line(p, vc, Math.sin(a0) * radius, 0, Math.cos(a0) * radius, Math.sin(a1) * radius, 0, Math.cos(a1) * radius, orbitColor);
@@ -449,11 +484,11 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
                 });
                 pose.translate(Math.sin(time * 0.001 + 10 * planetID) * radius, 0, Math.cos(time * 0.001 + 10 * planetID) * radius);
                 if (ctx.state().destination.is(planet)) {
-                    ctx.collector().submitCustomGeometry(pose, HoloRenderTypes.textured(PARTICLES), (p, vc) -> particle(ctx, p, vc, SELECTED_ICON,
+                    ctx.sink().geometry(pose, HoloRenderTypes.textured(PARTICLES), (p, vc) -> particle(ctx, p, vc, SELECTED_ICON,
                             planet.getSize() * 0.15f * sizeMultiply, 0, 0, 0, Holo.r(planetColor), Holo.g(planetColor), Holo.b(planetColor)));
                 }
                 if (ctx.state().position.is(planet)) {
-                    ctx.collector().submitCustomGeometry(pose, HoloRenderTypes.textured(PARTICLES), (p, vc) -> particle(ctx, p, vc, CURRENT_ICON,
+                    ctx.sink().geometry(pose, HoloRenderTypes.textured(PARTICLES), (p, vc) -> particle(ctx, p, vc, CURRENT_ICON,
                             planet.getSize() * 0.25f, 0, 0, 0, Holo.r(planetColor), Holo.g(planetColor), Holo.b(planetColor)));
                 }
                 pose.pushPose();
@@ -464,7 +499,7 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
                 pose.mulPose(Axis.XP.rotationDegrees(100));
                 pose.mulPose(Axis.ZP.rotationDegrees((float) (time * 2)));
                 float planetSize = planet.getSize();
-                ctx.collector().submitCustomGeometry(pose, HoloRenderTypes.LINE_TYPE, (p, vc) -> Holo.wireSphere(p, vc,
+                ctx.sink().geometry(pose, HoloRenderTypes.LINE_TYPE, (p, vc) -> Holo.wireSphere(p, vc,
                         planetSize * 0.1f * sizeMultiply, (int) (16 + planetSize * 2), (int) (8 + planetSize * 2), wire));
                 planetID++;
                 pose.popPose();
@@ -507,16 +542,11 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
             int color = Holo.mul(Galaxy.COLOR_HOLO, opacity);
             double[] heights = new double[10];
             for (int i = 0; i < 10; i++) heights[i] = 64 * (0.5 * random.nextGaussian() + 1d) / 2d;
-            ctx.collector().submitCustomGeometry(ctx.pose(), HoloRenderTypes.COLOR_QUADS, (p, vc) -> {
-                double step = 64d / 10d;
-                for (int i = 0; i < 10; i++) {
-                    float x = (float) (step * i), y = -10, w = (float) (step - 1), h = (float) heights[i];
-                    vc.addVertex(p, x, y, 0).setColor(Holo.r(color), Holo.g(color), Holo.b(color), 1);
-                    vc.addVertex(p, x + w, y, 0).setColor(Holo.r(color), Holo.g(color), Holo.b(color), 1);
-                    vc.addVertex(p, x + w, y - h, 0).setColor(Holo.r(color), Holo.g(color), Holo.b(color), 1);
-                    vc.addVertex(p, x, y - h, 0).setColor(Holo.r(color), Holo.g(color), Holo.b(color), 1);
-                }
-            });
+            double step = 64d / 10d;
+            for (int i = 0; i < 10; i++) {
+                float x = (float) (step * i), y = -10, w = (float) (step - 1), h = (float) heights[i];
+                ctx.sink().fill(ctx.pose(), x, y, x + w, y - h, color);
+            }
         }
     };
 
@@ -550,11 +580,11 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
             pose.pushPose();
             pose.mulPose(Axis.XP.rotationDegrees(10));
             pose.mulPose(Axis.YP.rotationDegrees((float) (ctx.time() * 0.1)));
-            ctx.collector().submitCustomGeometry(pose, HoloRenderTypes.DEPTH, (p, vc) -> Holo.solidSphere(p, vc, size * 0.99f, 64, 32, 0));
+            ctx.sink().geometry(pose, HoloRenderTypes.DEPTH, (p, vc) -> Holo.solidSphere(p, vc, size * 0.99f, 64, 32, 0));
             pose.pushPose();
             pose.mulPose(Axis.XP.rotationDegrees(90));
             int wire = Holo.mul(planet.getGuiColor(ctx.player()), 0.2f * (1f / distance));
-            ctx.collector().submitCustomGeometry(pose, HoloRenderTypes.LINE_TYPE, (p, vc) -> Holo.wireSphere(p, vc, size, 64, 32, wire));
+            ctx.sink().geometry(pose, HoloRenderTypes.LINE_TYPE, (p, vc) -> Holo.wireSphere(p, vc, size, 64, 32, wire));
             pose.popPose();
             // 1.7.10 drawBuildings: a cube per building at a random spot of the surface
             random.setSeed(planet.getSeed());
@@ -564,7 +594,7 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
                 pose.mulPose(Axis.ZP.rotationDegrees((float) (random.nextDouble() * 360)));
                 pose.translate(size - 0.04, 0, 0);
                 int cube = Holo.mul(Galaxy.COLOR_HOLO, 1f / distance);
-                ctx.collector().submitCustomGeometry(pose, HoloRenderTypes.COLOR_QUADS, (p, vc) -> Holo.cube(p, vc, 0.1f, 0.1f, 0.1f, cube));
+                ctx.sink().geometry(pose, HoloRenderTypes.COLOR_QUADS, (p, vc) -> Holo.cube(p, vc, 0.1f, 0.1f, 0.1f, cube));
                 pose.popPose();
             }
             pose.popPose();
@@ -581,7 +611,7 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
                 double phi = startingAngle + Math.copySign(ctx.time() * 0.005, direction);
                 double theta = random.nextDouble() * Math.PI * 2;
                 double radius = random.nextDouble() * 0.3 + 0.1 + planetSize;
-                ctx.collector().submitCustomGeometry(ctx.pose(), HoloRenderTypes.LINE_TYPE, (p, vc) -> {
+                ctx.sink().geometry(ctx.pose(), HoloRenderTypes.LINE_TYPE, (p, vc) -> {
                     for (int s = 0; s < 7; s++) {
                         double a = phi - Math.copySign(0.1 * s, direction), b = phi - Math.copySign(0.1 * (s + 1), direction);
                         Holo.line(p, vc, Math.sin(a) * Math.sin(theta) * radius, Math.sin(a) * Math.cos(theta) * radius, Math.cos(a) * radius,

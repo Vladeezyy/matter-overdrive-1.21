@@ -248,5 +248,12 @@
     "sounds": [
       "matteroverdrive:gui/quest_complete"
     ]
+  },
+  "button_soft": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:gui/button_soft_0",
+      "matteroverdrive:gui/button_soft_1"
+    ]
   }
 }

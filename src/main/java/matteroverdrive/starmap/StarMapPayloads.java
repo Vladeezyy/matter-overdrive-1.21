@@ -93,10 +93,36 @@ public final class StarMapPayloads {
         }
     }
 
+    /** 1.7.10 PacketStarMapClientCommands: the screen sets the map's zoom, position and destination. */
+    public record Command(net.minecraft.core.BlockPos pos, int zoom, GalacticPosition position, GalacticPosition destination)
+            implements CustomPacketPayload {
+        public static final Type<Command> TYPE = new Type<>(id("star_map_command"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, Command> STREAM_CODEC = StreamCodec.composite(
+                net.minecraft.core.BlockPos.STREAM_CODEC, Command::pos, ByteBufCodecs.BYTE.map(b -> (int) b, i -> (byte) (int) i), Command::zoom,
+                GalacticPosition.STREAM_CODEC, Command::position, GalacticPosition.STREAM_CODEC, Command::destination, Command::new);
+
+        @Override
+        public Type<Command> type() {
+            return TYPE;
+        }
+    }
+
+    private static void handleCommand(Command command, IPayloadContext context) {
+        if (!(context.player() instanceof ServerPlayer player)) return;
+        if (!player.canInteractWithBlock(command.pos(), 4)
+                || !(player.level().getBlockEntity(command.pos()) instanceof matteroverdrive.block.entity.StarMapBlockEntity starMap)
+                || !starMap.isUseableByPlayer(player)) return;
+        starMap.setZoomLevel(command.zoom());
+        starMap.setGalacticPosition(command.position());
+        starMap.setDestination(command.destination());
+        starMap.sync();
+    }
+
     public static void register(PayloadRegistrar registrar) {
         registrar.playToClient(GalaxySync.TYPE, GalaxySync.STREAM_CODEC, (p, c) -> GalaxyClient.setGalaxy(p.galaxy()))
                 .playToClient(PlanetUpdate.TYPE, PlanetUpdate.STREAM_CODEC, StarMapPayloads::handlePlanet)
                 .playToServer(StarRequest.TYPE, StarRequest.STREAM_CODEC, StarMapPayloads::handleStarRequest)
+                .playToServer(Command.TYPE, Command.STREAM_CODEC, StarMapPayloads::handleCommand)
                 .playToClient(StarPlanets.TYPE, StarPlanets.STREAM_CODEC, StarMapPayloads::handleStarPlanets)
                 .playToClient(TravelEvents.TYPE, TravelEvents.STREAM_CODEC, (p, c) -> {
                     Galaxy galaxy = GalaxyClient.getGalaxy();

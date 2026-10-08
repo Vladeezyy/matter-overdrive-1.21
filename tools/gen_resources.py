@@ -754,7 +754,8 @@ SOUNDS = {"phaser_rifle_shot": ["weapon/phaser_rifle_shot"], "plasma_shotgun_sho
           "scanner_scanning": ["matter_scanner/scanner_scanning"], "scanner_success": ["matter_scanner/scanner_success_2"],
           "scanner_fail": ["matter_scanner/scanner_fail"], "scanner_beep": ["matter_scanner/scanner_beep"],
           "transporter": ["transporter/transporter_0"],
-          "quest_started": ["gui/quest_started"], "quest_complete": ["gui/quest_complete"]}
+          "quest_started": ["gui/quest_started"], "quest_complete": ["gui/quest_complete"],
+          "button_soft": ["gui/button_soft_0", "gui/button_soft_1"]}
 SOUND_CATEGORY = {k: "neutral" for k in SOUNDS if k.startswith("failed_animal")} | {k: "hostile" for k in SOUNDS if k.startswith("rogue_android")} | \
                  {k: "block" for k in SOUNDS if k.startswith("crate_")}
 for files in SOUNDS.values():
@@ -1255,6 +1256,29 @@ for icon in ["page_icon_star", "page_icon_planet", "page_icon_galaxy", "page_ico
     cp(ref / "textures/gui/items" / f"{icon}.png", A / "textures/gui/holo" / f"{icon}.png")
 for f in ["star_names", "star_prefixes", "star_suffixes"]:
     cp(ref / "info" / f"{f}.txt", A / "info" / f"{f}.txt")
+
+# --- phase 7t: star map screen --------------------------------------------------------------------------------
+def nine(name, src, w_, h_, l, r, t, b):
+    cp(src, GUI / "sprites" / f"{name}.png")
+    w(GUI / "sprites" / f"{name}.png.mcmeta", {"gui": {"scaling": {"type": "nine_slice", "width": w_, "height": h_,
+                                                                  "border": {"left": l, "right": r, "top": t, "bottom": b}}}})
+E = ref / "textures/gui/elements"
+nine("star_map", ref / "textures/gui/star_map.png", 255, 141, 213, 34, 42, 94)       # GuiStarMap.BG offsets
+nine("holo_list_entry", E / "holo_list_entry.png", 32, 32, 18, 12, 15, 15)
+nine("holo_list_entry_flipped", E / "holo_list_entry_flipped.png", 32, 32, 12, 18, 15, 15)
+nine("holo_list_entry_circle", E / "holo_list_entry_circle.png", 32, 32, 15, 15, 15, 15)
+nine("right_side_bar_panel_bg_holo", E / "right_side_bar_panel_bg_holo.png", 15, 18, 7, 7, 8, 9)   # SidePannel offsets
+# holo_list_entry_middle.png is three 32 px states side by side (normal / over / down)
+for i, state in enumerate(["normal", "over", "down"]):
+    dst = GUI / "sprites" / f"holo_list_entry_middle_{state}.png"
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(E / "holo_list_entry_middle.png"), "-vf", f"crop=32:32:{i * 32}:0",
+                    "-pix_fmt", "rgba", "-fflags", "+bitexact", "-flags", "+bitexact", str(dst)], check=True)
+    w(GUI / "sprites" / f"holo_list_entry_middle_{state}.png.mcmeta", {"gui": {"scaling": {"type": "nine_slice", "width": 32,
+                                                                                          "height": 32, "border": 15}}})
+cp(E / "slot_holo_with_BG.png", GUI / "sprites/slot_holo_with_bg.png")
+w(GUI / "sprites/slot_holo_with_bg.png.mcmeta", {"gui": {"scaling": {"type": "stretch"}}})
+for icon in ["travel_icon", "icon_search", "factory", "icon_attack", "icon_stats"]:
+    cp(ref / "textures/gui/items" / f"{icon}.png", A / "textures/gui/holo" / f"{icon}.png")
 
 # --- phase 7b: mobs -----------------------------------------------------------------------------------------
 import zlib
@@ -1929,6 +1953,9 @@ for src_name, dst_name in [("en_US", "en_us"), ("ru_RU", "ru_ru")]:
     # 7p: guide categories, groups and named entries: guide.<kind>.<name>.name -> guide.matteroverdrive.<kind>.<name>
     for k in [k for k in en if k.startswith("guide.") and k.endswith(".name")]:
         lang["guide." + MOD + "." + k[len("guide."):-len(".name")]] = src.get(k) or en[k]
+    # 7t: star map screen pages
+    for k in ["galaxy", "quadrant", "star", "planet", "planet_stats"]:
+        lang[f"gui.{MOD}.page.{k}"] = src.get(f"gui.tooltip.page.{k}") or en[f"gui.tooltip.page.{k}"]
     # 7s: star map
     lang[f"block.{MOD}.star_map"] = src.get("tile.star_map.name") or en["tile.star_map.name"]
     lang[f"block.{MOD}.star_map.details"] = src.get("tile.star_map.details") or en["tile.star_map.details"]

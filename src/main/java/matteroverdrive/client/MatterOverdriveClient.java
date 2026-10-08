@@ -34,6 +34,11 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 @EventBusSubscriber(modid = MatterOverdrive.MODID, value = Dist.CLIENT)
 public class MatterOverdriveClient {
     @SubscribeEvent
+    static void pictureInPicture(net.neoforged.neoforge.client.event.RegisterPictureInPictureRenderersEvent event) {
+        event.register(matteroverdrive.client.starmap.StarMapPipRenderer.State.class, matteroverdrive.client.starmap.StarMapPipRenderer::new);
+    }
+
+    @SubscribeEvent
     static void pipelines(net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent event) {
         matteroverdrive.client.starmap.HoloRenderTypes.register(event);
     }
@@ -119,6 +124,7 @@ public class MatterOverdriveClient {
         event.register(MOMenus.TRANSPORTER.get(), matteroverdrive.client.screen.TransporterScreen::new);
         event.register(MOMenus.ANDROID_SPAWNER.get(), matteroverdrive.client.screen.AndroidSpawnerScreen::new);
         event.register(MOMenus.CONTRACT_MARKET.get(), matteroverdrive.client.screen.ContractMarketScreen::new);
+        event.register(MOMenus.STAR_MAP.get(), matteroverdrive.client.screen.StarMapScreen::new);
     }
 
     @SubscribeEvent
