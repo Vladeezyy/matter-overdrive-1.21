@@ -8,6 +8,7 @@ import matteroverdrive.gametest.MOGameTests;
 import matteroverdrive.init.MOBlockEntities;
 import matteroverdrive.init.MOBlocks;
 import matteroverdrive.init.MOCreativeTabs;
+import matteroverdrive.init.MOFeatures;
 import matteroverdrive.init.MOFluids;
 import matteroverdrive.init.MODataComponents;
 import matteroverdrive.init.MOItems;
@@ -37,6 +38,7 @@ public class MatterOverdrive {
         MOMenus.MENUS.register(modEventBus);
         MORecipes.TYPES.register(modEventBus);
         MORecipes.SERIALIZERS.register(modEventBus);
+        MOFeatures.FEATURES.register(modEventBus);
         MOCreativeTabs.TABS.register(modEventBus);
         MOGameTests.register(modEventBus);
         modEventBus.addListener(MatterOverdrive::registerCapabilities);

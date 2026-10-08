@@ -15,6 +15,8 @@
     "matteroverdrive:pattern_monitor",
     "matteroverdrive:network_router",
     "matteroverdrive:network_switch",
-    "matteroverdrive:network_pipe"
+    "matteroverdrive:network_pipe",
+    "matteroverdrive:gravitational_stabilizer",
+    "matteroverdrive:machine_hull"
   ]
 }

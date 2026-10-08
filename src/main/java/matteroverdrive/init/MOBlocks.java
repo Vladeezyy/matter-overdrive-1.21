@@ -3,6 +3,8 @@ package matteroverdrive.init;
 import matteroverdrive.MatterOverdrive;
 import matteroverdrive.block.AnalyzerBlock;
 import matteroverdrive.block.DecomposerBlock;
+import matteroverdrive.block.GravitationalAnomalyBlock;
+import matteroverdrive.block.GravitationalStabilizerBlock;
 import matteroverdrive.block.InscriberBlock;
 import matteroverdrive.block.MatterPipeBlock;
 import matteroverdrive.block.NetworkPipeBlock;
@@ -66,6 +68,16 @@ public final class MOBlocks {
             p -> p.mapColor(MapColor.METAL).strength(20f, 9f).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion().lightLevel(s -> 8));
     public static final DeferredBlock<ReplicatorBlock> REPLICATOR = BLOCKS.registerBlock("replicator", ReplicatorBlock::new,
             p -> p.mapColor(MapColor.METAL).strength(20f, 9f).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion());
+
+    // Phase 4
+    public static final DeferredBlock<GravitationalAnomalyBlock> GRAVITATIONAL_ANOMALY = BLOCKS.registerBlock("gravitational_anomaly",
+            GravitationalAnomalyBlock::new, p -> p.mapColor(MapColor.COLOR_BLACK).strength(-1f, 6000000f).noOcclusion().noLootTable()
+                    .lightLevel(s -> 0));
+    public static final DeferredBlock<GravitationalStabilizerBlock> GRAVITATIONAL_STABILIZER = BLOCKS.registerBlock("gravitational_stabilizer",
+            GravitationalStabilizerBlock::new, p -> p.mapColor(MapColor.METAL).strength(20f, 10f).sound(SoundType.METAL).requiresCorrectToolForDrops());
+    // 1.7.10 machine_hull: tritanium plating for the fusion reactor ring
+    public static final DeferredBlock<Block> MACHINE_HULL = BLOCKS.registerSimpleBlock("machine_hull",
+            p -> p.mapColor(MapColor.METAL).strength(15f, 8f).sound(SoundType.METAL).requiresCorrectToolForDrops());
 
     private MOBlocks() {}
 }

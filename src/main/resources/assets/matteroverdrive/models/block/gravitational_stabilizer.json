@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "matteroverdrive:block/network_port",
+    "south": "matteroverdrive:block/base",
+    "east": "matteroverdrive:block/vent2",
+    "west": "matteroverdrive:block/vent2",
+    "up": "matteroverdrive:block/base_coil",
+    "down": "matteroverdrive:block/base_coil",
+    "particle": "matteroverdrive:block/vent2"
+  }
+}

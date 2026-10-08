@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    " T ",
+    "T T",
+    " T "
+  ],
+  "key": {
+    "T": "#c:plates/tritanium"
+  },
+  "result": {
+    "id": "matteroverdrive:machine_hull",
+    "count": 1
+  }
+}

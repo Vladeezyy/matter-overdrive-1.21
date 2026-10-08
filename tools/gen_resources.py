@@ -36,7 +36,8 @@ BATTERIES = {"battery": (191, 228, 230), "hc_battery": (254, 203, 4), "creative_
 BLOCKS = ["tritanium_ore", "dilithium_ore", "tritanium_block"]
 MACHINES = ["solar_panel", "inscriber"]
 MACHINES_P3 = ["decomposer", "matter_recycler", "matter_pipe", "heavy_matter_pipe", "matter_analyzer", "pattern_storage",
-               "replicator", "pattern_monitor", "network_router", "network_switch", "network_pipe"]
+               "replicator", "pattern_monitor", "network_router", "network_switch", "network_pipe",
+               "gravitational_anomaly", "gravitational_stabilizer", "machine_hull"]
 
 # lang keys that don't follow item.<name>.name / tile.<name>.name in the 1.7.10 files
 LANG_KEYS = {f"isolinear_circuit_mk{i}": f"item.isolinear_circuit.mk{i}.name" for i in range(1, 5)}
@@ -539,6 +540,51 @@ shaped("pattern_monitor", mid("pattern_monitor"), [" H ", "1N1", " F "],
        {"H": "minecraft:glass_pane", "1": MK[2], "N": mid("network_switch"), "F": mid("network_flash_drive")})
 
 
+# --- phase 4: gravitational anomaly, stabilizer, machine hull ------------------------------------------
+for tex in ["gravitational_anomaly_core", "base_coil"]:
+    cp(ref / "textures/blocks" / f"{tex}.png", A / "textures/block" / f"{tex}.png")
+cp(ref / "textures/items/spacetime_equalizer.png", A / "textures/item/spacetime_equalizer.png")
+w(A / "models/item/spacetime_equalizer.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{MOD}:item/spacetime_equalizer"}})
+w(A / "items/spacetime_equalizer.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:item/spacetime_equalizer"}})
+# The anomaly: the 1.7.10 sphere.obj (centred, radius 0.5) with the black core texture.
+obj_model("sphere", {"GeoSphere001": "gravitational_anomaly_core"}, shift_y=True, particle="gravitational_anomaly_core")
+anomaly_model = json.loads((A / "models/block/sphere.json").read_text()) | {"render_type": "minecraft:cutout"}
+(A / "models/block/sphere.json").unlink()
+w(A / "models/block/gravitational_anomaly.json", anomaly_model)
+w(A / "blockstates/gravitational_anomaly.json", {"variants": {"": {"model": f"{MOD}:block/gravitational_anomaly"}}})
+w(A / "items/gravitational_anomaly.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:block/gravitational_anomaly"}})
+# 1.7.10 BlockGravitationalStabilizer: front network port (the emitter), back monitor, sides vent2, top/bottom coils.
+w(A / "models/block/gravitational_stabilizer.json", six_sided("network_port", "base", "vent2", "base_coil", "base_coil"))
+facing_blockstate("gravitational_stabilizer", f"{MOD}:block/gravitational_stabilizer")
+w(A / "models/block/machine_hull.json", {"parent": "minecraft:block/cube_all", "textures": {"all": f"{MOD}:block/base"}})
+w(A / "blockstates/machine_hull.json", {"variants": {"": {"model": f"{MOD}:block/machine_hull"}}})
+w(A / "items/machine_hull.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:block/machine_hull"}})
+for n in ["gravitational_stabilizer", "machine_hull"]:
+    w(D / f"loot_table/blocks/{n}.json", self_drop(n))
+for tag in ["mineable/pickaxe", "needs_iron_tool"]:
+    p = TAGS / f"minecraft/tags/block/{tag}.json"
+    w(p, {"values": json.loads(p.read_text())["values"] + [mid("gravitational_stabilizer"), mid("machine_hull")]})
+# Damage when an anomaly swallows something alive (1.7.10 DamageSource "blackHole").
+w(D / "damage_type/black_hole.json", {"message_id": "matteroverdrive.black_hole", "exhaustion": 0.0, "scaling": "never"})
+w(TAGS / "minecraft/tags/damage_type/bypasses_armor.json", {"values": [mid("black_hole")]})
+# World gen (1.7.10 MOWorldGen: 0.5% of chunks, y = 4 + rand(60)).
+w(D / "worldgen/configured_feature/gravitational_anomaly.json", {"type": mid("gravitational_anomaly"), "config": {}})
+w(D / "worldgen/placed_feature/gravitational_anomaly.json", {"feature": mid("gravitational_anomaly"), "placement": [
+    {"type": "minecraft:rarity_filter", "chance": 200}, {"type": "minecraft:in_square"},
+    {"type": "minecraft:height_range", "height": {"type": "minecraft:uniform", "min_inclusive": {"absolute": 4},
+                                                  "max_inclusive": {"absolute": 63}}},
+    {"type": "minecraft:biome"}]})
+w(D / "neoforge/biome_modifier/gravitational_anomaly.json", {"type": "neoforge:add_features",
+    "biomes": "#minecraft:is_overworld", "features": mid("gravitational_anomaly"), "step": "underground_decoration"})
+
+shaped("spacetime_equalizer", mid("spacetime_equalizer"), [" M ", "EHE", " M "],
+       {"M": mid("s_magnet"), "E": "minecraft:ender_pearl", "H": mid("h_compensator")}, category="equipment")
+shaped("machine_hull", mid("machine_hull"), [" T ", "T T", " T "], {"T": PLATE}, category="building")
+# The holo sign (phase 7) isn't ported yet; a glass pane stands in for it until then.
+shaped("gravitational_stabilizer", mid("gravitational_stabilizer"), [" H ", "TST", "CMC"],
+       {"H": "minecraft:glass_pane", "T": PLATE, "S": mid("spacetime_equalizer"), "C": mid("s_magnet"), "M": mid("machine_casing")})
+
+
 # --- matter values (1.7.10 MatterOverdriveMatter.registerBasic*) -----------------------------------
 # Base values of the matteroverdrive:matter data map; everything else is calculated from recipes at runtime.
 # Ore dictionary names are mapped to today's tags. Tags come first so that single items can override them.
@@ -617,6 +663,8 @@ GUI_KEYS = {
     "item.matteroverdrive.matter_dust.details": "item.matter_dust.details",
     "item.matteroverdrive.pattern_drive.details": "item.pattern_drive.details",
     "gui.matteroverdrive.refresh": "gui.tooltip.button.refresh",
+    "death.attack.matteroverdrive.black_hole": "death.attack.blackHole",
+    "death.attack.matteroverdrive.black_hole.player": "death.attack.blackHole",
     "gui.matteroverdrive.request": "gui.tooltip.button.request",
     "gui.matteroverdrive.search": {"en_us": "Search", "ru_ru": "Поиск"},
     "gui.matteroverdrive.pattern": {"en_us": "%s (pattern %s%%)", "ru_ru": "%s (шаблон %s%%)"},
@@ -647,7 +695,7 @@ for src_name, dst_name in [("en_US", "en_us"), ("ru_RU", "ru_ru")]:
         lang[f"item.{MOD}.{n}"] = src.get(key) or EXTRA.get(dst_name, {}).get(n) or en.get(key) or n
         if key not in src and n not in EXTRA.get(dst_name, {}):
             fallback.append(n)
-    for n in list(BATTERIES) + ["pattern_drive", "network_flash_drive"]:
+    for n in list(BATTERIES) + ["pattern_drive", "network_flash_drive", "spacetime_equalizer"]:
         lang[f"item.{MOD}.{n}"] = src.get(f"item.{n}.name") or en.get(f"item.{n}.name")
     for n in BLOCKS + MACHINES + MACHINES_P3:
         key = LANG_KEYS.get(n, f"tile.{n}.name")

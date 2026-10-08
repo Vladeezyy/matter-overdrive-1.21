@@ -3,6 +3,8 @@ package matteroverdrive.init;
 import matteroverdrive.MatterOverdrive;
 import matteroverdrive.block.entity.AnalyzerBlockEntity;
 import matteroverdrive.block.entity.DecomposerBlockEntity;
+import matteroverdrive.block.entity.GravitationalAnomalyBlockEntity;
+import matteroverdrive.block.entity.GravitationalStabilizerBlockEntity;
 import matteroverdrive.block.entity.InscriberBlockEntity;
 import matteroverdrive.block.entity.MatterPipeBlockEntity;
 import matteroverdrive.block.entity.PatternMonitorBlockEntity;
@@ -41,6 +43,11 @@ public final class MOBlockEntities {
             BLOCK_ENTITIES.register("pattern_monitor", () -> new BlockEntityType<>(PatternMonitorBlockEntity::new, MOBlocks.PATTERN_MONITOR.get()));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ReplicatorBlockEntity>> REPLICATOR =
             BLOCK_ENTITIES.register("replicator", () -> new BlockEntityType<>(ReplicatorBlockEntity::new, MOBlocks.REPLICATOR.get()));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<GravitationalAnomalyBlockEntity>> GRAVITATIONAL_ANOMALY =
+            BLOCK_ENTITIES.register("gravitational_anomaly", () -> new BlockEntityType<>(GravitationalAnomalyBlockEntity::new, MOBlocks.GRAVITATIONAL_ANOMALY.get()));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<GravitationalStabilizerBlockEntity>> GRAVITATIONAL_STABILIZER =
+            BLOCK_ENTITIES.register("gravitational_stabilizer", () -> new BlockEntityType<>(GravitationalStabilizerBlockEntity::new, MOBlocks.GRAVITATIONAL_STABILIZER.get()));
 
     private MOBlockEntities() {}
 }

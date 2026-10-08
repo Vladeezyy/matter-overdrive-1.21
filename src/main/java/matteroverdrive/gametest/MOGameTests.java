@@ -69,6 +69,7 @@ public final class MOGameTests {
         MachineGameTests.addAll();
         MatterGameTests.addAll();
         NetworkGameTests.addAll();
+        AnomalyGameTests.addAll();
         TESTS.forEach((name, spec) -> FUNCTIONS.register(name, () -> spec.body()));
     }
 

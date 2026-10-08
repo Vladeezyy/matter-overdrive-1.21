@@ -17,7 +17,10 @@ import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.HoeItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.equipment.ArmorType;
+import net.minecraft.world.item.equipment.Equippable;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -84,6 +87,12 @@ public final class MOItems {
     public static final DeferredItem<BlockItem> NETWORK_PIPE = block("network_pipe", MOBlocks.NETWORK_PIPE);
     public static final DeferredItem<BlockItem> NETWORK_ROUTER = block("network_router", MOBlocks.NETWORK_ROUTER);
     public static final DeferredItem<BlockItem> NETWORK_SWITCH = block("network_switch", MOBlocks.NETWORK_SWITCH);
+    public static final DeferredItem<BlockItem> GRAVITATIONAL_ANOMALY = block("gravitational_anomaly", MOBlocks.GRAVITATIONAL_ANOMALY);
+    public static final DeferredItem<BlockItem> GRAVITATIONAL_STABILIZER = block("gravitational_stabilizer", MOBlocks.GRAVITATIONAL_STABILIZER);
+    public static final DeferredItem<BlockItem> MACHINE_HULL = block("machine_hull", MOBlocks.MACHINE_HULL);
+    /** 1.7.10 SpacetimeEqualizer: worn on the chest, it cancels a gravitational anomaly's pull. */
+    public static final DeferredItem<Item> SPACETIME_EQUALIZER = item("spacetime_equalizer", Item::new,
+            p -> p.stacksTo(1).component(DataComponents.EQUIPPABLE, Equippable.builder(EquipmentSlot.CHEST).build()));
     // 1.7.10 PatternDrive("pattern_drive", 2)
     public static final DeferredItem<PatternDriveItem> PATTERN_DRIVE = item("pattern_drive", p -> new PatternDriveItem(2, p), p -> p);
     public static final DeferredItem<Item> NETWORK_FLASH_DRIVE = simple("network_flash_drive");

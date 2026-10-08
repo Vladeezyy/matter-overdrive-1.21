@@ -87,8 +87,10 @@ public final class DevScene {
         at(366, mc -> shot(mc, "pipes"));
         at(368, mc -> server(mc, p -> p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY() + 1, origin.getZ() - 3.5, Set.of(), 180f, 15f, false)));
         at(378, mc -> shot(mc, "network"));
-        at(380, mc -> server(mc, p -> p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 35f, false)));
-        at(388, mc -> mc.stop());
+        at(379, mc -> server(mc, p -> p.teleportTo(p.level(), origin.getX() + 3.5, origin.getY() + 3, origin.getZ() - 7.5, Set.of(), 120f, 5f, false)));
+        at(386, mc -> shot(mc, "anomaly"));
+        at(388, mc -> server(mc, p -> p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 35f, false)));
+        at(396, mc -> mc.stop());
     }
 
     private static void at(int t, Consumer<Minecraft> action) {
@@ -187,6 +189,9 @@ public final class DevScene {
         ItemStack drive = new ItemStack(MOItems.PATTERN_DRIVE.get());
         MOItems.PATTERN_DRIVE.get().addProgress(drive, Items.IRON_INGOT, 100);
         analyzer.getInventory().setStack(matteroverdrive.block.entity.AnalyzerBlockEntity.DATABASE, drive);
+        // phase 4: an anomaly above the far end with a stabilizer aiming at it from the floor
+        level.setBlockAndUpdate(base.offset(0, 3, -10), MOBlocks.GRAVITATIONAL_ANOMALY.get().defaultBlockState());
+        level.setBlockAndUpdate(base.offset(0, 3, -6), MOBlocks.GRAVITATIONAL_STABILIZER.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.NORTH));
         level.setBlockAndUpdate(base.offset(0, 0, -5), MOBlocks.TRITANIUM_ORE.get().defaultBlockState());
         level.setBlockAndUpdate(base.offset(-2, 0, -5), MOBlocks.DILITHIUM_ORE.get().defaultBlockState());
         level.setBlockAndUpdate(base.offset(2, 0, -5), MOBlocks.TRITANIUM_BLOCK.get().defaultBlockState());
