@@ -24,7 +24,9 @@ public final class MatterEvents {
         event.registrar("1")
                 .playToClient(MatterValuesPayload.TYPE, MatterValuesPayload.STREAM_CODEC, MatterValuesPayload::handle)
                 .playToClient(PatternListPayload.TYPE, PatternListPayload.STREAM_CODEC, PatternListPayload::handle)
-                .playToServer(PatternRequestPayload.TYPE, PatternRequestPayload.STREAM_CODEC, PatternRequestPayload::handle);
+                .playToServer(PatternRequestPayload.TYPE, PatternRequestPayload.STREAM_CODEC, PatternRequestPayload::handle)
+                .playToServer(matteroverdrive.network.FireWeaponPayload.TYPE, matteroverdrive.network.FireWeaponPayload.STREAM_CODEC,
+                        matteroverdrive.network.FireWeaponPayload::handle);
     }
 
     /** Recipes and data maps were (re)loaded on the server: recalculate on next use. */
@@ -38,7 +40,9 @@ public final class MatterEvents {
     @SubscribeEvent
     static void onDatapackSync(OnDatapackSyncEvent event) {
         var payload = new MatterValuesPayload(MatterRegistry.values(event.getPlayerList().getServer()));
-        event.getRelevantPlayers().forEach(player -> PacketDistributor.sendToPlayer(player, payload));
+        // only clients that have this mod's channel (not vanilla clients or game-test mock players)
+        event.getRelevantPlayers().filter(player -> player.connection.hasChannel(MatterValuesPayload.TYPE))
+                .forEach(player -> PacketDistributor.sendToPlayer(player, payload));
     }
 
     private MatterEvents() {}

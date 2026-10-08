@@ -94,8 +94,41 @@ public final class DevScene {
         at(402, mc -> mc.player.closeContainer());
         at(404, mc -> server(mc, p -> p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY() + 14, origin.getZ() - 6.5, Set.of(), 180f, 60f, false)));
         at(414, mc -> shot(mc, "reactor"));
-        at(416, mc -> server(mc, p -> p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 35f, false)));
-        at(424, mc -> mc.stop());
+        // phase 5: weapons in hand, a bolt in flight, inventory icons
+        at(416, mc -> server(mc, p -> {
+            p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 0f, false);
+            for (var w : new matteroverdrive.item.weapon.EnergyWeaponItem[] {MOItems.PHASER_RIFLE.get(), MOItems.PLASMA_SHOTGUN.get(), MOItems.ION_SNIPER.get()}) {
+                ItemStack s = new ItemStack(w);
+                matteroverdrive.item.weapon.EnergyWeaponItem.setEnergy(s, 32000);
+                p.getInventory().add(s);
+            }
+            p.getInventory().setItem(0, findWeapon(p, MOItems.PHASER_RIFLE.get()));
+            p.getInventory().setSelectedSlot(0);
+        }));
+        at(418, mc -> mc.player.getInventory().setSelectedSlot(0));   // the selected slot is client-authoritative
+        at(424, mc -> shot(mc, "rifle_hand"));
+        // a slow bolt so the renderer can be seen (real ones cross the view in a tick or two)
+        at(426, mc -> server(mc, p -> {
+            for (int i = 0; i < 3; i++) {
+                var bolt = new matteroverdrive.entity.PlasmaBolt(p.level(), p, 0, 64, matteroverdrive.item.weapon.WeaponColorModuleItem.COLORS[i]);
+                var look = p.getLookAngle();
+                bolt.setPos(p.getX() + (i - 1) * 0.8, p.getEyeY() - 0.2, p.getZ() - 2.5);
+                bolt.shoot(look.x, look.y, look.z, 0.005f, 0);
+                p.level().addFreshEntity(bolt);
+            }
+        }));
+        at(428, mc -> shot(mc, "bolt"));
+        at(430, mc -> server(mc, p -> p.getInventory().setItem(0, findWeapon(p, MOItems.PLASMA_SHOTGUN.get()))));
+        at(436, mc -> shot(mc, "shotgun_hand"));
+        at(437, mc -> server(mc, p -> MOItems.PLASMA_SHOTGUN.get().tryFire(p, p.getMainHandItem(), false)));
+        at(439, mc -> shot(mc, "shotgun_fire"));
+        at(441, mc -> server(mc, p -> p.getInventory().setItem(0, findWeapon(p, MOItems.ION_SNIPER.get()))));
+        at(447, mc -> shot(mc, "sniper_hand"));
+        at(449, mc -> mc.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player)));
+        at(456, mc -> shot(mc, "inventory"));
+        at(458, mc -> mc.setScreen(null));
+        at(460, mc -> server(mc, p -> p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 35f, false)));
+        at(468, mc -> mc.stop());
     }
 
     private static void at(int t, Consumer<Minecraft> action) {
@@ -250,6 +283,14 @@ public final class DevScene {
         }
         reactor.getMatterTank().setMatter(1500);
         reactor.getInventory().setStack(reactor.getBatterySlot(), new ItemStack(MOItems.HC_BATTERY.get()));
+    }
+
+    private static ItemStack findWeapon(ServerPlayer p, net.minecraft.world.item.Item item) {
+        var inv = p.getInventory();
+        for (int i = 0; i < inv.getContainerSize(); i++) {
+            if (inv.getItem(i).is(item)) return inv.removeItemNoUpdate(i);
+        }
+        return ItemStack.EMPTY;
     }
 
     private static void openMachine(Minecraft mc, BlockPos pos) {

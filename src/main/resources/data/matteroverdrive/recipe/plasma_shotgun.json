@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "SP ",
+    "ICH",
+    "SPB"
+  ],
+  "key": {
+    "S": "matteroverdrive:weapon_receiver",
+    "P": "matteroverdrive:plasma_core",
+    "I": "minecraft:iron_ingot",
+    "C": "matteroverdrive:isolinear_circuit_mk3",
+    "H": "matteroverdrive:weapon_handle",
+    "B": "matteroverdrive:battery"
+  },
+  "result": {
+    "id": "matteroverdrive:plasma_shotgun",
+    "count": 1
+  }
+}

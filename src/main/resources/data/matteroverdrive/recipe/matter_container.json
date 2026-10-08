@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "TMT",
+    " T "
+  ],
+  "key": {
+    "T": "#c:ingots/tritanium",
+    "M": "matteroverdrive:s_magnet"
+  },
+  "result": {
+    "id": "matteroverdrive:matter_container",
+    "count": 4
+  }
+}

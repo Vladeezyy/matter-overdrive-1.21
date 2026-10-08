@@ -1,7 +1,9 @@
 package matteroverdrive.init;
 
 import matteroverdrive.MatterOverdrive;
+import matteroverdrive.recipe.EnergyPackRecipe;
 import matteroverdrive.recipe.InscriberRecipe;
+import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -17,6 +19,9 @@ public final class MORecipes {
             () -> RecipeType.simple(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "inscriber")));
     public static final DeferredHolder<RecipeSerializer<?>, InscriberRecipe.Serializer> INSCRIBER_SERIALIZER =
             SERIALIZERS.register("inscriber", InscriberRecipe.Serializer::new);
+
+    public static final DeferredHolder<RecipeSerializer<?>, CustomRecipe.Serializer<EnergyPackRecipe>> ENERGY_PACK_SERIALIZER =
+            SERIALIZERS.register("energy_pack", () -> new CustomRecipe.Serializer<>(EnergyPackRecipe::new));
 
     private MORecipes() {}
 }

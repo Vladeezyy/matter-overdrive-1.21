@@ -12,6 +12,11 @@ import matteroverdrive.item.MatterDustItem;
 import matteroverdrive.item.PatternDriveItem;
 import matteroverdrive.item.UpgradeItem;
 import matteroverdrive.item.WrenchItem;
+import matteroverdrive.item.weapon.EnergyPackItem;
+import matteroverdrive.item.weapon.IonSniperItem;
+import matteroverdrive.item.weapon.PhaserRifleItem;
+import matteroverdrive.item.weapon.PlasmaShotgunItem;
+import matteroverdrive.item.weapon.WeaponColorModuleItem;
 import matteroverdrive.machine.UpgradeType;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.BlockItem;
@@ -126,6 +131,24 @@ public final class MOItems {
             Map.of(UpgradeType.MATTER_STORAGE, 2.0));
 
     public static final DeferredItem<WrenchItem> TRITANIUM_WRENCH = item("tritanium_wrench", WrenchItem::new, p -> p);
+
+    // Weapons (phase 5)
+    public static final DeferredItem<PhaserRifleItem> PHASER_RIFLE = item("phaser_rifle", PhaserRifleItem::new, p -> p);
+    public static final DeferredItem<PlasmaShotgunItem> PLASMA_SHOTGUN = item("plasma_shotgun", PlasmaShotgunItem::new, p -> p);
+    public static final DeferredItem<IonSniperItem> ION_SNIPER = item("ion_sniper", IonSniperItem::new, p -> p);
+    public static final DeferredItem<EnergyPackItem> ENERGY_PACK = item("energy_pack", EnergyPackItem::new, p -> p);
+    /** 1.7.10 MatterContainer: a portable matter tank; needed for the plasma core recipe (its tank isn't ported yet). */
+    public static final DeferredItem<Item> MATTER_CONTAINER = simple("matter_container");
+    public static final List<DeferredItem<WeaponColorModuleItem>> COLOR_MODULES = colorModules();
+
+    private static List<DeferredItem<WeaponColorModuleItem>> colorModules() {
+        List<DeferredItem<WeaponColorModuleItem>> list = new ArrayList<>();
+        for (int i = 0; i < WeaponColorModuleItem.NAMES.length; i++) {
+            int color = WeaponColorModuleItem.COLORS[i];
+            list.add(item("weapon_module_color_" + WeaponColorModuleItem.NAMES[i], p -> new WeaponColorModuleItem(color, p), p -> p));
+        }
+        return list;
+    }
 
     private static DeferredItem<UpgradeItem> upgrade(String name, Map<UpgradeType, Double> stats) {
         return item(name, p -> new UpgradeItem(stats, p), p -> p);

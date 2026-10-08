@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "ICI",
+    "SPP",
+    " HB"
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "C": "matteroverdrive:isolinear_circuit_mk4",
+    "S": "matteroverdrive:weapon_receiver",
+    "P": "matteroverdrive:plasma_core",
+    "H": "matteroverdrive:weapon_handle",
+    "B": "matteroverdrive:battery"
+  },
+  "result": {
+    "id": "matteroverdrive:ion_sniper",
+    "count": 1
+  }
+}

@@ -615,6 +615,106 @@ shaped("fusion_reactor_controller", mid("fusion_reactor_controller"), ["CHC", "2
        {"C": mid("fusion_reactor_coil"), "H": "minecraft:glass_pane", "2": MK[2], "3": MK[3], "M": mid("machine_casing"), "T": PLATE})
 
 
+# --- phase 5a: energy weapons ---------------------------------------------------------------------------
+import subprocess
+
+
+def weapon_obj(name, src_name, texture, scale, flip=False):
+    """A 1.7.10 weapon .obj as an item model. Keeps the model's origin (the grip) at the block centre and the
+    1.7.10 renderer's relative scale (SCALE / 0.06 rifle units; the rifle is ~1 block long); flip turns a model
+    that 1.7.10 rendered facing the other way (the shotgun) by 180 degrees so one display transform fits all."""
+    lines = (ref / "models/item" / f"{src_name}.obj").read_text().splitlines()
+    k = scale / (0.06 * 103.6)
+    out = [f"mtllib {name}.mtl", "usemtl weapon"]
+    for l in lines:
+        if l.startswith("v "):
+            x, y, z = map(float, l.split()[1:4])
+            if flip:
+                x, z = -x, -z
+            l = f"v {x * k + 0.5:.5f} {y * k + 0.5:.5f} {z * k + 0.5:.5f}"
+        elif l.startswith("vn ") and flip:
+            x, y, z = map(float, l.split()[1:4])
+            l = f"vn {-x} {y} {-z}"
+        elif l.startswith("usemtl") or l.startswith("mtllib"):
+            continue
+        out.append(l)
+    (A / "models/item").mkdir(parents=True, exist_ok=True)
+    (A / "models/item" / f"{name}.obj").write_text("\n".join(out) + "\n")
+    (A / "models/item" / f"{name}.mtl").write_text("newmtl weapon\nmap_Kd #weapon\n")
+    cp(ref / "textures/items" / f"{texture}.png", A / "textures/item" / f"{texture}.png")
+    w(A / "models/item" / f"{name}.json", {"loader": "neoforge:obj", "model": f"{MOD}:models/item/{name}.obj", "flip_v": True,
+        "textures": {"weapon": f"{MOD}:item/{texture}", "particle": f"{MOD}:item/{texture}"},
+        "display": WEAPON_DISPLAY})
+    w(A / "items" / f"{name}.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:item/{name}"}})
+
+
+WEAPON_DISPLAY = {
+    "firstperson_righthand": {"rotation": [0, 175, 0], "translation": [-3, 5, 2], "scale": [1.4, 1.4, 1.4]},
+    "firstperson_lefthand": {"rotation": [0, 185, 0], "translation": [-3, 5, 2], "scale": [1.4, 1.4, 1.4]},
+    "thirdperson_righthand": {"rotation": [0, 180, 0], "translation": [0, 2, 2], "scale": [1, 1, 1]},
+    "thirdperson_lefthand": {"rotation": [0, 180, 0], "translation": [0, 2, 2], "scale": [1, 1, 1]},
+    "gui": {"rotation": [0, 90, -40], "translation": [0, 0, 0], "scale": [1.45, 1.45, 1.45]},
+    "ground": {"rotation": [0, 0, 0], "translation": [0, 2, 0], "scale": [0.6, 0.6, 0.6]},
+    "fixed": {"rotation": [0, 90, 0], "translation": [0, 0, 0], "scale": [1, 1, 1]},
+}
+weapon_obj("phaser_rifle", "phaser_rifle", "phaser_rifle", 0.06)
+weapon_obj("plasma_shotgun", "plasma_shotgun", "plasma_shotgun", 0.85, flip=True)
+weapon_obj("ion_sniper", "ion_sniper", "ion_sniper", 0.06)
+
+def tinted_item(name, base, overlay, rgb):
+    w(A / "models/item" / f"{name}.json", {"parent": "minecraft:item/generated", "textures": {
+        "layer0": f"{MOD}:item/{base}", "layer1": f"{MOD}:item/{overlay}"}})
+    w(A / "items" / f"{name}.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:item/{name}", "tints": [
+        {"type": "minecraft:constant", "value": -1},
+        {"type": "minecraft:constant", "value": (0xFF << 24 | rgb >> 16 << 16 | (rgb >> 8 & 255) << 8 | (rgb & 255)) - (1 << 32)}]}})
+
+
+for t in ["container_2", "container_2_overlay", "weapon_module_color", "weapon_module_color_overlay", "container"]:
+    cp(ref / "textures/items" / f"{t}.png", A / "textures/item" / f"{t}.png")
+tinted_item("energy_pack", "container_2", "container_2_overlay", 0xE65014)          # COLOR_HOLO_RED
+COLOR_NAMES = ["red", "green", "blue", "brown", "pink", "sky_blue", "gold", "lime_green", "black", "grey"]
+COLOR_VALUES = [0xCC0000, 0x009933, 0x0066FF, 0x663333, 0xFF99FF, 0x99CCFF, 0xD4AF37, 0x66FF66, 0x1E1E1E, 0x808080]
+for n, c in zip(COLOR_NAMES, COLOR_VALUES):
+    tinted_item(f"weapon_module_color_{n}", "weapon_module_color", "weapon_module_color_overlay", c)
+w(A / "models/item/matter_container.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{MOD}:item/container"}})
+w(A / "items/matter_container.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:item/matter_container"}})
+cp(ref / "textures/entities/PlasmaFire.png", A / "textures/entity/plasma_fire.png")
+
+# Sounds: Minecraft only positions and attenuates mono sounds, so stereo originals are downmixed (needs ffmpeg + oggenc).
+SOUNDS = {"phaser_rifle_shot": ["weapon/phaser_rifle_shot"], "plasma_shotgun_shot": ["weapon/plasma_shotgun_shot"],
+          "sniper_rifle_fire": ["weapon/sniper_rifle_fire"], "reload": ["weapon/reload"], "overheat": ["weapon/overheat_med"],
+          "overheat_alarm": ["weapon/overheat_alarm"]}
+for files in SOUNDS.values():
+    for f in files:
+        dst = A / "sounds" / f"{f}.ogg"
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        # ffmpeg downmixes to a mono WAV, oggenc (vorbis-tools) encodes it: ffmpeg's own Vorbis encoder is stereo-only
+        wav = dst.with_suffix(".wav")
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(ref / "sounds" / f"{f}.ogg"), "-ac", "1", "-map_metadata", "-1",
+                        "-fflags", "+bitexact", "-flags:a", "+bitexact", str(wav)], check=True)
+        subprocess.run(["oggenc", "-Q", "-q", "5", "-o", str(dst), str(wav)], check=True)
+        wav.unlink()
+w(A / "sounds.json", {k: {"category": "player", "sounds": [f"{MOD}:{f}" for f in v]} for k, v in SOUNDS.items()})
+
+w(D / "damage_type/plasma.json", {"message_id": "matteroverdrive.plasma", "exhaustion": 0.1, "scaling": "when_caused_by_living_non_player"})
+w(TAGS / "minecraft/tags/damage_type/is_projectile.json", {"values": [mid("plasma")]})
+
+shaped("phaser_rifle", mid("phaser_rifle"), ["III", "SPC", "WHB"],
+       {"I": "minecraft:iron_ingot", "S": mid("weapon_receiver"), "P": mid("plasma_core"), "C": MK[3], "W": "#minecraft:wool",
+        "H": mid("weapon_handle"), "B": mid("battery")}, category="equipment")
+shaped("plasma_shotgun", mid("plasma_shotgun"), ["SP ", "ICH", "SPB"],
+       {"S": mid("weapon_receiver"), "P": mid("plasma_core"), "I": "minecraft:iron_ingot", "C": MK[3], "H": mid("weapon_handle"),
+        "B": mid("battery")}, category="equipment")
+shaped("ion_sniper", mid("ion_sniper"), ["ICI", "SPP", " HB"],
+       {"I": "minecraft:iron_ingot", "C": MK[4], "S": mid("weapon_receiver"), "P": mid("plasma_core"), "H": mid("weapon_handle"),
+        "B": mid("battery")}, category="equipment")
+shaped("plasma_core", mid("plasma_core"), ["GI ", "MCM", " IG"],
+       {"G": "minecraft:glass", "I": "minecraft:iron_ingot", "M": mid("s_magnet"), "C": mid("matter_container")})
+shaped("matter_container", mid("matter_container"), ["TMT", " T "], {"T": INGOT, "M": mid("s_magnet")}, count=4)
+# 1.7.10 EnergyPackRecipe: tritanium plate + a charged battery + gunpowder = one pack per 32000 FE in the battery.
+w(D / "recipe/energy_pack.json", {"type": mid("energy_pack"), "category": "misc"})
+
+
 # --- matter values (1.7.10 MatterOverdriveMatter.registerBasic*) -----------------------------------
 # Base values of the matteroverdrive:matter data map; everything else is calculated from recipes at runtime.
 # Ore dictionary names are mapped to today's tags. Tags come first so that single items can override them.
@@ -693,6 +793,16 @@ GUI_KEYS = {
     "item.matteroverdrive.matter_dust.details": "item.matter_dust.details",
     "item.matteroverdrive.pattern_drive.details": "item.pattern_drive.details",
     "gui.matteroverdrive.refresh": "gui.tooltip.button.refresh",
+    "item.matteroverdrive.energy_pack.details": {"en_us": "Used to reload energy weapons", "ru_ru": "Перезаряжает энергетическое оружие"},
+    "death.attack.matteroverdrive.plasma": "death.attack.plasmaBolt",
+    "death.attack.matteroverdrive.plasma.player": "death.attack.plasmaBolt",
+    "death.attack.matteroverdrive.plasma.item": "death.attack.plasmaBolt.item",
+    "tooltip.matteroverdrive.weapon.power_use": {"en_us": "Power Use: %s/s", "ru_ru": "Расход энергии: %s/с"},
+    "tooltip.matteroverdrive.weapon.damage": {"en_us": "Damage: %s", "ru_ru": "Урон: %s"},
+    "tooltip.matteroverdrive.weapon.dps": {"en_us": "DPS: %s", "ru_ru": "Урон/с: %s"},
+    "tooltip.matteroverdrive.weapon.speed": {"en_us": "Speed: %s s/m", "ru_ru": "Скорострельность: %s выстр./мин"},
+    "tooltip.matteroverdrive.weapon.range": {"en_us": "Range: %s b", "ru_ru": "Дальность: %s бл."},
+    "tooltip.matteroverdrive.weapon.heat": {"en_us": "Heat: %s", "ru_ru": "Нагрев: %s"},
     "gui.matteroverdrive.efficiency": {"en_us": "Efficiency %s%%", "ru_ru": "Эффективность %s%%"},
     "death.attack.matteroverdrive.black_hole": "death.attack.blackHole",
     "death.attack.matteroverdrive.black_hole.player": "death.attack.blackHole",
@@ -726,13 +836,19 @@ for src_name, dst_name in [("en_US", "en_us"), ("ru_RU", "ru_ru")]:
         lang[f"item.{MOD}.{n}"] = src.get(key) or EXTRA.get(dst_name, {}).get(n) or en.get(key) or n
         if key not in src and n not in EXTRA.get(dst_name, {}):
             fallback.append(n)
-    for n in list(BATTERIES) + ["pattern_drive", "network_flash_drive", "spacetime_equalizer"]:
+    for n in list(BATTERIES) + ["pattern_drive", "network_flash_drive", "spacetime_equalizer", "phaser_rifle", "plasma_shotgun",
+                                "ion_sniper", "energy_pack", "matter_container"]:
         lang[f"item.{MOD}.{n}"] = src.get(f"item.{n}.name") or en.get(f"item.{n}.name")
     for n in BLOCKS + MACHINES + MACHINES_P3:
         key = LANG_KEYS.get(n, f"tile.{n}.name")
         lang[f"block.{MOD}.{n}"] = src.get(key) or en.get(key) or n
         if key not in src:
             fallback.append(n)
+    COLOR_WORDS = {"en_us": ["Red", "Green", "Blue", "Brown", "Pink", "Sky Blue", "Gold", "Lime Green", "Black", "Grey"],
+                   "ru_ru": ["Красный", "Зелёный", "Синий", "Коричневый", "Розовый", "Голубой", "Золотой", "Лаймовый", "Чёрный", "Серый"]}
+    base = src.get("item.weapon_module_color.name") or en["item.weapon_module_color.name"]
+    for n, word in zip(COLOR_NAMES, COLOR_WORDS[dst_name]):
+        lang[f"item.{MOD}.weapon_module_color_{n}"] = f"{base} ({word})"
     for ours, theirs in GUI_KEYS.items():
         if isinstance(theirs, dict):
             lang[ours] = theirs[dst_name]

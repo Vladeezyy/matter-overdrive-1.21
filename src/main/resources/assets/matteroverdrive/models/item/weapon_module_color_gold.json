@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "matteroverdrive:item/weapon_module_color",
+    "layer1": "matteroverdrive:item/weapon_module_color_overlay"
+  }
+}

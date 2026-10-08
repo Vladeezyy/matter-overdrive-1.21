@@ -1,0 +1,38 @@
+{
+  "phaser_rifle_shot": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:weapon/phaser_rifle_shot"
+    ]
+  },
+  "plasma_shotgun_shot": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:weapon/plasma_shotgun_shot"
+    ]
+  },
+  "sniper_rifle_fire": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:weapon/sniper_rifle_fire"
+    ]
+  },
+  "reload": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:weapon/reload"
+    ]
+  },
+  "overheat": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:weapon/overheat_med"
+    ]
+  },
+  "overheat_alarm": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:weapon/overheat_alarm"
+    ]
+  }
+}

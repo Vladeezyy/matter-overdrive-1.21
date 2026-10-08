@@ -71,6 +71,7 @@ public final class MOGameTests {
         NetworkGameTests.addAll();
         AnomalyGameTests.addAll();
         FusionGameTests.addAll();
+        WeaponGameTests.addAll();
         TESTS.forEach((name, spec) -> FUNCTIONS.register(name, () -> spec.body()));
     }
 

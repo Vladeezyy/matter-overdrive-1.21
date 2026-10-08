@@ -37,6 +37,11 @@ public class MatterOverdriveClient {
         event.register(MOMenus.FUSION_REACTOR.get(), FusionReactorScreen::new);
     }
 
+    @SubscribeEvent
+    static void registerRenderers(net.neoforged.neoforge.client.event.EntityRenderersEvent.RegisterRenderers event) {
+        event.registerEntityRenderer(matteroverdrive.init.MOEntities.PLASMA_BOLT.get(), PlasmaBoltRenderer::new);
+    }
+
     /** Matter Plasma textures (1.7.10 matter_plasma_still / _flowing), shown by tanks of other mods. */
     @SubscribeEvent
     static void registerClientExtensions(RegisterClientExtensionsEvent event) {

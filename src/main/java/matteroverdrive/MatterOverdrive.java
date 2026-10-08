@@ -8,7 +8,9 @@ import matteroverdrive.gametest.MOGameTests;
 import matteroverdrive.init.MOBlockEntities;
 import matteroverdrive.init.MOBlocks;
 import matteroverdrive.init.MOCreativeTabs;
+import matteroverdrive.init.MOEntities;
 import matteroverdrive.init.MOFeatures;
+import matteroverdrive.init.MOSounds;
 import matteroverdrive.init.MOFluids;
 import matteroverdrive.init.MODataComponents;
 import matteroverdrive.init.MOItems;
@@ -39,6 +41,8 @@ public class MatterOverdrive {
         MORecipes.TYPES.register(modEventBus);
         MORecipes.SERIALIZERS.register(modEventBus);
         MOFeatures.FEATURES.register(modEventBus);
+        MOEntities.ENTITIES.register(modEventBus);
+        MOSounds.SOUNDS.register(modEventBus);
         MOCreativeTabs.TABS.register(modEventBus);
         MOGameTests.register(modEventBus);
         modEventBus.addListener(MatterOverdrive::registerCapabilities);
@@ -47,6 +51,9 @@ public class MatterOverdrive {
     private static void registerCapabilities(RegisterCapabilitiesEvent event) {
         for (BatteryItem battery : new BatteryItem[] {MOItems.BATTERY.get(), MOItems.HC_BATTERY.get(), MOItems.CREATIVE_BATTERY.get()}) {
             event.registerItem(Capabilities.Energy.ITEM, (stack, access) -> battery.createEnergyHandler(access), battery);
+        }
+        for (var weapon : new matteroverdrive.item.weapon.EnergyWeaponItem[] {MOItems.PHASER_RIFLE.get(), MOItems.PLASMA_SHOTGUN.get(), MOItems.ION_SNIPER.get()}) {
+            event.registerItem(Capabilities.Energy.ITEM, (stack, access) -> weapon.createEnergyHandler(access), weapon);
         }
         machine(event, MOBlockEntities.SOLAR_PANEL.get());
         machine(event, MOBlockEntities.INSCRIBER.get());
