@@ -1158,6 +1158,12 @@ for t in ["button_normal", "button_over", "button_over_dark"]:
     w(GUI / "sprites" / f"{t}.png.mcmeta", {"gui": {"scaling": {"type": "nine_slice", "width": 18, "height": 18, "border": 7}}})
 
 
+# --- phase 7l: android spawner ------------------------------------------------------------------------------
+# 1.7.10 BlockAndroidSpawner named the texture mo:android_spawner, which never existed (missing texture in 1.7.10):
+# the hazard-striped machine base stands in. Unbreakable, no drops, no recipe.
+w(A / "models/block/android_spawner.json", {"parent": "minecraft:block/cube_all", "textures": {"all": f"{MOD}:block/base_stripes"}})
+machine_blockstate("android_spawner", f"{MOD}:block/android_spawner")
+
 # --- phase 7b: mobs -----------------------------------------------------------------------------------------
 import zlib
 
@@ -1543,6 +1549,14 @@ GUI_KEYS = {
     "gui.matteroverdrive.pattern": {"en_us": "%s (pattern %s%%)", "ru_ru": "%s (шаблон %s%%)"},
     "item.matteroverdrive.matter_scanner": {"en_us": "Matter Scanner", "ru_ru": "Сканер материи"},
     "block.matteroverdrive.transporter": {"en_us": "Transporter", "ru_ru": "Транспортер"},
+    "block.matteroverdrive.android_spawner": "tile.android_spawner.name",
+    "gui.matteroverdrive.android_spawner.kill_all": {"en_us": "Kill All", "ru_ru": "Убить всех"},
+    "gui.matteroverdrive.android_spawner.next_spawn": {"en_us": "Time to next spawn: %s", "ru_ru": "До появления: %s"},
+    "gui.matteroverdrive.android_spawner.no_team": {"en_us": "No such scoreboard team", "ru_ru": "Такой команды нет"},
+    "gui.matteroverdrive.config.spawn_amount": {"en_us": "Spawn Amount", "ru_ru": "Количество"},
+    "gui.matteroverdrive.config.spawn_range": {"en_us": "Spawn Range", "ru_ru": "Радиус"},
+    "gui.matteroverdrive.config.spawn_delay": {"en_us": "Spawn Delay", "ru_ru": "Задержка"},
+    "gui.matteroverdrive.config.team": {"en_us": "Team", "ru_ru": "Команда"},
     "item.matteroverdrive.transport_flash_drive": {"en_us": "Transport Flash Drive", "ru_ru": "Транспортный флэш-накопитель"},
     "item.matteroverdrive.transport_flash_drive.details": {"en_us": "Used to mark locations for quick use with Teleporter",
                                                            "ru_ru": "Используется для обозначения места для быстрого использования Транспортера"},

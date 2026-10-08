@@ -30,6 +30,7 @@ public class MeleeRogueAndroid extends RogueAndroid {
     protected void registerGoals() {
         goalSelector.addGoal(1, new FloatGoal(this));
         goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.0, false));
+        goalSelector.addGoal(3, new matteroverdrive.entity.ai.MoveAlongPathGoal(this, 1.0));
         goalSelector.addGoal(4, new WaterAvoidingRandomStrollGoal(this, 1.0));
         goalSelector.addGoal(5, new LookAtPlayerGoal(this, LivingEntity.class, 8));
         goalSelector.addGoal(5, new RandomLookAroundGoal(this));

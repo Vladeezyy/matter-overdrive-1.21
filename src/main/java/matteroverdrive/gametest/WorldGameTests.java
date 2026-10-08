@@ -19,6 +19,7 @@ final class WorldGameTests {
         MOGameTests.add("matter_container", 20, false, WorldGameTests::matterContainer);
         MOGameTests.add("portable_decomposer", 20, false, WorldGameTests::portableDecomposer);
         MOGameTests.add("transporter", 120, false, WorldGameTests::transporter);
+        MOGameTests.add("android_spawner", 60, false, WorldGameTests::androidSpawner);
     }
 
     private static void check(GameTestHelper helper, boolean ok, String message) {
@@ -150,6 +151,45 @@ final class WorldGameTests {
             check(helper, pig.getBlockX() == abs.getX() + 10 && pig.getBlockZ() == abs.getZ(), "pig at " + pig.blockPosition() + ", expected " + abs.offset(10, 0, 0));
             check(helper, t.getEnergy().getEnergy() == 100000 - 160, "energy " + t.getEnergy().getEnergy());
             helper.succeed();
+        });
+    }
+
+    /** Android spawner: waits for its team, keeps max androids on the team with the flash drive path, Kill All removes them. */
+    private static void androidSpawner(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(2, 1, 2);
+        helper.setBlock(pos, matteroverdrive.init.MOBlocks.ANDROID_SPAWNER.get());
+        var spawner = helper.getBlockEntity(pos, matteroverdrive.block.entity.AndroidSpawnerBlockEntity.class);
+        var scoreboard = helper.getLevel().getScoreboard();
+        String teamName = "mo_spawner_test";
+        if (scoreboard.getPlayerTeam(teamName) != null) scoreboard.removePlayerTeam(scoreboard.getPlayerTeam(teamName));
+        spawner.setConfig(2, 3, 0, teamName);
+        BlockPos abs = helper.absolutePos(pos);
+        helper.runAfterDelay(5, () -> {
+            check(helper, spawner.getSpawnedCount() == 0 && !spawner.isActive(), "spawned without its team");
+            var team = scoreboard.addPlayerTeam(teamName);
+            spawner.getInventory().setStack(matteroverdrive.block.entity.AndroidSpawnerBlockEntity.COLOR_MODULE_SLOT,
+                    new net.minecraft.world.item.ItemStack(matteroverdrive.init.MOItems.COLOR_MODULES.get(0).get()));
+            helper.runAfterDelay(10, () -> {
+                var androids = helper.getLevel().getEntitiesOfClass(matteroverdrive.entity.monster.RogueAndroid.class,
+                        new net.minecraft.world.phys.AABB(abs).inflate(8));
+                check(helper, spawner.getSpawnedCount() == 2 && androids.size() == 2, "spawned " + spawner.getSpawnedCount() + ", found " + androids.size());
+                for (var android : androids) {
+                    check(helper, android.getTeam() == team && abs.equals(android.getSpawnerPos()) && android.isPersistenceRequired(),
+                            "android not tied to the spawner/team");
+                    check(helper, net.minecraft.world.phys.Vec3.atLowerCornerOf(abs).equals(android.getPathTarget()), "path " + android.getPathTarget());
+                    check(helper, android.getVisorColor() == 0xCC0000, "visor " + Integer.toHexString(android.getVisorColor()));
+                }
+                var drive = new net.minecraft.world.item.ItemStack(matteroverdrive.init.MOItems.TRANSPORT_FLASH_DRIVE.get());
+                drive.set(matteroverdrive.init.MODataComponents.TRANSPORT_TARGET.get(), abs.offset(5, 0, 5));
+                spawner.getInventory().setStack(matteroverdrive.block.entity.AndroidSpawnerBlockEntity.FLASH_DRIVE_SLOT_START, drive);
+                check(helper, net.minecraft.world.phys.Vec3.atLowerCornerOf(abs.offset(5, 0, 5)).equals(androids.get(0).getPathTarget()),
+                        "path not updated: " + androids.get(0).getPathTarget());
+                spawner.setConfig(2, 3, 100000, teamName);
+                spawner.removeAllAndroids();
+                check(helper, spawner.getSpawnedCount() == 0 && androids.stream().allMatch(net.minecraft.world.entity.Entity::isRemoved), "kill all");
+                scoreboard.removePlayerTeam(team);
+                helper.succeed();
+            });
         });
     }
 }

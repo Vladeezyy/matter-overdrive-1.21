@@ -4,9 +4,11 @@ import java.util.List;
 
 import matteroverdrive.MatterOverdrive;
 import matteroverdrive.android.Android;
+import matteroverdrive.block.entity.AndroidSpawnerBlockEntity;
 import matteroverdrive.init.MOItems;
 import matteroverdrive.init.MOSounds;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -35,6 +37,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -48,9 +51,17 @@ public abstract class RogueAndroid extends Monster {
             "C-3PO", "Gort", "IG-88", "T-800", "ED-209", "B-4", "Ultron", "CHAPPiE", "Sonny", "BB-8"};
     private static final EntityDataAccessor<Integer> LEVEL = SynchedEntityData.defineId(RogueAndroid.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> LEGENDARY = SynchedEntityData.defineId(RogueAndroid.class, EntityDataSerializers.BOOLEAN);
+    /** Visor colour set by an android spawner's colour module (-1 = by level). */
+    private static final EntityDataAccessor<Integer> VISOR_COLOR = SynchedEntityData.defineId(RogueAndroid.class, EntityDataSerializers.INT);
     public static final int MAX_ANDROIDS_PER_CHUNK = 4;
     /** 1.7.10 Reference colours: COLOR_HOLO, COLOR_HOLO_YELLOW, COLOR_HOLO_PURPLE, white; legendary COLOR_HOLO_RED. */
     private static final int[] VISOR = {0xA9E2FB, 0xFCE48A, 0xBA8BDB, 0xFFFFFF};
+
+    private @Nullable BlockPos spawnerPos;
+    private boolean registered;
+    private List<Vec3> path = List.of();
+    private int pathIndex;
+    private int pathRangeSq;
 
     protected RogueAndroid(EntityType<? extends RogueAndroid> type, Level level) {
         super(type, level);
@@ -66,6 +77,7 @@ public abstract class RogueAndroid extends Monster {
         super.defineSynchedData(builder);
         builder.define(LEVEL, 0);
         builder.define(LEGENDARY, false);
+        builder.define(VISOR_COLOR, -1);
     }
 
     public int getAndroidLevel() {
@@ -77,10 +89,15 @@ public abstract class RogueAndroid extends Monster {
     }
 
     public int getVisorColor() {
+        int set = entityData.get(VISOR_COLOR);
+        if (set >= 0) return set;
         return isLegendary() ? 0xE65014 : VISOR[Mth.clamp(getAndroidLevel(), 0, 3)];
     }
 
-    /** 1.7.10 init(): level, legendary, health, damage, name. */
+    public void setVisorColor(int rgb) {
+        entityData.set(VISOR_COLOR, rgb & 0xFFFFFF);
+    }
+
     /** Sets level and legendary after finalizeSpawn and re-rolls the gear for them (structures place set androids). */
     public void setupEquipped(int level, boolean legendary, DifficultyInstance difficulty) {
         setup(level, legendary);
@@ -155,7 +172,6 @@ public abstract class RogueAndroid extends Monster {
     }
 
     /** 1.7.10 AndroidTargetSelector: humans (not androids) and mutant scientists. */
-    /** 1.7.10 AndroidTargetSelector: humans (not androids) and mutant scientists. */
     public static boolean isEnemy(LivingEntity target) {
         if (target instanceof MutantScientist) return true;
         return target instanceof Player player && !Android.isAndroid(player) && !player.isCreative() && !player.isSpectator();
@@ -176,6 +192,9 @@ public abstract class RogueAndroid extends Monster {
         super.addAdditionalSaveData(output);
         output.putInt("android_level", getAndroidLevel());
         output.putBoolean("legendary", isLegendary());
+        if (entityData.get(VISOR_COLOR) >= 0) output.putInt("visor_color", entityData.get(VISOR_COLOR));
+        if (spawnerPos != null) output.store("spawner_pos", BlockPos.CODEC, spawnerPos);
+        output.putInt("path_index", pathIndex);
     }
 
     @Override
@@ -183,6 +202,69 @@ public abstract class RogueAndroid extends Monster {
         super.readAdditionalSaveData(input);
         entityData.set(LEVEL, input.getIntOr("android_level", 0));
         entityData.set(LEGENDARY, input.getBooleanOr("legendary", false));
+        entityData.set(VISOR_COLOR, input.getIntOr("visor_color", -1));
+        spawnerPos = input.read("spawner_pos", BlockPos.CODEC).orElse(null);
+        pathIndex = input.getIntOr("path_index", 0);
+    }
+
+    // --- android spawner (1.7.10 IPathableMob) -----------------------------------------------------
+
+    /** Ties this android to a spawner: it counts towards the spawner's limit and walks the spawner's path. */
+    public void setSpawnerPos(@Nullable BlockPos pos) {
+        this.spawnerPos = pos;
+    }
+
+    public @Nullable BlockPos getSpawnerPos() {
+        return spawnerPos;
+    }
+
+    /** 1.7.10 setPath: waypoints and how close counts as reached. */
+    public void setPath(List<Vec3> path, int range) {
+        this.path = List.copyOf(path);
+        this.pathRangeSq = range * range;
+    }
+
+    public @Nullable Vec3 getPathTarget() {
+        return pathIndex < path.size() ? path.get(pathIndex) : null;
+    }
+
+    /** 1.7.10 onTargetReached: go on to the next waypoint; stays at the last one. */
+    public void onPathTargetReached() {
+        if (pathIndex < path.size() - 1) pathIndex++;
+    }
+
+    public boolean isNearPathTarget(Vec3 target) {
+        return target.distanceToSqr(position()) < pathRangeSq;
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        // 1.7.10 init()/onAwake: register with the spawner after loading, die when it is gone
+        if (spawnerPos != null && !registered && level() instanceof ServerLevel server && server.isLoaded(spawnerPos)) {
+            registered = true;
+            if (server.getBlockEntity(spawnerPos) instanceof AndroidSpawnerBlockEntity spawner) {
+                spawner.addSpawnedAndroid(this);
+            } else {
+                discard();
+            }
+        }
+    }
+
+    @Override
+    public void remove(RemovalReason reason) {
+        if (reason.shouldDestroy() && spawnerPos != null && level() instanceof ServerLevel server && server.isLoaded(spawnerPos)
+                && server.getBlockEntity(spawnerPos) instanceof AndroidSpawnerBlockEntity spawner) {
+            spawner.removeAndroid(this);
+        }
+        super.remove(reason);
+    }
+
+    /** 1.7.10 setAttackTarget: never targets a member of its own team. */
+    @Override
+    public void setTarget(@Nullable LivingEntity target) {
+        if (target != null && target.getTeam() != null && target.getTeam().isAlliedTo(getTeam())) return;
+        super.setTarget(target);
     }
 
     @Override

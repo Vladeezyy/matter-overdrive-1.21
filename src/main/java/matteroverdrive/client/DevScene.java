@@ -42,6 +42,8 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 @EventBusSubscriber(modid = MatterOverdrive.MODID, value = Dist.CLIENT)
 public final class DevScene {
     private static final boolean ENABLED = System.getProperty("matteroverdrive.scene") != null;
+    /** Debug: jump from the base build straight to this tick ({@code ./gradlew runScene -PsceneFrom=N}). */
+    private static final int FROM = Integer.getInteger("matteroverdrive.scene.from", 0);
     private static final List<Step> STEPS = new ArrayList<>();
     private static int tick;
     /** Where the player stood when the scene started; restored before quitting so every run builds in one place. */
@@ -542,7 +544,45 @@ public final class DevScene {
         at(1488, mc -> mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT));
         at(1540, mc -> shot(mc, "transporter_transport"));
         at(1541, mc -> mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON));
-        at(1544, mc -> mc.stop());
+        // 7l: an android spawner on a team with a red colour module and a path; its screen (home + config), then the androids
+        at(1544, mc -> server(mc, p -> {
+            BlockPos base = origin.above(30);
+            for (BlockPos pos : BlockPos.betweenClosed(base.offset(-8, -1, -14), base.offset(8, 5, 2))) {
+                p.level().setBlock(pos, pos.getY() < base.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
+                        Block.UPDATE_CLIENTS | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
+            }
+            p.level().getEntitiesOfClass(net.minecraft.world.entity.Mob.class, new AABB(base).inflate(20)).forEach(e -> e.discard());
+            var scoreboard = p.level().getScoreboard();
+            if (scoreboard.getPlayerTeam("rogues") == null) scoreboard.addPlayerTeam("rogues").setColor(net.minecraft.ChatFormatting.RED);
+            BlockPos spawnerPos = base.offset(-4, -1, -10);
+            p.level().setBlockAndUpdate(spawnerPos, MOBlocks.ANDROID_SPAWNER.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
+            if (p.level().getBlockEntity(spawnerPos) instanceof matteroverdrive.block.entity.AndroidSpawnerBlockEntity s) {
+                s.getInventory().setStack(matteroverdrive.block.entity.AndroidSpawnerBlockEntity.COLOR_MODULE_SLOT,
+                        new ItemStack(MOItems.COLOR_MODULES.get(0).get()));
+                ItemStack drive = new ItemStack(MOItems.TRANSPORT_FLASH_DRIVE.get());
+                drive.set(matteroverdrive.init.MODataComponents.TRANSPORT_TARGET.get(), base.offset(3, -1, -6));
+                s.getInventory().setStack(matteroverdrive.block.entity.AndroidSpawnerBlockEntity.FLASH_DRIVE_SLOT_START, drive);
+                s.setConfig(4, 4, 0, "rogues");
+            }
+            p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() + 0.5, Set.of(), 180f, 25f, false);
+        }));
+        at(1560, mc -> server(mc, p -> {
+            BlockPos spawnerPos = origin.above(30).offset(-4, -1, -10);
+            if (p.level().getBlockEntity(spawnerPos) instanceof matteroverdrive.block.entity.AndroidSpawnerBlockEntity s) {
+                s.setConfig(4, 4, 600, "rogues");
+                p.openMenu(s, buf -> buf.writeBlockPos(spawnerPos));
+            }
+        }));
+        at(1570, mc -> shot(mc, "android_spawner_home"));
+        at(1571, mc -> page(mc, MachineMenu.Page.CONFIG));
+        at(1576, mc -> shot(mc, "android_spawner_config"));
+        at(1577, mc -> server(mc, ServerPlayer::closeContainer));
+        at(1630, mc -> shot(mc, "android_spawner_world"));
+        at(1631, mc -> server(mc, p -> {
+            BlockPos spawnerPos = origin.above(30).offset(-4, -1, -10);
+            if (p.level().getBlockEntity(spawnerPos) instanceof matteroverdrive.block.entity.AndroidSpawnerBlockEntity s) s.removeAllAndroids();
+        }));
+        at(1634, mc -> mc.stop());
     }
 
     private static void at(int t, Consumer<Minecraft> action) {
@@ -560,6 +600,7 @@ public final class DevScene {
             mc.setScreen(null);
         }
         tick++;
+        if (tick == 41 && FROM > 41) tick = FROM;
         for (Step step : STEPS) {
             if (step.at() == tick) {
                 MatterOverdrive.LOGGER.info("[scene] tick {}", tick);

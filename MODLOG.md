@@ -295,13 +295,29 @@
   E → ender pearl). 73 GameTests. Deviations: entities land on the block centre (1.7.10: the block corner); no
   ComputerCraft/OpenComputers peripheral.
 
+- **7l ✅** Android spawner (`AndroidSpawnerBlockEntity`, 1.7.10 TileEntityAndroidSpawner): unbreakable, no recipe, no
+  energy/upgrades. Keeps up to max spawn amount (6) rogue androids alive (30% melee), spawning the missing ones every spawn
+  delay (300) ticks within spawn range (4), only towards +x/+z (1.7.10 clamped the gaussian to 0..1), at the surface
+  capped to 3 above the block; persistent, mob-spawner particles. Optional scoreboard team (spawner idles while the team
+  doesn't exist); with a team the colour module tints visor + weapon. Path = marked spots of the transport flash drives
+  (5 slots) in order, reached within the spawn range (`MoveAlongPathGoal`, 1.7.10 EntityAIMoveAlongPath); androids store
+  their spawner, re-register after loading and vanish when it's gone; never target their own team. Screen: Kill All,
+  spawned/max, time to next spawn; Config page: amount/range/delay/team fields (`AndroidSpawnerPayload`). 74 GameTests.
+  Deviations: 1.7.10 named a texture `android_spawner` that never existed -> `base_stripes` stand-in; the unused 6th
+  flash drive slot is dropped; the colour module slot is shown (1.7.10 had it but never drew it); spawned set is by UUID.
+- Cloud (Linux) notes: regenerating resources rewrites the .ogg and ffmpeg-made .png bytes (different ffmpeg/oggenc
+  builds) - `git checkout` them. Screenshots: `Xvfb :99` + `DISPLAY=:99 ./gradlew runScene` (software GL is slow; give
+  menus extra ticks), world created by `runServer` with a flat creative server.properties, then moved to run/saves;
+  `run/options.txt` needs `onboardAccessibility:false`. `./gradlew runScene -PsceneFrom=N` skips to tick N after the base build.
+  Don't `pkill -f <word>` from a shell whose own command line contains that word (it kills the shell).
+
 ### Next in phase 7 (start here)
 1. ~~Failed animals~~ ✅ 7c.
 2. ~~Mutant scientist~~ ✅ 7d (underwater base spawns one named "Mitko'Urrr", persistent, on the star map block).
 3. ~~Structures~~ ✅ 7f (the mad scientist house is a village piece: comes with the mad scientist in item 5).
 4. ~~Transporter, omni tool, matter scanner, portable decomposer, matter container, microwave~~ ✅ 7g-7k.
 5. Star map / galaxy / ships / buildings / quests / dialogs / contract market; mad scientist villager (dialog + trades:
-   TradeHandlerMadScientist); android spawner block (teams + path drives, not used by worldgen).
+   TradeHandlerMadScientist); android spawner ✅ 7l.
 - Deviations so far: legendary rogue android parts drop without bonus attributes; no rogue android teams/paths;
   legendary weapons have no stat bonuses; buildings: star map → holo matrix stand-in (swap STAR_MAP in
   gen_resources.py when ported), no crashed-ship quest contract, underwater base needs 16+ water (1.7.10: 27+, rare in today's deep

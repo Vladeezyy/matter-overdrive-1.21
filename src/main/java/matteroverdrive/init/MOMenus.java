@@ -54,5 +54,8 @@ public final class MOMenus {
     public static final DeferredHolder<MenuType<?>, MenuType<matteroverdrive.menu.TransporterMenu>> TRANSPORTER =
             MENUS.register("transporter", () -> IMenuTypeExtension.create(matteroverdrive.menu.TransporterMenu::new));
 
+    public static final DeferredHolder<MenuType<?>, MenuType<matteroverdrive.menu.AndroidSpawnerMenu>> ANDROID_SPAWNER =
+            MENUS.register("android_spawner", () -> IMenuTypeExtension.create(matteroverdrive.menu.AndroidSpawnerMenu::new));
+
     private MOMenus() {}
 }

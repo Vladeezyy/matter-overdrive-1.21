@@ -75,6 +75,7 @@ public class MatterOverdriveClient {
         event.register(MOMenus.REPLICATOR.get(), ReplicatorScreen::new);
         event.register(MOMenus.FUSION_REACTOR.get(), FusionReactorScreen::new);
         event.register(MOMenus.TRANSPORTER.get(), matteroverdrive.client.screen.TransporterScreen::new);
+        event.register(MOMenus.ANDROID_SPAWNER.get(), matteroverdrive.client.screen.AndroidSpawnerScreen::new);
     }
 
     @SubscribeEvent

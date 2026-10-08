@@ -64,6 +64,7 @@ neoForge {
             client()
             programArguments.addAll '--quickPlaySingleplayer', 'mo_scene'
             systemProperty 'matteroverdrive.scene', 'true'
+            systemProperty 'matteroverdrive.scene.from', project.findProperty('sceneFrom') ?: '0'
         }
         server {
             server()

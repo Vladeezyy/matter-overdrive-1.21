@@ -45,6 +45,7 @@ public class RangedRogueAndroid extends RogueAndroid implements RangedAttackMob,
         goalSelector.addGoal(1, new FloatGoal(this));
         // 1.7.10 EntityAIPhaserBoltAttack(1.0, 60, 15)
         goalSelector.addGoal(3, new RangedAttackGoal(this, 1.0, 20, 60, 15));
+        goalSelector.addGoal(4, new matteroverdrive.entity.ai.MoveAlongPathGoal(this, 1.0));
         goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 1.0));
         goalSelector.addGoal(6, new LookAtPlayerGoal(this, LivingEntity.class, 8));
         goalSelector.addGoal(6, new RandomLookAroundGoal(this));

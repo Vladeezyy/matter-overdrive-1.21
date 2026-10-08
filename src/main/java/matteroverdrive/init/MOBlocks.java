@@ -120,6 +120,11 @@ public final class MOBlocks {
             matteroverdrive.block.TransporterBlock::new, p -> p.mapColor(MapColor.METAL).strength(20f, 9f).sound(SoundType.METAL)
                     .requiresCorrectToolForDrops());
 
+    /** 1.7.10 BlockAndroidSpawner: unbreakable (hardness -1). */
+    public static final DeferredBlock<matteroverdrive.block.AndroidSpawnerBlock> ANDROID_SPAWNER = BLOCKS.registerBlock("android_spawner",
+            matteroverdrive.block.AndroidSpawnerBlock::new, p -> p.mapColor(MapColor.METAL).strength(-1f, 3600000f).sound(SoundType.METAL)
+                    .noLootTable());
+
     /** 1.7.10 BlockMicrowave: hardness 10, resistance 9, iron pickaxe. */
     public static final DeferredBlock<matteroverdrive.block.MicrowaveBlock> MICROWAVE = BLOCKS.registerBlock("microwave",
             matteroverdrive.block.MicrowaveBlock::new, p -> p.mapColor(MapColor.METAL).strength(10f, 9f).sound(SoundType.METAL)

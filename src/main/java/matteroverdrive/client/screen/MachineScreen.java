@@ -174,7 +174,11 @@ public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractCo
         g.submitOutline(x + REDSTONE_X, y + REDSTONE_Y, REDSTONE_W, REDSTONE_H, 0xFF22282A);
         Component mode = Component.translatable(menu.getRedstoneMode().translationKey());
         g.drawString(font, mode, x + REDSTONE_X + (REDSTONE_W - font.width(mode)) / 2, y + REDSTONE_Y + 6, 0xFFFFFFFF, false);
+        renderConfigExtra(g, x, y, mx, my);
     }
+
+    /** Machine-specific settings below the redstone mode on the Config page (1.7.10 config properties). */
+    protected void renderConfigExtra(GuiGraphics g, int x, int y, int mx, int my) {}
 
     /** 1.7.10 MOElementEnergy: 16x42 bar from energy.png (left half empty, right half full). */
     protected void drawEnergy(GuiGraphics g, int x, int y) {

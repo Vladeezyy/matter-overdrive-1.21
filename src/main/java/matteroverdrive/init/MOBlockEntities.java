@@ -76,5 +76,9 @@ public final class MOBlockEntities {
             BLOCK_ENTITIES.register("transporter", () -> new BlockEntityType<>(matteroverdrive.block.entity.TransporterBlockEntity::new,
                     MOBlocks.TRANSPORTER.get()));
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<matteroverdrive.block.entity.AndroidSpawnerBlockEntity>> ANDROID_SPAWNER =
+            BLOCK_ENTITIES.register("android_spawner", () -> new BlockEntityType<>(matteroverdrive.block.entity.AndroidSpawnerBlockEntity::new,
+                    MOBlocks.ANDROID_SPAWNER.get()));
+
     private MOBlockEntities() {}
 }

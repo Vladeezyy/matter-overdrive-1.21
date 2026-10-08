@@ -31,6 +31,8 @@ public final class MatterEvents {
                         matteroverdrive.network.FireWeaponPayload::handle)
                 .playToServer(matteroverdrive.network.TransporterPayload.TYPE, matteroverdrive.network.TransporterPayload.STREAM_CODEC,
                         matteroverdrive.network.TransporterPayload::handle)
+                .playToServer(matteroverdrive.network.AndroidSpawnerPayload.TYPE, matteroverdrive.network.AndroidSpawnerPayload.STREAM_CODEC,
+                        matteroverdrive.network.AndroidSpawnerPayload::handle)
                 .playToServer(matteroverdrive.network.HoloSignPayload.TYPE, matteroverdrive.network.HoloSignPayload.STREAM_CODEC,
                         matteroverdrive.network.HoloSignPayload::handle)
                 .playToServer(matteroverdrive.network.UnlockStatPayload.TYPE, matteroverdrive.network.UnlockStatPayload.STREAM_CODEC,
