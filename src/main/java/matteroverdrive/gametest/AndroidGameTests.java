@@ -19,6 +19,7 @@ final class AndroidGameTests {
         MOGameTests.add("android_pills", 20, false, AndroidGameTests::pills);
         MOGameTests.add("android_stat_rules", 20, false, AndroidGameTests::statRules);
         MOGameTests.add("android_station_parts", 20, false, AndroidGameTests::stationParts);
+        MOGameTests.add("android_legendary_part", 20, false, AndroidGameTests::legendaryPart);
         MOGameTests.add("android_passive_stats", 20, false, AndroidGameTests::passiveStats);
         MOGameTests.add("android_toggle_stats", 20, false, AndroidGameTests::toggleStats);
         MOGameTests.add("android_shield_and_shockwave", 20, false, AndroidGameTests::shieldAndShockwave);
@@ -146,6 +147,34 @@ final class AndroidGameTests {
         Android.setAndroid(player, false);
         check(helper, player.getMaxHealth() == 20, "max health as human " + player.getMaxHealth());
         check(helper, !menu.stillValid(player), "humans can use the android station");
+        helper.succeed();
+    }
+
+    /** A legendary part's own attributes replace the +1 health; removing it removes them all. */
+    private static void legendaryPart(GameTestHelper helper) {
+        ServerPlayer player = player(helper);
+        Android.setAndroid(player, true);
+        ItemStack arms = new ItemStack(MOItems.ROGUE_ANDROID_ARMS.get());
+        arms.set(matteroverdrive.init.MODataComponents.LEGENDARY_PART.get(),
+                new matteroverdrive.item.android.BionicPartItem.Legendary(0, 3, 0.2, 0.1, -0.4, 0));
+        Android.get(player).setStack(AndroidData.SLOT_ARMS, arms);
+        double speed = player.getAttributeBaseValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED);
+        Android.tick(player);
+        check(helper, player.getMaxHealth() == 20, "the +1 health stays with a legendary part: " + player.getMaxHealth());
+        check(helper, player.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE) == 1 + 3, "attack "
+                + player.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE));
+        check(helper, Math.abs(player.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE) - 0.2) < 1e-6, "knockback");
+        check(helper, Math.abs(player.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED) - speed * 1.1) < 1e-6, "speed");
+        // a rolled legendary part (level 3) is named and has 0..3 per attribute
+        ItemStack rolled = new ItemStack(MOItems.ROGUE_ANDROID_HEAD.get());
+        matteroverdrive.entity.monster.RogueAndroid.makeLegendary(rolled, helper.getLevel().random, 3);
+        var legendary = rolled.get(matteroverdrive.init.MODataComponents.LEGENDARY_PART.get());
+        check(helper, legendary != null && legendary.health() <= 3 && legendary.battery() >= -0.09 - 1e-9 && rolled.getHoverName().getString().contains("\u272a"),
+                "rolled " + legendary + " " + rolled.getHoverName().getString());
+        Android.get(player).setStack(AndroidData.SLOT_ARMS, ItemStack.EMPTY);
+        Android.tick(player);
+        check(helper, player.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE) == 1, "attack left over");
+        player.discard();
         helper.succeed();
     }
 

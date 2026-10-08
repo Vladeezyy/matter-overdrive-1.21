@@ -33,6 +33,26 @@ final class WeaponGameTests {
         MOGameTests.add("phaser_stuns", 20, false, h -> phaserHits(h, 2));
         MOGameTests.add("phaser_kills", 20, false, h -> phaserHits(h, 5));
         MOGameTests.add("phaser_levels_energy_heat", 20, false, WeaponGameTests::phaserLevels);
+        MOGameTests.add("legendary_weapon", 20, false, WeaponGameTests::legendaryWeapon);
+    }
+
+    /** Legendary multipliers: damage and cooldown change; the range multiplier is read as an int like 1.7.10 (no change). */
+    private static void legendaryWeapon(GameTestHelper helper) {
+        var rifle = matteroverdrive.init.MOItems.PHASER_RIFLE.get();
+        net.minecraft.world.item.ItemStack plain = new net.minecraft.world.item.ItemStack(rifle);
+        net.minecraft.world.item.ItemStack legendary = plain.copy();
+        legendary.set(matteroverdrive.init.MODataComponents.LEGENDARY_WEAPON.get(), new matteroverdrive.item.weapon.WeaponFactory.Legendary(1.3f, 0.7f, 0.85f, 1.45f));
+        var zombie = helper.spawn(net.minecraft.world.entity.EntityType.ZOMBIE, new net.minecraft.core.BlockPos(1, 1, 1));
+        float base = rifle.getDamage(plain, zombie), boosted = rifle.getDamage(legendary, zombie);
+        float attack = (float) zombie.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE);
+        helper.assertTrue(Math.abs((boosted - attack) - (base - attack) * 1.3f) < 1e-4, net.minecraft.network.chat.Component.literal("damage " + base + " -> " + boosted));
+        helper.assertTrue(rifle.getShootCooldown(legendary) == (int) (rifle.getShootCooldown(plain) * 0.85f),
+                net.minecraft.network.chat.Component.literal("cooldown " + rifle.getShootCooldown(legendary)));
+        helper.assertTrue(rifle.getRange(legendary) == rifle.getRange(plain), net.minecraft.network.chat.Component.literal("range " + rifle.getRange(legendary)));
+        var generated = matteroverdrive.item.weapon.WeaponFactory.randomDecorated(helper.getLevel().random, 3, true);
+        helper.assertTrue(generated.has(matteroverdrive.init.MODataComponents.LEGENDARY_WEAPON.get()), net.minecraft.network.chat.Component.literal("no legendary stats"));
+        zombie.discard();
+        helper.succeed();
     }
 
     private static ServerPlayer shooter(GameTestHelper helper, ItemStack weapon) {

@@ -449,6 +449,14 @@
     power rows (1.7.10 drew it over them, unreadable). Kept: without a base the slot lists both "No Base building"
     and "Not enough building spaces"; the
     galaxy hologram's travelling ship moves away from its destination (from + (from - to) * progress).
+- **Leftovers: legendary bonuses ✅** (1.7.10 AndroidPartsFactory.addLegendaryAttributesToPart, WeaponFactory.modifyToLegendary,
+  EnergyWeapon custom multipliers / addStatWithMultiplyInfo, BionicPart.loadCustomAttributes / addDetails). A legendary
+  android's dropped part rolls 0..level for max health, attack damage, knockback resistance (x0.1), speed (+10%),
+  glitch time (-20%), battery use (-3%) (`legendary_part` component); like 1.7.10 its own attributes replace the
+  part's +1 health. Legendary weapons roll damage x(1 + 0.1n), spread x(1 - 0.1n), cooldown x(1 - 0.05n), range
+  x(1 + 0.15n) (`legendary_weapon`); 1.7.10 read the range multiplier as an int, so it never changed the range (kept).
+  Both get the "✪ Legendary" gold name. Weapon tooltips show the 1.7.10 green / red percentages against the base and the
+  Accuracy line; part tooltips list every attribute in the 1.7.10 format. 92 GameTests.
 - Cloud (Linux) notes: regenerating resources rewrites the .ogg and ffmpeg-made .png bytes (different ffmpeg/oggenc
   builds) - `git checkout` them. Screenshots: `Xvfb :99` + `DISPLAY=:99 ./gradlew runScene` (software GL is slow; give
   menus extra ticks), world created by `runServer` with a flat creative server.properties, then moved to run/saves;
@@ -462,8 +470,7 @@
 4. ~~Transporter, omni tool, matter scanner, portable decomposer, matter container, microwave~~ ✅ 7g-7k.
 5. Star map ✅ 7s (galaxy + block + hologram), screen ✅ 7t, buildings / ships ✅ 7u; quests / dialogs / mad scientist ✅ 7m-7p, contract market ✅ 7q, android
    spawner ✅ 7l. Security protocol + crash landing ✅ 7r.
-- Deviations so far: legendary rogue android parts drop without bonus attributes; no rogue android teams/paths;
-  legendary weapons have no stat bonuses; buildings: underwater base needs 16+ water (1.7.10: 27+, rare in today's deep
+- Deviations so far: buildings: underwater base needs 16+ water (1.7.10: 27+, rare in today's deep
   oceans) and sinks into the floor to stay submerged, no "generate buildings" config (use a datapack), not rotated
   (1.7.10 never rotated them either).
 
@@ -471,7 +478,7 @@
 **Workflow**
 - Resources: never hand-edit `src/main/resources/{assets,data}` — regenerate:
   `rm -rf src/main/resources/{assets,data} && python3 -I tools/gen_resources.py ~/mo-reference/mo-1.7.10/src/main/resources/assets/mo src/main/resources`
-- Tests: `./gradlew runGameTestServer` (90 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
+- Tests: `./gradlew runGameTestServer` (92 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
   `FunctionGameTestInstance`, custom 12³ structure `matteroverdrive:gametest_area`, time-of-day via `TestEnvironmentDefinition.TimeOfDay`,
   `makeMockServerPlayerInLevel`). Visual: `./gradlew runScene` → `run/screenshots/scene_*.png` (DevScene, world `run/saves/mo_scene`;
   pristine copy = "Новый мир (2)"; needs `pauseOnLostFocus=false`; selected hotbar slot is client-side; place blocks with

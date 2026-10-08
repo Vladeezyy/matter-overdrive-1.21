@@ -97,5 +97,14 @@ public final class MODataComponents {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Long>> BUILD_START =
             COMPONENTS.registerComponentType("build_start", b -> b.persistent(Codec.LONG).networkSynchronized(ByteBufCodecs.VAR_LONG));
 
+    /** 1.7.10 AndroidPartsFactory.addLegendaryAttributesToPart: a legendary part's "CustomAttributes". */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<matteroverdrive.item.android.BionicPartItem.Legendary>> LEGENDARY_PART =
+            COMPONENTS.registerComponentType("legendary_part", b -> b.persistent(matteroverdrive.item.android.BionicPartItem.Legendary.CODEC)
+                    .networkSynchronized(ByteBufCodecs.fromCodec(matteroverdrive.item.android.BionicPartItem.Legendary.CODEC)));
+    /** 1.7.10 WeaponFactory.modifyToLegendary: the CUSTOM_*_MULTIPLY stats. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<matteroverdrive.item.weapon.WeaponFactory.Legendary>> LEGENDARY_WEAPON =
+            COMPONENTS.registerComponentType("legendary_weapon", b -> b.persistent(matteroverdrive.item.weapon.WeaponFactory.Legendary.CODEC)
+                    .networkSynchronized(ByteBufCodecs.fromCodec(matteroverdrive.item.weapon.WeaponFactory.Legendary.CODEC)));
+
     private MODataComponents() {}
 }

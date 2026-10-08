@@ -122,12 +122,15 @@ public abstract class EnergyWeaponItem extends Item {
         return modifyStat(stat, weapon, 0) > 0;
     }
 
+    /** 1.7.10: x the legendary range multiplier read as an int (floor: 1.15-1.45 -> 1). */
     public int getRange(ItemStack weapon) {
-        return Math.round(modifyStat(WeaponStat.RANGE, weapon, defaultRange));
+        return Math.round(modifyStat(WeaponStat.RANGE, weapon, defaultRange)) * (int) WeaponFactory.legendary(weapon).range();
     }
 
     public int getShootCooldown(ItemStack weapon) {
-        return Math.max(1, (int) modifyStat(WeaponStat.FIRE_RATE, weapon, baseCooldown));
+        int cooldown = (int) modifyStat(WeaponStat.FIRE_RATE, weapon, baseCooldown);
+        cooldown = (int) (cooldown * WeaponFactory.legendary(weapon).speed());
+        return Math.max(1, cooldown);
     }
 
     /** Energy per tick of cooldown (1.7.10 getEnergyUse: ENERGY_PER_SHOT / cooldown, x AMMO modules). */
@@ -144,7 +147,7 @@ public abstract class EnergyWeaponItem extends Item {
     }
 
     public float getDamage(ItemStack weapon, LivingEntity shooter) {
-        float damage = modifyStat(WeaponStat.DAMAGE, weapon, baseDamage);
+        float damage = modifyStat(WeaponStat.DAMAGE, weapon, baseDamage) * WeaponFactory.legendary(weapon).damage();
         damage += (float) shooter.getAttributeValue(Attributes.ATTACK_DAMAGE);
         return shooter instanceof WeaponShooter mob ? damage * mob.weaponDamageScale() : damage;
     }
@@ -157,6 +160,7 @@ public abstract class EnergyWeaponItem extends Item {
         accuracy = modifyStat(WeaponStat.ACCURACY, weapon, accuracy);
         ItemStack sights = getModule(weapon, WeaponModule.SLOT_SIGHTS);
         if (sights.getItem() instanceof WeaponScope scope) accuracy = scope.getAccuracyModify(sights, weapon, zoomed, accuracy);
+        accuracy *= WeaponFactory.legendary(weapon).accuracy();
         if (shooter instanceof WeaponShooter mob) accuracy += mob.weaponAccuracyAdd();
         return accuracy;
     }
@@ -360,12 +364,15 @@ public abstract class EnergyWeaponItem extends Item {
                 MOText.energy(getCapacity(weapon))).withStyle(ChatFormatting.YELLOW));
         tooltip.accept(Component.translatable("tooltip.matteroverdrive.weapon.power_use", MOText.energy(getEnergyUse(weapon) * 20L))
                 .withStyle(ChatFormatting.DARK_RED));
-        float damage = modifyStat(WeaponStat.DAMAGE, weapon, baseDamage) + 1;
+        WeaponFactory.Legendary legendary = WeaponFactory.legendary(weapon);
+        float damage = modifyStat(WeaponStat.DAMAGE, weapon, baseDamage) * legendary.damage() + 1;
         int cooldown = getShootCooldown(weapon);
-        tooltip.accept(stat("damage", String.format(Locale.ROOT, "%.2f", damage)));
-        tooltip.accept(stat("dps", String.format(Locale.ROOT, "%.2f", damage / cooldown * 20)));
-        tooltip.accept(stat("speed", (int) (20d / cooldown * 60)));
-        tooltip.accept(stat("range", getRange(weapon)));
+        // 1.7.10 addStatWithMultiplyInfo: the change against the base as a green / red percentage
+        tooltip.accept(stat("damage", String.format(Locale.ROOT, "%.2f", damage), damage / baseDamage));
+        tooltip.accept(stat("dps", String.format(Locale.ROOT, "%.2f", damage / cooldown * 20), 1));
+        tooltip.accept(stat("speed", (int) (20d / cooldown * 60), (double) baseCooldown / cooldown));
+        tooltip.accept(stat("range", getRange(weapon), (double) getRange(weapon) / defaultRange));
+        tooltip.accept(stat("accuracy", "", 1 / (modifyStat(WeaponStat.ACCURACY, weapon, 1) * legendary.accuracy())));
         StringBuilder bar = new StringBuilder();
         for (int i = 0; i < 32 * Math.min(1, getHeat(weapon) / getMaxHeat(weapon)); i++) bar.append('|');
         tooltip.accept(Component.translatable("tooltip.matteroverdrive.weapon.heat", bar.toString()).withStyle(ChatFormatting.DARK_RED));
@@ -374,7 +381,12 @@ public abstract class EnergyWeaponItem extends Item {
         }
     }
 
-    private static Component stat(String key, Object value) {
-        return Component.translatable("tooltip.matteroverdrive.weapon." + key, Component.literal(String.valueOf(value)).withStyle(ChatFormatting.DARK_AQUA));
+    private static Component stat(String key, Object value, double multiply) {
+        var line = Component.translatable("tooltip.matteroverdrive.weapon." + key, Component.literal(String.valueOf(value)).withStyle(ChatFormatting.DARK_AQUA));
+        if (Math.abs(multiply - 1) > 1e-6) {
+            line.append(Component.literal(" (" + java.text.NumberFormat.getPercentInstance().format(multiply) + ")")
+                    .withStyle(multiply > 1 ? ChatFormatting.DARK_GREEN : ChatFormatting.DARK_RED));
+        }
+        return line;
     }
 }

@@ -177,14 +177,20 @@ public abstract class RogueAndroid extends Monster {
         return target instanceof Player player && !Android.isAndroid(player) && !player.isCreative() && !player.isSpectator();
     }
 
-    /** A random part (1.7.10 AndroidPartsFactory: head/arms/legs/chest 100 each, spine 20). */
+    /** A random part (1.7.10 AndroidPartsFactory: head/arms/legs/chest 100 each, spine 20); a legendary android's is legendary. */
     protected ItemStack randomPart() {
         int roll = random.nextInt(420);
-        if (roll < 100) return new ItemStack(MOItems.ROGUE_ANDROID_HEAD.get());
-        if (roll < 200) return new ItemStack(MOItems.ROGUE_ANDROID_ARMS.get());
-        if (roll < 300) return new ItemStack(MOItems.ROGUE_ANDROID_LEGS.get());
-        if (roll < 400) return new ItemStack(MOItems.ROGUE_ANDROID_CHEST.get());
-        return new ItemStack(MOItems.TRITANIUM_SPINE.get());
+        ItemStack part = roll < 100 ? new ItemStack(MOItems.ROGUE_ANDROID_HEAD.get()) : roll < 200 ? new ItemStack(MOItems.ROGUE_ANDROID_ARMS.get())
+                : roll < 300 ? new ItemStack(MOItems.ROGUE_ANDROID_LEGS.get()) : roll < 400 ? new ItemStack(MOItems.ROGUE_ANDROID_CHEST.get())
+                : new ItemStack(MOItems.TRITANIUM_SPINE.get());
+        if (isLegendary()) makeLegendary(part, random, getAndroidLevel());
+        return part;
+    }
+
+    /** 1.7.10 addLegendaryAttributesToPart: rolled attributes and the gold "✪ Legendary" name. */
+    public static void makeLegendary(ItemStack part, net.minecraft.util.RandomSource random, int level) {
+        part.set(matteroverdrive.init.MODataComponents.LEGENDARY_PART.get(), matteroverdrive.item.android.BionicPartItem.Legendary.roll(random, level));
+        part.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME, matteroverdrive.item.weapon.WeaponFactory.legendaryName(part));
     }
 
     @Override

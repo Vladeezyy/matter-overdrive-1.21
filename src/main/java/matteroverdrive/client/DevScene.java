@@ -1093,7 +1093,47 @@ public final class DevScene {
             p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
                     "time set 6000");
         }));
-        at(2956, mc -> mc.stop());
+        // leftovers: legendary weapon and legendary part tooltips
+        at(2958, mc -> {
+            var rng = net.minecraft.util.RandomSource.create(7);
+            ItemStack weapon = matteroverdrive.item.weapon.WeaponFactory.randomDecorated(rng, 3, true);
+            weapon.set(matteroverdrive.init.MODataComponents.LEGENDARY_WEAPON.get(),
+                    new matteroverdrive.item.weapon.WeaponFactory.Legendary(1.3f, 0.8f, 0.9f, 1.3f));
+            mc.setScreen(new TooltipScreen(weapon));
+        });
+        at(2966, mc -> shot(mc, "legendary_weapon"));
+        at(2968, mc -> {
+            ItemStack part = new ItemStack(MOItems.ROGUE_ANDROID_ARMS.get());
+            part.set(matteroverdrive.init.MODataComponents.LEGENDARY_PART.get(),
+                    new matteroverdrive.item.android.BionicPartItem.Legendary(2, 3, 0.1, 0.2, -0.4, -0.06));
+            part.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME, matteroverdrive.item.weapon.WeaponFactory.legendaryName(part));
+            mc.setScreen(new TooltipScreen(part));
+        });
+        at(2976, mc -> shot(mc, "legendary_part"));
+        at(2978, mc -> mc.setScreen(null));
+        at(2982, mc -> mc.stop());
+    }
+
+    /** Shows one item's tooltip in the middle of the screen. */
+    private static class TooltipScreen extends net.minecraft.client.gui.screens.Screen {
+        private final ItemStack stack;
+
+        TooltipScreen(ItemStack stack) {
+            super(net.minecraft.network.chat.Component.empty());
+            this.stack = stack;
+        }
+
+        @Override
+        public void render(net.minecraft.client.gui.GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+            super.render(g, mouseX, mouseY, partialTick);
+            g.renderItem(stack, width / 2 - 100, height / 2 - 40);
+            g.setTooltipForNextFrame(font, stack, width / 2 - 80, height / 2 - 40);
+        }
+
+        @Override
+        public boolean isPauseScreen() {
+            return false;
+        }
     }
 
     private static void at(int t, Consumer<Minecraft> action) {
