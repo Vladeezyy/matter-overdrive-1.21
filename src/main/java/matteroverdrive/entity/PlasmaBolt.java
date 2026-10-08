@@ -87,7 +87,7 @@ public class PlasmaBolt extends Projectile {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(COLOR, 0xFFFFFF);
-        builder.define(RENDER_SIZE, 0.5f);
+        builder.define(RENDER_SIZE, 2f);   // 1.7.10 PlasmaBolt.renderSize default
     }
 
     @Override
@@ -121,6 +121,8 @@ public class PlasmaBolt extends Projectile {
             target.setDeltaMovement(before);     // 1.7.10 restored the target's motion: no knockback
             if (fireMultiplier > 0) target.igniteForSeconds(10 * fireMultiplier);   // 1.7.10 setFire(10 x multiplier)
         }
+        matteroverdrive.network.BoltHitPayload.send(server, result.getLocation(), getDeltaMovement().scale(-1), getColor(), getRenderSize(),
+                target instanceof LivingEntity ? matteroverdrive.network.BoltHitPayload.LIVING : matteroverdrive.network.BoltHitPayload.ENTITY);
         discard();
     }
 
@@ -133,6 +135,10 @@ public class PlasmaBolt extends Projectile {
                     getOwner() instanceof LivingEntity l ? l : null);
             tnt.setFuse(0);
             server.addFreshEntity(tnt);
+        }
+        if (level() instanceof ServerLevel server) {
+            matteroverdrive.network.BoltHitPayload.send(server, result.getLocation(), new Vec3(result.getDirection().getStepX(), result.getDirection().getStepY(), result.getDirection().getStepZ()),
+                    getColor(), getRenderSize(), matteroverdrive.network.BoltHitPayload.BLOCK);
         }
         discard();
     }

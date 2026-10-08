@@ -780,7 +780,10 @@ SOUNDS = {"phaser_rifle_shot": ["weapon/phaser_rifle_shot"], "plasma_shotgun_sho
           "button_soft": ["gui/button_soft_0", "gui/button_soft_1"],
           # machine loops (1.7.10 MOTileEntityMachine.getSound), replication, the anomaly's wind
           "machine": ["blocks/machine"], "analyzer": ["blocks/analyzer"], "force_field": ["force_field"],
-          "replicate_success": ["replicator/replicate_success"], "windy": ["windy"]}
+          "replicate_success": ["replicator/replicate_success"], "windy": ["windy"],
+          # plasma bolt hits (1.7.10 PlasmaBolt.onHit) and the plasma shotgun's charge-up
+          "sizzle": ["weapon/sizzle"], "laser_ricochet": ["weapon/laser_ricochet_0", "weapon/laser_ricochet_1"],
+          "plasma_shotgun_charging": ["weapon/plasma_shotgun_charging"]}
 SOUND_CATEGORY = {k: "neutral" for k in SOUNDS if k.startswith("failed_animal")} | {k: "hostile" for k in SOUNDS if k.startswith("rogue_android")} | \
                  {k: "block" for k in SOUNDS if k.startswith("crate_")} | \
                  {k: "block" for k in ["transporter", "machine", "analyzer", "force_field", "replicate_success", "windy"]}
@@ -1275,6 +1278,9 @@ shaped("star_map", mid("star_map"), [" S ", "CFC", "GMR"],
         "G": "minecraft:glowstone_dust", "M": mid("machine_casing"), "R": "minecraft:redstone"})
 # hologram: the beam texture, the additive particle sheet (star icons), holo icons; star names for the generator
 cp(ref / "textures/fx/hologram_beam.png", A / "textures/fx/hologram_beam.png")
+# gravitational stabilizer beam and its motes (1.7.10 TileEntityRendererGravitationalStabilizer, particles_additive.png)
+cp(ref / "textures/fx/physbeam.png", A / "textures/fx/physbeam.png")
+cp(ref / "textures/particle/particles_additive.png", A / "textures/fx/particles_additive.png")
 # android shield (1.7.10 BioticStatRendererShield): its textures and the two sphere meshes it draws
 for t in ["shield", "shield_damage", "forcefield_plasma", "forcefield_plasma_2"]:
     cp(ref / f"textures/fx/{t}.png", A / f"textures/fx/{t}.png")

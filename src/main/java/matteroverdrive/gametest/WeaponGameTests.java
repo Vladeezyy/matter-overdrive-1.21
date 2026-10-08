@@ -27,6 +27,7 @@ final class WeaponGameTests {
         MOGameTests.add("bolt_hurts_mob", 60, false, WeaponGameTests::boltHurtsMob);
         MOGameTests.add("rifle_overheats", 20, false, WeaponGameTests::rifleOverheats);
         MOGameTests.add("shotgun_spread", 20, false, WeaponGameTests::shotgunSpread);
+        MOGameTests.add("shotgun_charged_shot", 20, false, WeaponGameTests::shotgunChargedShot);
         MOGameTests.add("weapon_cools_down", 20, false, WeaponGameTests::coolsDown);
         MOGameTests.add("energy_pack_reloads", 20, false, WeaponGameTests::energyPackReloads);
         MOGameTests.add("energy_pack_recipe", 20, false, WeaponGameTests::energyPackRecipe);
@@ -52,6 +53,22 @@ final class WeaponGameTests {
         var generated = matteroverdrive.item.weapon.WeaponFactory.randomDecorated(helper.getLevel().random, 3, true);
         helper.assertTrue(generated.has(matteroverdrive.init.MODataComponents.LEGENDARY_WEAPON.get()), net.minecraft.network.chat.Component.literal("no legendary stats"));
         zombie.discard();
+        helper.succeed();
+    }
+
+    /** 1.7.10 PlasmaShotgun.onPlayerStoppedUsing: 15 of 20 charge ticks leave 2 bolts of render size (10 / 2) x 0.5. */
+    private static void shotgunChargedShot(GameTestHelper helper) {
+        ItemStack shotgun = charged(MOItems.PLASMA_SHOTGUN.get());
+        ServerPlayer player = shooter(helper, shotgun);
+        var item = MOItems.PLASMA_SHOTGUN.get();
+        helper.assertTrue(item.releaseUsing(shotgun, helper.getLevel(), player, item.getUseDuration(shotgun, player) - 15),
+                Component.literal("charged shot not fired"));
+        List<PlasmaBolt> bolts = bolts(helper, player);
+        helper.assertTrue(bolts.size() == 2 && bolts.stream().allMatch(b -> b.getRenderSize() == 2.5f),
+                Component.literal("charged bolts: " + bolts.size() + " " + bolts.stream().map(PlasmaBolt::getRenderSize).toList()));
+        helper.assertTrue(matteroverdrive.item.weapon.PlasmaShotgunItem.chargedShots(0) == 10
+                && matteroverdrive.item.weapon.PlasmaShotgunItem.chargedShots(40) == 1, Component.literal("charge curve"));
+        helper.assertFalse(item.releaseUsing(shotgun, helper.getLevel(), player, 0), Component.literal("fired during cooldown"));
         helper.succeed();
     }
 

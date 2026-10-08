@@ -22,7 +22,7 @@ public class IonSniperItem extends EnergyWeaponItem {
 
     @Override
     protected void fire(ServerLevel level, LivingEntity shooter, ItemStack weapon, boolean zoomed) {
-        spawnBolt(level, shooter, weapon, getDamage(weapon, shooter), getAccuracy(weapon, shooter, zoomed)).setRenderSize(0.8f);
+        spawnBolt(level, shooter, weapon, getDamage(weapon, shooter), getAccuracy(weapon, shooter, zoomed));
         playShot(level, shooter, MOSounds.SNIPER_RIFLE_FIRE.get());
         addHeatAfterShot(weapon, level, shooter, getHeat(weapon) + getMaxHeat(weapon) * 0.8f);
     }

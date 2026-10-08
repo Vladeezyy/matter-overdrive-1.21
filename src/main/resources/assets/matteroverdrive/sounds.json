@@ -285,5 +285,24 @@
     "sounds": [
       "matteroverdrive:windy"
     ]
+  },
+  "sizzle": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:weapon/sizzle"
+    ]
+  },
+  "laser_ricochet": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:weapon/laser_ricochet_0",
+      "matteroverdrive:weapon/laser_ricochet_1"
+    ]
+  },
+  "plasma_shotgun_charging": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:weapon/plasma_shotgun_charging"
+    ]
   }
 }

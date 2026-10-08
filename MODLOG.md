@@ -168,7 +168,7 @@
 - Station hologram is the plain item, not the cyan holo shader. Phaser body isn't tinted by the colour module and the
   power-level slider on its back isn't drawn.
 - Colour module chest chance is 20% per chest (1.7.10 used weight 1 in each chest's own list).
-- Damage sources aren't tagged fire / magic / explosion by barrel; the shotgun charge-up is still missing.
+- Damage sources aren't tagged fire / magic / explosion by barrel; the shotgun charge-up is still missing (done in the leftovers).
 - The explosion barrel keeps the 1.7.10 FIRE_RATE x0.15 (on the phaser it makes the burst explosions happen almost every tick).
 
 ## 2026-10-08 — phase 6: androids ✅
@@ -526,6 +526,26 @@
     outer layer (hat +0.5, jacket / sleeves / pants +0.25) would cover the armor. `RenderPlayerEvent.Pre` hides a
     player's overlay under each worn piece (helmet: hat; chestplate: jacket + sleeves; leggings / boots: pants). The
     base skin still shows through the transparent bands of the 1.7.10 texture (elbows, knees), as it did in 1.7.10.
+- **Leftovers: stabilizer beam, bolt hits, shotgun charge ✅**
+  - Stabilizer (1.7.10 TileEntityRendererGravitationalStabilizer + GravitationalStabilizerBeamParticle):
+    `client/StabilizerRenderer` replaces the END_ROD stand-in: a block-wide physbeam (two crossed additive planes, u
+    repeating every 2 blocks) in the beam colour (`getBeamColorR/G/B`, clamped at 0 like glColor) to the anomaly's
+    centre (1.7.10: the ray's hit point on it); spiral motes (particles_additive cell 0, a 20% chance per tick, 80 ticks
+    along the beam, radius 0.3-0.45 around the up axis, the colour of their birth tick) derived from the game time in
+    the renderer instead of particle entities; and the anomaly screen on the stabilizer's back (holo glow + back,
+    "Mass / Range / Brake Range / Horizon / Brake Lvl" in English like 1.7.10, auto-sized text).
+  - Plasma bolt hits (1.7.10 PlasmaBolt.onHit, client side there; the port's server sends `BoltHitPayload`):
+    `client/BoltHitEffects` - a POOF puff in the bolt colour; 80% of the time 16 x size sparks (PhaserBoltRecoil:
+    generic_0/1, full bright, thrown off the hit face, shrinking, gravity 0.03) fewer with decreased / minimal
+    particles, and bolts larger than 0.5 sizzle (+ laser_ricochet on blocks); living targets get 10 red dust.
+  - Bolt render size is now in 1.7.10 units (default 2, half width size x 0.05625): the port had 0.5 x 0.2, which drew
+    the shotgun's 0.5 bolts as thick as the rifle's and the ion sniper's at 0.8 (1.7.10: 2).
+  - Plasma shotgun charge (1.7.10 onItemRightClick / onPlayerStoppedUsing): holding use charges (plasma_shotgun_charging,
+    volume 3, pitch 0.9 x rand x 0.2 - clamped to 0.5), releasing fires max(1, (1 - ticks / 20) x 10) bolts sharing the
+    damage, accuracy x count / 10, range + range x (1 - count / 10), render size (10 / count) x 0.5 with integer
+    division; the charge sound is stopped for everyone near on release (1.7.10 stopped its own client sound). 95 GameTests.
+  - Not ported: gui button_expand - it belongs to 1.7.10's collapsible side panel, and the port's machine tabs are
+    always shown.
 - Cloud (Linux) notes: regenerating resources rewrites the .ogg and ffmpeg-made .png bytes (different ffmpeg/oggenc
   builds) - `git checkout` them. Screenshots: `Xvfb :99` + `DISPLAY=:99 ./gradlew runScene` (software GL is slow; give
   menus extra ticks), world created by `runServer` with a flat creative server.properties, then moved to run/saves;
@@ -547,7 +567,7 @@
 **Workflow**
 - Resources: never hand-edit `src/main/resources/{assets,data}` — regenerate:
   `rm -rf src/main/resources/{assets,data} && python3 -I tools/gen_resources.py ~/mo-reference/mo-1.7.10/src/main/resources/assets/mo src/main/resources`
-- Tests: `./gradlew runGameTestServer` (94 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
+- Tests: `./gradlew runGameTestServer` (95 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
   `FunctionGameTestInstance`, custom 12³ structure `matteroverdrive:gametest_area`, time-of-day via `TestEnvironmentDefinition.TimeOfDay`,
   `makeMockServerPlayerInLevel`). Visual: `./gradlew runScene` → `run/screenshots/scene_*.png` (DevScene, world `run/saves/mo_scene`;
   pristine copy = "Новый мир (2)"; needs `pauseOnLostFocus=false`; selected hotbar slot is client-side; place blocks with
@@ -598,14 +618,12 @@
 
 ## Next
 - Phase 7 ✅. Leftovers done: legendary bonuses, network destination filters, machine renderers, machine sounds,
-  machine item tooltip, android shield bubble + teleport marker, tritanium armor model.
-- Leftovers still to do (user: any order):
-  1. noticed while doing the sounds: the stabilizer's beam is END_ROD particles, not the 1.7.10 coloured beam
-     (GravitationalStabilizerBeamParticle; colours are `getBeamColorR/G/B` now); missing weapon sounds sizzle,
-     laser_ricochet (plasma bolt hits), plasma_shotgun_charging, gui button_expand.
+  machine item tooltip, android shield bubble + teleport marker, tritanium armor model, stabilizer beam, bolt hits,
+  shotgun charge.
+- Leftovers: all done (only gui button_expand is left out, see above).
 
 ## Handover (2026-10-08, cloud -> local)
-- Branch `main-uvidhk`, everything committed and pushed. Last commit: "Leftovers: tritanium armor model ...". 94 GameTests
+- Branch `main-uvidhk`, everything committed and pushed. Last commit: "Leftovers: stabilizer beam, bolt hits ...". 95 GameTests
   pass (`./gradlew runGameTestServer`).
 - DevScene now builds the scene at the world spawn on the flat surface (`level.getMinY() + 4`), not at the player's
   saved position. A local mo_scene world that isn't a default superflat may put the floor elsewhere: adjust `build()`

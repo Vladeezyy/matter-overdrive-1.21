@@ -30,6 +30,8 @@ public final class MatterEvents {
         event.registrar("1")
                 .playToClient(MatterValuesPayload.TYPE, MatterValuesPayload.STREAM_CODEC, MatterValuesPayload::handle)
                 .playToClient(PatternListPayload.TYPE, PatternListPayload.STREAM_CODEC, PatternListPayload::handle)
+                .playToClient(matteroverdrive.network.BoltHitPayload.TYPE, matteroverdrive.network.BoltHitPayload.STREAM_CODEC,
+                        matteroverdrive.network.BoltHitPayload::handle)
                 .playToServer(PatternRequestPayload.TYPE, PatternRequestPayload.STREAM_CODEC, PatternRequestPayload::handle)
                 .playToServer(matteroverdrive.network.FireWeaponPayload.TYPE, matteroverdrive.network.FireWeaponPayload.STREAM_CODEC,
                         matteroverdrive.network.FireWeaponPayload::handle)

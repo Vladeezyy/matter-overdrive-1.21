@@ -64,6 +64,10 @@ public final class MOSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> FORCE_FIELD = sound("force_field");
     public static final DeferredHolder<SoundEvent, SoundEvent> REPLICATE_SUCCESS = sound("replicate_success");
     public static final DeferredHolder<SoundEvent, SoundEvent> WINDY = sound("windy");
+    // Plasma bolt hits and the plasma shotgun's charge-up
+    public static final DeferredHolder<SoundEvent, SoundEvent> SIZZLE = sound("sizzle");
+    public static final DeferredHolder<SoundEvent, SoundEvent> LASER_RICOCHET = sound("laser_ricochet");
+    public static final DeferredHolder<SoundEvent, SoundEvent> PLASMA_SHOTGUN_CHARGING = sound("plasma_shotgun_charging");
 
     private static DeferredHolder<SoundEvent, SoundEvent> sound(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, name)));

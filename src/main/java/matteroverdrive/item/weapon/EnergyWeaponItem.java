@@ -296,7 +296,11 @@ public abstract class EnergyWeaponItem extends Item {
 
     /** Spawns one bolt along the shooter's look; 1.7.10 spread was gaussian * 0.0075 * accuracy. */
     protected PlasmaBolt spawnBolt(ServerLevel level, LivingEntity shooter, ItemStack weapon, float damage, float accuracy) {
-        PlasmaBolt bolt = new PlasmaBolt(level, shooter, damage, getRange(weapon), getColor(weapon));
+        return spawnBolt(level, shooter, weapon, damage, accuracy, getRange(weapon));
+    }
+
+    protected PlasmaBolt spawnBolt(ServerLevel level, LivingEntity shooter, ItemStack weapon, float damage, float accuracy, float range) {
+        PlasmaBolt bolt = new PlasmaBolt(level, shooter, damage, range, getColor(weapon));
         bolt.setFireMultiplier(modifyStat(WeaponStat.FIRE_DAMAGE, weapon, 0));
         Vec3 look = shooter.getLookAngle();
         // vanilla shoot() spreads by 0.0172275 * inaccuracy; scale so the spread matches 1.7.10

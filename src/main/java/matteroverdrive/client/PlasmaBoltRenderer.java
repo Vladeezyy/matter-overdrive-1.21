@@ -62,7 +62,7 @@ public class PlasmaBoltRenderer extends EntityRenderer<PlasmaBolt, PlasmaBoltRen
         float alpha = 1 - (1 - state.life) * (1 - state.life);        // 1.7.10 Quad.easeOut over the life
         int color = ARGB.color(Math.round(255 * alpha), state.color);
         // 1.7.10: length (6 x speed + 10) and width renderSize, both scaled by 0.05625
-        float s = Math.max(0.06f, state.size * 0.2f), length = (6 * state.speed + 10) * 0.05625f;
+        float s = state.size * 0.05625f, length = (6 * state.speed + 10) * 0.05625f;
         // additive like 1.7.10 (GL_ONE, GL_ONE): the texture's black background adds nothing
         collector.submitCustomGeometry(pose, RenderType.energySwirl(TEXTURE, 0, 0), (p, vc) -> {
             for (int i = 0; i < 2; i++) {

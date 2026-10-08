@@ -1309,11 +1309,78 @@ public final class DevScene {
             p.level().getEntitiesOfClass(net.minecraft.world.entity.decoration.ArmorStand.class, new AABB(origin.above(30)).inflate(8),
                     e -> e.getTags().contains("mo_scene_armor")).forEach(net.minecraft.world.entity.Entity::discard);
         }));
+        // leftovers: the stabilizer's beam with its motes, and the anomaly screen on its back (in the clean room)
         at(3285, mc -> {
             mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
-            mc.options.hideGui = false;
+            mc.options.hideGui = true;
+            server(mc, p -> {
+                BlockPos base = origin.above(30);
+                p.level().setBlockAndUpdate(base.offset(0, 1, -9), MOBlocks.GRAVITATIONAL_ANOMALY.get().defaultBlockState());
+                if (p.level().getBlockEntity(base.offset(0, 1, -9)) instanceof matteroverdrive.block.entity.GravitationalAnomalyBlockEntity a) a.setMass(1500);
+                p.level().setBlockAndUpdate(base.offset(0, 1, -3), MOBlocks.GRAVITATIONAL_STABILIZER.get().defaultBlockState()
+                        .setValue(MachineBlock.FACING, Direction.NORTH));
+                p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION, 600, 0, false, false));
+                p.getAbilities().flying = true;
+                p.onUpdateAbilities();
+                p.teleportTo(p.level(), base.getX() + 4.5, base.getY() + 1, base.getZ() - 5.5, Set.of(), 90f, 10f, false);
+            });
         });
-        at(3288, mc -> mc.stop());
+        at(3310, mc -> shot(mc, "stabilizer_beam"));
+        at(3311, mc -> server(mc, p -> {
+            BlockPos base = origin.above(30);
+            p.teleportTo(p.level(), base.getX() + 0.5, base.getY() + 0.4, base.getZ() - 0.6, Set.of(), 180f, 0f, false);
+        }));
+        at(3324, mc -> shot(mc, "stabilizer_screen"));
+        at(3325, mc -> server(mc, p -> {
+            BlockPos base = origin.above(30);
+            p.removeEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION);
+            p.level().setBlock(base.offset(0, 1, -9), Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
+            p.level().setBlock(base.offset(0, 1, -3), Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
+        }));
+        // leftovers: plasma shotgun - the full spread (thin bolts) and a charged shot (one big bolt): in flight and their
+        // hits on the wall (sparks, puff)
+        at(3327, mc -> {
+            mc.options.hideGui = true;
+            server(mc, p -> {
+                BlockPos base = origin.above(30);
+                ItemStack shotgun = new ItemStack(MOItems.PLASMA_SHOTGUN.get());
+                matteroverdrive.item.weapon.EnergyWeaponItem.setEnergy(shotgun, matteroverdrive.item.weapon.EnergyWeaponItem.CAPACITY);
+                p.getInventory().setItem(p.getInventory().getSelectedSlot(), shotgun);
+                for (var slot : new net.minecraft.world.entity.EquipmentSlot[] {net.minecraft.world.entity.EquipmentSlot.HEAD,
+                        net.minecraft.world.entity.EquipmentSlot.CHEST, net.minecraft.world.entity.EquipmentSlot.LEGS, net.minecraft.world.entity.EquipmentSlot.FEET}) {
+                    p.setItemSlot(slot, ItemStack.EMPTY);
+                }
+                p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION, 900, 0, false, false));
+                p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() + 5.5, Set.of(), 180f, 0f, false);
+            });
+        });
+        at(3335, mc -> server(mc, p -> MOItems.PLASMA_SHOTGUN.get().tryFire(p, p.getMainHandItem(), false)));
+        at(3336, mc -> shot(mc, "shotgun_spread"));
+        at(3362, mc -> server(mc, p -> {
+            var shotgun = MOItems.PLASMA_SHOTGUN.get();
+            shotgun.releaseUsing(p.getMainHandItem(), p.level(), p, shotgun.getUseDuration(p.getMainHandItem(), p) - 25);
+        }));
+        at(3363, mc -> shot(mc, "shotgun_charged"));
+        at(3366, mc -> {
+            mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+            server(mc, p -> {
+                BlockPos base = origin.above(30);
+                p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() - 8.5, Set.of(), 180f, 0f, false);
+            });
+        });
+        at(3390, mc -> server(mc, p -> MOItems.PLASMA_SHOTGUN.get().tryFire(p, p.getMainHandItem(), false)));
+        at(3392, mc -> shot(mc, "shotgun_spread_hit"));
+        at(3418, mc -> server(mc, p -> {
+            var shotgun = MOItems.PLASMA_SHOTGUN.get();
+            shotgun.releaseUsing(p.getMainHandItem(), p.level(), p, shotgun.getUseDuration(p.getMainHandItem(), p) - 25);
+        }));
+        at(3420, mc -> shot(mc, "shotgun_charged_hit"));
+        at(3421, mc -> server(mc, p -> {
+            p.getInventory().setItem(p.getInventory().getSelectedSlot(), ItemStack.EMPTY);
+            p.removeEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION);
+        }));
+        at(3423, mc -> mc.options.hideGui = false);
+        at(3426, mc -> mc.stop());
     }
 
     /** Shows one item's tooltip in the middle of the screen. */
