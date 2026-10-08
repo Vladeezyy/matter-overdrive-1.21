@@ -210,6 +210,30 @@
 - Teleport has no target marker; the shield has no visual bubble (hit flashes / shield_loop sound not ported).
 - Out of the 1.7.10 android commands, only test helpers exist (`Android.setTurning`, `Android.tick`).
 
+## 2026-10-08 — phase 7: world & extras (in progress)
+- **7a ✅** `MODecorative`: all 1.7.10 decorative blocks (rotated ones as pillars, colored tritanium plate = 16 blocks
+  tinted by a block colour handler), tritanium (force) glass, holo sign (wall panel, BE text, `HoloSignScreen` +
+  `HoloSignPayload`, `HoloSignRenderer` text via `submitText`); holo sign replaces the glass-pane stand-ins in recipes.
+  Food: emergency ration, Earl Grey (clears effects, bottle), Romulan ale (nausea for humans); matter values 3/2/2.
+  Tritanium spine bionic part (other slot, +2 health, glitch x0.5).
+- **7b ✅** Rogue androids (`entity/monster`): melee + ranged, level 0-3, legendary, names, visor colour (emissive
+  visor layer), random decorated weapon (`EnergyWeaponItem.fireFromMob`, `WeaponShooter` difficulty scaling), drops,
+  natural spawns (biome modifier, weight 15, max 4/chunk). Spawn eggs drawn by the generator (`write_png`).
+- Fix: anomaly rendering (see phase 6 notes).
+
+### Next in phase 7 (start here)
+1. Failed animals (pig/cow/chicken/sheep subclasses + renderers overriding the texture; pig/cow textures are 64x32 and
+   the 1.21 pig/cow models are 64x64 with the same UVs → pad the PNGs to 64x64; chicken/sheep meshes are 64x32).
+   Sounds failed_animal_*.
+2. Mutant scientist (port ModelHulkingScientist, 256 HP) — used by the underwater base.
+3. Structures (world/MO*: android house, sand pit, crashed ship, cargo ship, underwater base, mad scientist house;
+   1.7.10 MOImageGen builds them from images in textures/world).
+4. Transporter + transport flash drive; omni tool (also 30% of rogue android weapons); matter scanner; portable
+   decomposer; matter container tank; microwave.
+5. Star map / galaxy / ships / buildings / quests / dialogs / contract market; mad scientist villager (dialog + trades:
+   TradeHandlerMadScientist); android spawner block (teams + path drives, not used by worldgen).
+- Deviations so far: legendary rogue android parts drop without bonus attributes; no rogue android teams/paths.
+
 ## 1.21.10 / NeoForge 21.10.64 API notes (learned the hard way)
 **Workflow**
 - Resources: never hand-edit `src/main/resources/{assets,data}` — regenerate:
