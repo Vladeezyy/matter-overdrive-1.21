@@ -196,7 +196,7 @@
   health/food/air hidden for androids.
 - Fix (phase 4 look): the anomaly was the sphere OBJ with the core texture (mostly transparent → looked half empty).
   Now `AnomalyRenderer` like 1.7.10: a solid black sphere of radius 0.5 x pulsing event horizon + a camera-facing plane
-  (2 x horizon) with the core disc and the additive white glow ring.
+  (2 x horizon) with the core disc and the additive white glow ring. (Later: alpha blended like 1.7.10, see the leftovers.)
 - **6e** Charging station: 3 blocks high (base + 2 invisible parts, breaks as one), OBJ base+rod, 512000 FE, charges
   androids within 8 blocks (range upgrades up to x8) with up to 512 FE/t scaled by distance.
 - 63 GameTests pass (survival mock player helper: vanilla's mock is hard-wired to creative, invulnerable until
@@ -546,6 +546,11 @@
     division; the charge sound is stopped for everyone near on release (1.7.10 stopped its own client sound). 95 GameTests.
   - Not ported: gui button_expand - it belongs to 1.7.10's collapsible side panel, and the port's machine tabs are
     always shown.
+- **Anomaly look fixed** (checked against the 1.7.10 renderer and its guide screenshot): the core and glow planes are
+  alpha blended (1.7.10 GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, unlit), not additive - the white ring is half
+  transparent, no longer a bright glow; and the particles are 1.7.10 GravitationalAnomalyParticle (`client/AnomalyParticles`):
+  one dark grey speck per tick from the break-range sphere, pulled to the core by a tenth of the distance per tick,
+  generic sprites 7 to 0, instead of the vanilla purple reverse portal particles.
 - Cloud (Linux) notes: regenerating resources rewrites the .ogg and ffmpeg-made .png bytes (different ffmpeg/oggenc
   builds) - `git checkout` them. Screenshots: `Xvfb :99` + `DISPLAY=:99 ./gradlew runScene` (software GL is slow; give
   menus extra ticks), world created by `runServer` with a flat creative server.properties, then moved to run/saves;

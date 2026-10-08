@@ -14,7 +14,6 @@ import matteroverdrive.init.MOItems;
 import matteroverdrive.matter.MatterHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
@@ -155,14 +154,12 @@ public class GravitationalAnomalyBlockEntity extends BlockEntity {
     /** The client's playing wind sound. */
     public @org.jetbrains.annotations.Nullable Object clientSound;
 
-    /** 1.7.10 spawnParticles: one particle per tick from a random point in break range, drawn to the core. */
+    /** Set by the client: 1.7.10 spawnParticles, one dark speck per tick from the break-range sphere, drawn to the core. */
+    public static java.util.function.Consumer<GravitationalAnomalyBlockEntity> clientParticles = anomaly -> {};
+
     public static void clientTick(Level level, BlockPos pos, BlockState state, GravitationalAnomalyBlockEntity anomaly) {
         clientSoundTick.accept(anomaly);
-        RandomSource r = level.getRandom();
-        double radius = Math.max(1, anomaly.getBlockBreakRange());
-        Vec3 dir = new Vec3(r.nextGaussian(), r.nextGaussian(), r.nextGaussian()).normalize().scale(radius);
-        Vec3 c = pos.getCenter();
-        level.addParticle(ParticleTypes.REVERSE_PORTAL, c.x + dir.x, c.y + dir.y, c.z + dir.z, -dir.x * 0.05, -dir.y * 0.05, -dir.z * 0.05);
+        clientParticles.accept(anomaly);
     }
 
     private void updateSuppression() {

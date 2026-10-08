@@ -1326,7 +1326,13 @@ public final class DevScene {
             });
         });
         at(3310, mc -> shot(mc, "stabilizer_beam"));
+        // the anomaly close up, off the beam (1.7.10: black sphere, thin white ring, dark specks drawn in)
         at(3311, mc -> server(mc, p -> {
+            BlockPos base = origin.above(30);
+            p.teleportTo(p.level(), base.getX() + 3.5, base.getY() + 1, base.getZ() - 9 + 0.5, Set.of(), 90f, 0f, false);
+        }));
+        at(3318, mc -> shot(mc, "anomaly_close"));
+        at(3319, mc -> server(mc, p -> {
             BlockPos base = origin.above(30);
             p.teleportTo(p.level(), base.getX() + 0.5, base.getY() + 0.4, base.getZ() - 0.6, Set.of(), 180f, 0f, false);
         }));
