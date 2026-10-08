@@ -75,6 +75,7 @@ public final class MOGameTests {
         ModuleGameTests.addAll();
         AndroidGameTests.addAll();
         WorldGameTests.addAll();
+        QuestGameTests.addAll();
         TESTS.forEach((name, spec) -> FUNCTIONS.register(name, () -> spec.body()));
     }
 

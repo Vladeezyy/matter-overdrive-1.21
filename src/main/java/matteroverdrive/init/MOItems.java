@@ -198,6 +198,8 @@ public final class MOItems {
             net.minecraft.world.item.SpawnEggItem::new, p -> p.spawnEgg(MOEntities.ROGUE_ANDROID.get()));
     public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> RANGED_ROGUE_ANDROID_SPAWN_EGG = item("ranged_rogue_android_spawn_egg",
             net.minecraft.world.item.SpawnEggItem::new, p -> p.spawnEgg(MOEntities.RANGED_ROGUE_ANDROID.get()));
+    public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> MAD_SCIENTIST_SPAWN_EGG = item("mad_scientist_spawn_egg",
+            net.minecraft.world.item.SpawnEggItem::new, p -> p.spawnEgg(MOEntities.MAD_SCIENTIST.get()));
     public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> MUTANT_SCIENTIST_SPAWN_EGG = item("mutant_scientist_spawn_egg",
             net.minecraft.world.item.SpawnEggItem::new, p -> p.spawnEgg(MOEntities.MUTANT_SCIENTIST.get()));
     public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> FAILED_PIG_SPAWN_EGG = item("failed_pig_spawn_egg",

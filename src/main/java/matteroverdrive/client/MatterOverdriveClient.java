@@ -51,6 +51,18 @@ public class MatterOverdriveClient {
             mc.setScreen(new matteroverdrive.client.screen.HoloSignScreen(pos, text));
         };
         // 1.7.10 AndroidPlayer.playTransformMusic
+        matteroverdrive.quest.PlayerQuests.clientUpdated = matteroverdrive.client.quest.QuestHud::onSync;
+        matteroverdrive.dialog.DialogPayloads.openScreen = npc -> net.minecraft.client.Minecraft.getInstance().setScreen(
+                new matteroverdrive.client.quest.DialogScreen(npc, net.minecraft.client.Minecraft.getInstance().player));
+        matteroverdrive.dialog.DialogMessage.showOnClient = message -> {
+            var mc = net.minecraft.client.Minecraft.getInstance();
+            if (mc.screen instanceof matteroverdrive.client.quest.DialogScreen screen) {
+                if (message == null) screen.onClose();
+                else screen.setCurrent(message);
+            }
+        };
+        matteroverdrive.dialog.DialogMessage.shownOnClient = () ->
+                net.minecraft.client.Minecraft.getInstance().screen instanceof matteroverdrive.client.quest.DialogScreen screen ? screen.getCurrent() : null;
         matteroverdrive.android.AndroidClientHooks.transformationStarted = player -> {
             var mc = net.minecraft.client.Minecraft.getInstance();
             if (player == mc.player) {
@@ -92,6 +104,7 @@ public class MatterOverdriveClient {
         event.registerEntityRenderer(matteroverdrive.init.MOEntities.ROGUE_ANDROID.get(), RogueAndroidRenderer::melee);
         event.registerEntityRenderer(matteroverdrive.init.MOEntities.RANGED_ROGUE_ANDROID.get(), RogueAndroidRenderer::ranged);
         event.registerEntityRenderer(matteroverdrive.init.MOEntities.MUTANT_SCIENTIST.get(), MutantScientistRenderer::new);
+        event.registerEntityRenderer(matteroverdrive.init.MOEntities.MAD_SCIENTIST.get(), MadScientistRenderer::new);
         event.registerEntityRenderer(matteroverdrive.init.MOEntities.FAILED_PIG.get(), FailedAnimalRenderers::pig);
         event.registerEntityRenderer(matteroverdrive.init.MOEntities.FAILED_COW.get(), FailedAnimalRenderers::cow);
         event.registerEntityRenderer(matteroverdrive.init.MOEntities.FAILED_CHICKEN.get(), FailedAnimalRenderers::chicken);

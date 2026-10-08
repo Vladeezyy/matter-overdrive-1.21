@@ -749,7 +749,8 @@ SOUNDS = {"phaser_rifle_shot": ["weapon/phaser_rifle_shot"], "plasma_shotgun_sho
           "crate_open": ["blocks/crate_open"], "crate_close": ["blocks/crate_close"],
           "scanner_scanning": ["matter_scanner/scanner_scanning"], "scanner_success": ["matter_scanner/scanner_success_2"],
           "scanner_fail": ["matter_scanner/scanner_fail"], "scanner_beep": ["matter_scanner/scanner_beep"],
-          "transporter": ["transporter/transporter_0"]}
+          "transporter": ["transporter/transporter_0"],
+          "quest_started": ["gui/quest_started"], "quest_complete": ["gui/quest_complete"]}
 SOUND_CATEGORY = {k: "neutral" for k in SOUNDS if k.startswith("failed_animal")} | {k: "hostile" for k in SOUNDS if k.startswith("rogue_android")} | \
                  {k: "block" for k in SOUNDS if k.startswith("crate_")}
 for files in SOUNDS.values():
@@ -1164,6 +1165,12 @@ for t in ["button_normal", "button_over", "button_over_dark"]:
 w(A / "models/block/android_spawner.json", {"parent": "minecraft:block/cube_all", "textures": {"all": f"{MOD}:block/base_stripes"}})
 machine_blockstate("android_spawner", f"{MOD}:block/android_spawner")
 
+# --- phase 7m: dialogs, quests, mad scientist -------------------------------------------------------------
+cp(ref / "textures/entities/mad_scientist.png", A / "textures/entity/mad_scientist.png")
+cp(ref / "textures/gui/elements/dialog_separator.png", A / "textures/gui/elements/dialog_separator.png")
+for icon in ["trade", "mini_quit"]:                               # 1.7.10 HoloIcons used by dialog options
+    cp(ref / "textures/gui/items" / f"{icon}.png", A / "textures/gui/holo" / f"{icon}.png")
+
 # --- phase 7b: mobs -----------------------------------------------------------------------------------------
 import zlib
 
@@ -1193,6 +1200,7 @@ def egg(name, base, spot):
 
 egg("rogue_android_spawn_egg", 0x0FFFFF, 0x000000)          # 1.7.10 addEntity(..., 0xFFFFF, 0)
 egg("ranged_rogue_android_spawn_egg", 0x0FFFFF, 0x000000)
+egg("mad_scientist_spawn_egg", 0xFFFFFF, 0x000000)                 # 1.7.10 addEntity(mad_scientist, 0xFFFFFF, 0)
 for t in ["android", "android_ranged"]:
     cp(ref / "textures/entities" / f"{t}.png", A / "textures/entity" / f"{t}.png")
 # 7c failed animals: 1.7.10 egg colours; the pig and cow textures are 64x32, today's models use the same UVs on 64x64
@@ -1693,6 +1701,25 @@ for src_name, dst_name in [("en_US", "en_us"), ("ru_RU", "ru_ru")]:
     lang[f"death.attack.{MOD}.android_transformation"] = src.get("death.attack.android_transformation") or en["death.attack.android_transformation"]
     lang[f"attribute.name.{MOD}.android_glitch_time"] = {"en_us": "Glitch Time", "ru_ru": "Длительность сбоев"}[dst_name]
     lang[f"attribute.name.{MOD}.android_battery_use"] = {"en_us": "Battery Use", "ru_ru": "Расход батареи"}[dst_name]
+    # 7m: dialog and quest texts under the mod namespace (ru falls back to en where the original lacks them)
+    for k in [k for k in en if k.startswith("dialog.") or k.startswith("quest.")]:
+        first, rest = k.split(".", 1)
+        lang[f"{first}.{MOD}.{rest}"] = src.get(k) or en[k]
+    lang[f"entity.{MOD}.mad_scientist"] = src.get("entity.mad_scientist.name") or en["entity.mad_scientist.name"]
+    lang[f"entity.{MOD}.mad_scientist.junkie"] = src.get("entity.mad_scientist.junkie.name") or en["entity.mad_scientist.junkie.name"]
+    lang[f"item.{MOD}.mad_scientist_spawn_egg"] = {"en_us": f"{lang[f'entity.{MOD}.mad_scientist']} Spawn Egg",
+                                                  "ru_ru": f"Яйцо призыва: {lang[f'entity.{MOD}.mad_scientist']}"}[dst_name]
+    # 1.7.10 QuestLogicBecomeAndroid printed entity.mad_scientist.line.fail.0-3, which no lang file had (raw keys)
+    fails = {"en_us": ["Where are the parts?", "You don't have all the parts!", "Come back when you have the full set.",
+                       "Do you think I can build an android out of thin air?"],
+             "ru_ru": ["Где детали?", "У тебя нет всех деталей!", "Возвращайся, когда соберёшь полный комплект.",
+                       "Думаешь, я соберу андроида из воздуха?"]}[dst_name]
+    for i, line in enumerate(fails):
+        lang[f"entity.{MOD}.mad_scientist.line.fail.{i}"] = " " + line
+    lang[f"chat.{MOD}.quest_completed"] = {"en_us": "[Matter Overdrive] %1$s completed %2$s",
+                                           "ru_ru": "[Matter Overdrive] %1$s выполнил(а) %2$s"}[dst_name]
+    lang[f"gui.{MOD}.quest.started"] = {"en_us": "Started:", "ru_ru": "Начато:"}[dst_name]
+    lang[f"gui.{MOD}.quest.completed"] = {"en_us": "Completed:", "ru_ru": "Выполнено:"}[dst_name]
     for ours, theirs in GUI_KEYS.items():
         if isinstance(theirs, dict):
             lang[ours] = theirs[dst_name]

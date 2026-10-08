@@ -305,6 +305,28 @@
   spawned/max, time to next spawn; Config page: amount/range/delay/team fields (`AndroidSpawnerPayload`). 74 GameTests.
   Deviations: 1.7.10 named a texture `android_spawner` that never existed -> `base_stripes` stand-in; the unused 6th
   flash drive slot is dropped; the colour module slot is shown (1.7.10 had it but never drew it); spawned set is by UUID.
+- **7m ✅** Quests, dialogs, mad scientist.
+  - Quests (`quest/`): `QuestStack` (quest id, data tag, giver UUID, completed), `Quest` (1.7.10 GenericQuest: logic,
+    XP, item rewards; texts `quest.matteroverdrive.<id>.*` translated on the client), `QuestLogic` (IQuestLogic),
+    `PlayerQuests` player attachment (active + completed, copyOnDeath, synced to its player only; the client diffs
+    syncs for the HUD instead of 1.7.10's ADD/UPDATE/COMPLETE packets), `QuestEvents` (kills by the player, item
+    pickups after the portable decomposer, dialog interactions; completion on the player tick: XP, rewards, chat line).
+    Quests so far: Puny Humans (`BecomeAndroidLogic`) and Cocktail of Ascension (`CocktailOfAscensionLogic`, quirks
+    kept: gunpowder capped by the mushroom max, one extra gunpowder taken per pickup).
+  - Dialogs (`dialog/`): `DialogMessage` (+ the 1.7.10 subclasses in `DialogMessages`: Quit, Back, BackToMain, Trade,
+    AndroidOnly, QuestGive, QuestStart, QuestOnObjectivesCompleted), random variations split by ';' and picked by the
+    screen seed, `DialogRegistry` ids by registration order, multi-line chains (constructMultipleLineDialog),
+    `DialogPayloads` Manage (both ways) / Interact, `TalkToPlayerGoal` (stand still, look, end beyond sqrt 32).
+    `DialogScreen` = GuiDialog (letterbox, line left of the holo separator, options with holo icons, 20-tick delay).
+  - `QuestHud` = GuiQuestHud ("Started:", "Completed:" + counting XP, changed objectives; quest_started/complete sounds).
+  - `MadScientist` (AbstractVillager): talking opens the conversation; human / android / junkie start messages and all
+    1.7.10 branches; Puny Humans converts a player with head+arms+legs+chest parts (rewards battery + red pill: 1.7.10's
+    ItemStackReward(pill, 1) is damage 0); the cocktail turns the junkie into a mutant scientist (wither, failed animal
+    death sound). Trades = TradeHandlerMadScientist (chances and prices, 7 uses). Villager model + 1.7.10 texture,
+    spawn egg white/black. 77 GameTests.
+  - Deviations: no cinematic dialog camera (1.7.10 DialogShot close-ups); he isn't a villager profession (no job,
+    village brain, breeding or restocking); the first quest doesn't give a Data Pad yet (Data Pad not ported); the
+    1.7.10 "line.fail" chat lines had no translation (raw keys) → written; the contract quests come with the market.
 - Cloud (Linux) notes: regenerating resources rewrites the .ogg and ffmpeg-made .png bytes (different ffmpeg/oggenc
   builds) - `git checkout` them. Screenshots: `Xvfb :99` + `DISPLAY=:99 ./gradlew runScene` (software GL is slow; give
   menus extra ticks), world created by `runServer` with a flat creative server.properties, then moved to run/saves;

@@ -32,7 +32,7 @@ final class AndroidGameTests {
     }
 
     /** GameTestHelper.makeMockServerPlayerInLevel, but in survival (the vanilla mock is hard-wired to creative). */
-    private static ServerPlayer player(GameTestHelper helper) {
+    static ServerPlayer player(GameTestHelper helper) {
         var cookie = net.minecraft.server.network.CommonListenerCookie.createInitial(
                 new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "test-android"), false);
         ServerPlayer player = new ServerPlayer(helper.getLevel().getServer(), helper.getLevel(), cookie.gameProfile(), cookie.clientInformation()) {

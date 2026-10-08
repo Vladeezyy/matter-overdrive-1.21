@@ -15,5 +15,9 @@ public final class MOAttachments {
     public static final Supplier<AttachmentType<AndroidData>> ANDROID = ATTACHMENTS.register("android",
             () -> AttachmentType.serializable(AndroidData::new).copyOnDeath().sync(AndroidData.SYNC).build());
 
+    /** 1.7.10 MOExtendedProperties quest data: kept through death (1.7.10 copied it on clone), synced to its player. */
+    public static final Supplier<AttachmentType<matteroverdrive.quest.PlayerQuests>> QUESTS = ATTACHMENTS.register("quests",
+            () -> AttachmentType.serializable(matteroverdrive.quest.PlayerQuests::new).copyOnDeath().sync(matteroverdrive.quest.PlayerQuests.SYNC).build());
+
     private MOAttachments() {}
 }

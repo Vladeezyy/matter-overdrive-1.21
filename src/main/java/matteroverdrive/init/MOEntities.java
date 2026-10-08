@@ -29,6 +29,11 @@ public final class MOEntities {
             ENTITIES.registerEntityType("mutant_scientist", matteroverdrive.entity.monster.MutantScientist::new, MobCategory.MONSTER,
                     b -> b.sized(1f, 2.3f).clientTrackingRange(8).notInPeaceful());
 
+    /** 1.7.10 EntityVillagerMadScientist: villager size. */
+    public static final DeferredHolder<EntityType<?>, EntityType<matteroverdrive.entity.MadScientist>> MAD_SCIENTIST =
+            ENTITIES.registerEntityType("mad_scientist", matteroverdrive.entity.MadScientist::new, MobCategory.MISC,
+                    b -> b.sized(0.6f, 1.95f).eyeHeight(1.62f).clientTrackingRange(10));
+
     // 1.7.10 failed animals: vanilla sizes
     public static final DeferredHolder<EntityType<?>, EntityType<FailedPig>> FAILED_PIG = ENTITIES.registerEntityType("failed_pig",
             FailedPig::new, MobCategory.CREATURE, b -> b.sized(0.9f, 0.9f).passengerAttachments(0.86875f).clientTrackingRange(10));

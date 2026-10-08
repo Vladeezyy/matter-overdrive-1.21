@@ -582,7 +582,69 @@ public final class DevScene {
             BlockPos spawnerPos = origin.above(30).offset(-2, -1, -5);
             if (p.level().getBlockEntity(spawnerPos) instanceof matteroverdrive.block.entity.AndroidSpawnerBlockEntity s) s.removeAllAndroids();
         }));
-        at(1634, mc -> mc.stop());
+        // 7m: the mad scientist: a human's conversation, taking Puny Humans (HUD "Started"), the junkie's cocktail story, trades
+        at(1636, mc -> server(mc, p -> {
+            BlockPos base = origin.above(30);
+            for (BlockPos pos : BlockPos.betweenClosed(base.offset(-8, -1, -14), base.offset(8, 5, 2))) {
+                p.level().setBlock(pos, pos.getY() < base.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
+                        Block.UPDATE_CLIENTS | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
+            }
+            p.level().getEntitiesOfClass(net.minecraft.world.entity.Mob.class, new AABB(base).inflate(20)).forEach(e -> e.discard());
+            matteroverdrive.quest.PlayerQuests.get(p).getActiveQuests().clear();
+            matteroverdrive.quest.PlayerQuests.get(p).getCompletedQuests().clear();
+            matteroverdrive.quest.PlayerQuests.sync(p);
+            matteroverdrive.android.Android.setAndroid(p, false);
+            p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() + 0.5, Set.of(), 180f, 5f, false);
+            var npc = matteroverdrive.init.MOEntities.MAD_SCIENTIST.get().create(p.level(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            npc.snapTo(base.getX() + 0.5, base.getY(), base.getZ() - 2.5, 0, 0);
+            npc.setJunkie(false);
+            npc.setNoAi(true);
+            p.level().addFreshEntity(npc);
+        }));
+        at(1644, mc -> server(mc, p -> p.level().getEntitiesOfClass(matteroverdrive.entity.MadScientist.class, p.getBoundingBox().inflate(6))
+                .forEach(npc -> matteroverdrive.dialog.DialogPayloads.startConversation(p, npc))));
+        at(1652, mc -> shot(mc, "dialog_human"));
+        at(1653, mc -> {
+            if (mc.screen instanceof matteroverdrive.client.quest.DialogScreen d) d.choose(0);
+        });
+        at(1680, mc -> shot(mc, "dialog_puny_humans"));
+        at(1681, mc -> mc.setScreen(null));
+        at(1684, mc -> server(mc, p -> p.level().getEntitiesOfClass(matteroverdrive.entity.MadScientist.class, p.getBoundingBox().inflate(6))
+                .forEach(npc -> {
+                    npc.setJunkie(true);
+                    matteroverdrive.dialog.DialogPayloads.startConversation(p, npc);
+                })));
+        at(1692, mc -> shot(mc, "dialog_junkie"));
+        // the cocktail story: its first line, then on to the last line with Accept / Decline
+        at(1693, mc -> {
+            if (mc.screen instanceof matteroverdrive.client.quest.DialogScreen d) {
+                d.choose(d.getCurrent().getOptions(d.getNpc(), mc.player).indexOf(matteroverdrive.entity.MadScientist.Dialogs.cocktailOfAscension));
+            }
+        });
+        at(1720, mc -> shot(mc, "dialog_cocktail"));
+        at(1721, mc -> {
+            if (mc.screen instanceof matteroverdrive.client.quest.DialogScreen d) {
+                var lines = matteroverdrive.entity.MadScientist.Dialogs.cocktailQuest;
+                d.setCurrent(lines[lines.length - 1]);
+            }
+        });
+        at(1726, mc -> shot(mc, "dialog_cocktail_accept"));
+        at(1727, mc -> {
+            if (mc.screen instanceof matteroverdrive.client.quest.DialogScreen d) {
+                d.setCurrent(d.getNpc().getStartDialogMessage(mc.player));
+            }
+        });
+        at(1730, mc -> {
+            if (mc.screen instanceof matteroverdrive.client.quest.DialogScreen d) {
+                d.choose(d.getCurrent().getOptions(d.getNpc(), mc.player).indexOf(matteroverdrive.entity.MadScientist.Dialogs.trade));
+            }
+        });
+        at(1745, mc -> shot(mc, "mad_scientist_trades"));
+        at(1746, mc -> mc.setScreen(null));
+        at(1750, mc -> mc.options.hideGui = true);
+        at(1760, mc -> shot(mc, "mad_scientist"));
+        at(1761, mc -> mc.options.hideGui = false);
+        at(1764, mc -> mc.stop());
     }
 
     private static void at(int t, Consumer<Minecraft> action) {

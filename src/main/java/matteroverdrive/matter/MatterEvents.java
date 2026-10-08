@@ -23,6 +23,7 @@ public final class MatterEvents {
     static void registerPayloads(RegisterPayloadHandlersEvent event) {
         matteroverdrive.network.AndroidPayloads.register(event.registrar("1"));
         matteroverdrive.network.ScannerPayloads.register(event.registrar("1"));
+        matteroverdrive.dialog.DialogPayloads.register(event.registrar("1"));
         event.registrar("1")
                 .playToClient(MatterValuesPayload.TYPE, MatterValuesPayload.STREAM_CODEC, MatterValuesPayload::handle)
                 .playToClient(PatternListPayload.TYPE, PatternListPayload.STREAM_CODEC, PatternListPayload::handle)
@@ -44,13 +45,17 @@ public final class MatterEvents {
     static void onPickup(net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent.Pre event) {
         var player = event.getPlayer();
         var item = event.getItemEntity().getItem();
-        if (player.level().isClientSide() || item.isEmpty() || !MatterHelper.hasMatter(item)) return;
-        for (int i = 0; i < 9 && !item.isEmpty(); i++) {
-            var stack = player.getInventory().getItem(i);
-            if (stack.getItem() instanceof matteroverdrive.item.PortableDecomposerItem) {
-                matteroverdrive.item.PortableDecomposerItem.decompose(player.level().getServer(), stack, item);
+        if (player.level().isClientSide() || item.isEmpty()) return;
+        if (MatterHelper.hasMatter(item)) {
+            for (int i = 0; i < 9 && !item.isEmpty(); i++) {
+                var stack = player.getInventory().getItem(i);
+                if (stack.getItem() instanceof matteroverdrive.item.PortableDecomposerItem) {
+                    matteroverdrive.item.PortableDecomposerItem.decompose(player.level().getServer(), stack, item);
+                }
             }
         }
+        // then the quests (1.7.10 extendedProperties.onEvent), which may take items too (cocktail ingredients)
+        matteroverdrive.quest.QuestEvents.onEvent(player, event);
         if (item.isEmpty()) event.getItemEntity().discard();
         else event.getItemEntity().setItem(item);
     }

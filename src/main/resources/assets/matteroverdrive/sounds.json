@@ -236,5 +236,17 @@
     "sounds": [
       "matteroverdrive:transporter/transporter_0"
     ]
+  },
+  "quest_started": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:gui/quest_started"
+    ]
+  },
+  "quest_complete": {
+    "category": "player",
+    "sounds": [
+      "matteroverdrive:gui/quest_complete"
+    ]
   }
 }

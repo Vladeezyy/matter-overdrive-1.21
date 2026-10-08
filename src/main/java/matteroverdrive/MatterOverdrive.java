@@ -86,6 +86,8 @@ public class MatterOverdrive {
     private static void registerAttributes(net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent event) {
         event.put(MOEntities.ROGUE_ANDROID.get(), matteroverdrive.entity.monster.MeleeRogueAndroid.createAttributes().build());
         event.put(MOEntities.RANGED_ROGUE_ANDROID.get(), matteroverdrive.entity.monster.RangedRogueAndroid.createAttributes().build());
+        event.put(MOEntities.MAD_SCIENTIST.get(), net.minecraft.world.entity.Mob.createMobAttributes()
+                .add(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED, 0.5).build());
         event.put(MOEntities.MUTANT_SCIENTIST.get(), matteroverdrive.entity.monster.MutantScientist.createAttributes().build());
         event.put(MOEntities.FAILED_PIG.get(), net.minecraft.world.entity.animal.Pig.createAttributes().build());
         event.put(MOEntities.FAILED_COW.get(), net.minecraft.world.entity.animal.Cow.createAttributes().build());
