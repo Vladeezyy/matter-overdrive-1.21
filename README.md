@@ -13,7 +13,7 @@ translations (English and Russian). The 1.7.10 source (0.4.2) is the specificati
 | 2 | Machine framework: FE energy, machine GUIs, upgrades, batteries, wrench, solar panel, inscriber | ✅ |
 | 3 | Matter: values, decomposer, recycler, pipes, analyzer, pattern storage, pattern monitor, replicator, network | ✅ |
 | 4 | Gravitational anomaly, stabilizer, fusion reactor | ✅ |
-| 5 | Weapons: phaser, phaser rifle, plasma shotgun, ion sniper, weapon station | 🔶 in progress |
+| 5 | Weapons: phaser, phaser rifle, plasma shotgun, ion sniper, weapon station | ✅ |
 | 6 | Androids, charging station | — |
 | 7 | Mobs, structures, transporter, star map, quests | — |
 

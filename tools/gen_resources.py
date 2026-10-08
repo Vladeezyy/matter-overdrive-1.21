@@ -30,6 +30,10 @@ ITEMS.update({n: (n, "handheld") for n in ["tritanium_sword", "tritanium_pickaxe
                                             "tritanium_wrench"]})
 UPGRADES = ["base", "speed", "power", "failsafe", "range", "power_storage", "hyper_speed", "matter_storage"]
 ITEMS.update({f"upgrade_{u}": (f"upgrade_{u}", "generated") for u in UPGRADES})
+# 1.7.10 WeaponModuleBarrel subtypes became one item each; the sniper scope (phase 5c).
+BARRELS = ["damage", "fire", "explosion", "heal"]
+ITEMS.update({f"weapon_module_barrel_{b}": (f"barrel_{b}", "generated") for b in BARRELS})
+ITEMS["sniper_scope"] = ("sniper_scope", "generated")
 # Batteries: one base texture + an overlay tinted per battery (1.7.10 Battery colours: COLOR_MATTER,
 # COLOR_YELLOW_STRIPES, COLOR_HOLO_RED).
 BATTERIES = {"battery": (191, 228, 230), "hc_battery": (254, 203, 4), "creative_battery": (230, 80, 20)}
@@ -43,6 +47,7 @@ MACHINES_P3 = ["decomposer", "matter_recycler", "matter_pipe", "heavy_matter_pip
 # lang keys that don't follow item.<name>.name / tile.<name>.name in the 1.7.10 files
 LANG_KEYS = {f"isolinear_circuit_mk{i}": f"item.isolinear_circuit.mk{i}.name" for i in range(1, 5)}
 LANG_KEYS.update({f"upgrade_{u}": f"item.upgrade.{u}.name" for u in UPGRADES})
+LANG_KEYS.update({f"weapon_module_barrel_{b}": f"item.weapon_module_barrel.{b}.name" for b in BARRELS})
 # Strings the original translation never had.
 EXTRA = {"ru_ru": {"weapon_handle": "Рукоять оружия", "weapon_receiver": "Ствольная коробка оружия",
                    "plasma_core": "Плазменное ядро"}}
@@ -665,6 +670,16 @@ weapon_obj("phaser", "phaser2", "phaser2", 6.0, hidden=("weapon_module_barrel_da
                                                         "weapon_module_barrel_fire", "weapon_module_barrel_heal"),
            display={"firstperson_righthand": {"rotation": [0, 175, 0], "translation": [-1, 4, 1], "scale": [0.75, 0.75, 0.75]},
                     "firstperson_lefthand": {"rotation": [0, 185, 0], "translation": [-1, 4, 1], "scale": [0.75, 0.75, 0.75]}})
+# The barrel part shown follows the barrel module (1.7.10 WeaponItemRenderer.renderBarrel): one model per barrel, picked by
+# the matteroverdrive:barrel select property.
+PHASER_BARRELS = ["damage", "explosion", "fire", "heal"]
+phaser_display = json.loads((A / "models/item/phaser.json").read_text())
+for b in PHASER_BARRELS:
+    w(A / "models/item" / f"phaser_{b}.json", phaser_display | {"visibility": {
+        f"weapon_module_barrel_{o}": False for o in ["none"] + [x for x in PHASER_BARRELS if x != b]}})
+w(A / "items/phaser.json", {"model": {"type": "minecraft:select", "property": mid("barrel"),
+    "cases": [{"when": b, "model": {"type": "minecraft:model", "model": f"{MOD}:item/phaser_{b}"}} for b in PHASER_BARRELS],
+    "fallback": {"type": "minecraft:model", "model": f"{MOD}:item/phaser"}}})
 cp(ref / "textures/fx/plasmabeam.png", A / "textures/fx/plasmabeam.png")
 
 def tinted_item(name, base, overlay, rgb):
@@ -723,6 +738,54 @@ shaped("plasma_core", mid("plasma_core"), ["GI ", "MCM", " IG"],
 shaped("matter_container", mid("matter_container"), ["TMT", " T "], {"T": INGOT, "M": mid("s_magnet")}, count=4)
 # 1.7.10 EnergyPackRecipe: tritanium plate + a charged battery + gunpowder = one pack per 32000 FE in the battery.
 w(D / "recipe/energy_pack.json", {"type": mid("energy_pack"), "category": "misc"})
+
+
+# --- phase 5c: weapon modules and the weapon station ---------------------------------------------------
+# 1.7.10 WeaponModuleBarrel.register and MatterOverdriveRecipes (sniper scope, weapon station).
+shaped("weapon_module_barrel_damage", mid("weapon_module_barrel_damage"), [" G ", "RDR", " T "],
+       {"G": "minecraft:glass", "R": "minecraft:redstone", "D": DILITHIUM, "T": PLATE}, category="equipment")
+shaped("weapon_module_barrel_fire", mid("weapon_module_barrel_fire"), [" G ", "BFB", " T "],
+       {"G": "minecraft:glass", "B": "minecraft:blaze_rod", "F": "minecraft:fire_charge", "T": PLATE}, category="equipment")
+shaped("weapon_module_barrel_explosion", mid("weapon_module_barrel_explosion"), [" B ", "BRB", "DTD"],
+       {"B": "minecraft:tnt", "R": "minecraft:blaze_rod", "D": "minecraft:diamond", "T": PLATE}, category="equipment")
+shaped("weapon_module_barrel_heal", mid("weapon_module_barrel_heal"), [" S ", "SAS", "ETE"],
+       {"S": "minecraft:sugar", "A": "minecraft:golden_apple", "E": "minecraft:emerald", "T": PLATE}, category="equipment")
+shaped("sniper_scope", mid("sniper_scope"), ["IIC", "GFG", "III"],
+       {"I": "minecraft:iron_ingot", "C": MK[2], "G": "minecraft:lime_stained_glass_pane", "F": mid("forcefield_emitter")},
+       category="equipment")
+shaped("weapon_station", mid("weapon_station"), ["GFR", "CMB"],
+       {"G": "minecraft:glowstone_dust", "F": mid("forcefield_emitter"), "R": "minecraft:redstone", "C": MK[3],
+        "M": mid("machine_casing"), "B": mid("battery")})
+
+# Weapon station: a 9/16 high table (1.7.10 block bounds), top / side / bottom textures, light 10.
+for t in ["top", "side", "bottom"]:
+    cp(ref / "textures/blocks" / f"weapon_station_{t}.png", A / "textures/block" / f"weapon_station_{t}.png")
+w(A / "models/block/weapon_station.json", {"parent": "minecraft:block/block", "textures": {
+    "top": f"{MOD}:block/weapon_station_top", "side": f"{MOD}:block/weapon_station_side",
+    "bottom": f"{MOD}:block/weapon_station_bottom", "particle": f"{MOD}:block/weapon_station_side"},
+    "elements": [{"from": [0, 0, 0], "to": [16, 9, 16], "faces": {
+        "up": {"texture": "#top"}, "down": {"texture": "#bottom", "cullface": "down"},
+        **{f: {"uv": [0, 7, 16, 16], "texture": "#side", "cullface": f} for f in ["north", "south", "east", "west"]}}}]})
+facing_blockstate("weapon_station", f"{MOD}:block/weapon_station")
+w(D / "loot_table/blocks/weapon_station.json", self_drop("weapon_station"))
+for tag in ["mineable/pickaxe", "needs_iron_tool"]:
+    p = TAGS / f"minecraft/tags/block/{tag}.json"
+    w(p, {"values": json.loads(p.read_text())["values"] + [mid("weapon_station")]})
+# Weapon station GUI: the module slot holo icons.
+for n in ["battery", "color", "barrel", "sights", "module"]:
+    cp(ref / "textures/gui/items" / f"{n}.png", GUI / "elements" / f"holo_{n}.png")
+
+# 1.7.10 WeaponModuleColor.addToDunguns: every colour module in dungeon, desert temple, mineshaft, stronghold corridor and
+# blacksmith chests at weight 1. Loot tables can't be appended to directly any more, so a global loot modifier adds a
+# roll of this table (one random colour module, 20% of chests) to the same chests.
+CHESTS = ["simple_dungeon", "desert_pyramid", "abandoned_mineshaft", "stronghold_corridor", "village/village_weaponsmith"]
+w(D / "loot_table/chests/weapon_module_colors.json", {"type": "minecraft:chest", "pools": [{"rolls": 1, "bonus_rolls": 0,
+    "conditions": [{"condition": "minecraft:random_chance", "chance": 0.2}],
+    "entries": [{"type": "minecraft:item", "name": mid(f"weapon_module_color_{n}")} for n in COLOR_NAMES]}]})
+w(D / "loot_modifiers/weapon_module_colors.json", {"type": "neoforge:add_table", "table": mid("chests/weapon_module_colors"),
+    "conditions": [{"condition": "minecraft:any_of", "terms": [
+        {"condition": "neoforge:loot_table_id", "loot_table_id": f"minecraft:chests/{c}"} for c in CHESTS]}]})
+w(out / "data/neoforge/loot_modifiers/global_loot_modifiers.json", {"replace": False, "entries": [mid("weapon_module_colors")]})
 
 
 # --- matter values (1.7.10 MatterOverdriveMatter.registerBasic*) -----------------------------------
@@ -862,6 +925,11 @@ for src_name, dst_name in [("en_US", "en_us"), ("ru_RU", "ru_ru")]:
     base = src.get("item.weapon_module_color.name") or en["item.weapon_module_color.name"]
     for n, word in zip(COLOR_NAMES, COLOR_WORDS[dst_name]):
         lang[f"item.{MOD}.weapon_module_color_{n}"] = f"{base} ({word})"
+    lang[f"block.{MOD}.weapon_station"] = src.get("tile.weapon_station.name") or en["tile.weapon_station.name"]
+    for i, stat in enumerate(["damage", "ammo", "effect", "range", "fire_damage", "block_damage", "explosion_damage", "fire_rate", "heal"]):
+        lang[f"weapon_stat.{MOD}.{stat}"] = src.get(f"weaponstat.{i}.name") or en[f"weaponstat.{i}.name"]
+    for m in ["battery", "color", "barrel", "sights", "other"]:
+        lang[f"gui.{MOD}.module.{m}"] = src.get(f"module.{m}.name") or en[f"module.{m}.name"]
     for ours, theirs in GUI_KEYS.items():
         if isinstance(theirs, dict):
             lang[ours] = theirs[dst_name]

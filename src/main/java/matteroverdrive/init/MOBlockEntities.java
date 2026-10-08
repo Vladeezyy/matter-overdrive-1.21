@@ -14,6 +14,7 @@ import matteroverdrive.block.entity.PatternStorageBlockEntity;
 import matteroverdrive.block.entity.ReplicatorBlockEntity;
 import matteroverdrive.block.entity.RecyclerBlockEntity;
 import matteroverdrive.block.entity.SolarPanelBlockEntity;
+import matteroverdrive.block.entity.WeaponStationBlockEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -53,6 +54,8 @@ public final class MOBlockEntities {
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<FusionReactorControllerBlockEntity>> FUSION_REACTOR_CONTROLLER =
             BLOCK_ENTITIES.register("fusion_reactor_controller", () -> new BlockEntityType<>(FusionReactorControllerBlockEntity::new, MOBlocks.FUSION_REACTOR_CONTROLLER.get()));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<WeaponStationBlockEntity>> WEAPON_STATION =
+            BLOCK_ENTITIES.register("weapon_station", () -> new BlockEntityType<>(WeaponStationBlockEntity::new, MOBlocks.WEAPON_STATION.get()));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<FusionReactorIOBlockEntity>> FUSION_REACTOR_IO =
             BLOCK_ENTITIES.register("fusion_reactor_io", () -> new BlockEntityType<>(FusionReactorIOBlockEntity::new, MOBlocks.FUSION_REACTOR_IO.get()));
 

@@ -22,10 +22,17 @@ public class PlasmaShotgunItem extends EnergyWeaponItem {
         return 5f + getHeat(weapon) * 0.3f;
     }
 
+    /** 1.7.10 PlasmaShotgun.supportsModule: colour modules and the damage or fire barrel only. */
+    @Override
+    public boolean supportsModule(ItemStack module) {
+        return module.getItem() instanceof WeaponColorModuleItem
+                || module.getItem() instanceof WeaponBarrelItem barrel && !barrel.phaserOnly();
+    }
+
     @Override
     protected void fire(ServerLevel level, Player shooter, ItemStack weapon, boolean zoomed) {
         float damage = getDamage(weapon, shooter) / SHOTS;
-        float accuracy = getAccuracy(weapon, zoomed);
+        float accuracy = getAccuracy(weapon, shooter, zoomed);
         for (int i = 0; i < SHOTS; i++) {
             spawnBolt(level, shooter, weapon, damage, accuracy).setRenderSize(0.5f);
         }

@@ -18,6 +18,8 @@ import matteroverdrive.item.weapon.PhaserItem;
 import matteroverdrive.item.weapon.PhaserRifleItem;
 import matteroverdrive.item.weapon.PlasmaShotgunItem;
 import matteroverdrive.item.weapon.WeaponColorModuleItem;
+import matteroverdrive.item.weapon.WeaponBarrelItem;
+import matteroverdrive.item.weapon.SniperScopeItem;
 import matteroverdrive.machine.UpgradeType;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.BlockItem;
@@ -142,6 +144,16 @@ public final class MOItems {
     /** 1.7.10 MatterContainer: a portable matter tank; needed for the plasma core recipe (its tank isn't ported yet). */
     public static final DeferredItem<Item> MATTER_CONTAINER = simple("matter_container");
     public static final List<DeferredItem<WeaponColorModuleItem>> COLOR_MODULES = colorModules();
+    public static final DeferredItem<WeaponBarrelItem> BARREL_DAMAGE = barrel(WeaponBarrelItem.Type.DAMAGE);
+    public static final DeferredItem<WeaponBarrelItem> BARREL_FIRE = barrel(WeaponBarrelItem.Type.FIRE);
+    public static final DeferredItem<WeaponBarrelItem> BARREL_EXPLOSION = barrel(WeaponBarrelItem.Type.EXPLOSION);
+    public static final DeferredItem<WeaponBarrelItem> BARREL_HEAL = barrel(WeaponBarrelItem.Type.HEAL);
+    public static final DeferredItem<SniperScopeItem> SNIPER_SCOPE = item("sniper_scope", SniperScopeItem::new, p -> p);
+    public static final DeferredItem<BlockItem> WEAPON_STATION = block("weapon_station", MOBlocks.WEAPON_STATION);
+
+    private static DeferredItem<WeaponBarrelItem> barrel(WeaponBarrelItem.Type type) {
+        return item("weapon_module_barrel_" + type.id(), p -> new WeaponBarrelItem(type, p), p -> p);
+    }
 
     private static List<DeferredItem<WeaponColorModuleItem>> colorModules() {
         List<DeferredItem<WeaponColorModuleItem>> list = new ArrayList<>();

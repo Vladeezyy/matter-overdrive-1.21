@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "GFR",
+    "CMB"
+  ],
+  "key": {
+    "G": "minecraft:glowstone_dust",
+    "F": "matteroverdrive:forcefield_emitter",
+    "R": "minecraft:redstone",
+    "C": "matteroverdrive:isolinear_circuit_mk3",
+    "M": "matteroverdrive:machine_casing",
+    "B": "matteroverdrive:battery"
+  },
+  "result": {
+    "id": "matteroverdrive:weapon_station",
+    "count": 1
+  }
+}

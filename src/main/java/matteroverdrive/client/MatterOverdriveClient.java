@@ -36,6 +36,7 @@ public class MatterOverdriveClient {
     @SubscribeEvent
     static void registerScreens(RegisterMenuScreensEvent event) {
         event.register(MOMenus.SOLAR_PANEL.get(), SolarPanelScreen::new);
+        event.register(MOMenus.WEAPON_STATION.get(), matteroverdrive.client.screen.WeaponStationScreen::new);
         event.register(MOMenus.INSCRIBER.get(), InscriberScreen::new);
         event.register(MOMenus.DECOMPOSER.get(), DecomposerScreen::new);
         event.register(MOMenus.RECYCLER.get(), RecyclerScreen::new);
@@ -47,8 +48,14 @@ public class MatterOverdriveClient {
     }
 
     @SubscribeEvent
+    static void registerSelectProperties(net.neoforged.neoforge.client.event.RegisterSelectItemModelPropertyEvent event) {
+        event.register(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "barrel"), BarrelProperty.TYPE);
+    }
+
+    @SubscribeEvent
     static void registerRenderers(net.neoforged.neoforge.client.event.EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(matteroverdrive.init.MOEntities.PLASMA_BOLT.get(), PlasmaBoltRenderer::new);
+        event.registerBlockEntityRenderer(matteroverdrive.init.MOBlockEntities.WEAPON_STATION.get(), WeaponStationRenderer::new);
     }
 
     /** Matter Plasma textures (1.7.10 matter_plasma_still / _flowing), shown by tanks of other mods. */

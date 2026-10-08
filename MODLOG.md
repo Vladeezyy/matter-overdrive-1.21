@@ -149,11 +149,27 @@
 - Resource generation is deterministic (oggenc `-s 1`, gzip mtime 0): regenerating no longer dirties git.
 - Open question for the user: 1.7.10 explosion barrel multiplies FIRE_RATE by 0.15 (almost no cooldown) — keep or fix?
 
-### Remaining phase 5 (5c)
-- Barrel modules (damage/fire/explosion/heal, 1.7.10 recipes) and sniper scope (accuracy ×0.8, range ×1.5; recipe IIC/GFG/III).
-- Weapon Station block: slots battery/colour/barrel/sights/other, reads/writes `weapon_modules` component.
-- Colour modules in chest loot (global loot modifier). Phaser barrel model variants (toggle OBJ group visibility per module).
-- Then update README/MODDING_PLAN, rerun `./gradlew runGameTestServer` + `./gradlew runScene`, commit, push.
+### 5c ✅ modules and the weapon station
+- Barrel modules (one item each: damage, fire, explosion, heal; 1.7.10 stats and recipes), sniper scope (zoom 0.85,
+  accuracy x0.4 zoomed / +3 unzoomed, accuracy x0.8, range x1.5). Module rules from 1.7.10 supportsModule: explosion/heal
+  barrels only on the phaser, no sights on the phaser, the shotgun takes colour + damage/fire barrels only.
+- Battery module: with a battery in slot 0 the weapon's energy *is* the battery's (charge/drain/capacity go through it).
+- Accuracy now includes 1.7.10 movement (+10 x speed) and sneaking (x0.6); zoom comes from the scope when installed.
+- Weapon Station: 9/16 table, light 10; one weapon slot + five module slots that edit the weapon's `weapon_modules`
+  component; the weapon floats and turns above the table (BER). GUI shows a big preview with lines to the modules,
+  greyed-out slots the weapon lacks, holo icons on empty slots.
+- Colour modules in dungeon / desert temple / mineshaft / stronghold corridor / weaponsmith chests (global loot modifier).
+- Phaser model shows the installed barrel (select item model property `matteroverdrive:barrel`).
+- 52 GameTests pass.
+
+### Deviations (phase 5)
+- Weapon Station GUI uses the standard 225x186 machine frame (1.7.10: 255x237 with a 3D model preview); slot positions
+  scaled from the original.
+- Station hologram is the plain item, not the cyan holo shader. Phaser body isn't tinted by the colour module and the
+  power-level slider on its back isn't drawn.
+- Colour module chest chance is 20% per chest (1.7.10 used weight 1 in each chest's own list).
+- Damage sources aren't tagged fire / magic / explosion by barrel; the shotgun charge-up is still missing.
+- The explosion barrel keeps the 1.7.10 FIRE_RATE x0.15 (on the phaser it makes the burst explosions happen almost every tick).
 
 ## 1.21.10 / NeoForge 21.10.64 API notes (learned the hard way)
 **Workflow**
@@ -198,6 +214,6 @@
 - Sounds must be mono ogg: ffmpeg → mono wav → `oggenc` (vorbis-tools); ffmpeg's built-in vorbis is stereo-only.
 
 ## Next
-- Finish phase 5 (see Open problems + 5c above), then phase 6 androids, phase 7 world & extras.
+- Phase 6: androids (player attachment, biotic stats, android station, HUD, abilities, charging station). Phase 7: world & extras.
 - Polish later: machine item tooltip with stored energy, inscriber head animation, machine sounds, custom tritanium armor model,
   pattern storage drive rendering, replicator item animation, monitor hologram, router/switch filters, matter scanner.

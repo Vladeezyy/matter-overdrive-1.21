@@ -89,6 +89,17 @@ public class PhaserItem extends EnergyWeaponItem {
     @Override
     protected void fire(ServerLevel level, Player shooter, ItemStack weapon, boolean zoomed) {}
 
+    /** 1.7.10 Phaser: no sights slot; barrels (all four) and colour modules only. */
+    @Override
+    public boolean supportsSlot(int slot) {
+        return slot != WeaponModule.SLOT_SIGHTS;
+    }
+
+    @Override
+    public boolean supportsModule(ItemStack module) {
+        return module.getItem() instanceof WeaponBarrelItem || module.getItem() instanceof WeaponColorModuleItem;
+    }
+
     @Override
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack phaser = player.getItemInHand(hand);

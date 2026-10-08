@@ -145,7 +145,41 @@ public final class DevScene {
         at(469, mc -> shot(mc, "inventory"));
         at(471, mc -> mc.setScreen(null));
         at(473, mc -> server(mc, p -> p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 35f, false)));
-        at(481, mc -> mc.stop());
+        // phase 5c: weapon station with a fully fitted rifle, its GUI, then a phaser (no sights slot) with a barrel
+        at(475, mc -> server(mc, p -> {
+            BlockPos station = origin.offset(0, 0, -2);
+            p.level().setBlockAndUpdate(station, MOBlocks.WEAPON_STATION.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
+            ItemStack rifle = new ItemStack(MOItems.PHASER_RIFLE.get());
+            matteroverdrive.item.weapon.EnergyWeaponItem.setModule(rifle, 0, MOItems.HC_BATTERY.get().charged());
+            matteroverdrive.item.weapon.EnergyWeaponItem.setModule(rifle, 1, new ItemStack(MOItems.COLOR_MODULES.get(0).get()));
+            matteroverdrive.item.weapon.EnergyWeaponItem.setModule(rifle, 2, new ItemStack(MOItems.BARREL_FIRE.get()));
+            matteroverdrive.item.weapon.EnergyWeaponItem.setModule(rifle, 3, new ItemStack(MOItems.SNIPER_SCOPE.get()));
+            ((matteroverdrive.block.entity.WeaponStationBlockEntity) p.level().getBlockEntity(station)).getInventory()
+                    .setStack(matteroverdrive.block.entity.WeaponStationBlockEntity.WEAPON, rifle);
+            p.getInventory().add(new ItemStack(MOItems.BARREL_DAMAGE.get()));
+            p.getInventory().add(new ItemStack(MOItems.SNIPER_SCOPE.get()));
+            p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 30f, false);
+        }));
+        at(484, mc -> shot(mc, "weapon_station"));
+        at(485, mc -> openMachine(mc, origin.offset(0, 0, -2)));
+        at(492, mc -> shot(mc, "weapon_station_gui"));
+        at(493, mc -> server(mc, p -> {
+            ItemStack phaser = new ItemStack(MOItems.PHASER.get());
+            matteroverdrive.item.weapon.EnergyWeaponItem.setModule(phaser, 2, new ItemStack(MOItems.BARREL_EXPLOSION.get()));
+            ((matteroverdrive.block.entity.WeaponStationBlockEntity) p.level().getBlockEntity(origin.offset(0, 0, -2))).getInventory()
+                    .setStack(matteroverdrive.block.entity.WeaponStationBlockEntity.WEAPON, phaser);
+        }));
+        at(498, mc -> shot(mc, "weapon_station_phaser"));
+        at(499, mc -> mc.setScreen(null));
+        at(500, mc -> server(mc, p -> {
+            ItemStack phaser = new ItemStack(MOItems.PHASER.get());
+            matteroverdrive.item.weapon.EnergyWeaponItem.setEnergy(phaser, 32000);
+            matteroverdrive.item.weapon.EnergyWeaponItem.setModule(phaser, 2, new ItemStack(MOItems.BARREL_HEAL.get()));
+            p.getInventory().setItem(0, phaser);
+            p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 0f, false);
+        }));
+        at(508, mc -> shot(mc, "phaser_barrel"));
+        at(512, mc -> mc.stop());
     }
 
     private static void at(int t, Consumer<Minecraft> action) {

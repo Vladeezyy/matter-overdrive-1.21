@@ -9,7 +9,9 @@ import matteroverdrive.entity.PlasmaBolt;
 import matteroverdrive.init.MODataComponents;
 import matteroverdrive.init.MOSounds;
 import matteroverdrive.util.MOText;
+import matteroverdrive.item.BatteryItem;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -34,6 +36,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.transfer.access.ItemAccess;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.energy.ItemAccessEnergyHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 
 /**
  * 1.7.10 EnergyWeapon. Fires with the attack key (held for automatic fire), aims/zooms with use. Every shot costs
@@ -66,11 +69,46 @@ public abstract class EnergyWeaponItem extends Item {
 
     // --- stats (1.7.10 getters, all passed through the installed modules) -----------------------
 
+    /** The installed modules, indexed by {@link WeaponModule} slot (empty stacks where nothing is installed). */
+    public static NonNullList<ItemStack> getModuleSlots(ItemStack weapon) {
+        NonNullList<ItemStack> slots = NonNullList.withSize(WeaponModule.SLOTS, ItemStack.EMPTY);
+        weapon.getOrDefault(MODataComponents.WEAPON_MODULES.get(), ItemContainerContents.EMPTY).copyInto(slots);
+        return slots;
+    }
+
     public static List<ItemStack> getModules(ItemStack weapon) {
-        ItemContainerContents contents = weapon.getOrDefault(MODataComponents.WEAPON_MODULES.get(), ItemContainerContents.EMPTY);
         List<ItemStack> list = new ArrayList<>();
-        contents.stream().forEach(list::add);
+        for (ItemStack module : getModuleSlots(weapon)) {
+            if (!module.isEmpty()) list.add(module);
+        }
         return list;
+    }
+
+    public static ItemStack getModule(ItemStack weapon, int slot) {
+        return getModuleSlots(weapon).get(slot);
+    }
+
+    public static void setModule(ItemStack weapon, int slot, ItemStack module) {
+        NonNullList<ItemStack> slots = getModuleSlots(weapon);
+        slots.set(slot, module.copy());
+        weapon.set(MODataComponents.WEAPON_MODULES.get(), ItemContainerContents.fromItems(slots));
+    }
+
+    /** 1.7.10 supportsModule(slot, weapon): which module slots this weapon has. */
+    public boolean supportsSlot(int slot) {
+        return true;
+    }
+
+    /** 1.7.10 supportsModule(weapon, module): explosion and heal barrels are phaser-only. */
+    public boolean supportsModule(ItemStack module) {
+        return !(module.getItem() instanceof WeaponBarrelItem barrel && barrel.phaserOnly());
+    }
+
+    /** 1.7.10 ModuleSlot.isValidForSlot: a battery (an energy item that isn't a weapon) or a module made for that slot. */
+    public boolean canInstall(int slot, ItemStack module) {
+        if (!supportsSlot(slot)) return false;
+        if (slot == WeaponModule.SLOT_BATTERY) return module.getItem() instanceof BatteryItem;
+        return module.getItem() instanceof WeaponModule m && m.getSlot(module) == slot && supportsModule(module);
     }
 
     public static float modifyStat(WeaponStat stat, ItemStack weapon, float value) {
@@ -110,8 +148,15 @@ public abstract class EnergyWeaponItem extends Item {
         return damage + (float) shooter.getAttributeValue(Attributes.ATTACK_DAMAGE);
     }
 
-    public float getAccuracy(ItemStack weapon, boolean zoomed) {
-        return baseAccuracy(weapon, zoomed) * modifyStat(WeaponStat.ACCURACY, weapon, 1);
+    /** 1.7.10 getAccuracy: base + 10 x movement, x0.6 sneaking, then modules and the scope. */
+    public float getAccuracy(ItemStack weapon, LivingEntity shooter, boolean zoomed) {
+        Vec3 motion = shooter.getDeltaMovement();
+        float accuracy = baseAccuracy(weapon, zoomed) + (float) new Vec3(motion.x, motion.y * 0.1, motion.z).length() * 10;
+        if (shooter.isShiftKeyDown()) accuracy *= 0.6f;
+        accuracy = modifyStat(WeaponStat.ACCURACY, weapon, accuracy);
+        ItemStack sights = getModule(weapon, WeaponModule.SLOT_SIGHTS);
+        if (sights.getItem() instanceof WeaponScope scope) accuracy = scope.getAccuracyModify(sights, weapon, zoomed, accuracy);
+        return accuracy;
     }
 
     protected abstract float baseAccuracy(ItemStack weapon, boolean zoomed);
@@ -120,7 +165,10 @@ public abstract class EnergyWeaponItem extends Item {
         return shotSpeed;
     }
 
-    public float getZoom() {
+    /** 1.7.10 getZoomMultiply: the scope's zoom when one is installed. */
+    public float getZoom(ItemStack weapon) {
+        ItemStack sights = getModule(weapon, WeaponModule.SLOT_SIGHTS);
+        if (sights.getItem() instanceof WeaponScope scope) return scope.getZoomAmount(sights, weapon);
         return zoom;
     }
 
@@ -133,16 +181,44 @@ public abstract class EnergyWeaponItem extends Item {
 
     // --- energy, heat --------------------------------------------------------------------------
 
+    /** Charges and drains through {@link #getEnergy}/{@link #setEnergy}, so a battery module is used when installed. */
     public EnergyHandler createEnergyHandler(ItemAccess access) {
-        return new ItemAccessEnergyHandler(access, MODataComponents.ENERGY.get(), CAPACITY, TRANSFER, TRANSFER);
+        return new ItemAccessEnergyHandler(access, MODataComponents.ENERGY.get(), getCapacity(access.getResource().toStack()), TRANSFER, TRANSFER) {
+            @Override
+            protected int getAmountFrom(ItemResource resource) {
+                return resource.is(validItem) ? getEnergy(resource.toStack()) : 0;
+            }
+
+            @Override
+            protected ItemResource update(ItemResource resource, int amount) {
+                ItemStack stack = resource.toStack();
+                setEnergy(stack, amount);
+                return ItemResource.of(stack);
+            }
+        };
     }
 
+    /** 1.7.10 EnergyWeapon: with a battery module installed the weapon runs on (and charges) the battery instead. */
     public static int getEnergy(ItemStack weapon) {
+        ItemStack battery = getModule(weapon, WeaponModule.SLOT_BATTERY);
+        if (battery.getItem() instanceof BatteryItem b) return b.getEnergy(battery);
         return weapon.getOrDefault(MODataComponents.ENERGY.get(), 0);
     }
 
     public static void setEnergy(ItemStack weapon, int energy) {
+        ItemStack battery = getModule(weapon, WeaponModule.SLOT_BATTERY);
+        if (battery.getItem() instanceof BatteryItem b) {
+            if (b.isCreative()) return;
+            battery.set(MODataComponents.ENERGY.get(), Mth.clamp(energy, 0, b.getCapacity()));
+            setModule(weapon, WeaponModule.SLOT_BATTERY, battery);
+            return;
+        }
         weapon.set(MODataComponents.ENERGY.get(), Mth.clamp(energy, 0, CAPACITY));
+    }
+
+    public static int getCapacity(ItemStack weapon) {
+        ItemStack battery = getModule(weapon, WeaponModule.SLOT_BATTERY);
+        return battery.getItem() instanceof BatteryItem b ? b.getCapacity() : CAPACITY;
     }
 
     public static float getHeat(ItemStack weapon) {
@@ -220,7 +296,7 @@ public abstract class EnergyWeaponItem extends Item {
             player.getCooldowns().addCooldown(weapon, 40);
             return InteractionResult.SUCCESS;
         }
-        if (zoom > 0) {
+        if (getZoom(weapon) > 0) {
             player.startUsingItem(hand);
             return InteractionResult.CONSUME;
         }
@@ -252,18 +328,18 @@ public abstract class EnergyWeaponItem extends Item {
 
     @Override
     public int getBarWidth(ItemStack stack) {
-        return Math.round(13f * getEnergy(stack) / CAPACITY);
+        return Math.round(13f * getEnergy(stack) / getCapacity(stack));
     }
 
     @Override
     public int getBarColor(ItemStack stack) {
-        return isOverheated(stack) ? 0xFF3333 : Mth.hsvToRgb(getEnergy(stack) / (float) CAPACITY / 3f, 1f, 1f);
+        return isOverheated(stack) ? 0xFF3333 : Mth.hsvToRgb(getEnergy(stack) / (float) getCapacity(stack) / 3f, 1f, 1f);
     }
 
     @Override
     public void appendHoverText(ItemStack weapon, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
         tooltip.accept(Component.translatable("tooltip.matteroverdrive.energy_stored", MOText.energy(getEnergy(weapon)),
-                MOText.energy(CAPACITY)).withStyle(ChatFormatting.YELLOW));
+                MOText.energy(getCapacity(weapon))).withStyle(ChatFormatting.YELLOW));
         tooltip.accept(Component.translatable("tooltip.matteroverdrive.weapon.power_use", MOText.energy(getEnergyUse(weapon) * 20L))
                 .withStyle(ChatFormatting.DARK_RED));
         float damage = modifyStat(WeaponStat.DAMAGE, weapon, baseDamage) + 1;

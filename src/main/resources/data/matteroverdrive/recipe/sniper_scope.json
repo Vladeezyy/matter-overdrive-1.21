@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "IIC",
+    "GFG",
+    "III"
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "C": "matteroverdrive:isolinear_circuit_mk2",
+    "G": "minecraft:lime_stained_glass_pane",
+    "F": "matteroverdrive:forcefield_emitter"
+  },
+  "result": {
+    "id": "matteroverdrive:sniper_scope",
+    "count": 1
+  }
+}

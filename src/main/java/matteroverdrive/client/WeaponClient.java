@@ -41,8 +41,8 @@ public final class WeaponClient {
     @SubscribeEvent
     static void onFov(ComputeFovModifierEvent event) {
         var player = event.getPlayer();
-        if (player.isUsingItem() && player.getUseItem().getItem() instanceof EnergyWeaponItem weapon && weapon.getZoom() > 0) {
-            event.setNewFovModifier(event.getNewFovModifier() * (1 - weapon.getZoom()));
+        if (player.isUsingItem() && player.getUseItem().getItem() instanceof EnergyWeaponItem weapon && weapon.getZoom(player.getUseItem()) > 0) {
+            event.setNewFovModifier(event.getNewFovModifier() * (1 - weapon.getZoom(player.getUseItem())));
         }
     }
 

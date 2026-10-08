@@ -21,7 +21,7 @@ public class PhaserRifleItem extends EnergyWeaponItem {
 
     @Override
     protected void fire(ServerLevel level, Player shooter, ItemStack weapon, boolean zoomed) {
-        spawnBolt(level, shooter, weapon, getDamage(weapon, shooter), getAccuracy(weapon, zoomed));
+        spawnBolt(level, shooter, weapon, getDamage(weapon, shooter), getAccuracy(weapon, shooter, zoomed));
         playShot(level, shooter, MOSounds.PHASER_RIFLE_SHOT.get());
         addHeatAfterShot(weapon, level, shooter, (getHeat(weapon) + 4) * 2.2f);
     }

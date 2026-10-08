@@ -20,6 +20,7 @@
     "matteroverdrive:machine_hull",
     "matteroverdrive:fusion_reactor_coil",
     "matteroverdrive:fusion_reactor_io",
-    "matteroverdrive:fusion_reactor_controller"
+    "matteroverdrive:fusion_reactor_controller",
+    "matteroverdrive:weapon_station"
   ]
 }

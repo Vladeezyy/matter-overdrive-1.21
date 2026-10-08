@@ -1,0 +1,136 @@
+{
+  "loader": "neoforge:obj",
+  "model": "matteroverdrive:models/item/phaser.obj",
+  "flip_v": true,
+  "textures": {
+    "weapon": "matteroverdrive:item/phaser2",
+    "particle": "matteroverdrive:item/phaser2"
+  },
+  "display": {
+    "firstperson_righthand": {
+      "rotation": [
+        0,
+        175,
+        0
+      ],
+      "translation": [
+        -1,
+        4,
+        1
+      ],
+      "scale": [
+        0.75,
+        0.75,
+        0.75
+      ]
+    },
+    "firstperson_lefthand": {
+      "rotation": [
+        0,
+        185,
+        0
+      ],
+      "translation": [
+        -1,
+        4,
+        1
+      ],
+      "scale": [
+        0.75,
+        0.75,
+        0.75
+      ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [
+        0,
+        180,
+        0
+      ],
+      "translation": [
+        0,
+        2,
+        2
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [
+        0,
+        180,
+        0
+      ],
+      "translation": [
+        0,
+        2,
+        2
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "gui": {
+      "rotation": [
+        0,
+        90,
+        -40
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.45,
+        1.45,
+        1.45
+      ]
+    },
+    "ground": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        2,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.6,
+        0.6
+      ]
+    },
+    "fixed": {
+      "rotation": [
+        0,
+        90,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  "visibility": {
+    "weapon_module_barrel_none": false,
+    "weapon_module_barrel_explosion": false,
+    "weapon_module_barrel_fire": false,
+    "weapon_module_barrel_heal": false
+  }
+}
