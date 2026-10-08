@@ -193,6 +193,25 @@ public final class MOItems {
     public static final DeferredItem<matteroverdrive.item.ContractItem> CONTRACT = item("contract", matteroverdrive.item.ContractItem::new, p -> p);
     public static final DeferredItem<matteroverdrive.item.SecurityProtocolItem> SECURITY_PROTOCOL = item("security_protocol",
             matteroverdrive.item.SecurityProtocolItem::new, p -> p);
+    // star map buildings and ships (1.7.10 MatterOverdriveItems; no recipes in 1.7.10)
+    public static final DeferredItem<matteroverdrive.item.starmap.StarMapBuildingItem> BUILDING_BASE = building("building_base", "BASE");
+    public static final DeferredItem<matteroverdrive.item.starmap.StarMapBuildingItem> SHIP_FACTORY = building("ship_factory", "SHIP_FACTORY");
+    public static final DeferredItem<matteroverdrive.item.starmap.StarMapBuildingItem> BUILDING_RESIDENTIAL = building("building_residential", "RESIDENTIAL");
+    public static final DeferredItem<matteroverdrive.item.starmap.StarMapBuildingItem> BUILDING_MATTER_EXTRACTOR =
+            building("building_matter_extractor", "MATTER_EXTRACTOR");
+    public static final DeferredItem<matteroverdrive.item.starmap.StarMapBuildingItem> BUILDING_POWER_GENERATOR =
+            building("building_power_generator", "POWER_GENERATOR");
+    public static final DeferredItem<matteroverdrive.item.starmap.StarMapBuildingItem> BUILDING_SHIP_HANGAR = building("building_ship_hangar", "SHIP_HANGAR");
+    public static final DeferredItem<matteroverdrive.item.starmap.StarMapShipItem> SCOUT_SHIP = item("scout_ship",
+            p -> new matteroverdrive.item.starmap.StarMapShipItem(matteroverdrive.starmap.ShipType.SCOUT, p), p -> p);
+    public static final DeferredItem<matteroverdrive.item.starmap.StarMapShipItem> COLONIZER_SHIP = item("ship_colonizer",
+            p -> new matteroverdrive.item.starmap.StarMapShipItem(matteroverdrive.starmap.ShipType.COLONIZER, p), p -> p);
+
+    private static DeferredItem<matteroverdrive.item.starmap.StarMapBuildingItem> building(String name, String kind) {
+        return item(name, p -> new matteroverdrive.item.starmap.StarMapBuildingItem(
+                matteroverdrive.item.starmap.StarMapBuildingItem.Kind.valueOf(kind), p), p -> p);
+    }
+
     public static final DeferredItem<matteroverdrive.item.DataPadItem> DATA_PAD = item("data_pad", matteroverdrive.item.DataPadItem::new, p -> p);
     public static final DeferredItem<matteroverdrive.item.MatterScannerItem> MATTER_SCANNER = item("matter_scanner",
             matteroverdrive.item.MatterScannerItem::new, p -> p);

@@ -70,6 +70,10 @@ public class TravelEvent {
         return timeStart;
     }
 
+    public void setTimeStart(long timeStart) {
+        this.timeStart = timeStart;
+    }
+
     public long getTimeRemaining(Level level) {
         return timeStart + getTimeLength() - level.getGameTime();
     }

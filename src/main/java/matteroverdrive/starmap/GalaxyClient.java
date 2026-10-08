@@ -62,9 +62,11 @@ public final class GalaxyClient {
         }
     }
 
-    /** 1.7.10 canSeePlanetInfo: own planets (creative sees all); ship owners see their ships' planets (phase 7u). */
+    /** 1.7.10 canSeePlanetInfo: own planets, planets with one of the player's ships; creative sees all. */
     public static boolean canSeePlanetInfo(Planet planet, Player player) {
-        return planet.isOwner(player) || player.getAbilities().instabuild;
+        if (planet.isOwner(player) || player.getAbilities().instabuild) return true;
+        for (var ship : planet.getFleet()) if (ship.getItem() instanceof ShipItem item && item.isOwner(ship, player)) return true;
+        return false;
     }
 
     public static boolean canSeeStarInfo(Star star, Player player) {

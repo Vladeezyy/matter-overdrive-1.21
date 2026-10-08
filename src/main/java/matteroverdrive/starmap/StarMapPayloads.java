@@ -118,11 +118,37 @@ public final class StarMapPayloads {
         starMap.sync();
     }
 
+    /** 1.7.10 PacketStarMapAttack: send ship shipID of planet "from" to planet "to". */
+    public record Attack(GalacticPosition from, GalacticPosition to, int shipID) implements CustomPacketPayload {
+        public static final Type<Attack> TYPE = new Type<>(id("star_map_attack"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, Attack> STREAM_CODEC = StreamCodec.composite(
+                GalacticPosition.STREAM_CODEC, Attack::from, GalacticPosition.STREAM_CODEC, Attack::to, ByteBufCodecs.INT, Attack::shipID, Attack::new);
+
+        @Override
+        public Type<Attack> type() {
+            return TYPE;
+        }
+    }
+
+    /** Only the ship's owner sends it (1.7.10 trusted the client). */
+    private static void handleAttack(Attack attack, IPayloadContext context) {
+        if (!(context.player() instanceof ServerPlayer player)) return;
+        Galaxy galaxy = GalaxyServer.getGalaxy();
+        Planet from = galaxy == null ? null : galaxy.getPlanet(attack.from());
+        if (from == null || attack.shipID() < 0 || attack.shipID() >= from.getFleet().size()) return;
+        var ship = from.getShip(attack.shipID());
+        if (!(ship.getItem() instanceof ShipItem item) || !item.isOwner(ship, player)) return;
+        if (GalaxyServer.createTravelEvent(player.level(), attack.from(), attack.to(), attack.shipID()) != null) {
+            GalaxyServer.sendTravelEvents(player.level().getServer());
+        }
+    }
+
     public static void register(PayloadRegistrar registrar) {
         registrar.playToClient(GalaxySync.TYPE, GalaxySync.STREAM_CODEC, (p, c) -> GalaxyClient.setGalaxy(p.galaxy()))
                 .playToClient(PlanetUpdate.TYPE, PlanetUpdate.STREAM_CODEC, StarMapPayloads::handlePlanet)
                 .playToServer(StarRequest.TYPE, StarRequest.STREAM_CODEC, StarMapPayloads::handleStarRequest)
                 .playToServer(Command.TYPE, Command.STREAM_CODEC, StarMapPayloads::handleCommand)
+                .playToServer(Attack.TYPE, Attack.STREAM_CODEC, StarMapPayloads::handleAttack)
                 .playToClient(StarPlanets.TYPE, StarPlanets.STREAM_CODEC, StarMapPayloads::handleStarPlanets)
                 .playToClient(TravelEvents.TYPE, TravelEvents.STREAM_CODEC, (p, c) -> {
                     Galaxy galaxy = GalaxyClient.getGalaxy();

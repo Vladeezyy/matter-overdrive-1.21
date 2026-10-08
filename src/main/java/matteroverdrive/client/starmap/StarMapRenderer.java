@@ -280,6 +280,14 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
         icon(ctx, name, x, y, iconSize(name), rgb);
     }
 
+    static void item(Ctx ctx, net.minecraft.world.item.ItemStack stack, float x, float y) {
+        ctx.sink().item(ctx.pose(), stack, x, y);
+    }
+
+    static String time(long ticks) {
+        return matteroverdrive.client.screen.AndroidSpawnerScreen.formatRemainingTime(ticks / 20f);
+    }
+
     static String percent(float value) {
         return NumberFormat.getPercentInstance().format(value);
     }
@@ -598,7 +606,28 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
                 pose.popPose();
             }
             pose.popPose();
+            drawPlanetInfoClose(ctx, planet);
             drawShips(ctx, planet, size);
+        }
+
+        /** 1.7.10 drawPlanetInfoClose: the buildings' icons and names on an arc around the planet, facing the viewer. */
+        protected void drawPlanetInfoClose(Ctx ctx, Planet planet) {
+            if (ctx.player() == null || !GalaxyClient.canSeePlanetInfo(planet, ctx.player())) return;
+            PoseStack pose = ctx.pose();
+            pose.pushPose();
+            pose.mulPose(ctx.orientation());
+            pose.scale(0.01f, -0.01f, 0.01f);
+            double radius = clampedSize(planet) * 140;
+            var buildings = planet.getBuildings();
+            for (int i = 0; i < buildings.size(); i++) {
+                double angle = (14 * i - 6 * buildings.size()) * (Math.PI / 180);
+                int x = (int) (Math.cos(angle) * radius) - 10, y = (int) (Math.sin(angle) * radius) - 10;
+                var building = buildings.get(i);
+                item(ctx, building, x, y);
+                boolean own = building.getItem() instanceof matteroverdrive.starmap.Buildable b && b.isOwner(building, ctx.player());
+                text(ctx, building.getHoverName().getString(), x + 21, y + 6, own ? Galaxy.COLOR_HOLO : Galaxy.COLOR_HOLO_RED, 1, false);
+            }
+            pose.popPose();
         }
 
         /** 1.7.10 drawShips: each ship circles the planet on its own path (the ship icons come with phase 7u). */
@@ -611,6 +640,14 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
                 double phi = startingAngle + Math.copySign(ctx.time() * 0.005, direction);
                 double theta = random.nextDouble() * Math.PI * 2;
                 double radius = random.nextDouble() * 0.3 + 0.1 + planetSize;
+                var shipStack = planet.getShip(i);
+                PoseStack pose = ctx.pose();
+                pose.pushPose();
+                pose.translate(Math.sin(phi) * Math.sin(theta) * radius, Math.sin(phi) * Math.cos(theta) * radius, Math.cos(phi) * radius);
+                pose.mulPose(ctx.orientation());
+                pose.scale(0.01f, -0.01f, 0.01f);
+                item(ctx, shipStack, -8, -8);
+                pose.popPose();
                 ctx.sink().geometry(ctx.pose(), HoloRenderTypes.LINE_TYPE, (p, vc) -> {
                     for (int s = 0; s < 7; s++) {
                         double a = phi - Math.copySign(0.1 * s, direction), b = phi - Math.copySign(0.1 * (s + 1), direction);
@@ -628,6 +665,25 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
             boolean known = player != null && GalaxyClient.canSeePlanetInfo(planet, player);
             Font font = ctx.font();
             int x = 0, y = -16;
+            var level = Minecraft.getInstance().level;
+            if (known && level != null) {
+                // 1.7.10: the construction slots, with the time left or why they can't be built
+                int itemCount = 0;
+                for (int i = 0; i < Planet.SLOT_COUNT; i++) {
+                    var stack = planet.getStackInSlot(i);
+                    if (stack.isEmpty()) continue;
+                    java.util.List<Component> info = new java.util.ArrayList<>();
+                    int itemY = y - itemCount * 18 - 21;
+                    item(ctx, stack, 0, itemY);
+                    if (stack.getItem() instanceof matteroverdrive.starmap.Buildable b && planet.canBuild(b, stack, info)) {
+                        text(ctx, stack.getHoverName().getString() + " - " + time(b.getRemainingBuildTimeTicks(stack, planet, level)), 18, itemY + 5,
+                                Galaxy.COLOR_HOLO, opacity, false);
+                    } else {
+                        text(ctx, String.join(". ", info.stream().map(Component::getString).toList()), 18, itemY + 5, Galaxy.COLOR_HOLO_RED, opacity, false);
+                    }
+                    itemCount++;
+                }
+            }
             if (known) {
                 int factoryCount = planet.getFactoryCount();
                 int color = factoryCount <= 0 ? Galaxy.COLOR_HOLO_RED : Galaxy.COLOR_HOLO;
@@ -695,6 +751,7 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
                 pose.pushPose();
                 pose.mulPose(ctx.orientation());
                 pose.scale(0.01f, -0.01f, 0.01f);
+                drawTravelingShips(ctx, to);
                 icon(ctx, "arrow_right", -9, -9, Galaxy.COLOR_HOLO);
                 pose.popPose();
                 org.joml.Vector3f b = yaw.transform(new org.joml.Vector3f(-(clampedSize(to) + 0.25f), 0, 0));
@@ -707,12 +764,33 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
             }
         }
 
+        /** 1.7.10 drawTravelingShips: the player's ships on their way here, with the time left. */
+        private void drawTravelingShips(Ctx ctx, Planet planet) {
+            var level = Minecraft.getInstance().level;
+            if (level == null || ctx.player() == null) return;
+            int height = -24;
+            for (TravelEvent event : ctx.galaxy().getTravelEvents()) {
+                var ship = event.getShip();
+                if (!event.getTo().is(planet) || !(ship.getItem() instanceof matteroverdrive.starmap.ShipItem s) || !s.isOwner(ship, ctx.player())) continue;
+                String time = time(event.getTimeRemaining(level));
+                item(ctx, ship, -8, height - 8);
+                text(ctx, time, -ctx.font().width(time) / 2f, height + 8, Galaxy.COLOR_HOLO, 1, false);
+                height -= 26;
+            }
+        }
+
+        @Override
+        protected void drawPlanetInfoClose(Ctx ctx, Planet planet) {}
+
+        /** 1.7.10: the planet's ships, red when not the player's. */
         @Override
         public void renderGuiInfo(Ctx ctx, SpaceBody body, float opacity) {
             Planet planet = (Planet) body;
             int y = 0;
             for (var ship : planet.getFleet()) {
-                text(ctx, ship.getHoverName().getString(), 36, y - 10, Galaxy.COLOR_HOLO, 1, false);
+                boolean own = ctx.player() != null && ship.getItem() instanceof matteroverdrive.starmap.ShipItem s && s.isOwner(ship, ctx.player());
+                item(ctx, ship, 16, y - 16);
+                text(ctx, ship.getHoverName().getString(), 36, y - 10, own ? Galaxy.COLOR_HOLO : Galaxy.COLOR_HOLO_RED, 1, false);
                 y -= 16;
             }
         }

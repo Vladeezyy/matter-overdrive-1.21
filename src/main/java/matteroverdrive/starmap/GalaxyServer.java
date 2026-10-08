@@ -190,12 +190,18 @@ public final class GalaxyServer {
         return null;
     }
 
-    /** 1.7.10 buildHomeworld: 8 building and 10 fleet spaces (the starting base and scout ship come with phase 7u). */
+    /** 1.7.10 buildHomeworld: 8 building and 10 fleet spaces, a base and a scout ship, all the player's. */
     private static void buildHomeworld(Planet planet, Player player) {
         planet.setOwnerUUID(player.getUUID());
         planet.setHomeworld(true);
         planet.setBuildingSpaces(8);
         planet.setFleetSpaces(10);
+        ItemStack base = new ItemStack(matteroverdrive.init.MOItems.BUILDING_BASE.get());
+        ((Buildable) base.getItem()).setOwner(base, player.getUUID());
+        planet.addBuilding(base);
+        ItemStack scout = new ItemStack(matteroverdrive.init.MOItems.SCOUT_SHIP.get());
+        ((Buildable) scout.getItem()).setOwner(scout, player.getUUID());
+        planet.addShip(scout);
         planet.markDirty();
     }
 
@@ -206,9 +212,20 @@ public final class GalaxyServer {
 
     // --- events / sync -------------------------------------------------------------------------------
 
-    /** 1.7.10 Planet.onTravelEvent: tell the ship's owner it arrived. */
-    static void onTravelEvent(Level level, Planet to, ItemStack ship, GalacticPosition from) {
-        to.markForUpdate();
+    /**
+     * 1.7.10 createTravelEvent: the ship leaves the planet when the trip is valid and the destination will take it.
+     */
+    public static @Nullable TravelEvent createTravelEvent(Level level, GalacticPosition from, GalacticPosition to, int shipID) {
+        if (galaxy == null) return null;
+        Planet planet = galaxy.getPlanet(from);
+        if (planet == null || shipID < 0 || shipID >= planet.getFleet().size()) return null;
+        ItemStack ship = planet.getShip(shipID);
+        TravelEvent event = new TravelEvent(level, from, to, ship, galaxy);
+        if (!event.isValid(galaxy) || !galaxy.canCompleteTravelEvent(event, level)) return null;
+        planet.removeShip(shipID);
+        planet.markDirty();
+        galaxy.addTravelEvent(event);
+        return event;
     }
 
     static void sendPlanet(MinecraftServer server, Planet planet) {
@@ -216,7 +233,7 @@ public final class GalaxyServer {
         for (ServerPlayer player : server.getPlayerList().getPlayers()) send(player, update);
     }
 
-    static void sendTravelEvents(MinecraftServer server) {
+    public static void sendTravelEvents(MinecraftServer server) {
         if (galaxy == null) return;
         var events = new StarMapPayloads.TravelEvents(galaxy);
         for (ServerPlayer player : server.getPlayerList().getPlayers()) send(player, events);

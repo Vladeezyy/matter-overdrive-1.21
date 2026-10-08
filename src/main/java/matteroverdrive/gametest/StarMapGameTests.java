@@ -19,6 +19,8 @@ final class StarMapGameTests {
         MOGameTests.add("galaxy_generation", 20, false, StarMapGameTests::generation);
         MOGameTests.add("galaxy_homeworld", 20, false, StarMapGameTests::homeworld);
         MOGameTests.add("star_map_menu", 20, false, StarMapGameTests::menu);
+        MOGameTests.add("star_map_building", 20, false, StarMapGameTests::building);
+        MOGameTests.add("star_map_travel", 20, false, StarMapGameTests::travel);
     }
 
     private static void check(GameTestHelper helper, boolean ok, String message) {
@@ -85,13 +87,94 @@ final class StarMapGameTests {
         helper.succeed();
     }
 
+    private static net.minecraft.world.item.ItemStack aged(GameTestHelper helper, net.minecraft.world.item.Item item) {
+        var stack = new net.minecraft.world.item.ItemStack(item);
+        ((matteroverdrive.starmap.Buildable) item).setBuildStart(stack, helper.getLevel().getGameTime() - 1_000_000);
+        return stack;
+    }
+
+    /** Construction slots: buildings need a base, ships a factory; finished ones join the planet, owned by its owner. */
+    private static void building(GameTestHelper helper) {
+        ServerPlayer player = AndroidGameTests.player(helper);
+        GalaxyServer.tryAndClaimPlanet(player);
+        Planet home = GalaxyServer.getHomeworld(player);
+        var level = helper.getLevel();
+        check(helper, home.hasBuildingType(matteroverdrive.starmap.BuildingType.BASE) && home.getFleet().size() == 1
+                && home.getFleet().get(0).is(matteroverdrive.init.MOItems.SCOUT_SHIP.get()), "homeworld base + scout " + home.getFleet());
+        check(helper, home.getBuildingSpaces() == 10, "8 + 2 from the base: " + home.getBuildingSpaces());
+        // a ship without a factory can't be built: its clock restarts
+        home.setStackInSlot(2, aged(helper, matteroverdrive.init.MOItems.SCOUT_SHIP.get()));
+        home.update(level);
+        var waiting = home.getStackInSlot(2);
+        check(helper, !waiting.isEmpty() && ((matteroverdrive.starmap.Buildable) waiting.getItem()).getBuildStart(waiting) == level.getGameTime(),
+                "ship built without a factory");
+        home.setStackInSlot(0, aged(helper, matteroverdrive.init.MOItems.SHIP_FACTORY.get()));
+        home.setStackInSlot(1, aged(helper, matteroverdrive.init.MOItems.BUILDING_RESIDENTIAL.get()));
+        home.update(level);
+        check(helper, home.getStackInSlot(0).isEmpty() && home.hasBuildingType(matteroverdrive.starmap.BuildingType.SHIP_FACTORY)
+                && home.getBuildings().size() == 3, "buildings " + home.getBuildings());
+        var factory = home.getBuildings().get(1);
+        check(helper, player.getUUID().equals(((matteroverdrive.starmap.Buildable) factory.getItem()).getOwnerID(factory)), "owner");
+        check(helper, home.getPopulation() == 10000 && home.getPowerProduction() == -4 && home.getBuildingSpaces() == 14
+                && Math.abs(home.getHappiness() - (-0.4f - 0.6f)) < 1e-4, "stats pop " + home.getPopulation() + " power " + home.getPowerProduction()
+                + " spaces " + home.getBuildingSpaces() + " happiness " + home.getHappiness());
+        // the ship now has a factory (and a fleet space: 1.7.10 compared the fleet with itself)
+        home.setStackInSlot(2, aged(helper, matteroverdrive.init.MOItems.SCOUT_SHIP.get()));
+        home.update(level);
+        check(helper, home.getStackInSlot(2).isEmpty() && home.getFleet().size() == 2, "ship not built " + home.getFleet());
+        // a second base can't be built
+        var info = new java.util.ArrayList<Component>();
+        var base = new net.minecraft.world.item.ItemStack(matteroverdrive.init.MOItems.BUILDING_BASE.get());
+        check(helper, !home.canBuild((matteroverdrive.starmap.BuildingItem) base.getItem(), base, info) && !info.isEmpty(), "second base " + info);
+        player.discard();
+        helper.succeed();
+    }
+
+    /** A scout flies to another planet and arrives; a colonizer claims a free planet with a base. */
+    private static void travel(GameTestHelper helper) {
+        ServerPlayer player = AndroidGameTests.player(helper);
+        GalaxyServer.tryAndClaimPlanet(player);
+        Planet home = GalaxyServer.getHomeworld(player);
+        var level = helper.getLevel();
+        Galaxy galaxy = GalaxyServer.getGalaxy();
+        Planet target = null;
+        for (Quadrant quadrant : galaxy.getQuadrants()) {
+            for (Star star : quadrant.getStars()) {
+                for (Planet planet : star.getPlanets()) if (!planet.hasOwner() && planet.getFleet().isEmpty() && target == null) target = planet;
+            }
+        }
+        var from = GalacticPosition.of(home);
+        var to = GalacticPosition.of(target);
+        var scout = GalaxyServer.createTravelEvent(level, from, to, 0);
+        check(helper, scout != null && home.getFleet().isEmpty() && galaxy.getTravelEvents().contains(scout), "scout didn't leave");
+        check(helper, scout.getTimeLength() > 0, "travel time " + scout.getTimeLength());
+        scout.setTimeStart(level.getGameTime() - 10_000_000);
+        galaxy.update(level);
+        check(helper, target.getFleet().size() == 1 && !galaxy.getTravelEvents().contains(scout), "scout didn't arrive " + target.getFleet());
+        // back home, then a colonizer from home claims the target
+        var colonizer = new net.minecraft.world.item.ItemStack(matteroverdrive.init.MOItems.COLONIZER_SHIP.get());
+        ((matteroverdrive.starmap.Buildable) colonizer.getItem()).setOwner(colonizer, player.getUUID());
+        home.addShip(colonizer);
+        var event = GalaxyServer.createTravelEvent(level, from, to, home.getFleet().size() - 1);
+        check(helper, event != null, "colonizer didn't leave");
+        event.setTimeStart(level.getGameTime() - 10_000_000);
+        galaxy.update(level);
+        check(helper, target.isOwner(player) && target.hasBuildingType(matteroverdrive.starmap.BuildingType.BASE) && target.getFleet().size() == 1,
+                "not colonized: owner " + target.getOwnerUUID() + " fleet " + target.getFleet());
+        // an owned homeworld only takes its owner's ships
+        var stranger = new net.minecraft.world.item.ItemStack(matteroverdrive.init.MOItems.SCOUT_SHIP.get());
+        check(helper, home.canAddShip(stranger, player) && !home.canAddShip(stranger, AndroidGameTests.player(helper)), "homeworld fleet");
+        player.discard();
+        helper.succeed();
+    }
+
     /** A new player gets a homeworld (8 building / 10 fleet spaces); a star map placed by them shows it and zooms 0-4. */
     private static void homeworld(GameTestHelper helper) {
         check(helper, GalaxyServer.getGalaxy() != null, "no server galaxy");
         ServerPlayer player = AndroidGameTests.player(helper);
         GalaxyServer.tryAndClaimPlanet(player);
         Planet home = GalaxyServer.getHomeworld(player);
-        check(helper, home != null && home.isHomeworld(player) && home.getBuildingSpaces() == 8 && home.getFleetSpaces() == 10, "homeworld " + home);
+        check(helper, home != null && home.isHomeworld(player) && home.getBuildingSpaces() == 10 && home.getFleetSpaces() == 10, "homeworld " + home);
         check(helper, !GalaxyServer.tryAndClaimPlanet(player) && GalaxyServer.getHomeworld(player) == home, "claimed twice");
         for (Planet planet : home.getStar().getPlanets()) {
             check(helper, planet == home || !planet.hasOwner() || planet.isOwner(player), "someone else's system");

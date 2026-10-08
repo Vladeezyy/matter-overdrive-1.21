@@ -34,6 +34,10 @@ ITEMS.update({f"upgrade_{u}": (f"upgrade_{u}", "generated") for u in UPGRADES})
 BARRELS = ["damage", "fire", "explosion", "heal"]
 ITEMS.update({f"weapon_module_barrel_{b}": (f"barrel_{b}", "generated") for b in BARRELS})
 ITEMS["sniper_scope"] = ("sniper_scope", "generated")
+# 1.7.10 star map buildings and ships (phase 7u)
+STARMAP_ITEMS = ["building_base", "ship_factory", "building_residential", "building_matter_extractor", "building_power_generator",
+                 "building_ship_hangar", "scout_ship", "ship_colonizer"]
+ITEMS.update({n: (n, "generated") for n in STARMAP_ITEMS})
 # Batteries: one base texture + an overlay tinted per battery (1.7.10 Battery colours: COLOR_MATTER,
 # COLOR_YELLOW_STRIPES, COLOR_HOLO_RED).
 BATTERIES = {"battery": (191, 228, 230), "hc_battery": (254, 203, 4), "creative_battery": (230, 80, 20)}
@@ -1953,6 +1957,14 @@ for src_name, dst_name in [("en_US", "en_us"), ("ru_RU", "ru_ru")]:
     # 7p: guide categories, groups and named entries: guide.<kind>.<name>.name -> guide.matteroverdrive.<kind>.<name>
     for k in [k for k in en if k.startswith("guide.") and k.endswith(".name")]:
         lang["guide." + MOD + "." + k[len("guide."):-len(".name")]] = src.get(k) or en[k]
+    # 7u: star map buildings / ships details, alerts and build info
+    for n in STARMAP_ITEMS:
+        if f"item.{n}.details" in en:
+            lang[f"item.{MOD}.{n}.details"] = src.get(f"item.{n}.details") or en[f"item.{n}.details"]
+    for k in ["ship_arrive", "on_build"]:
+        lang[f"alert.{MOD}.starmap.{k}"] = src.get(f"alert.starmap.{k}") or en[f"alert.starmap.{k}"]
+    for k in ["no_ship_space", "no_building_space", "no_ship_factory", "has_base", "no_base"]:
+        lang[f"gui.{MOD}.starmap.{k}"] = src.get(f"gui.tooltip.starmap.{k}") or en[f"gui.tooltip.starmap.{k}"]
     # 7t: star map screen pages
     for k in ["galaxy", "quadrant", "star", "planet", "planet_stats"]:
         lang[f"gui.{MOD}.page.{k}"] = src.get(f"gui.tooltip.page.{k}") or en[f"gui.tooltip.page.{k}"]

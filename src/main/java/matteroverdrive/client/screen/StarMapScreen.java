@@ -220,10 +220,15 @@ public class StarMapScreen extends AbstractContainerScreen<StarMapMenu> {
         return entry.ship() == null && entry.body() instanceof Planet planet && !starMap.getGalaxyPosition().is(planet);
     }
 
-    /** "Enter" (planets: not someone else's); for ships "Attack" (the selected planet can take the ship, phase 7u). */
+    /** "Enter" (planets: not someone else's); for ships "Attack": the player's ship, and the selected planet takes it. */
     private boolean canView(Entry entry) {
         Player player = minecraft.player;
-        if (entry.ship() != null) return false;
+        if (entry.ship() != null) {
+            Galaxy galaxy = galaxy();
+            Planet to = galaxy == null ? null : galaxy.getPlanet(starMap.getDestination());
+            return player != null && entry.ship().getItem() instanceof ShipItem ship && ship.isOwner(entry.ship(), player)
+                    && to != null && to != entry.body() && to.canAddShip(entry.ship(), player);
+        }
         if (entry.body() instanceof Planet planet) return !planet.hasOwner() || (player != null && planet.isOwner(player));
         return true;
     }
@@ -236,6 +241,10 @@ public class StarMapScreen extends AbstractContainerScreen<StarMapMenu> {
     }
 
     private void view(Entry entry) {
+        if (entry.ship() != null) {
+            ClientPacketDistributor.sendToServer(new StarMapPayloads.Attack(starMap.getGalaxyPosition(), starMap.getDestination(), entry.shipId()));
+            return;
+        }
         setPage(entry.body() instanceof Quadrant ? 1 : entry.body() instanceof Star ? 2 : 3);
     }
 
@@ -335,7 +344,32 @@ public class StarMapScreen extends AbstractContainerScreen<StarMapMenu> {
                 g.blit(RenderPipelines.GUI_TEXTURED, holo(icon), slot.x, slot.y, 0, 0, 16, 16, 16, 16, 0xFF000000 | color);
             }
         }
-        if (page == 3) renderPlanetPage(g);
+        if (page == 3) {
+            renderPlanetPage(g);
+            renderSlotInfo(g);
+        }
+    }
+
+    /** 1.7.10 ElementSlotBuilding / ElementSlotShip.drawForeground: time left, or why it can't be built, left of the slot. */
+    private void renderSlotInfo(GuiGraphics g) {
+        Planet planet = starMap.getPlanet();
+        if (planet == null || minecraft.level == null) return;
+        for (int i = 0; i < StarMapMenu.SLOTS; i++) {
+            Slot slot = menu.slots.get(i);
+            ItemStack stack = slot.getItem();
+            if (slot.x < -1000 || !(stack.getItem() instanceof matteroverdrive.starmap.Buildable buildable)) continue;
+            List<Component> info = new ArrayList<>();
+            if (planet.canBuild(buildable, stack, info)) {
+                long remaining = buildable.getRemainingBuildTimeTicks(stack, planet, minecraft.level) / 20;
+                if (remaining >= 0) {
+                    String time = AndroidSpawnerScreen.formatRemainingTime(remaining);
+                    g.drawString(font, time, slot.x - 3 - font.width(time) - 4, slot.y - 3 + 6, 0xFF000000 | Galaxy.COLOR_HOLO, false);
+                }
+            } else {
+                String text = String.join(". ", info.stream().map(Component::getString).toList());
+                g.drawString(font, text, slot.x - 3 - font.width(text) - 4, slot.y - 3 + 7, 0xFF000000 | Galaxy.COLOR_HOLO_RED, false);
+            }
+        }
     }
 
     private static int div(int rgb, int d) {

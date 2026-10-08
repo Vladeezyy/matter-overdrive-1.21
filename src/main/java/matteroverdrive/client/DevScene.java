@@ -50,6 +50,7 @@ public final class DevScene {
     private static BlockPos origin;
     private static final java.util.UUID STRANGER = java.util.UUID.fromString("00000000-0000-4000-8000-00000000beef");
     private static BlockPos crashCrate;
+    private static matteroverdrive.starmap.GalacticPosition scoutTarget;
     private static BlockPos inscriberPos, solarPos, decomposerPos, recyclerPos, analyzerPos, storagePos, monitorPos, replicatorPos, reactorPos;
 
     private record Step(int at, Consumer<Minecraft> action) {}
@@ -1007,7 +1008,92 @@ public final class DevScene {
             at(2774 + i * 14, mc -> shot(mc, "star_map_screen_" + n));
         }
         at(2832, mc -> server(mc, ServerPlayer::closeContainer));
-        at(2836, mc -> mc.stop());
+        // 7u: the homeworld with buildings, ships, two constructions under way and a scout on its way to another system
+        at(2840, mc -> server(mc, p -> {
+            var home = matteroverdrive.starmap.GalaxyServer.getHomeworld(p);
+            if (home == null) return;
+            long now = p.level().getGameTime();
+            home.getBuildings().clear();
+            home.getFleet().clear();
+            for (var item : List.of(MOItems.BUILDING_BASE.get(), MOItems.SHIP_FACTORY.get(), MOItems.BUILDING_RESIDENTIAL.get(),
+                    MOItems.BUILDING_POWER_GENERATOR.get())) {
+                ItemStack building = new ItemStack(item);
+                ((matteroverdrive.starmap.Buildable) item).setOwner(building, p.getUUID());
+                home.addBuilding(building);
+            }
+            for (var item : List.of(MOItems.SCOUT_SHIP.get(), MOItems.COLONIZER_SHIP.get(), MOItems.SCOUT_SHIP.get())) {
+                ItemStack ship = new ItemStack(item);
+                ((matteroverdrive.starmap.Buildable) item).setOwner(ship, p.getUUID());
+                home.addShip(ship);
+            }
+            ItemStack extractor = new ItemStack(MOItems.BUILDING_MATTER_EXTRACTOR.get());
+            ((matteroverdrive.starmap.Buildable) extractor.getItem()).setBuildStart(extractor, now - 20 * 200);
+            home.setStackInSlot(0, extractor);
+            ItemStack scout = new ItemStack(MOItems.SCOUT_SHIP.get());
+            ((matteroverdrive.starmap.Buildable) scout.getItem()).setBuildStart(scout, now - 20 * 60);
+            home.setStackInSlot(2, scout);
+            home.markDirty();
+            // the nearest other system's planet: a scout goes there
+            matteroverdrive.starmap.Planet target = null;
+            double best = Double.MAX_VALUE;
+            for (var star : home.getStar().getQuadrant().getStars()) {
+                double d = star.getPosition().distanceTo(home.getStar().getPosition());
+                if (star == home.getStar() || star.getPlanets().isEmpty() || d >= best) continue;
+                best = d;
+                target = star.getPlanets().iterator().next();
+            }
+            if (target != null) {
+                matteroverdrive.starmap.GalaxyServer.createTravelEvent(p.level(), matteroverdrive.starmap.GalacticPosition.of(home),
+                        matteroverdrive.starmap.GalacticPosition.of(target), 2);
+                matteroverdrive.starmap.GalaxyServer.sendTravelEvents(p.level().getServer());
+                scoutTarget = matteroverdrive.starmap.GalacticPosition.of(target);
+            }
+            BlockPos map = origin.above(30).offset(0, 0, -4);
+            if (p.level().getBlockEntity(map) instanceof matteroverdrive.block.entity.StarMapBlockEntity m) {
+                m.setDestination(matteroverdrive.starmap.GalacticPosition.of(home));
+                m.setZoomLevel(3);
+                m.sync();
+            }
+            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
+                    "time set 18000");
+            p.teleportTo(p.level(), map.getX() + 0.5, map.getY(), map.getZ() + 4.0, Set.of(), 180f, -14f, false);
+        }));
+        at(2842, mc -> mc.options.hideGui = true);
+        at(2870, mc -> shot(mc, "starmap_planet_buildings"));
+        at(2872, mc -> server(mc, p -> {
+            BlockPos map = origin.above(30).offset(0, 0, -4);
+            if (p.level().getBlockEntity(map) instanceof matteroverdrive.block.entity.StarMapBlockEntity m) {
+                m.setZoomLevel(0);
+                m.sync();
+            }
+        }));
+        at(2900, mc -> shot(mc, "starmap_travel"));
+        at(2901, mc -> mc.options.hideGui = false);
+        at(2904, mc -> server(mc, p -> {
+            BlockPos map = origin.above(30).offset(0, 0, -4);
+            if (p.level().getBlockEntity(map) instanceof matteroverdrive.block.entity.StarMapBlockEntity m) {
+                m.setZoomLevel(3);
+                m.sync();
+                p.teleportTo(p.level(), map.getX() + 0.5, map.getY(), map.getZ() + 2.5, Set.of(), 180f, 10f, false);
+                p.openMenu(m, buf -> buf.writeBlockPos(map));
+            }
+        }));
+        at(2924, mc -> shot(mc, "starmap_screen_construction"));
+        at(2926, mc -> server(mc, p -> {
+            BlockPos map = origin.above(30).offset(0, 0, -4);
+            if (scoutTarget != null && p.level().getBlockEntity(map) instanceof matteroverdrive.block.entity.StarMapBlockEntity m) {
+                m.setDestination(scoutTarget);
+                m.setZoomLevel(4);
+                m.sync();
+            }
+        }));
+        at(2950, mc -> shot(mc, "starmap_screen_fleet"));
+        at(2952, mc -> server(mc, p -> {
+            p.closeContainer();
+            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
+                    "time set 6000");
+        }));
+        at(2956, mc -> mc.stop());
     }
 
     private static void at(int t, Consumer<Minecraft> action) {

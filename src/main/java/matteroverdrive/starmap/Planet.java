@@ -100,12 +100,106 @@ public class Planet extends SpaceBody {
 
     // --- update ---------------------------------------------------------------------------------
 
-    /** Server: sends the planet to the clients when it changed (1.7.10 needsClientUpdate -> PacketUpdatePlanet). */
+    /**
+     * 1.7.10 update (server): sends the planet to the clients when it changed; a construction slot whose item can be built
+     * is built once its time is up (owned by the planet's owner), one that can't restarts its clock every update.
+     */
     public void update(net.minecraft.world.level.Level level) {
-        if (!level.isClientSide() && needsClientUpdate) {
+        if (level.isClientSide()) return;
+        if (needsClientUpdate) {
             needsClientUpdate = false;
             if (level instanceof net.minecraft.server.level.ServerLevel server) GalaxyServer.sendPlanet(server.getServer(), this);
         }
+        for (int i = 0; i < SLOT_COUNT; i++) {
+            ItemStack stack = inventory[i];
+            if (!(stack.getItem() instanceof Buildable buildable)) continue;
+            List<net.minecraft.network.chat.Component> info = new ArrayList<>();
+            if (canBuild(buildable, stack, info)) {
+                if (buildable.isReadyToBuild(level, stack, this)) {
+                    if (buildable instanceof BuildingItem) buildings.add(stack);
+                    else fleet.add(stack);
+                    if (ownerUUID != null) buildable.setOwner(stack, ownerUUID);
+                    inventory[i] = ItemStack.EMPTY;
+                    onBuild(stack, level);
+                    markDirty();
+                }
+            } else {
+                buildable.setBuildStart(stack, level.getGameTime());
+                markDirty();
+            }
+        }
+    }
+
+    /** 1.7.10 onBuild: tell the owner. */
+    private void onBuild(ItemStack stack, net.minecraft.world.level.Level level) {
+        tell(level, ((Buildable) stack.getItem()).getOwnerID(stack), "alert.matteroverdrive.starmap.on_build", stack.getHoverName(), name);
+    }
+
+    /** 1.7.10 onTravelEvent: tell the ship's owner it arrived, run the ship's arrival (a colonizer is used up). */
+    public void onTravelEvent(ItemStack ship, net.minecraft.world.level.Level level) {
+        if (level.isClientSide() || !(ship.getItem() instanceof ShipItem shipItem)) return;
+        tell(level, shipItem.getOwnerID(ship), "alert.matteroverdrive.starmap.ship_arrive", ship.getHoverName(), name);
+        shipItem.onTravel(ship, this);
+        if (ship.getCount() <= 0) fleet.remove(ship);
+        markDirty();
+        markForUpdate();
+    }
+
+    private static void tell(net.minecraft.world.level.Level level, @Nullable UUID player, String key, net.minecraft.network.chat.Component item,
+                             String planet) {
+        if (player == null || level.getServer() == null) return;
+        var owner = level.getServer().getPlayerList().getPlayer(player);
+        if (owner != null) {
+            owner.sendSystemMessage(net.minecraft.network.chat.Component.literal("[Matter Overdrive]").withStyle(net.minecraft.ChatFormatting.GOLD)
+                    .append(net.minecraft.network.chat.Component.translatable(key, item, planet).withStyle(net.minecraft.ChatFormatting.RESET)));
+        }
+    }
+
+    // --- building rules (1.7.10 canBuild / canAddShip) ---------------------------------------------------
+
+    public boolean canBuild(Buildable buildable, ItemStack stack, List<net.minecraft.network.chat.Component> info) {
+        if (buildable instanceof BuildingItem building) return canBuild(building, stack, info);
+        if (buildable instanceof ShipItem ship) return canBuild(ship, stack, info);
+        return false;
+    }
+
+    /**
+     * A free building space and a base. 1.7.10 quirks kept: without a base both "No Base building" and "Not enough
+     * building spaces" are listed. Fixed: a base itself doesn't need a base (1.7.10 asked for one, so colonizers could
+     * never build theirs).
+     */
+    public boolean canBuild(BuildingItem building, ItemStack stack, List<net.minecraft.network.chat.Component> info) {
+        if (buildings.size() < getBuildingSpaces()) {
+            if (hasBuildingType(BuildingType.BASE) || building.getType(stack) == BuildingType.BASE) return building.canBuild(stack, this, info);
+            info.add(net.minecraft.network.chat.Component.translatable("gui.matteroverdrive.starmap.no_base"));
+        }
+        info.add(net.minecraft.network.chat.Component.translatable("gui.matteroverdrive.starmap.no_building_space"));
+        return false;
+    }
+
+    /** A free fleet space and a ship factory (fixed: 1.7.10 compared the fleet size with itself, so no ship could be built). */
+    public boolean canBuild(ShipItem ship, ItemStack stack, List<net.minecraft.network.chat.Component> info) {
+        if (fleet.size() < getFleetSpaces()) {
+            if (hasBuildingType(BuildingType.SHIP_FACTORY)) return ship.canBuild(stack, this, info);
+            info.add(net.minecraft.network.chat.Component.translatable("gui.matteroverdrive.starmap.no_ship_factory"));
+        } else {
+            info.add(net.minecraft.network.chat.Component.translatable("gui.matteroverdrive.starmap.no_ship_space"));
+        }
+        return false;
+    }
+
+    /** 1.7.10 canAddShip: an owned homeworld only takes its owner's ships; elsewhere a free fleet space (fixed like canBuild). */
+    public boolean canAddShip(ItemStack ship, @Nullable Player player) {
+        if (!(ship.getItem() instanceof ShipItem)) return false;
+        if (player != null && hasOwner() && homeworld) return isOwner(player);
+        return fleet.size() < getFleetSpaces();
+    }
+
+    public boolean hasBuildingType(BuildingType type) {
+        for (ItemStack building : buildings) {
+            if (building.getItem() instanceof BuildingItem item && item.getType(building) == type) return true;
+        }
+        return false;
     }
 
     public void markDirty() {

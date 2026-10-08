@@ -93,5 +93,9 @@ public final class MODataComponents {
             COMPONENTS.registerComponentType("security_owner", b -> b.persistent(net.minecraft.core.UUIDUtil.CODEC)
                     .networkSynchronized(net.minecraft.core.UUIDUtil.STREAM_CODEC));
 
+    /** Star map buildings / ships: when their construction started (1.7.10 "BuildStart"); the owner is security_owner. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Long>> BUILD_START =
+            COMPONENTS.registerComponentType("build_start", b -> b.persistent(Codec.LONG).networkSynchronized(ByteBufCodecs.VAR_LONG));
+
     private MODataComponents() {}
 }

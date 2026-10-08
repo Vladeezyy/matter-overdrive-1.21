@@ -70,7 +70,7 @@ public class Galaxy extends SpaceBody {
                         to.addShip(event.getShip());
                         from.markDirty();
                         to.markDirty();
-                        GalaxyServer.onTravelEvent(level, to, event.getShip(), event.getFrom());
+                        to.onTravelEvent(event.getShip(), level);
                         if (level instanceof net.minecraft.server.level.ServerLevel server) GalaxyServer.sendTravelEvents(server.getServer());
                     }
                 }
@@ -207,6 +207,15 @@ public class Galaxy extends SpaceBody {
         int count = 0;
         for (Quadrant quadrant : getQuadrants()) for (Star star : quadrant.getStars()) if (star.isClaimed(player) == 1) count++;
         return count;
+    }
+
+    /** 1.7.10 canCompleteTravelEvent: the destination takes the ship (its owner looked up online). */
+    public boolean canCompleteTravelEvent(TravelEvent event, Level level) {
+        Planet to = getPlanet(event.getTo());
+        if (to == null || !(event.getShip().getItem() instanceof ShipItem ship)) return false;
+        java.util.UUID ownerID = ship.getOwnerID(event.getShip());
+        Player owner = ownerID == null ? null : level.getPlayerByUUID(ownerID);
+        return to.canAddShip(event.getShip(), owner);
     }
 
     public void addTravelEvent(TravelEvent event) {

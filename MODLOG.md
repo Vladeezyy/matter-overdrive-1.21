@@ -429,6 +429,25 @@
   - Deviations: the screen places its slots at runtime (access transformer makes Slot.x / y non-final); lists are
     clipped with a scissor; on small GUI sizes the slot arc can overlap the inventory (1.7.10 used the same full-screen
     layout); "Travel To" / "Enter" tooltips are plain text like 1.7.10.
+- **7u ✅** Star map buildings and ships (1.7.10 IBuildable / IBuilding / IShip, items/starmap/*, Planet.update / canBuild /
+  canAddShip / onTravelEvent, GalaxyServer.createTravelEvent / buildHomeworld, PacketStarMapAttack). Items (no recipes,
+  like 1.7.10): base (+2 building spaces, one per planet, 500 s), ship factory (400 s), residential (10000 people,
+  -4 energy, -2 matter, +4 spaces, happiness from the energy / matter balance, 5 min), matter extractor (+10 matter,
+  -6 energy, 12 min), power generator (+8 energy, -2 matter, 12 min), ship hangar (+2 fleet spaces, 4 min), scout ship
+  (180 s), colonizer (250 s; on arrival becomes the planet's base and claims it). `build_start` component (the owner is
+  `security_owner`). A construction slot builds its item when the time is up (restarting its clock while it can't be
+  built), owned by the planet's owner, with chat alerts "... was built at ..." / "... has arrived at ...". New homeworlds
+  get a base and a scout ship. Planet stats page: own ships can be sent ("attack") to the selected planet if it takes
+  them; travel time = ly * 8 ticks (au * 10 within a system). The hologram shows building icons and names around the
+  planet, ships on their orbits, the construction list with time left / reasons, ships on their way; the screen shows
+  the time left (or the reason) next to the construction slots. Owners of a ship at a planet see that planet's info.
+  90 GameTests.
+  - Deviations (1.7.10 bugs that made the feature unusable, fixed - say if they should be restored): ships need a free
+    fleet space (1.7.10 compared the fleet size with itself, so no ship could ever be built or sent anywhere but the
+    owner's homeworld); a base doesn't need a base (1.7.10 asked for one, so colonizers never claimed anything); the
+    attack packet checks that the sender owns the ship. Kept: without a base the slot lists both "No Base building"
+    and "Not enough building spaces"; the planet panel's construction list overlaps the happiness / power rows; the
+    galaxy hologram's travelling ship moves away from its destination (from + (from - to) * progress).
 - Cloud (Linux) notes: regenerating resources rewrites the .ogg and ffmpeg-made .png bytes (different ffmpeg/oggenc
   builds) - `git checkout` them. Screenshots: `Xvfb :99` + `DISPLAY=:99 ./gradlew runScene` (software GL is slow; give
   menus extra ticks), world created by `runServer` with a flat creative server.properties, then moved to run/saves;
@@ -440,7 +459,7 @@
 2. ~~Mutant scientist~~ ✅ 7d (underwater base spawns one named "Mitko'Urrr", persistent, on the star map block).
 3. ~~Structures~~ ✅ 7f (the mad scientist house is a village piece: comes with the mad scientist in item 5).
 4. ~~Transporter, omni tool, matter scanner, portable decomposer, matter container, microwave~~ ✅ 7g-7k.
-5. Star map ✅ 7s (galaxy + block + hologram), screen ✅ 7t; next 7u buildings / ships; quests / dialogs / mad scientist ✅ 7m-7p, contract market ✅ 7q, android
+5. Star map ✅ 7s (galaxy + block + hologram), screen ✅ 7t, buildings / ships ✅ 7u; quests / dialogs / mad scientist ✅ 7m-7p, contract market ✅ 7q, android
    spawner ✅ 7l. Security protocol + crash landing ✅ 7r.
 - Deviations so far: legendary rogue android parts drop without bonus attributes; no rogue android teams/paths;
   legendary weapons have no stat bonuses; buildings: underwater base needs 16+ water (1.7.10: 27+, rare in today's deep
@@ -451,7 +470,7 @@
 **Workflow**
 - Resources: never hand-edit `src/main/resources/{assets,data}` — regenerate:
   `rm -rf src/main/resources/{assets,data} && python3 -I tools/gen_resources.py ~/mo-reference/mo-1.7.10/src/main/resources/assets/mo src/main/resources`
-- Tests: `./gradlew runGameTestServer` (88 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
+- Tests: `./gradlew runGameTestServer` (90 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
   `FunctionGameTestInstance`, custom 12³ structure `matteroverdrive:gametest_area`, time-of-day via `TestEnvironmentDefinition.TimeOfDay`,
   `makeMockServerPlayerInLevel`). Visual: `./gradlew runScene` → `run/screenshots/scene_*.png` (DevScene, world `run/saves/mo_scene`;
   pristine copy = "Новый мир (2)"; needs `pauseOnLostFocus=false`; selected hotbar slot is client-side; place blocks with

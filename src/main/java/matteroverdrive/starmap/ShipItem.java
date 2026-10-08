@@ -1,4 +1,11 @@
 package matteroverdrive.starmap;
 
-/** 1.7.10 IShip: an item built on a planet's fleet (the ship slots take these). Filled in with phase 7u. */
-public interface ShipItem {}
+import net.minecraft.world.item.ItemStack;
+
+/** 1.7.10 IShip: a ship of a planet's fleet (the last two construction slots take these). */
+public interface ShipItem extends Buildable {
+    ShipType getType(ItemStack stack);
+
+    /** On arrival at a planet. */
+    void onTravel(ItemStack stack, Planet to);
+}

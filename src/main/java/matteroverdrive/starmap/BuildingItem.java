@@ -1,4 +1,8 @@
 package matteroverdrive.starmap;
 
-/** 1.7.10 IBuilding: an item built on a planet (the building slots take these). Filled in with phase 7u. */
-public interface BuildingItem {}
+import net.minecraft.world.item.ItemStack;
+
+/** 1.7.10 IBuilding: a building of a planet (the first two construction slots take these). */
+public interface BuildingItem extends Buildable {
+    BuildingType getType(ItemStack stack);
+}

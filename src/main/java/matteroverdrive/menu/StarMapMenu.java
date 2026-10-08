@@ -165,5 +165,24 @@ public class StarMapMenu extends AbstractContainerMenu {
         public int getMaxStackSize() {
             return 1;
         }
+
+        /** 1.7.10 onItemPlaced / onItemPickup: construction (re)starts now. */
+        @Override
+        public void set(ItemStack stack) {
+            restart(stack);
+            super.set(stack);
+        }
+
+        @Override
+        public void onTake(Player player, ItemStack stack) {
+            restart(stack);
+            super.onTake(player, stack);
+        }
+
+        private void restart(ItemStack stack) {
+            if (!player.level().isClientSide() && stack.getItem() instanceof matteroverdrive.starmap.Buildable buildable) {
+                buildable.setBuildStart(stack, player.level().getGameTime());
+            }
+        }
     }
 }
