@@ -5,9 +5,5 @@
   "textures": {
     "texture": "matteroverdrive:block/inscriber",
     "particle": "matteroverdrive:block/base"
-  },
-  "visibility": {
-    "rail": false,
-    "head": false
   }
 }

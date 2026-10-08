@@ -230,13 +230,16 @@ for n, rgb in BATTERIES.items():
         {"type": "minecraft:constant", "value": (0xFF << 24 | rgb[0] << 16 | rgb[1] << 8 | rgb[2]) - (1 << 32)}]}})
 
 FACING_Y = {"north": 0, "east": 90, "south": 180, "west": 270}
+# 1.7.10 RenderUtils.rotateFromBlock (the OBJ machines, crate and charging station): the models face +z, unrotated
+# for south, turned 180 for north.
+OBJ_FACING_Y = {"south": 0, "west": 90, "north": 180, "east": 270}
 
 
-def facing_blockstate(n, model):
+def facing_blockstate(n, model, facing_y=FACING_Y):
     """Every machine block has facing and active; this one looks the same while working."""
     w(A / "blockstates" / f"{n}.json", {"variants": {
         f"active={a},facing={f}": ({"model": model, "y": y} if y else {"model": model})
-        for f, y in FACING_Y.items() for a in ("false", "true")}})
+        for f, y in facing_y.items() for a in ("false", "true")}})
     w(A / "items" / f"{n}.json", {"model": {"type": "minecraft:model", "model": model}})
 
 
@@ -259,8 +262,18 @@ for line in (ref / "models/block/inscriber.obj").read_text().splitlines():
 (A / "models/block/inscriber.obj").write_text("\n".join(obj_lines) + "\n")
 (A / "models/block/inscriber.mtl").write_text("newmtl inscriber\nmap_Kd #texture\n")
 w(A / "models/block/inscriber.json", {"loader": "neoforge:obj", "model": f"{MOD}:models/block/inscriber.obj",
+    "flip_v": True, "textures": {"texture": f"{MOD}:block/inscriber", "particle": f"{MOD}:block/base"},
+    "visibility": {"rail": False, "head": False}})
+# 1.7.10 TileEntityRendererInscriber moved the rail and head groups: one model each for the renderer
+for part, others in [("rail", ["base", "head"]), ("head", ["base", "rail"])]:
+    w(A / "models/block" / f"inscriber_{part}.json", {"loader": "neoforge:obj", "model": f"{MOD}:models/block/inscriber.obj",
+        "flip_v": True, "textures": {"texture": f"{MOD}:block/inscriber", "particle": f"{MOD}:block/base"},
+        "visibility": {o: False for o in others}})
+facing_blockstate("inscriber", f"{MOD}:block/inscriber", OBJ_FACING_Y)
+# the item keeps the whole model (the block's rail and head move in the renderer)
+w(A / "models/block/inscriber_full.json", {"loader": "neoforge:obj", "model": f"{MOD}:models/block/inscriber.obj",
     "flip_v": True, "textures": {"texture": f"{MOD}:block/inscriber", "particle": f"{MOD}:block/base"}})
-facing_blockstate("inscriber", f"{MOD}:block/inscriber")
+w(A / "items/inscriber.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:block/inscriber_full"}})
 
 for n in MACHINES:
     w(D / f"loot_table/blocks/{n}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "bonus_rolls": 0,
@@ -460,7 +473,7 @@ shaped("matter_analyzer", mid("matter_analyzer"), [" C ", "PMF", "ONO"],
 
 
 # --- phase 3 step 4: the matter network -----------------------------------------------------------
-def obj_model(name, materials, shift_y=False, hidden=(), particle="base", tints=None):
+def obj_model(name, materials, shift_y=False, hidden=(), particle="base", tints=None, render_type=None):
     """Copy a 1.7.10 Wavefront model for NeoForge's OBJ loader: one material per group (as the 1.7.10 renderer
     picked an icon per group), block-corner coordinates (shift the centred models by half a block)."""
     lines = [f"mtllib {name}.mtl"]
@@ -480,6 +493,8 @@ def obj_model(name, materials, shift_y=False, hidden=(), particle="base", tints=
         f"newmtl {m}\nmap_Kd #{m}\n" + (f"neoforge_TintIndex {tints[m]}\n" if tints and m in tints else "") for m in mats))
     model = {"loader": "neoforge:obj", "model": f"{MOD}:models/block/{name}.obj", "flip_v": True,
              "textures": {m: f"{MOD}:block/{m}" for m in mats} | {"particle": f"{MOD}:block/{particle}"}}
+    if render_type:
+        model["render_type"] = render_type
     if hidden:
         model["visibility"] = {h: False for h in hidden}
     w(A / "models/block" / f"{name}.json", model)
@@ -490,11 +505,16 @@ for tex in ["pattern_storage", "replicator", "vent", "network_router", "network_
 # 1.7.10 RendererBlockPatternStorage: pattern_storage + vents; the drive group was drawn by the tile renderer.
 obj_model("pattern_storage", {"pattern_storage": "pattern_storage", "Vents": "vent", "drive": "pattern_storage"},
           hidden=("drive",), particle="pattern_storage")
-facing_blockstate("pattern_storage", f"{MOD}:block/pattern_storage")
-# 1.7.10 RendererBlockReplicator: front + inside replicator, shell base, vents, back network port.
+# 1.7.10 TileEntityRendererPatterStorage drew the model's "drive" group once per drive: a model of just that group
+w(A / "models/block/pattern_storage_drive.json", {"loader": "neoforge:obj", "model": f"{MOD}:models/block/pattern_storage.obj", "flip_v": True,
+    "textures": {"pattern_storage": f"{MOD}:block/pattern_storage", "vent": f"{MOD}:block/vent", "particle": f"{MOD}:block/pattern_storage"},
+    "visibility": {"Vents": False, "pattern_storage": False}})
+facing_blockstate("pattern_storage", f"{MOD}:block/pattern_storage", OBJ_FACING_Y)
+# 1.7.10 RendererBlockReplicator: front + inside replicator, shell base, vents, back network port. The front's window
+# is transparent (pass 0 alpha test = cutout), so the output item drawn by the tile renderer shows through it.
 obj_model("replicator", {"Front": "replicator", "Inside": "replicator", "Shell": "base", "Vents": "vent", "Back": "network_port"},
-          shift_y=True, particle="replicator")
-facing_blockstate("replicator", f"{MOD}:block/replicator")
+          shift_y=True, particle="replicator", render_type="minecraft:cutout")
+facing_blockstate("replicator", f"{MOD}:block/replicator", OBJ_FACING_Y)
 for n in ["network_router", "network_switch"]:
     w(A / f"models/block/{n}.json", {"parent": "minecraft:block/cube_all", "textures": {"all": f"{MOD}:block/{n}"}})
     w(A / f"blockstates/{n}.json", {"variants": {"": {"model": f"{MOD}:block/{n}"}}})
@@ -508,18 +528,16 @@ def quad(frm, to, uv, tex, cull=None):
 
 
 screen = [quad([0, 8, 10.99], [8, 16, 10.99], [0, 0, 2, 2], "#screen"), quad([8, 8, 10.99], [16, 16, 10.99], [14, 0, 16, 2], "#screen"),
-          quad([0, 0, 10.99], [8, 8, 10.99], [0, 14, 2, 16], "#screen"), quad([8, 0, 10.99], [16, 8, 10.99], [14, 14, 16, 16], "#screen"),
-          quad([4, 4, 10.9], [12, 12, 10.9], [0, 0, 16, 16], "#holo")]
-# 1.7.10 TileEntityRendererMonitor tinted the holo COLOR_HOLO * 0.7 (169,226,251 -> 0x769EAF); tint 0 = block colour
-screen[-1]["faces"]["north"]["tintindex"] = 0
-HOLO_TINT = [{"type": "minecraft:constant", "value": 0xFF769EAF - (1 << 32)}]
+          quad([0, 0, 10.99], [8, 8, 10.99], [0, 14, 2, 16], "#screen"), quad([8, 0, 10.99], [16, 8, 10.99], [14, 14, 16, 16], "#screen")]
+# the holo screen itself (glow, back, holo icon, pattern count) is drawn by MonitorRenderer like 1.7.10 TileEntityRendererMonitor
+cp(ref / "textures/blocks/pattern_monitor_holo_back.png", A / "textures/block/pattern_monitor_holo_back.png")
+cp(ref / "textures/fx/holo_monitor_glow.png", A / "textures/fx/holo_monitor_glow.png")
 body = {"from": [0, 0, 11], "to": [16, 16, 16], "faces": {d: {"texture": "#base"} for d in ["south", "east", "west", "up", "down"]}
         | {"south": {"texture": "#port"}}}
 w(A / "models/block/pattern_monitor.json", {"parent": "minecraft:block/block", "render_type": "minecraft:cutout", "textures": {
     "base": f"{MOD}:block/base", "port": f"{MOD}:block/network_port", "screen": f"{MOD}:block/holo_monitor",
     "holo": f"{MOD}:block/pattern_monitor_holo", "particle": f"{MOD}:block/base"}, "elements": [body] + screen})
 facing_blockstate("pattern_monitor", f"{MOD}:block/pattern_monitor")
-w(A / "items/pattern_monitor.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:block/pattern_monitor", "tints": HOLO_TINT}})
 
 for tex in ["refresh", "request"]:
     cp(ref / "textures/gui/items" / f"{tex}.png", A / "textures/gui/elements" / f"{tex}.png")
@@ -919,7 +937,7 @@ w(A / "models/block/charging_station.json", {"loader": "neoforge:obj", "model": 
 w(A / "models/block/charging_station_part.json", {"textures": {"particle": f"{MOD}:block/base"}})
 w(A / "blockstates/charging_station.json", {"variants": {
     f"active={a},facing={f},part={p}": ({"model": f"{MOD}:block/charging_station", "y": y} if p == 0 else {"model": f"{MOD}:block/charging_station_part"})
-    for f, y in FACING_Y.items() for a in ("false", "true") for p in (0, 1, 2)}})
+    for f, y in OBJ_FACING_Y.items() for a in ("false", "true") for p in (0, 1, 2)}})
 w(A / "items/charging_station.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:block/charging_station"}})
 w(D / "loot_table/blocks/charging_station.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "bonus_rolls": 0,
     "entries": [{"type": "minecraft:item", "name": mid("charging_station"), "functions": [{"function": "minecraft:copy_components",
@@ -1086,7 +1104,7 @@ obj_model("tritanium_crate", {"base": "tritanium_crate_base", "overlay": "tritan
 CRATES = [f"tritanium_crate_{dye}" for dye in DYES]
 for dye, n in zip(DYES, CRATES):
     w(A / "blockstates" / f"{n}.json", {"variants": {f"facing={f}": ({"model": f"{MOD}:block/tritanium_crate", "y": y} if y else
-                                                                    {"model": f"{MOD}:block/tritanium_crate"}) for f, y in FACING_Y.items()}})
+                                                                    {"model": f"{MOD}:block/tritanium_crate"}) for f, y in OBJ_FACING_Y.items()}})
     w(A / "items" / f"{n}.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:block/tritanium_crate",
         "tints": [{"type": "minecraft:constant", "value": (0xFF << 24 | DYE_RGB[dye]) - (1 << 32)}]}})
     w(D / f"loot_table/blocks/{n}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "bonus_rolls": 0,
@@ -1215,7 +1233,6 @@ w(A / "models/block/contract_market.json", {"parent": "minecraft:block/block", "
     "base": f"{MOD}:block/base", "port": f"{MOD}:block/base", "screen": f"{MOD}:block/holo_monitor",
     "holo": f"{MOD}:block/contract_station_holo", "particle": f"{MOD}:block/base"}, "elements": [body] + screen})
 facing_blockstate("contract_market", f"{MOD}:block/contract_market")
-w(A / "items/contract_market.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:block/contract_market", "tints": HOLO_TINT}})
 w(D / "loot_table/blocks/contract_market.json", self_drop("contract_market"))
 for tag in ["mineable/pickaxe", "needs_iron_tool"]:
     p = TAGS / f"minecraft/tags/block/{tag}.json"

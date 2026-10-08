@@ -34,6 +34,11 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 @EventBusSubscriber(modid = MatterOverdrive.MODID, value = Dist.CLIENT)
 public class MatterOverdriveClient {
     @SubscribeEvent
+    static void standaloneModels(net.neoforged.neoforge.client.event.ModelEvent.RegisterStandalone event) {
+        MachineRenderers.registerModels(event);
+    }
+
+    @SubscribeEvent
     static void pictureInPicture(net.neoforged.neoforge.client.event.RegisterPictureInPictureRenderersEvent event) {
         event.register(matteroverdrive.client.starmap.StarMapPipRenderer.State.class, matteroverdrive.client.starmap.StarMapPipRenderer::new);
     }
@@ -68,9 +73,6 @@ public class MatterOverdriveClient {
             event.register((state, level, pos, tint) -> rgb, matteroverdrive.init.MODecorative.COLORED_PLATES.get(i).get());
             event.register((state, level, pos, tint) -> tint == 0 ? rgb : -1, matteroverdrive.init.MOBlocks.TRITANIUM_CRATES.get(i).get());
         }
-        // 1.7.10 TileEntityRendererMonitor: the monitors' holo drawn in COLOR_HOLO * 0.7
-        event.register((state, level, pos, tint) -> tint == 0 ? 0xFF769EAF : -1,
-                matteroverdrive.init.MOBlocks.PATTERN_MONITOR.get(), matteroverdrive.init.MOBlocks.CONTRACT_MARKET.get());
     }
 
     public MatterOverdriveClient() {
@@ -137,6 +139,13 @@ public class MatterOverdriveClient {
         event.registerEntityRenderer(matteroverdrive.init.MOEntities.PLASMA_BOLT.get(), PlasmaBoltRenderer::new);
         event.registerBlockEntityRenderer(matteroverdrive.init.MOBlockEntities.WEAPON_STATION.get(), WeaponStationRenderer::new);
         event.registerBlockEntityRenderer(matteroverdrive.init.MOBlockEntities.STAR_MAP.get(), matteroverdrive.client.starmap.StarMapRenderer::new);
+        event.registerBlockEntityRenderer(matteroverdrive.init.MOBlockEntities.PATTERN_STORAGE.get(), MachineRenderers.PatternStorage::new);
+        event.registerBlockEntityRenderer(matteroverdrive.init.MOBlockEntities.REPLICATOR.get(), MachineRenderers.Replicator::new);
+        event.registerBlockEntityRenderer(matteroverdrive.init.MOBlockEntities.INSCRIBER.get(), MachineRenderers.Inscriber::new);
+        event.registerBlockEntityRenderer(matteroverdrive.init.MOBlockEntities.PATTERN_MONITOR.get(),
+                c -> new MachineRenderers.Monitor<>(c, "pattern_monitor_holo"));
+        event.registerBlockEntityRenderer(matteroverdrive.init.MOBlockEntities.CONTRACT_MARKET.get(),
+                c -> new MachineRenderers.Monitor<>(c, "contract_station_holo"));
         event.registerBlockEntityRenderer(matteroverdrive.init.MOBlockEntities.HOLO_SIGN.get(), HoloSignRenderer::new);
         event.registerBlockEntityRenderer(matteroverdrive.init.MOBlockEntities.GRAVITATIONAL_ANOMALY.get(), AnomalyRenderer::new);
         event.registerEntityRenderer(matteroverdrive.init.MOEntities.ROGUE_ANDROID.get(), RogueAndroidRenderer::melee);

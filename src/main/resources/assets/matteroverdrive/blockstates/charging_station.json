@@ -1,48 +1,8 @@
 {
   "variants": {
-    "active=false,facing=north,part=0": {
-      "model": "matteroverdrive:block/charging_station",
-      "y": 0
-    },
-    "active=false,facing=north,part=1": {
-      "model": "matteroverdrive:block/charging_station_part"
-    },
-    "active=false,facing=north,part=2": {
-      "model": "matteroverdrive:block/charging_station_part"
-    },
-    "active=true,facing=north,part=0": {
-      "model": "matteroverdrive:block/charging_station",
-      "y": 0
-    },
-    "active=true,facing=north,part=1": {
-      "model": "matteroverdrive:block/charging_station_part"
-    },
-    "active=true,facing=north,part=2": {
-      "model": "matteroverdrive:block/charging_station_part"
-    },
-    "active=false,facing=east,part=0": {
-      "model": "matteroverdrive:block/charging_station",
-      "y": 90
-    },
-    "active=false,facing=east,part=1": {
-      "model": "matteroverdrive:block/charging_station_part"
-    },
-    "active=false,facing=east,part=2": {
-      "model": "matteroverdrive:block/charging_station_part"
-    },
-    "active=true,facing=east,part=0": {
-      "model": "matteroverdrive:block/charging_station",
-      "y": 90
-    },
-    "active=true,facing=east,part=1": {
-      "model": "matteroverdrive:block/charging_station_part"
-    },
-    "active=true,facing=east,part=2": {
-      "model": "matteroverdrive:block/charging_station_part"
-    },
     "active=false,facing=south,part=0": {
       "model": "matteroverdrive:block/charging_station",
-      "y": 180
+      "y": 0
     },
     "active=false,facing=south,part=1": {
       "model": "matteroverdrive:block/charging_station_part"
@@ -52,7 +12,7 @@
     },
     "active=true,facing=south,part=0": {
       "model": "matteroverdrive:block/charging_station",
-      "y": 180
+      "y": 0
     },
     "active=true,facing=south,part=1": {
       "model": "matteroverdrive:block/charging_station_part"
@@ -62,7 +22,7 @@
     },
     "active=false,facing=west,part=0": {
       "model": "matteroverdrive:block/charging_station",
-      "y": 270
+      "y": 90
     },
     "active=false,facing=west,part=1": {
       "model": "matteroverdrive:block/charging_station_part"
@@ -72,12 +32,52 @@
     },
     "active=true,facing=west,part=0": {
       "model": "matteroverdrive:block/charging_station",
-      "y": 270
+      "y": 90
     },
     "active=true,facing=west,part=1": {
       "model": "matteroverdrive:block/charging_station_part"
     },
     "active=true,facing=west,part=2": {
+      "model": "matteroverdrive:block/charging_station_part"
+    },
+    "active=false,facing=north,part=0": {
+      "model": "matteroverdrive:block/charging_station",
+      "y": 180
+    },
+    "active=false,facing=north,part=1": {
+      "model": "matteroverdrive:block/charging_station_part"
+    },
+    "active=false,facing=north,part=2": {
+      "model": "matteroverdrive:block/charging_station_part"
+    },
+    "active=true,facing=north,part=0": {
+      "model": "matteroverdrive:block/charging_station",
+      "y": 180
+    },
+    "active=true,facing=north,part=1": {
+      "model": "matteroverdrive:block/charging_station_part"
+    },
+    "active=true,facing=north,part=2": {
+      "model": "matteroverdrive:block/charging_station_part"
+    },
+    "active=false,facing=east,part=0": {
+      "model": "matteroverdrive:block/charging_station",
+      "y": 270
+    },
+    "active=false,facing=east,part=1": {
+      "model": "matteroverdrive:block/charging_station_part"
+    },
+    "active=false,facing=east,part=2": {
+      "model": "matteroverdrive:block/charging_station_part"
+    },
+    "active=true,facing=east,part=0": {
+      "model": "matteroverdrive:block/charging_station",
+      "y": 270
+    },
+    "active=true,facing=east,part=1": {
+      "model": "matteroverdrive:block/charging_station_part"
+    },
+    "active=true,facing=east,part=2": {
       "model": "matteroverdrive:block/charging_station_part"
     }
   }

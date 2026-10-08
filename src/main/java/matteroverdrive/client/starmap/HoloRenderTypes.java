@@ -41,7 +41,20 @@ public final class HoloRenderTypes {
             .withLocation(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "pipeline/holo_lines"))
             .withBlend(BlendFunction.ADDITIVE).withDepthWrite(false).build();
 
+    /** 1.7.10 block screens: glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR). */
+    public static final RenderPipeline SCREEN = base("holo_screen").withBlend(new BlendFunction(
+                    com.mojang.blaze3d.platform.SourceFactor.ONE, com.mojang.blaze3d.platform.DestFactor.ONE_MINUS_SRC_COLOR))
+            .withVertexShader("core/position_tex_color").withFragmentShader("core/position_tex_color").withSampler("Sampler0")
+            .withVertexFormat(DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS).build();
+    private static final Map<ResourceLocation, RenderType> SCREEN_TYPES = new HashMap<>();
+
+    public static RenderType screen(ResourceLocation texture) {
+        return SCREEN_TYPES.computeIfAbsent(texture, t -> RenderType.create("mo_holo_screen", 1536, false, true, SCREEN,
+                RenderType.CompositeState.builder().setTextureState(new RenderStateShard.TextureStateShard(t, false)).createCompositeState(false)));
+    }
+
     public static void register(RegisterRenderPipelinesEvent event) {
+        event.registerPipeline(SCREEN);
         event.registerPipeline(TEXTURED);
         event.registerPipeline(QUADS);
         event.registerPipeline(TRIANGLES);

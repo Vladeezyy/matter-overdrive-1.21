@@ -1130,7 +1130,59 @@ public final class DevScene {
         at(3005, mc -> mc.setScreen(new TooltipScreen(mc.player.getMainHandItem())));
         at(3013, mc -> shot(mc, "network_flash_drive"));
         at(3014, mc -> mc.setScreen(null));
-        at(3018, mc -> mc.stop());
+        // leftovers: machine renderers - the inscriber at work, pattern storage drives, the monitor screen, the replicated item
+        at(3020, mc -> server(mc, p -> {
+            if (p.level().getBlockEntity(inscriberPos) instanceof matteroverdrive.block.entity.InscriberBlockEntity inscriber) {
+                inscriber.getEnergy().set(inscriber.getEnergy().getCapacity());
+                inscriber.getInventory().setStack(matteroverdrive.block.entity.InscriberBlockEntity.MAIN, new ItemStack(MOItems.ISOLINEAR_CIRCUIT_MK1.get(), 4));
+                inscriber.getInventory().setStack(matteroverdrive.block.entity.InscriberBlockEntity.SECONDARY, new ItemStack(Items.GOLD_INGOT, 4));
+            }
+            if (p.level().getBlockEntity(replicatorPos) instanceof matteroverdrive.block.entity.ReplicatorBlockEntity replicator) {
+                replicator.getInventory().setStack(matteroverdrive.block.entity.ReplicatorBlockEntity.OUTPUT, new ItemStack(Items.DIAMOND, 3));
+            }
+            p.teleportTo(p.level(), inscriberPos.getX() + 0.5, inscriberPos.getY() + 0.4, inscriberPos.getZ() + 2.0, Set.of(), 180f, 35f, false);
+        }));
+        at(3022, mc -> mc.options.hideGui = true);
+        at(3040, mc -> shot(mc, "inscriber_working"));
+        at(3050, mc -> shot(mc, "inscriber_working_2"));
+        at(3052, mc -> server(mc, p -> p.teleportTo(p.level(), monitorPos.getX() + 0.5, monitorPos.getY() + 0.2, monitorPos.getZ() + 3.0,
+                Set.of(), 180f, 18f, false)));
+        at(3080, mc -> shot(mc, "network_machines"));
+        at(3082, mc -> server(mc, p -> p.teleportTo(p.level(), inscriberPos.getX() + 0.5, inscriberPos.getY() + 0.6, inscriberPos.getZ() + 1.1,
+                Set.of(), 180f, 60f, false)));
+        at(3100, mc -> shot(mc, "inscriber_close"));
+        at(3102, mc -> server(mc, p -> {
+            BlockPos pos = origin.above(30).offset(0, 0, -4);
+            for (BlockPos b : BlockPos.betweenClosed(pos.offset(-3, -1, -3), pos.offset(3, 3, 3))) {
+                p.level().setBlock(b, b.getY() < pos.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
+                        Block.UPDATE_CLIENTS | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
+            }
+            p.level().setBlockAndUpdate(pos, MOBlocks.PATTERN_STORAGE.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
+            if (p.level().getBlockEntity(pos) instanceof matteroverdrive.block.entity.PatternStorageBlockEntity storage) {
+                for (int i = 0; i < 6; i++) storage.getInventory().setStack(i, new ItemStack(MOItems.PATTERN_DRIVE.get()));
+            }
+            p.teleportTo(p.level(), pos.getX() + 2.2, pos.getY(), pos.getZ() + 2.2, Set.of(), 135f, 30f, false);
+        }));
+        at(3120, mc -> shot(mc, "pattern_storage_drives"));
+        at(3121, mc -> server(mc, p -> {
+            BlockPos pos = origin.above(30).offset(0, 0, -4);
+            p.teleportTo(p.level(), pos.getX() - 1.2, pos.getY(), pos.getZ() + 2.2, Set.of(), 225f, 30f, false);
+        }));
+        at(3130, mc -> shot(mc, "pattern_storage_side"));
+        at(3132, mc -> server(mc, p -> {
+            BlockPos pos = origin.above(30).offset(0, 0, -4);
+            p.level().setBlockAndUpdate(pos, MOBlocks.REPLICATOR.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
+            if (p.level().getBlockEntity(pos) instanceof matteroverdrive.block.entity.ReplicatorBlockEntity replicator) {
+                replicator.getInventory().setStack(matteroverdrive.block.entity.ReplicatorBlockEntity.OUTPUT, new ItemStack(Items.DIAMOND, 3));
+            }
+            // the replaced pattern storage dropped its drives
+            p.level().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, new net.minecraft.world.phys.AABB(pos).inflate(8))
+                    .forEach(net.minecraft.world.entity.Entity::discard);
+            p.teleportTo(p.level(), pos.getX() + 0.5, pos.getY(), pos.getZ() + 2.8, Set.of(), 180f, 30f, false);
+        }));
+        at(3160, mc -> shot(mc, "replicator_item"));
+        at(3161, mc -> mc.options.hideGui = false);
+        at(3164, mc -> mc.stop());
     }
 
     /** Shows one item's tooltip in the middle of the screen. */
@@ -1190,7 +1242,10 @@ public final class DevScene {
         level.setDayTime(6000);
         level.setWeatherParameters(6000, 0, false, false);
         player.setGameMode(GameType.CREATIVE);
-        BlockPos base = player.blockPosition();
+        // A fixed spot (the spawn, on the flat world's surface): the player's saved position drifts between runs.
+        BlockPos spawn = level.getRespawnData().pos();
+        BlockPos base = new BlockPos(spawn.getX(), level.getMinY() + 4, spawn.getZ());
+        player.teleportTo(level, base.getX() + 0.5, base.getY(), base.getZ() + 0.5, Set.of(), 180f, 0f, false);
         origin = base;
         for (BlockPos p : BlockPos.betweenClosed(base.offset(-3, -1, -8), base.offset(3, -1, 0))) {
             level.setBlockAndUpdate(p, Blocks.SMOOTH_STONE.defaultBlockState());

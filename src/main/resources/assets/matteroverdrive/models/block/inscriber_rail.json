@@ -7,7 +7,7 @@
     "particle": "matteroverdrive:block/base"
   },
   "visibility": {
-    "rail": false,
+    "base": false,
     "head": false
   }
 }

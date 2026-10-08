@@ -89,7 +89,7 @@
 - The network is a shared bus: router and switch only connect; destination filters came later (see the leftovers).
 - Pattern monitor recipe uses a glass pane instead of the holo sign until the holo sign (phase 7) exists.
 - The analyzer's database slot takes a pattern drive directly (or a matter scanner since 7j).
-- Pattern storage drives inside the block, replicator item animation, monitor hologram are renderer polish for later.
+- Pattern storage drives, the replicator's item, the monitor hologram: done in the leftovers (machine renderers).
 
 ### Gotchas
 13. Matter values must be computed on the logical server from the RecipeManager, after datapacks load; the client only
@@ -465,6 +465,20 @@
   the listed blocks: the analyzer stores into listed storages, the monitor lists listed storages' patterns and sends
   tasks to listed replicators (the storage's and replicator's filters did nothing visible in 1.7.10 either). 93 GameTests.
   - Deviation: 1.7.10's "Destination Address" text field (saved, never used) isn't ported.
+- **Leftovers: machine renderers ✅** (1.7.10 TileEntityRendererPatterStorage / Replicator / Inscriber, TileEntityRendererPatternMonitor
+  + holo monitor base, RenderUtils.rotateFromBlock). `client/MachineRenderers`: the pattern storage draws the OBJ's
+  "drive" group per filled drive slot (3 per side, they stick out of the side bays); the replicator shows its output
+  stack through the front window (the window texture is transparent: the model is now `cutout`, 1.7.10's pass-0 alpha
+  test); the inscriber's rail and head are separate standalone models that move to a new random gaussian spot every 20
+  ticks while active (deterministic per block + step, lerped) and the item lies on the bed; the pattern monitor and
+  contract market draw the 1.7.10 holo screen (glow, back plane, holo plane, additive `holo_screen` pipeline) instead
+  of the old model quad, and the monitor writes its pattern count (synced every 20 ticks). Machines now send a block
+  update when their inventory changes (renderers need it).
+  - Fix: the OBJ machines (inscriber, pattern storage, replicator, charging station, tritanium crate) were turned 180
+    degrees - their models face +z, and 1.7.10 rotateFromBlock leaves south unrotated (`OBJ_FACING_Y` in gen_resources).
+  - Deviation: 1.7.10 turned the replicator's item 90 degrees in world space, edge-on through the window; it faces the
+    window here. Items in the replicator are lit from the block in front (the machine's own light can be 0).
+  - DevScene: the scene origin is the world spawn on the flat surface (the saved player position drifted between runs).
 - Cloud (Linux) notes: regenerating resources rewrites the .ogg and ffmpeg-made .png bytes (different ffmpeg/oggenc
   builds) - `git checkout` them. Screenshots: `Xvfb :99` + `DISPLAY=:99 ./gradlew runScene` (software GL is slow; give
   menus extra ticks), world created by `runServer` with a flat creative server.properties, then moved to run/saves;
@@ -537,5 +551,4 @@
 
 ## Next
 - Phase 7: world & extras (rogue androids, mad scientist, structures, transporter, star map, quests, holo sign, crate, food).
-- Polish later: machine item tooltip with stored energy, inscriber head animation, machine sounds, custom tritanium armor model,
-  pattern storage drive rendering, replicator item animation, monitor hologram, matter scanner.
+- Polish later: machine item tooltip with stored energy, machine sounds, custom tritanium armor model, matter scanner.

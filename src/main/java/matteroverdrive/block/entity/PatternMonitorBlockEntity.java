@@ -34,6 +34,11 @@ public class PatternMonitorBlockEntity extends MachineBlockEntity {
     public static final int MAX_QUEUE = 16;
 
     private final List<Task> queue = new ArrayList<>();
+    private int patternCount;
+
+    public int getPatternCount() {
+        return patternCount;
+    }
 
     public PatternMonitorBlockEntity(BlockPos pos, BlockState state) {
         super(MOBlockEntities.PATTERN_MONITOR.get(), pos, state, withFilterSlot(MachineInventory.builder()), false, 0, 0, 0, 0, Set.of());
@@ -69,6 +74,14 @@ public class PatternMonitorBlockEntity extends MachineBlockEntity {
 
     @Override
     protected boolean tickMachine(boolean redstoneAllows) {
+        // the screen shows how many patterns the network has (1.7.10 getGuiPatterns().size())
+        if (getLevel().getGameTime() % 20 == 0) {
+            int count = networkPatterns().size();
+            if (count != patternCount) {
+                patternCount = count;
+                getLevel().sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+            }
+        }
         if (queue.isEmpty() || getLevel().getGameTime() % DISPATCH_DELAY != 0) return !queue.isEmpty();
         for (ReplicatorBlockEntity replicator : MatterNetwork.of(getLevel(), getBlockPos(), getNetworkFilter()).replicators()) {
             if (replicator.isIdle()) {
@@ -87,6 +100,7 @@ public class PatternMonitorBlockEntity extends MachineBlockEntity {
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
+        output.putInt("pattern_count", patternCount);
         var list = output.list("queue", Task.CODEC);
         queue.forEach(list::add);
     }
@@ -94,6 +108,7 @@ public class PatternMonitorBlockEntity extends MachineBlockEntity {
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
+        patternCount = input.getIntOr("pattern_count", 0);
         queue.clear();
         input.listOrEmpty("queue", Task.CODEC).stream().forEach(queue::add);
     }

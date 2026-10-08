@@ -8,5 +8,6 @@
     "replicator": "matteroverdrive:block/replicator",
     "vent": "matteroverdrive:block/vent",
     "particle": "matteroverdrive:block/replicator"
-  }
+  },
+  "render_type": "minecraft:cutout"
 }

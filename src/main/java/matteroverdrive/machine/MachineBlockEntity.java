@@ -138,6 +138,8 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
     protected void onInventoryChanged() {
         energy.refresh();
         setChanged();
+        // the renderers show what's inside (drives, the replicated item, the inscribed item)
+        if (level != null && !level.isClientSide()) level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 2);
     }
 
     // --- accessors -------------------------------------------------------------------------------
