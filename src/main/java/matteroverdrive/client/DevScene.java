@@ -464,7 +464,23 @@ public final class DevScene {
             mc.options.keyUse.setDown(false);
             mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
         });
-        at(1440, mc -> mc.stop());
+        // 7i: microwaves facing the camera and sideways, the portable decomposer in the hotbar
+        at(1440, mc -> server(mc, p -> {
+            BlockPos base = origin.above(14);
+            for (BlockPos pos : BlockPos.betweenClosed(base.offset(-2, 0, -7), base.offset(2, 2, -7))) {
+                p.level().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+            }
+            p.level().setBlockAndUpdate(base.offset(-1, 0, -4), MOBlocks.MICROWAVE.get().defaultBlockState()
+                    .setValue(net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING, Direction.SOUTH));
+            p.level().setBlockAndUpdate(base.offset(1, 0, -4), MOBlocks.MICROWAVE.get().defaultBlockState()
+                    .setValue(net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING, Direction.EAST));
+            ItemStack decomposer = new ItemStack(MOItems.PORTABLE_DECOMPOSER.get());
+            decomposer.set(matteroverdrive.init.MODataComponents.ENERGY.get(), 90000);
+            p.getInventory().setItem(0, decomposer);
+            p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() - 1.0, Set.of(), 180f, 40f, false);
+        }));
+        at(1450, mc -> shot(mc, "microwave"));
+        at(1452, mc -> mc.stop());
     }
 
     private static void at(int t, Consumer<Minecraft> action) {

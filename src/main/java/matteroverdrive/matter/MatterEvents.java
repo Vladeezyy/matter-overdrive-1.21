@@ -34,6 +34,33 @@ public final class MatterEvents {
                         matteroverdrive.network.UnlockStatPayload::handle);
     }
 
+    /** 1.7.10 EntityHandler.onEntityItemPickup: portable decomposers in the hotbar eat the listed items first. */
+    @SubscribeEvent
+    static void onPickup(net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent.Pre event) {
+        var player = event.getPlayer();
+        var item = event.getItemEntity().getItem();
+        if (player.level().isClientSide() || item.isEmpty() || !MatterHelper.hasMatter(item)) return;
+        for (int i = 0; i < 9 && !item.isEmpty(); i++) {
+            var stack = player.getInventory().getItem(i);
+            if (stack.getItem() instanceof matteroverdrive.item.PortableDecomposerItem) {
+                matteroverdrive.item.PortableDecomposerItem.decompose(player.level().getServer(), stack, item);
+            }
+        }
+        if (item.isEmpty()) event.getItemEntity().discard();
+        else event.getItemEntity().setItem(item);
+    }
+
+    /** 1.7.10 PlayerEventHandler.onAnvilRepair: decomposer + an item adds that item to its list (3 levels, 1 item). */
+    @SubscribeEvent
+    static void onAnvil(net.neoforged.neoforge.event.AnvilUpdateEvent event) {
+        if (!(event.getLeft().getItem() instanceof matteroverdrive.item.PortableDecomposerItem) || event.getRight().isEmpty()) return;
+        var output = event.getLeft().copy();
+        if (!matteroverdrive.item.PortableDecomposerItem.addToList(output, event.getRight())) return;
+        event.setOutput(output);
+        event.setMaterialCost(1);
+        event.setXpCost(3);
+    }
+
     /** Recipes and data maps were (re)loaded on the server: recalculate on next use. */
     @SubscribeEvent
     static void onTagsUpdated(TagsUpdatedEvent event) {

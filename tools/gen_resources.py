@@ -1087,6 +1087,31 @@ for tag in ["mineable/pickaxe", "needs_iron_tool"]:
 w(D / "tags/item/tritanium_crates.json", {"values": [mid(n) for n in CRATES]})
 
 
+# --- phase 7i: portable decomposer, microwave --------------------------------------------------------------
+cp(ref / "textures/items/portable_decomposer.png", A / "textures/item/portable_decomposer.png")
+w(A / "models/item/portable_decomposer.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{MOD}:item/portable_decomposer"}})
+w(A / "items/portable_decomposer.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:item/portable_decomposer"}})
+shaped("portable_decomposer", mid("portable_decomposer"), [" T ", "IPM", " T "],
+       {"T": mid("tritanium_plate"), "I": mid("integration_matrix"), "M": mid("me_conversion_matrix"), "P": "minecraft:sticky_piston"},
+       category="equipment")
+# 1.7.10 BlockMicrowave via MOBlockRenderer: the block bounds drawn with the front icon on the facing side, the back icon
+# opposite and "microwave" elsewhere (UVs follow the bounds, like the element defaults)
+for t in ["microwave", "microwave_front", "microwave_back"]:
+    cp(ref / "textures/blocks" / f"{t}.png", A / "textures/block" / f"{t}.png")
+w(A / "models/block/microwave.json", {"parent": "minecraft:block/block", "textures": {
+    "particle": f"{MOD}:block/microwave", "side": f"{MOD}:block/microwave", "front": f"{MOD}:block/microwave_front",
+    "back": f"{MOD}:block/microwave_back"}, "elements": [{"from": [1, 0, 3], "to": [15, 10, 13], "faces": {
+        "north": {"texture": "#front"}, "south": {"texture": "#back"}, "east": {"texture": "#side"}, "west": {"texture": "#side"},
+        "up": {"texture": "#side"}, "down": {"texture": "#side", "cullface": "down"}}}]})
+w(A / "blockstates/microwave.json", {"variants": {f"facing={f}": ({"model": f"{MOD}:block/microwave", "y": y} if y else
+                                                                 {"model": f"{MOD}:block/microwave"}) for f, y in FACING_Y.items()}})
+w(A / "items/microwave.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:block/microwave"}})
+w(D / "loot_table/blocks/microwave.json", self_drop("microwave"))
+for tag in ["mineable/pickaxe", "needs_iron_tool"]:
+    p = TAGS / f"minecraft/tags/block/{tag}.json"
+    w(p, {"values": json.loads(p.read_text())["values"] + [mid("microwave")]})
+
+
 # --- phase 7b: mobs -----------------------------------------------------------------------------------------
 import zlib
 
@@ -1473,6 +1498,10 @@ GUI_KEYS = {
     "gui.matteroverdrive.queue": {"en_us": "Queue: %s requests, %s items", "ru_ru": "Очередь: %s заказов, %s предметов"},
     "gui.matteroverdrive.replicating": {"en_us": "%s x%s (pattern %s%%)", "ru_ru": "%s x%s (шаблон %s%%)"},
     "fluid.matteroverdrive.matter_plasma": {"en_us": "Matter Plasma", "ru_ru": "Плазменная материя"},
+    "block.matteroverdrive.microwave": {"en_us": "Microwave", "ru_ru": "Микроволновка"},
+    "item.matteroverdrive.portable_decomposer": {"en_us": "Portable Decomposer", "ru_ru": "Портативный разборщик"},
+    "item.matteroverdrive.portable_decomposer.details": {"en_us": "Decomposes picked up items into Matter Plasma",
+                                                         "ru_ru": "Разбирает подобранные предметы в плазменную материю"},
     "block.matteroverdrive.matter_plasma": {"en_us": "Matter Plasma", "ru_ru": "Плазменная материя"},
     "tooltip.matteroverdrive.energy_io": {"en_us": "Input/Output: %s/%s FE/t", "ru_ru": "Вход/выход: %s/%s FE/т"},
     "upgrade_type.matteroverdrive.speed": "upgradetype.Speed.name",

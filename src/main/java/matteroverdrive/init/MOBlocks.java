@@ -116,6 +116,11 @@ public final class MOBlocks {
         return TRITANIUM_CRATES.get(color.getId());
     }
 
+    /** 1.7.10 BlockMicrowave: hardness 10, resistance 9, iron pickaxe. */
+    public static final DeferredBlock<matteroverdrive.block.MicrowaveBlock> MICROWAVE = BLOCKS.registerBlock("microwave",
+            matteroverdrive.block.MicrowaveBlock::new, p -> p.mapColor(MapColor.METAL).strength(10f, 9f).sound(SoundType.METAL)
+                    .requiresCorrectToolForDrops().noOcclusion());
+
     /** 1.7.10 blockMatterPlasma: the placed fluid. */
     public static final DeferredBlock<net.minecraft.world.level.block.LiquidBlock> MATTER_PLASMA = BLOCKS.registerBlock("matter_plasma",
             p -> new net.minecraft.world.level.block.LiquidBlock(MOFluids.MATTER_PLASMA.get(), p),

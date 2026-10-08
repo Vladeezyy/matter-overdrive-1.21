@@ -17,6 +17,7 @@ final class WorldGameTests {
         MOGameTests.add("tritanium_crate", 20, false, WorldGameTests::tritaniumCrate);
         MOGameTests.add("buildings", 20, false, WorldGameTests::buildings);
         MOGameTests.add("matter_container", 20, false, WorldGameTests::matterContainer);
+        MOGameTests.add("portable_decomposer", 20, false, WorldGameTests::portableDecomposer);
     }
 
     private static void check(GameTestHelper helper, boolean ok, String message) {
@@ -108,6 +109,27 @@ final class WorldGameTests {
         helper.setBlock(pos, matteroverdrive.init.MOBlocks.MATTER_PLASMA.get());
         var fluid = helper.getLevel().getFluidState(helper.absolutePos(pos));
         check(helper, fluid.isSource() && fluid.getType() == matteroverdrive.init.MOFluids.MATTER_PLASMA.get(), "plasma block " + fluid);
+        helper.succeed();
+    }
+
+    /** Portable decomposer: listed items become 10% of their matter for 1 FE per point; others are left alone. */
+    private static void portableDecomposer(GameTestHelper helper) {
+        var server = helper.getLevel().getServer();
+        var item = net.minecraft.world.item.Items.IRON_INGOT;
+        int value = matteroverdrive.matter.MatterHelper.getMatter(server, new net.minecraft.world.item.ItemStack(item));
+        check(helper, value > 0, "iron has no matter");
+        var decomposer = new net.minecraft.world.item.ItemStack(matteroverdrive.init.MOItems.PORTABLE_DECOMPOSER.get());
+        decomposer.set(matteroverdrive.init.MODataComponents.ENERGY.get(), 100000);
+        var dirt = new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.COBBLESTONE, 10);
+        matteroverdrive.item.PortableDecomposerItem.decompose(server, decomposer, dirt);
+        check(helper, dirt.getCount() == 10, "unlisted item decomposed");
+        check(helper, matteroverdrive.item.PortableDecomposerItem.addToList(decomposer, new net.minecraft.world.item.ItemStack(item)), "not listed");
+        var ingots = new net.minecraft.world.item.ItemStack(item, 3);
+        matteroverdrive.item.PortableDecomposerItem.decompose(server, decomposer, ingots);
+        float matter = matteroverdrive.item.PortableDecomposerItem.getMatter(decomposer);
+        check(helper, ingots.isEmpty() && Math.abs(matter - 3 * value * 0.1f) < 0.01f
+                && matteroverdrive.item.PortableDecomposerItem.getEnergy(decomposer) == 100000 - 3 * value,
+                "matter " + matter + ", energy " + matteroverdrive.item.PortableDecomposerItem.getEnergy(decomposer) + ", left " + ingots.getCount());
         helper.succeed();
     }
 }

@@ -44,5 +44,12 @@ public final class MODataComponents {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> PHASER_LEVEL =
             COMPONENTS.registerComponentType("phaser_level", b -> b.persistent(Codec.intRange(0, 5)).networkSynchronized(ByteBufCodecs.VAR_INT));
 
+    /** Portable decomposer: matter it holds (1.7.10 float "Matter") and the items it decomposes ("Items"). */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Float>> STORED_MATTER =
+            COMPONENTS.registerComponentType("stored_matter", b -> b.persistent(Codec.FLOAT).networkSynchronized(ByteBufCodecs.FLOAT));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<net.minecraft.world.item.Item>>> DECOMPOSE_LIST =
+            COMPONENTS.registerComponentType("decompose_list", b -> b.persistent(net.minecraft.core.registries.BuiltInRegistries.ITEM.byNameCodec().listOf())
+                    .networkSynchronized(ByteBufCodecs.registry(Registries.ITEM).apply(ByteBufCodecs.list())));
+
     private MODataComponents() {}
 }

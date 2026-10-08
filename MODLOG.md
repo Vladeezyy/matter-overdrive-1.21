@@ -270,6 +270,11 @@
   the omni tool, ends at blocks), looping omni_tool_hum while digging (client tickable sound). wielder.obj at scale 7
   with damage/fire barrel variants (select property). Now 30 of 115 in `WeaponFactory` (rogue androids, loot).
   Recipe IFC/SPI/ BH. 70 GameTests. Deviation: no dig_effect glow on the dug face; hull not tinted (like other weapons).
+- **7i ✅** Portable decomposer (128000 FE, 256 FE/t in, 512 matter as float `stored_matter`, `decompose_list` of items):
+  anvil (decomposer + item → item listed, 3 levels, 1 item) and `ItemEntityPickupEvent.Pre` (hotbar decomposers take
+  10% of the matter value per listed item for 1 FE per value point, as many as room and energy allow); use on a block
+  with a fluid capability pours the matter in. List keyed by item only (1.7.10 compared NBT too). Microwave: decorative
+  14x10x10 facing block (front/back/side textures, hardness 10, no recipe like 1.7.10). 71 GameTests.
 
 ### Next in phase 7 (start here)
 1. ~~Failed animals~~ ✅ 7c.
@@ -289,7 +294,7 @@
 **Workflow**
 - Resources: never hand-edit `src/main/resources/{assets,data}` — regenerate:
   `rm -rf src/main/resources/{assets,data} && python3 -I tools/gen_resources.py ~/mo-reference/mo-1.7.10/src/main/resources/assets/mo src/main/resources`
-- Tests: `./gradlew runGameTestServer` (70 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
+- Tests: `./gradlew runGameTestServer` (71 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
   `FunctionGameTestInstance`, custom 12³ structure `matteroverdrive:gametest_area`, time-of-day via `TestEnvironmentDefinition.TimeOfDay`,
   `makeMockServerPlayerInLevel`). Visual: `./gradlew runScene` → `run/screenshots/scene_*.png` (DevScene, world `run/saves/mo_scene`;
   pristine copy = "Новый мир (2)"; needs `pauseOnLostFocus=false`; selected hotbar slot is client-side; place blocks with

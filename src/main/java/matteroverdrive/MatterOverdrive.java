@@ -58,6 +58,8 @@ public class MatterOverdrive {
     private static void registerCapabilities(RegisterCapabilitiesEvent event) {
         event.registerItem(Capabilities.Fluid.ITEM, (stack, access) -> new matteroverdrive.item.MatterContainerItem.FluidHandler(access),
                 MOItems.MATTER_CONTAINER.get(), MOItems.MATTER_CONTAINER_FULL.get());
+        event.registerItem(Capabilities.Energy.ITEM, (stack, access) -> MOItems.PORTABLE_DECOMPOSER.get().createEnergyHandler(access),
+                MOItems.PORTABLE_DECOMPOSER.get());
         for (BatteryItem battery : new BatteryItem[] {MOItems.BATTERY.get(), MOItems.HC_BATTERY.get(), MOItems.CREATIVE_BATTERY.get()}) {
             event.registerItem(Capabilities.Energy.ITEM, (stack, access) -> battery.createEnergyHandler(access), battery);
         }
