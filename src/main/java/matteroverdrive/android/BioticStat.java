@@ -147,6 +147,41 @@ public class BioticStat {
         return false;
     }
 
-    /** Every tick while unlocked and enabled. */
+    /** Every tick on the server while unlocked and enabled (1.7.10 onAndroidUpdate). */
     public void onAndroidTick(ServerPlayer player, AndroidData data, int level) {}
+
+    /** Every tick on the server while unlocked, enabled or not (1.7.10 changeAndroidStats). */
+    public void changeAndroidStats(ServerPlayer player, AndroidData data, int level, boolean enabled) {}
+
+    /** The ability key was pressed (server side; 1.7.10 onActionKeyPress). */
+    public void onActionKey(ServerPlayer player, AndroidData data, int level) {}
+
+    /** 1.7.10 onLivingEvent(LivingJumpEvent). */
+    public void onJump(Player player, AndroidData data, int level) {}
+
+    /** 1.7.10 onLivingEvent(LivingFallEvent). */
+    public void onFall(ServerPlayer player, AndroidData data, int level, double distance) {}
+
+    /**
+     * 1.7.10 onLivingEvent(LivingAttackEvent / LivingHurtEvent), before armour. Returns the new damage; a negative
+     * value cancels the hit.
+     */
+    public float onIncomingDamage(ServerPlayer player, AndroidData data, int level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return amount;
+    }
+
+    /** Attribute modifiers held while unlocked and enabled (1.7.10 attributes()). */
+    public java.util.Map<net.minecraft.core.Holder<net.minecraft.world.entity.ai.attributes.Attribute>, net.minecraft.world.entity.ai.attributes.AttributeModifier> attributes(int level) {
+        return java.util.Map.of();
+    }
+
+    /** Ticks until the ability can be used again (HUD). */
+    public int getDelay(Player player, AndroidData data, int level) {
+        return 0;
+    }
+
+    /** Whether the HUD lists it right now (1.7.10 showOnHud(android, level)). */
+    public boolean showOnHud(AndroidData data, int level) {
+        return showOnHud;
+    }
 }

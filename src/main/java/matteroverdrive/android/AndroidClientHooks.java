@@ -8,6 +8,8 @@ import net.minecraft.world.entity.player.Player;
 public final class AndroidClientHooks {
     /** The local player started turning into an android: 1.7.10 played the transformation music. */
     public static Consumer<Player> transformationStarted = player -> {};
+    /** The ability key's name for stat descriptions ("X"). */
+    public static java.util.function.Supplier<String> abilityKeyName = () -> "X";
 
     static void onTransformationStarted(Player player) {
         transformationStarted.accept(player);

@@ -193,7 +193,10 @@ public class GravitationalAnomalyBlockEntity extends BlockEntity {
                 consume(level, entity);
                 if (isRemoved()) return;
             }
-            if (entity instanceof LivingEntity living && living.getItemBySlot(EquipmentSlot.CHEST).is(MOItems.SPACETIME_EQUALIZER.get())) {
+            // 1.7.10: the space-time equalizer chestplate, or an android with the equalizer stat, isn't pulled
+            if (entity instanceof LivingEntity living && living.getItemBySlot(EquipmentSlot.CHEST).is(MOItems.SPACETIME_EQUALIZER.get())
+                    || entity instanceof net.minecraft.world.entity.player.Player player && matteroverdrive.android.Android.isAndroid(player)
+                    && matteroverdrive.android.Android.get(player).isUnlocked(matteroverdrive.android.BioticStats.EQUALIZER, 0)) {
                 continue;
             }
             if (!entity.isRemoved()) {

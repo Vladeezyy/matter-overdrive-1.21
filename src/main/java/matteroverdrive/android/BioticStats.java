@@ -6,25 +6,26 @@ import java.util.Map;
 import matteroverdrive.init.MOItems;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.entity.player.Player;
 
 /** 1.7.10 MatterOverdriveBioticStats: the 14 stats, their XP costs and how they depend on each other. */
 public final class BioticStats {
     private static final Map<String, BioticStat> STATS = new LinkedHashMap<>();
 
-    public static final BioticStat TELEPORT = add(new BioticStat("teleport", 48).hud().wheel());
-    public static final BioticStat NANOBOTS = add(new BioticStat("nanobots", 26).hud());
-    public static final BioticStat NANO_ARMOR = add(new BioticStat("nano_armor", 30).maxLevel(4).hud());
-    public static final BioticStat FLOTATION = add(new BioticStat("floatation", 14).hud());
-    public static final BioticStat SPEED = add(new BioticStat("speed", 18).maxLevel(4));
-    public static final BioticStat HIGH_JUMP = add(new BioticStat("high_jump", 36).hud());
+    public static final BioticStat TELEPORT = add(new StatImpls.Teleport().hud().wheel());
+    public static final BioticStat NANOBOTS = add(new StatImpls.Nanobots().hud());
+    public static final BioticStat NANO_ARMOR = add(new StatImpls.NanoArmor().maxLevel(4).hud());
+    public static final BioticStat FLOTATION = add(new StatImpls.Flotation().hud());
+    public static final BioticStat SPEED = add(new StatImpls.Speed().maxLevel(4));
+    public static final BioticStat HIGH_JUMP = add(new StatImpls.HighJump().hud());
     public static final BioticStat EQUALIZER = add(new BioticStat("equalizer", 24).hud());
-    public static final BioticStat SHIELD = add(new BioticStat("shield", 36).hud().wheel());
-    public static final BioticStat ATTACK = add(new BioticStat("attack", 30).maxLevel(4));
-    public static final BioticStat CLOAK = add(new BioticStat("cloak", 36).hud().wheel());
-    public static final BioticStat NIGHT_VISION = add(new BioticStat("nightvision", 28).hud().wheel());
+    public static final BioticStat SHIELD = add(new StatImpls.Shield().hud().wheel());
+    public static final BioticStat ATTACK = add(new StatImpls.Attack().maxLevel(4));
+    public static final BioticStat CLOAK = add(new StatImpls.Cloak().hud().wheel());
+    public static final BioticStat NIGHT_VISION = add(new StatImpls.NightVision().hud().wheel());
     public static final BioticStat MINIMAP = add(new BioticStat("minimap", 18));
-    public static final BioticStat FLASH_COOLING = add(new BioticStat("flash_cooling", 28));
-    public static final BioticStat SHOCKWAVE = add(new BioticStat("shockwave", 32));
+    public static final BioticStat FLASH_COOLING = add(new StatImpls.FlashCooling());
+    public static final BioticStat SHOCKWAVE = add(new StatImpls.Shockwave().hud().wheel());
 
     static {
         // 1.7.10 MatterOverdriveBioticStats.init / register
@@ -49,6 +50,21 @@ public final class BioticStats {
 
     public static Iterable<BioticStat> all() {
         return STATS.values();
+    }
+
+    /** 1.7.10 MOEventEnergyWeapon.Overheat + BioticStatFlashCooling: may cancel an overheat. */
+    public static boolean flashCool(Player player) {
+        AndroidData data = Android.get(player);
+        int level = data.getUnlockedLevel(FLASH_COOLING);
+        return data.isAndroid() && level > 0 && FLASH_COOLING.isEnabled(player, data, level)
+                && player.getRandom().nextFloat() < StatImpls.FlashCooling.COOLDOWN_CHANGE;
+    }
+
+    /** Whether the player has the stat unlocked, enabled, and is an android (e.g. the equalizer against anomalies). */
+    public static boolean has(Player player, BioticStat stat) {
+        AndroidData data = Android.get(player);
+        int level = data.getUnlockedLevel(stat);
+        return data.isAndroid() && level > 0 && stat.isEnabled(player, data, level);
     }
 
     public static BioticStat get(String id) {

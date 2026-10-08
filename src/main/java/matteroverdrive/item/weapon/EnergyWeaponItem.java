@@ -254,6 +254,12 @@ public abstract class EnergyWeaponItem extends Item {
     protected void addHeatAfterShot(ItemStack weapon, ServerLevel level, LivingEntity shooter, float newHeat) {
         setHeat(weapon, newHeat);
         if (newHeat >= getMaxHeat(weapon)) {
+            // 1.7.10 MOEventEnergyWeapon.Overheat: an android's flash cooling may cool the weapon at once instead
+            if (shooter instanceof Player player && matteroverdrive.android.BioticStats.flashCool(player)) {
+                setHeat(weapon, 0);
+                level.playSound(null, shooter.getX(), shooter.getY(), shooter.getZ(), MOSounds.OVERHEAT.get(), SoundSource.PLAYERS, 1, 1);
+                return;
+            }
             weapon.set(MODataComponents.OVERHEATED.get(), true);
             level.playSound(null, shooter.getX(), shooter.getY(), shooter.getZ(), MOSounds.OVERHEAT.get(), SoundSource.PLAYERS, 1, 1);
             level.playSound(null, shooter.getX(), shooter.getY(), shooter.getZ(), MOSounds.OVERHEAT_ALARM.get(), SoundSource.PLAYERS, 1, 1);

@@ -25,6 +25,7 @@ public class AndroidData implements ValueIOSerializable {
     public static final int SLOT_HEAD = 0, SLOT_ARMS = 1, SLOT_LEGS = 2, SLOT_CHEST = 3, SLOT_OTHER = 4, SLOT_BATTERY = 5, SLOTS = 6;
     public static final int MAX_ENERGY = 512000;
     private static final Codec<Map<String, Integer>> STATS_CODEC = Codec.unboundedMap(Codec.STRING, Codec.INT);
+    private static final Codec<Map<String, Long>> EFFECTS_CODEC = Codec.unboundedMap(Codec.STRING, Codec.LONG);
 
     boolean android;
     int energy = MAX_ENERGY;
@@ -32,6 +33,8 @@ public class AndroidData implements ValueIOSerializable {
     int turning;
     int glitchTime;
     String activeStat = "";
+    /** 1.7.10 AndroidPlayer.effects: toggles (Nightvision, Cloaked, Shield as 0/1) and timestamps (last teleport...). */
+    final Map<String, Long> effects = new HashMap<>();
     final ItemStacksResourceHandler inventory = new ItemStacksResourceHandler(SLOTS);
     /** Changed since the last sync to clients. */
     boolean dirty;
@@ -73,6 +76,28 @@ public class AndroidData implements ValueIOSerializable {
         return activeStat;
     }
 
+    public void setActiveStat(String id) {
+        activeStat = id;
+        dirty = true;
+    }
+
+    public long getEffect(String key) {
+        return effects.getOrDefault(key, 0L);
+    }
+
+    public boolean getFlag(String key) {
+        return getEffect(key) != 0;
+    }
+
+    public void setEffect(String key, long value) {
+        if (value == 0) {
+            effects.remove(key);
+        } else {
+            effects.put(key, value);
+        }
+        dirty = true;
+    }
+
     public ItemStacksResourceHandler getInventory() {
         return inventory;
     }
@@ -93,6 +118,7 @@ public class AndroidData implements ValueIOSerializable {
         output.store("stats", STATS_CODEC, stats);
         output.putInt("turning", turning);
         output.putString("active_stat", activeStat);
+        output.store("effects", EFFECTS_CODEC, effects);
         inventory.serialize(output.child("inventory"));
     }
 
@@ -104,6 +130,8 @@ public class AndroidData implements ValueIOSerializable {
         input.read("stats", STATS_CODEC).ifPresent(stats::putAll);
         turning = input.getIntOr("turning", 0);
         activeStat = input.getStringOr("active_stat", "");
+        effects.clear();
+        input.read("effects", EFFECTS_CODEC).ifPresent(effects::putAll);
         input.child("inventory").ifPresent(inventory::deserialize);
     }
 
@@ -141,6 +169,7 @@ public class AndroidData implements ValueIOSerializable {
         buf.writeVarInt(turning);
         buf.writeVarInt(glitchTime);
         buf.writeUtf(activeStat);
+        buf.writeMap(effects, (b, k) -> b.writeUtf(k), (b, v) -> b.writeVarLong(v));
         for (int i = 0; i < SLOTS; i++) {
             ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, getStack(i));
         }
@@ -154,6 +183,8 @@ public class AndroidData implements ValueIOSerializable {
         turning = buf.readVarInt();
         glitchTime = buf.readVarInt();
         activeStat = buf.readUtf();
+        effects.clear();
+        effects.putAll(buf.readMap(b -> b.readUtf(), b -> b.readVarLong()));
         for (int i = 0; i < SLOTS; i++) {
             ItemStack stack = ItemStack.OPTIONAL_STREAM_CODEC.decode(buf);
             inventory.set(i, ItemResource.of(stack), stack.getCount());

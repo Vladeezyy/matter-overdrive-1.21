@@ -19,6 +19,10 @@ final class AndroidGameTests {
         MOGameTests.add("android_pills", 20, false, AndroidGameTests::pills);
         MOGameTests.add("android_stat_rules", 20, false, AndroidGameTests::statRules);
         MOGameTests.add("android_station_parts", 20, false, AndroidGameTests::stationParts);
+        MOGameTests.add("android_passive_stats", 20, false, AndroidGameTests::passiveStats);
+        MOGameTests.add("android_toggle_stats", 20, false, AndroidGameTests::toggleStats);
+        MOGameTests.add("android_shield_and_shockwave", 20, false, AndroidGameTests::shieldAndShockwave);
+        MOGameTests.add("android_teleport", 20, false, AndroidGameTests::teleport);
     }
 
     private static void check(GameTestHelper helper, boolean ok, String message) {
@@ -140,6 +144,96 @@ final class AndroidGameTests {
         Android.setAndroid(player, false);
         check(helper, player.getMaxHealth() == 20, "max health as human " + player.getMaxHealth());
         check(helper, !menu.stillValid(player), "humans can use the android station");
+        helper.succeed();
+    }
+
+    private static ServerPlayer android(GameTestHelper helper, matteroverdrive.android.BioticStat... stats) {
+        ServerPlayer player = player(helper);
+        Android.setAndroid(player, true);
+        player.giveExperienceLevels(1000);
+        for (var stat : stats) {
+            for (int level = 1; level <= stat.maxLevel(); level++) Android.get(player).getStats().put(stat.id(), level);
+        }
+        return player;
+    }
+
+    /** Speed +40% (level 4), attack +25%, nanobots heal 0.6 a second, nano armour takes 30% off. */
+    private static void passiveStats(GameTestHelper helper) {
+        ServerPlayer player = android(helper, BioticStats.SPEED, BioticStats.NANOBOTS, BioticStats.NANO_ARMOR);
+        double speed = player.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED);
+        Android.tick(player);
+        double boosted = player.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED);
+        check(helper, Math.abs(boosted - speed * 1.4) < 1e-6, "speed " + speed + " -> " + boosted);
+        player.setHealth(10);
+        float before = player.getHealth();
+        // nanobots run on game time % 20 == 0; call the stat directly
+        BioticStats.NANOBOTS.onAndroidTick(player, Android.get(player), 1);
+        check(helper, helper.getLevel().getGameTime() % 20 != 0 || player.getHealth() > before, "nanobots didn't heal");
+        player.setHealth(20);
+        player.hurtServer(helper.getLevel(), helper.getLevel().damageSources().generic(), 10);
+        check(helper, Math.abs(player.getHealth() - (20 - 10 * (1 - 0.3f))) < 1e-4, "nano armour: health " + player.getHealth());
+        helper.succeed();
+    }
+
+    /** Night vision and cloak toggle with the ability key while selected. */
+    private static void toggleStats(GameTestHelper helper) {
+        ServerPlayer player = android(helper, BioticStats.NIGHT_VISION, BioticStats.CLOAK);
+        Android.get(player).setActiveStat(BioticStats.NIGHT_VISION.id());
+        Android.onActionKey(player);
+        Android.tick(player);
+        check(helper, player.hasEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION), "no night vision");
+        Android.onActionKey(player);
+        Android.tick(player);
+        check(helper, !player.hasEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION), "night vision stayed on");
+        Android.get(player).setActiveStat(BioticStats.CLOAK.id());
+        Android.onActionKey(player);
+        Android.tick(player);
+        check(helper, player.isInvisible(), "not cloaked");
+        Android.onActionKey(player);
+        Android.tick(player);
+        check(helper, !player.isInvisible(), "still cloaked");
+        helper.succeed();
+    }
+
+    /** The shield stops arrows; the shockwave hurts and throws nearby mobs. */
+    private static void shieldAndShockwave(GameTestHelper helper) {
+        ServerPlayer player = android(helper, BioticStats.NANOBOTS, BioticStats.NANO_ARMOR, BioticStats.SHIELD, BioticStats.ATTACK,
+                BioticStats.FLASH_COOLING, BioticStats.SHOCKWAVE);
+        Android.get(player).getStats().remove(BioticStats.NANO_ARMOR.id());   // only the shield should matter here
+        Android.get(player).setActiveStat(BioticStats.SHIELD.id());
+        Android.onActionKey(player);
+        check(helper, Android.get(player).getFlag("Shield"), "shield not up");
+        var arrow = net.minecraft.world.entity.EntityType.ARROW.create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        // 2 damage = 512 FE: within the built-in store's 1024 FE per pull, so the hit is blocked outright
+        player.hurtServer(helper.getLevel(), helper.getLevel().damageSources().arrow((net.minecraft.world.entity.projectile.AbstractArrow) arrow, null), 2);
+        check(helper, player.getHealth() == 20, "arrow got through the shield: " + player.getHealth());
+        // 6 damage = 1536 FE: more than one pull, so (1.7.10) only 1024/1536 of it is absorbed
+        player.invulnerableTime = 0;
+        player.hurtServer(helper.getLevel(), helper.getLevel().damageSources().arrow((net.minecraft.world.entity.projectile.AbstractArrow) arrow, null), 6);
+        check(helper, Math.abs(player.getHealth() - 16) < 1e-4, "partial shield: " + player.getHealth());
+        var pig = helper.spawnWithNoFreeWill(net.minecraft.world.entity.EntityType.PIG, new BlockPos(6, 1, 3));
+        Android.get(player).setActiveStat(BioticStats.SHOCKWAVE.id());
+        Android.onActionKey(player);
+        check(helper, pig.getHealth() < pig.getMaxHealth(), "shockwave missed the pig");
+        check(helper, BioticStats.SHOCKWAVE.getDelay(player, Android.get(player), 1) > 0, "no shockwave cooldown");
+        helper.succeed();
+    }
+
+    /** Teleport: up to 32 blocks, 4096 FE, 2 s cooldown; only while selected. */
+    private static void teleport(GameTestHelper helper) {
+        ServerPlayer player = android(helper, BioticStats.TELEPORT);
+        // 4096 FE per jump needs a battery that can give that much at once (the built-in store gives 1024)
+        Android.get(player).setStack(AndroidData.SLOT_BATTERY, MOItems.HC_BATTERY.get().charged());
+        var target = player.position().add(0, 0, 5);
+        Android.teleport(player, target);
+        check(helper, player.position().distanceTo(target) > 1, "teleported without selecting it");
+        Android.get(player).setActiveStat(BioticStats.TELEPORT.id());
+        int energy = Android.getEnergy(player);
+        Android.teleport(player, target);
+        check(helper, player.position().distanceTo(target) < 1e-3, "didn't teleport: " + player.position());
+        check(helper, Android.getEnergy(player) < energy, "teleport was free");
+        Android.teleport(player, target.add(0, 0, 3));
+        check(helper, player.position().distanceTo(target) < 1e-3, "teleported during the cooldown");
         helper.succeed();
     }
 }

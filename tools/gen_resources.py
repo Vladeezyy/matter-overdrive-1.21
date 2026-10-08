@@ -805,6 +805,13 @@ for tag in ["bypasses_armor", "bypasses_effects", "bypasses_enchantments", "bypa
     p = TAGS / f"minecraft/tags/damage_type/{tag}.json"
     values = json.loads(p.read_text())["values"] if p.exists() else []
     w(p, {"values": values + [mid("android_transformation")]})
+# 1.7.10 BioticStatShockwave.ShockwaveDamage: an armour-piercing explosion.
+w(D / "damage_type/android_shockwave.json", {"message_id": "matteroverdrive.android_shockwave", "exhaustion": 0.1,
+                                             "scaling": "when_caused_by_living_non_player"})
+for tag in ["bypasses_armor", "is_explosion"]:
+    p = TAGS / f"minecraft/tags/damage_type/{tag}.json"
+    values = json.loads(p.read_text())["values"] if p.exists() else []
+    w(p, {"values": values + [mid("android_shockwave")]})
 # 1.7.10 AndroidPill.addToDunguns: the red pill in stronghold corridors (weight 1 there; 10% of chests here).
 w(D / "loot_table/chests/android_pill.json", {"type": "minecraft:chest", "pools": [{"rolls": 1, "bonus_rolls": 0,
     "conditions": [{"condition": "minecraft:random_chance", "chance": 0.1}],
@@ -993,6 +1000,12 @@ for src_name, dst_name in [("en_US", "en_us"), ("ru_RU", "ru_ru")]:
         lang[f"item.{MOD}.android_pill_{c}.details"] = src.get(f"item.android_pill_{c}.details") or en[f"item.android_pill_{c}.details"]
     for k in [k for k in en if k.startswith("biotic_stat.") or k.startswith("gui.android_hud.transforming")]:
         lang[k.replace("biotic_stat.", f"biotic_stat.{MOD}.").replace("gui.android_hud.", f"gui.{MOD}.android_hud.")] = src.get(k) or en[k]
+    lang[f"death.attack.{MOD}.android_shockwave"] = {"en_us": "%1$s was blown away by %2$s's shockwave",
+                                                     "ru_ru": "%1$s отброшен ударной волной %2$s"}[dst_name]
+    lang[f"death.attack.{MOD}.android_shockwave.player"] = lang[f"death.attack.{MOD}.android_shockwave"]
+    lang[f"key.category.{MOD}.android"] = "Matter Overdrive"
+    lang[f"key.{MOD}.ability_use"] = {"en_us": "Android Ability key", "ru_ru": "Способность андроида"}[dst_name]
+    lang[f"key.{MOD}.ability_switch"] = {"en_us": "Android Switch Ability key", "ru_ru": "Выбор способности андроида"}[dst_name]
     lang[f"block.{MOD}.android_station"] = src.get("tile.android_station.name") or en["tile.android_station.name"]
     for part in ["head", "arms", "legs", "chest"]:
         lang[f"item.{MOD}.rogue_android_part_{part}"] = src.get(f"item.rouge_android_part.{part}.name") or en[f"item.rouge_android_part.{part}.name"]

@@ -51,6 +51,8 @@ public final class Android {
     public static final boolean REMOVE_POTION_EFFECTS = true;
     public static final ResourceKey<DamageType> TRANSFORMATION_DAMAGE = ResourceKey.create(Registries.DAMAGE_TYPE,
             ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "android_transformation"));
+    public static final ResourceKey<DamageType> SHOCKWAVE_DAMAGE = ResourceKey.create(Registries.DAMAGE_TYPE,
+            ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "android_shockwave"));
     private static final ResourceLocation OUT_OF_POWER = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "android_out_of_power");
 
     public static AndroidData get(Player player) {
@@ -148,6 +150,7 @@ public final class Android {
         if (!android) {
             removeOutOfPower(player);
             removeParts(player);
+            removeStatAttributes(player);
         }
         sync(player);
     }
@@ -157,6 +160,7 @@ public final class Android {
         AndroidData data = get(player);
         int xp = getResetXP(data);
         data.stats.clear();
+        removeStatAttributes(player);
         sync(player);
         return xp;
     }
@@ -219,7 +223,11 @@ public final class Android {
             if (player.getAirSupply() < 0) player.setAirSupply(0);
             for (BioticStat stat : BioticStats.all()) {
                 int level = data.getUnlockedLevel(stat);
-                if (level > 0 && stat.isEnabled(player, data, level)) stat.onAndroidTick(server, data, level);
+                boolean enabled = level > 0 && stat.isEnabled(player, data, level);
+                applyAttributes(player, stat, level, enabled);
+                if (level <= 0) continue;
+                stat.changeAndroidStats(server, data, level, enabled);
+                if (enabled) stat.onAndroidTick(server, data, level);
             }
         }
         manageTurning(server, data);
@@ -240,6 +248,24 @@ public final class Android {
                 health.removeModifier(id);
             }
         }
+    }
+
+    /** 1.7.10 manageStatAttributeModifiers: a stat's modifiers are held while it is unlocked and enabled. */
+    private static void applyAttributes(Player player, BioticStat stat, int level, boolean enabled) {
+        for (var entry : stat.attributes(Math.max(level, 1)).entrySet()) {
+            AttributeInstance attribute = player.getAttribute(entry.getKey());
+            if (attribute == null) continue;
+            AttributeModifier modifier = entry.getValue();
+            if (enabled) {
+                if (!modifier.equals(attribute.getModifier(modifier.id()))) attribute.addOrUpdateTransientModifier(modifier);
+            } else {
+                attribute.removeModifier(modifier.id());
+            }
+        }
+    }
+
+    private static void removeStatAttributes(Player player) {
+        for (BioticStat stat : BioticStats.all()) applyAttributes(player, stat, 1, false);
     }
 
     private static void removeParts(Player player) {
@@ -312,18 +338,74 @@ public final class Android {
 
     // --- events -------------------------------------------------------------------------------------
 
+    /** Fires on both sides: the client moves the player, the server pays the energy. */
     @SubscribeEvent
     static void onJump(LivingEvent.LivingJumpEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player && isAndroid(player)) {
-            extractEnergyScaled(player, ENERGY_PER_JUMP);
+        if (!(event.getEntity() instanceof Player player) || !isAndroid(player)) return;
+        if (!player.level().isClientSide()) extractEnergyScaled(player, ENERGY_PER_JUMP);
+        AndroidData data = get(player);
+        for (BioticStat stat : BioticStats.all()) {
+            int level = data.getUnlockedLevel(stat);
+            if (level > 0 && stat.isEnabled(player, data, level)) stat.onJump(player, data, level);
         }
     }
 
     @SubscribeEvent
     static void onFall(LivingFallEvent event) {
         if (event.getEntity() instanceof Player player && isAndroid(player)) {
+            if (player instanceof ServerPlayer server) {
+                AndroidData data = get(player);
+                for (BioticStat stat : BioticStats.all()) {
+                    int level = data.getUnlockedLevel(stat);
+                    if (level > 0 && stat.isEnabled(player, data, level)) stat.onFall(server, data, level, event.getDistance());
+                }
+            }
             event.setDistance(event.getDistance() * FALL_NEGATE);
         }
+    }
+
+    /** 1.7.10 LivingAttackEvent / LivingHurtEvent on the stats: the shield and nano armour. */
+    @SubscribeEvent
+    static void onIncomingDamage(net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent event) {
+        if (!(event.getEntity() instanceof ServerPlayer player) || !isAndroid(player)) return;
+        AndroidData data = get(player);
+        float amount = event.getAmount();
+        for (BioticStat stat : BioticStats.all()) {
+            int level = data.getUnlockedLevel(stat);
+            if (level <= 0 || !stat.isEnabled(player, data, level)) continue;
+            amount = stat.onIncomingDamage(player, data, level, event.getSource(), amount);
+            if (amount < 0) {
+                event.setCanceled(true);
+                return;
+            }
+        }
+        event.setAmount(amount);
+    }
+
+    /** The ability key (1.7.10 PacketBioticActionKey). */
+    public static void onActionKey(ServerPlayer player) {
+        AndroidData data = get(player);
+        if (!data.isAndroid()) return;
+        for (BioticStat stat : BioticStats.all()) {
+            int level = data.getUnlockedLevel(stat);
+            if (level > 0 && stat.isEnabled(player, data, level)) stat.onActionKey(player, data, level);
+        }
+    }
+
+    /** 1.7.10 PacketTeleportPlayer: checked again on the server (range, energy, cooldown). */
+    public static void teleport(ServerPlayer player, net.minecraft.world.phys.Vec3 target) {
+        AndroidData data = get(player);
+        BioticStat teleport = BioticStats.TELEPORT;
+        int level = data.getUnlockedLevel(teleport);
+        if (!data.isAndroid() || level <= 0 || !teleport.isEnabled(player, data, level)) return;
+        if (target.distanceTo(player.getEyePosition()) > StatImpls.Teleport.MAX_TELEPORT_DISTANCE + 4) return;
+        player.level().playSound(null, player.getX(), player.getY(), player.getZ(), MOSounds.ANDROID_TELEPORT.get(), SoundSource.PLAYERS, 0.2f, 1);
+        player.teleportTo(target.x, target.y, target.z);
+        player.fallDistance = 0;
+        player.level().playSound(null, target.x, target.y, target.z, MOSounds.ANDROID_TELEPORT.get(), SoundSource.PLAYERS, 0.2f, 1);
+        extractEnergyScaled(player, StatImpls.Teleport.ENERGY_PER_TELEPORT);
+        data.setEffect(StatImpls.Teleport.LAST, player.level().getGameTime() + StatImpls.Teleport.TELEPORT_DELAY);
+        sync(player);
     }
 
     /** 1.7.10 onEntityHurt: a short glitch (scaled by the glitch-time attribute) and its sound. */
