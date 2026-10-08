@@ -81,6 +81,12 @@ public abstract class RogueAndroid extends Monster {
     }
 
     /** 1.7.10 init(): level, legendary, health, damage, name. */
+    /** Sets level and legendary after finalizeSpawn and re-rolls the gear for them (structures place set androids). */
+    public void setupEquipped(int level, boolean legendary, DifficultyInstance difficulty) {
+        setup(level, legendary);
+        populateDefaultEquipmentSlots(random, difficulty);
+    }
+
     public void setup(int level, boolean legendary) {
         entityData.set(LEVEL, level);
         entityData.set(LEGENDARY, legendary);

@@ -1,9 +1,7 @@
 package matteroverdrive.entity.monster;
 
 import matteroverdrive.init.MOItems;
-import matteroverdrive.item.BatteryItem;
 import matteroverdrive.item.weapon.EnergyWeaponItem;
-import matteroverdrive.item.weapon.WeaponModule;
 import matteroverdrive.item.weapon.WeaponShooter;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
@@ -59,24 +57,8 @@ public class RangedRogueAndroid extends RogueAndroid implements RangedAttackMob,
     @Override
     protected void populateDefaultEquipmentSlots(RandomSource random, DifficultyInstance difficulty) {
         super.populateDefaultEquipmentSlots(random, difficulty);
-        int roll = random.nextInt(85);
-        EnergyWeaponItem item = roll < 70 ? MOItems.PHASER_RIFLE.get() : roll < 80 ? MOItems.PLASMA_SHOTGUN.get() : MOItems.ION_SNIPER.get();
-        ItemStack weapon = new ItemStack(item);
-        int level = getAndroidLevel();
-        // barrel: none 200, damage 100 (level 1+), fire 10 (level 1+), explosion 5 (level 2+)
-        int barrel = random.nextInt(200 + (level >= 1 ? 110 : 0) + (level >= 2 ? 5 : 0));
-        ItemStack module = barrel < 200 ? ItemStack.EMPTY : barrel < 300 ? new ItemStack(MOItems.BARREL_DAMAGE.get())
-                : barrel < 310 ? new ItemStack(MOItems.BARREL_FIRE.get()) : new ItemStack(MOItems.BARREL_EXPLOSION.get());
-        if (!module.isEmpty() && item.canInstall(WeaponModule.SLOT_BARREL, module)) EnergyWeaponItem.setModule(weapon, WeaponModule.SLOT_BARREL, module);
-        if (level >= 1) {
-            BatteryItem battery = random.nextInt(120) < 100 ? MOItems.BATTERY.get() : MOItems.HC_BATTERY.get();
-            EnergyWeaponItem.setModule(weapon, WeaponModule.SLOT_BATTERY, battery.charged());
-            if (random.nextInt(310) < 10) {
-                ItemStack scope = new ItemStack(MOItems.SNIPER_SCOPE.get());
-                if (item.canInstall(WeaponModule.SLOT_SIGHTS, scope)) EnergyWeaponItem.setModule(weapon, WeaponModule.SLOT_SIGHTS, scope);
-            }
-        }
-        EnergyWeaponItem.setEnergy(weapon, EnergyWeaponItem.getCapacity(weapon));
+        ItemStack weapon = matteroverdrive.item.weapon.WeaponFactory.randomDecorated(random, getAndroidLevel(), false);
+        EnergyWeaponItem item = (EnergyWeaponItem) weapon.getItem();
         setItemSlot(EquipmentSlot.MAINHAND, weapon);
         getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(item.getRange(weapon) - 2);
     }

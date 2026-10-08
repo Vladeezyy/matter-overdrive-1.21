@@ -329,7 +329,103 @@ public final class DevScene {
             p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() - 1.0, Set.of(), 180f, 25f, false);
         }));
         at(608, mc -> shot(mc, "tritanium_crates"));
-        at(610, mc -> mc.stop());
+        // 7f: every image building placed on the terrain far east of the scene, seen from above a corner
+        var buildings = matteroverdrive.world.Building.values();
+        for (int i = 0; i < buildings.length; i++) {
+            var building = buildings[i];
+            int t0 = 610 + i * 80;
+            at(t0, mc -> server(mc, p -> {
+                BlockPos site = buildingSite(building);
+                p.teleportTo(p.level(), site.getX(), 200, site.getZ(), Set.of(), 0f, 0f, false);
+            }));
+            at(t0 + 60, mc -> server(mc, p -> {
+                var t = building.template();
+                BlockPos site = buildingSite(building);
+                int y = p.level().getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, site.getX(), site.getZ()) - 3;
+                BlockPos at = new BlockPos(site.getX(), y, site.getZ());
+                var piece = new matteroverdrive.world.ImageStructurePiece(building, at, 42);
+                piece.postProcess(p.level(), p.level().structureManager(), p.level().getChunkSource().getGenerator(), p.level().getRandom(),
+                        piece.getBoundingBox(), new net.minecraft.world.level.ChunkPos(at), at);
+                double cx = at.getX() + t.width() / 2.0, cy = at.getY() + t.height() / 2.0, cz = at.getZ() + t.depth() / 2.0;
+                double size = Math.max(t.width(), t.depth());
+                double ex = cx - size * 0.75, ey = cy + size * 0.55 + 4, ez = cz - size * 0.75;
+                float yaw = (float) Math.toDegrees(Math.atan2(-(cx - ex), cz - ez));
+                float pitch = (float) Math.toDegrees(Math.atan2(ey - cy, Math.hypot(cx - ex, cz - ez)));
+                p.teleportTo(p.level(), ex, ey, ez, Set.of(), yaw, pitch, false);
+                p.getAbilities().flying = true;
+                p.onUpdateAbilities();
+            }));
+            at(t0 + 61, mc -> mc.options.hideGui = true);
+            at(t0 + 78, mc -> shot(mc, "building_" + building.getSerializedName()));
+            at(t0 + 79, mc -> mc.options.hideGui = false);
+        }
+        // and where the world generator would put them
+        at(1012, mc -> server(mc, p -> {
+            for (var building : buildings) {
+                p.level().getServer().getCommands().performPrefixedCommand(p.level().getServer().createCommandSourceStack(),
+                        "locate structure matteroverdrive:" + building.getSerializedName());
+            }
+        }));
+        // a naturally generated android house and crashed ship: fly to the nearest ones (fresh chunks), report what is there
+        String[] natural = {"android_house", "crashed_ship"};
+        // somewhere new every run, so the chunks there are generated now
+        BlockPos[] found0 = new BlockPos[1];
+        BlockPos searchFrom = new BlockPos(new java.util.Random().nextInt(40000) + 10000, 100, new java.util.Random().nextInt(40000) + 10000);
+        for (int i = 0; i < natural.length; i++) {
+            String id = natural[i];
+            boolean first = i == 0;
+            int t0 = 1020 + i * 160;
+            BlockPos[] found = i == 0 ? found0 : new BlockPos[1];
+            at(t0, mc -> server(mc, p -> {
+                var registry = p.level().registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.STRUCTURE);
+                var holder = registry.getOrThrow(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.STRUCTURE,
+                        net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("matteroverdrive", id)));
+                var result = p.level().getChunkSource().getGenerator().findNearestMapStructure(p.level(),
+                        net.minecraft.core.HolderSet.direct(holder), first ? searchFrom : found0[0], 100, false);
+                if (result == null) return;
+                found[0] = result.getFirst();
+                p.teleportTo(p.level(), found[0].getX(), 160, found[0].getZ(), Set.of(), 0f, 0f, false);
+            }));
+            at(t0 + 120, mc -> server(mc, p -> {
+                if (found[0] == null) return;
+                var holder = p.level().registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.STRUCTURE)
+                        .getValue(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("matteroverdrive", id));
+                var start = p.level().structureManager().getStructureAt(
+                        new BlockPos(found[0].getX(), p.level().getMinY() + 1, found[0].getZ()), holder);
+                BlockPos lookup = found[0];
+                if (!start.isValid()) {
+                    for (var s2 : p.level().structureManager().startsForStructure(new net.minecraft.world.level.ChunkPos(lookup), st -> st == holder)) {
+                        start = s2;
+                    }
+                }
+                if (!start.isValid()) {
+                    MatterOverdrive.LOGGER.info("[scene] {} near {}: no start", id, lookup);
+                    return;
+                }
+                var box = start.getBoundingBox();
+                var aabb = AABB.of(box).inflate(4);
+                int androids = p.level().getEntitiesOfClass(matteroverdrive.entity.monster.RogueAndroid.class, aabb).size();
+                int mutants = p.level().getEntitiesOfClass(matteroverdrive.entity.monster.MutantScientist.class, aabb).size();
+                int crates = 0, lootCrates = 0;
+                for (BlockPos pos : BlockPos.betweenClosed(box.minX(), box.minY(), box.minZ(), box.maxX(), box.maxY(), box.maxZ())) {
+                    if (p.level().getBlockEntity(pos) instanceof matteroverdrive.block.entity.TritaniumCrateBlockEntity crate) {
+                        crates++;
+                        if (crate.getLootTable() != null || !crate.isEmpty()) lootCrates++;
+                    }
+                }
+                MatterOverdrive.LOGGER.info("[scene] {} at {}: androids {}, mutants {}, crates {} (with loot {})", id, box, androids, mutants, crates, lootCrates);
+                double cx = box.getCenter().getX(), cy = box.minY() + 3, cz = box.getCenter().getZ();
+                double size = Math.max(box.getXSpan(), box.getZSpan());
+                double ex = cx - size * 0.8, ey = cy + size * 0.6 + 4, ez = cz - size * 0.8;
+                float yaw = (float) Math.toDegrees(Math.atan2(-(cx - ex), cz - ez));
+                float pitch = (float) Math.toDegrees(Math.atan2(ey - cy, Math.hypot(cx - ex, cz - ez)));
+                p.teleportTo(p.level(), ex, ey, ez, Set.of(), yaw, pitch, false);
+            }));
+            at(t0 + 121, mc -> mc.options.hideGui = true);
+            at(t0 + 150, mc -> shot(mc, "natural_" + id));
+            at(t0 + 151, mc -> mc.options.hideGui = false);
+        }
+        at(1340, mc -> mc.stop());
     }
 
     private static void at(int t, Consumer<Minecraft> action) {
@@ -506,6 +602,11 @@ public final class DevScene {
         if (mc.screen instanceof AbstractContainerScreen<?> screen && screen.getMenu() instanceof MachineMenu<?> menu) {
             menu.page = page;
         }
+    }
+
+    /** A spot for each building, spread far east of the scene so they don't overlap. */
+    private static BlockPos buildingSite(matteroverdrive.world.Building building) {
+        return origin.offset(300 + building.ordinal() * 120, 0, 0);
     }
 
     private static void shot(Minecraft mc, String name) {

@@ -44,6 +44,8 @@ public class MatterOverdrive {
         MOFeatures.FEATURES.register(modEventBus);
         MOEntities.ENTITIES.register(modEventBus);
         MOSounds.SOUNDS.register(modEventBus);
+        matteroverdrive.init.MOStructures.TYPES.register(modEventBus);
+        matteroverdrive.init.MOStructures.PIECES.register(modEventBus);
         matteroverdrive.init.MOAttachments.ATTACHMENTS.register(modEventBus);
         matteroverdrive.init.MOAttributes.ATTRIBUTES.register(modEventBus);
         MOCreativeTabs.TABS.register(modEventBus);

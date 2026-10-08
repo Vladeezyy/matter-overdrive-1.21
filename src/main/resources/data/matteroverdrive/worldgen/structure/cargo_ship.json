@@ -1,0 +1,8 @@
+{
+  "type": "matteroverdrive:image",
+  "building": "cargo_ship",
+  "biomes": "#matteroverdrive:has_structure/cargo_ship",
+  "step": "top_layer_modification",
+  "spawn_overrides": {},
+  "terrain_adaptation": "none"
+}

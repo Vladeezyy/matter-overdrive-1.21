@@ -1110,6 +1110,237 @@ for n in ["rogue_android", "ranged_rogue_android"]:
         "spawners": {"type": mid(n), "weight": 15, "minCount": 1, "maxCount": 2}})
 
 
+# --- phase 7f: image-generated buildings ----------------------------------------------------------------------
+# 1.7.10 MOImageGen: a building is a PNG cut into layerWidth x layerHeight tiles (left to right, top to bottom = y from
+# the bottom up); pixel colour = block mapping, 255-alpha = metadata, black = leave the world as it is. The images are
+# turned into templates here: a palette of finished block states (metadata already resolved) and one byte per pixel.
+# matteroverdrive.world.ImageStructure places them chunk by chunk.
+import base64
+
+def png_rgba(path):
+    size = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "stream=width,height", "-of", "csv=p=0", str(path)],
+                          capture_output=True, text=True, check=True).stdout.strip()
+    tw, th = map(int, size.split(","))
+    raw = subprocess.run(["ffmpeg", "-v", "error", "-i", str(path), "-f", "rawvideo", "-pix_fmt", "rgba", "-"],
+                         capture_output=True, check=True).stdout
+    return tw, th, raw
+
+WOOL = DYES                                                       # 1.7.10 wool/stained glass/carpet metadata order
+ITEM_DYE = list(reversed(DYES))                                   # 1.7.10 ItemDye order (crates, colored plates)
+FORGE_DIR = {2: "north", 3: "south", 4: "west", 5: "east"}
+
+def k_plain(block):
+    return lambda meta, ctx: (block, {})
+def k_facing(block):
+    return lambda meta, ctx: (block, {"facing": FORGE_DIR[meta]} if meta in FORGE_DIR else {})
+def k_fixed(block, **props):
+    return lambda meta, ctx: (block, props)
+def k_axis(block):                                                # 1.7.10 rotated decoratives turned their texture by 90°
+    return lambda meta, ctx: (block, {"axis": "y" if meta == 0 else "x"})
+def k_stairs(block):
+    return lambda meta, ctx: (block, {"facing": ["east", "west", "south", "north"][meta & 3], "half": "top" if meta & 4 else "bottom"})
+def k_bed(block):
+    return lambda meta, ctx: (block, {"facing": ["south", "west", "north", "east"][meta & 3], "part": "head" if meta & 8 else "foot"})
+def k_door(block):
+    def lower(meta):
+        return {"facing": ["east", "south", "west", "north"][meta & 3], "open": "true" if meta & 4 else "false"}
+    def f(meta, ctx):
+        if meta & 8:                                             # upper half: facing and open come from the lower half
+            below = ctx("below")
+            props = lower(below) if below is not None else {}
+            return block, props | {"half": "upper", "hinge": "right" if meta & 1 else "left"}
+        above = ctx("above")
+        return block, lower(meta) | {"half": "lower", "hinge": "right" if above is not None and above & 1 else "left"}
+    return f
+def k_button(block):
+    return lambda meta, ctx: (block, {"face": "wall", "facing": {1: "east", 2: "west", 3: "south", 4: "north"}[meta]}
+                              if meta in (1, 2, 3, 4) else {"face": "floor"})
+def k_by_meta(blocks, **props):                                   # block id chosen by metadata (colours, plant types)
+    return lambda meta, ctx: (blocks[meta] if meta < len(blocks) else blocks[0], props)
+def k_charging_part():                                            # 1.7.10 boundingBox above a charging station
+    return lambda meta, ctx: (mid("charging_station"), {"part": str(ctx("part"))})
+
+DECOR_COLORS = {0xd4b108: k_plain(mid("decorative_stripes")), 0xb6621e: k_plain(mid("decorative_coils")),
+                0x3b484b: k_plain(mid("decorative_clean")), 0x32393c: k_plain(mid("decorative_vent_dark")),
+                0x3f4b4e: k_plain(mid("decorative_vent_bright")), 0x323b3a: k_plain(mid("decorative_holo_matrix")),
+                0x475459: k_plain(mid("decorative_tritanium_plate")), 0x1c1f20: k_plain(mid("decorative_carbon_fiber_plate")),
+                0x5088a5: k_axis(mid("decorative_matter_tube")), 0x1e2220: k_axis(mid("decorative_beams")),
+                0x958d7c: k_plain(mid("decorative_floor_tiles")), 0x53593f: k_plain(mid("decorative_floor_tiles_green")),
+                0x7f7e7b: k_plain(mid("decorative_floor_noise")), 0x576468: k_plain(mid("decorative_tritanium_plate_stripe")),
+                0xa3a49c: k_plain(mid("decorative_floor_tile_white")), 0xe3e3e3: k_plain(mid("decorative_white_plate")),
+                0x303837: k_axis(mid("decorative_separator")), 0xd4f8f5: k_plain(mid("decorative_tritanium_lamp")),
+                0x505050: k_by_meta([mid(f"decorative_tritanium_plate_{d}") for d in ITEM_DYE]),
+                0x387c9e: k_plain(mid("decorative_engine_exhaust_plasma"))}
+CRATES_ALL = [k_facing(mid(f"tritanium_crate_{d}")) for d in ITEM_DYE]
+def crate(dye):
+    return k_facing(mid(f"tritanium_crate_{dye}"))
+# Not ported yet: the star map and the transporter get stand-ins (swap them here when they exist).
+STAR_MAP = k_plain(mid("decorative_holo_matrix"))
+TRANSPORTER = k_plain(mid("machine_hull"))
+CONNECT = {mid("network_pipe"), mid("heavy_matter_pipe"), mid("matter_pipe"), "minecraft:oak_fence"}
+
+def m(kinds, noise=False, specials=()):
+    return {"kinds": kinds if isinstance(kinds, list) else [kinds], "noise": noise, "specials": list(specials)}
+
+BUILDINGS = {
+    # 1.7.10 MOAndroidHouseBuilding: metadata = (255-alpha)/255*10
+    "android_house": ("android_house", 21, 21, "android", {
+        0x00fffc: m([k_axis(mid("decorative_beams")), k_plain(mid("decorative_carbon_fiber_plate")), k_plain(mid("decorative_white_plate"))]),
+        0x623200: m(k_plain("minecraft:dirt")), 0xffa200: m(k_plain(mid("decorative_floor_tiles"))),
+        0xfff600: m(k_plain(mid("decorative_holo_matrix"))), 0x80b956: m(k_plain("minecraft:grass_block")),
+        0x539ac3: m(k_plain(mid("decorative_tritanium_plate"))),
+        0xb1c8d5: m([k_plain(mid("decorative_floor_noise")), k_plain(mid("decorative_floor_tiles_green")), k_plain(mid("decorative_floor_tile_white"))]),
+        0x5f6569: m(k_plain(mid("decorative_vent_dark"))), 0xf1f1f1: m(k_plain("minecraft:air")), 0xe400ff: m(STAR_MAP),
+        0x1850ad: m(k_plain(mid("decorative_clean"))), 0x9553c3: m(k_plain(mid("force_glass"))),
+        0x35d6e0: m(k_facing(mid("replicator"))), 0x35e091: m(k_facing(mid("network_switch"))),
+        0xc8d43d: m(CRATES_ALL, specials=["crate_loot"]),
+        0x2a4071: m([k_facing(mid("android_station")), k_facing(mid("weapon_station"))]),
+        0xa13e5f: m(k_plain(mid("network_pipe"))), 0xa16a3e: m(k_facing(mid("charging_station"))),
+        0x416173: m(k_plain(mid("decorative_tritanium_plate_stripe"))), 0x187716: m(k_facing(mid("pattern_monitor"))),
+        0xac7c1e: m(k_plain(mid("decorative_vent_bright"))), 0x007eff: m(k_plain(mid("decorative_stripes")))}),
+    # 1.7.10 MOSandPit: no metadata
+    "sand_pit": ("sand_pit", 24, 24, None, {
+        0xe1db35: m(k_plain("minecraft:sandstone")), 0xf1f1f1: m(k_plain("minecraft:air")), 0xffff00: m(k_plain("minecraft:sand")),
+        0xc735e1: m(k_plain("minecraft:glowstone")), 0x35a2e1: m(k_plain("minecraft:water")),
+        0x359ae1: m(k_plain(mid("decorative_tritanium_plate"))), 0xff8400: m(k_plain(mid("decorative_coils"))),
+        0x6b4400: m(k_plain("minecraft:oak_fence"))}),
+    # 1.7.10 MOWorldGenCrashedSpaceShip: no metadata; the holo signs face east/west by colour
+    "crashed_ship": ("crashed_space_ship", 11, 35, None, {
+        0x38c8df: m(k_plain(mid("decorative_clean"))), 0x187b8b: m(k_plain(mid("decorative_vent_bright"))),
+        0xaa38df: m(k_plain(mid("force_glass"))), 0x00ff78: m(k_plain("minecraft:grass_block")),
+        0xd8ff00: m(k_fixed(mid("holo_sign"), facing="east"), specials=["holo_text"]),
+        0xaccb00: m(k_fixed(mid("holo_sign"), facing="west"), specials=["holo_text"]),
+        0x3896df: m(k_plain(mid("decorative_tritanium_plate"))), 0xdfd938: m(k_plain(mid("decorative_tritanium_plate_stripe"))),
+        0x5d89ab: m(k_plain(mid("decorative_holo_matrix"))), 0x77147d: m(k_plain(mid("weapon_station")), specials=["weapon"]),
+        0xb04a90: m(CRATES_ALL, specials=["crate_loot"]), 0x94deea: m(k_axis(mid("decorative_separator"))),
+        0xff9c00: m(k_plain(mid("decorative_coils"))), 0xaca847: m(k_axis(mid("decorative_matter_tube"))),
+        0x0c3b60: m(k_plain(mid("decorative_carbon_fiber_plate"))), 0xc5ced0: m(k_plain("minecraft:air"))}),
+    # 1.7.10 MOWorldGenUnderwaterBase: metadata = 255-alpha
+    "underwater_base": ("underwater_base", 43, 43, "alpha", {**{c: m(k) for c, k in DECOR_COLORS.items()},
+        0xdc979c: m(k_by_meta(["minecraft:short_grass", "minecraft:short_grass", "minecraft:fern"])),
+        0x77d1b6: m(k_by_meta(["minecraft:poppy", "minecraft:blue_orchid", "minecraft:allium", "minecraft:azure_bluet", "minecraft:red_tulip",
+                               "minecraft:orange_tulip", "minecraft:white_tulip", "minecraft:pink_tulip", "minecraft:oxeye_daisy"])),
+        0xd2fb50: m(k_plain(mid("force_glass"))), 0x0c1e4e: m(k_plain("minecraft:farmland")),
+        0xa7ac65: m(crate("orange")), 0xd6a714: m(k_by_meta([f"minecraft:{d}_stained_glass" for d in WOOL])),
+        0x2c5ae9: m(k_facing(mid("weapon_station"))), 0x0acd8c: m(k_facing(mid("android_station"))),
+        0x7018f9: m(crate("light_blue")), 0x4657cc: m(crate("lime")), 0x1f2312: m(crate("white")),
+        0xd3371d: m(k_plain(mid("machine_hull"))), 0x3640f9: m(k_button("minecraft:stone_button")),
+        0xeff73d: m(k_facing(mid("network_switch"))), 0x5a6388: m(k_charging_part()), 0xbf19a9: m(k_plain("minecraft:grass_block")),
+        0xc05e5e: m(k_by_meta(["minecraft:flower_pot", "minecraft:potted_poppy", "minecraft:potted_dandelion"])),
+        0x4d8dd3: m(k_facing(mid("pattern_monitor"))), 0xdb9c3a: m(k_facing(mid("holo_sign"))),
+        0x68b68c: m(k_facing(mid("matter_analyzer"))), 0x2cb0c7: m(STAR_MAP, specials=["mutant"]),
+        0x1b2ff7: m(k_plain(mid("network_pipe"))), 0x05eaab: m(crate("yellow")), 0x11003e: m(k_facing(mid("charging_station"))),
+        0xb31e83: m(k_fixed("minecraft:carrots", age="7")), 0xc78e77: m(k_facing(mid("replicator"))),
+        0x338a42: m(k_fixed("minecraft:potatoes", age="7")), 0xbdea8f: m(k_facing("minecraft:ladder")),
+        0x4d12f4: m(k_facing(mid("pattern_storage"))),
+        0xf7d20b: m(k_by_meta(["minecraft:oak_sapling", "minecraft:spruce_sapling", "minecraft:birch_sapling", "minecraft:jungle_sapling"])),
+        0x854b38: m(k_door("minecraft:iron_door")), 0xff00ff: m(k_plain("minecraft:air"))}),
+    # 1.7.10 MOWorldGenCargoShip: metadata = 255-alpha; the ores are picked per block
+    "cargo_ship": ("cargo_ship", 58, 23, "alpha", {**{c: m(k) for c, k in DECOR_COLORS.items()},
+        0xdb9c3a: m(k_facing(mid("holo_sign"))), 0x5fffbe: m(TRANSPORTER), 0xd2fb50: m(k_plain(mid("force_glass"))),
+        0xdc01d8: m(k_plain("minecraft:oak_pressure_plate")),
+        0xfc6b34: m([k_plain("minecraft:gold_ore"), k_plain("minecraft:iron_ore"), k_plain("minecraft:coal_ore"),
+                     k_plain(mid("tritanium_ore"))], noise=True),
+        0x0d1626: m(k_facing(mid("fusion_reactor_io"))), 0x1b2ff7: m(k_plain(mid("network_pipe"))), 0x1f2312: m(crate("white")),
+        0xab4824: m(k_plain("minecraft:oak_fence")), 0x68d738: m(k_by_meta([f"minecraft:{d}_carpet" for d in WOOL])),
+        0xbdea8f: m(k_facing("minecraft:ladder")), 0xeff73d: m(k_facing(mid("network_switch"))),
+        0xa8ed1c: m(k_plain(mid("heavy_matter_pipe"))), 0x4b285d: m(k_stairs("minecraft:oak_stairs")),
+        0xcfd752: m(k_facing(mid("network_router"))), 0x4d8dd3: m(k_facing(mid("pattern_monitor"))),
+        0x6b3534: m(k_bed("minecraft:red_bed")), 0xff00ff: m(k_plain("minecraft:air"))}),
+}
+# 1.7.10 MOWorldGenUnderwaterBase/CargoShip mapped every BlockDecorative by its colour, then their own colours on top.
+
+for bid, (img, lw, lh, meta_mode, mapping) in BUILDINGS.items():
+    tw, th, raw = png_rgba(ref / "textures/world" / f"{img}.png")
+    cols = tw // lw
+    layers = cols * (th // lh)
+    def pixel(layer, x, z):
+        if not 0 <= layer < layers:
+            return None
+        px, py = (layer % cols) * lw + x, (layer // cols) * lh + z
+        i = (py * tw + px) * 4
+        return (raw[i] << 16 | raw[i + 1] << 8 | raw[i + 2]), raw[i + 3]
+    def meta_of(alpha):
+        if meta_mode == "alpha":
+            return 255 - alpha
+        if meta_mode == "android":
+            return int((255 - alpha) / 255 * 10)
+        return 0
+    palette, index, data, unmapped = [], {}, [], set()
+    for layer in range(layers):
+        row = bytearray(lw * lh)
+        for z in range(lh):
+            for x in range(lw):
+                color, alpha = pixel(layer, x, z)
+                if color == 0:
+                    continue
+                mp = mapping.get(color)
+                if mp is None:
+                    unmapped.add(color)
+                    continue
+                meta = meta_of(alpha)
+                def ctx(what, layer=layer, x=x, z=z):
+                    if what in ("below", "above"):
+                        p = pixel(layer + (-1 if what == "below" else 1), x, z)
+                        return meta_of(p[1]) if p and p[0] == color else None
+                    if what == "part":                            # 1 + the part of the charging station below
+                        part, l = 0, layer - 1
+                        while l >= 0 and pixel(l, x, z)[0] in (0x5a6388,):
+                            part, l = part + 1, l - 1
+                        return part + 1
+                states = []
+                for kind in mp["kinds"]:
+                    block, props = kind(meta, ctx)
+                    states.append({"Name": block} | ({"Properties": props} if props else {}))
+                specials = mp["specials"] + (["connect"] if any(s["Name"] in CONNECT for s in states) else [])
+                entry = {"states": states, "noise": mp["noise"], "group": color, "specials": specials}
+                key = json.dumps(entry, sort_keys=True)
+                if key not in index:
+                    palette.append(entry)
+                    index[key] = len(palette)                     # 0 = leave the world as it is
+                row[z * lw + x] = index[key]
+        data.append(base64.b64encode(bytes(row)).decode())
+    assert len(palette) < 256, bid
+    if unmapped:
+        print(f"{bid}: unmapped colours {sorted('%06x' % c for c in unmapped)}")
+    w(D / "mo_buildings" / f"{bid}.json", {"width": lw, "depth": lh, "height": layers, "palette": palette, "layers": data})
+
+# 1.7.10 ChestGenHooks "android_house": 10-19 rolls (generateChestContents(random.nextInt(10) + 10))
+def loot_item(item, lo, hi, weight):
+    e = {"type": "minecraft:item", "name": item, "weight": weight}
+    if (lo, hi) != (1, 1):
+        e["functions"] = [{"function": "minecraft:set_count", "count": {"type": "minecraft:uniform", "min": lo, "max": hi}}]
+    return e
+w(D / "loot_table/chests/android_house.json", {"type": "minecraft:chest", "pools": [{"rolls": {"type": "minecraft:uniform", "min": 10, "max": 19},
+    "entries": [loot_item(mid("emergency_ration"), 8, 20, 100), loot_item(mid("earl_gray_tea"), 4, 10, 50),
+                loot_item(mid("romulan_ale"), 4, 10, 50),
+                loot_item(mid("isolinear_circuit_mk1"), 1, 5, 50), loot_item(mid("isolinear_circuit_mk2"), 1, 4, 40),
+                loot_item(mid("isolinear_circuit_mk3"), 1, 3, 30), loot_item(mid("isolinear_circuit_mk4"), 1, 2, 20),
+                loot_item(mid("android_pill_blue"), 1, 2, 10), loot_item(mid("android_pill_red"), 1, 1, 5),
+                loot_item(mid("weapon_module_barrel_damage"), 1, 1, 10), loot_item(mid("weapon_module_barrel_fire"), 1, 1, 8),
+                loot_item(mid("weapon_module_barrel_heal"), 1, 1, 10), loot_item(mid("weapon_module_barrel_explosion"), 1, 1, 5),
+                loot_item(mid("tritanium_spine"), 1, 1, 10),
+                *[loot_item(mid(f"rogue_android_part_{p}"), 1, 2, 15) for p in ["head", "arms", "legs", "chest"]],
+                loot_item(mid("hc_battery"), 1, 1, 10), loot_item(mid("h_compensator"), 1, 2, 10),
+                loot_item(mid("me_conversion_matrix"), 1, 2, 10),
+                loot_item(mid("matter_container"), 4, 8, 20),         # 1.7.10 matter_container_full (not ported yet)
+                loot_item(mid("phaser"), 1, 1, 10)]}]})
+
+# Placement. 1.7.10 tried a building in 1% of chunks (weights android house 20, sand pit 100, crashed ship 60,
+# underwater base 20, cargo ship 5) with minimum distances 256 (ship), 2048 (base), 4096 (cargo ship): random spreads
+# of about the same frequency.
+STRUCTURES = {"android_house": ("#minecraft:is_overworld", 24, 8), "sand_pit": ("minecraft:desert", 16, 6),
+              "crashed_ship": ("#minecraft:is_overworld", 20, 16), "underwater_base": ("#minecraft:is_deep_ocean", 128, 96),
+              "cargo_ship": (["#minecraft:is_overworld", "#minecraft:is_end"], 256, 200)}
+for i, (bid, (biomes, spacing, separation)) in enumerate(STRUCTURES.items()):
+    w(D / f"tags/worldgen/biome/has_structure/{bid}.json", {"values": biomes if isinstance(biomes, list) else [biomes]})
+    w(D / f"worldgen/structure/{bid}.json", {"type": mid("image"), "building": bid, "biomes": f"#{MOD}:has_structure/{bid}",
+        # 1.7.10 built after the chunk was populated, over its trees: place after the vegetation too
+        "step": "top_layer_modification", "spawn_overrides": {}, "terrain_adaptation": "none"})
+    w(D / f"worldgen/structure_set/{bid}.json", {"structures": [{"structure": mid(bid), "weight": 1}],
+        "placement": {"type": "minecraft:random_spread", "spacing": spacing, "separation": separation, "salt": 1870231 + i}})
+
+
 # --- matter values (1.7.10 MatterOverdriveMatter.registerBasic*) -----------------------------------
 # Base values of the matteroverdrive:matter data map; everything else is calculated from recipes at runtime.
 # Ore dictionary names are mapped to today's tags. Tags come first so that single items can override them.

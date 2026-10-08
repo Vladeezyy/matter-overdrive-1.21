@@ -1,0 +1,8 @@
+{
+  "type": "matteroverdrive:image",
+  "building": "android_house",
+  "biomes": "#matteroverdrive:has_structure/android_house",
+  "step": "top_layer_modification",
+  "spawn_overrides": {},
+  "terrain_adaptation": "none"
+}

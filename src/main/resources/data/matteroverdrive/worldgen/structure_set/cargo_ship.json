@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "matteroverdrive:cargo_ship",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 256,
+    "separation": 200,
+    "salt": 1870235
+  }
+}

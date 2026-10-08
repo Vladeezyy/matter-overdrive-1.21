@@ -1,0 +1,8 @@
+{
+  "type": "matteroverdrive:image",
+  "building": "underwater_base",
+  "biomes": "#matteroverdrive:has_structure/underwater_base",
+  "step": "top_layer_modification",
+  "spawn_overrides": {},
+  "terrain_adaptation": "none"
+}

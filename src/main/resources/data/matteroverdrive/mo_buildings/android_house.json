@@ -1,0 +1,311 @@
+{
+  "width": 21,
+  "depth": 21,
+  "height": 9,
+  "palette": [
+    {
+      "states": [
+        {
+          "Name": "minecraft:dirt"
+        }
+      ],
+      "noise": false,
+      "group": 6435328,
+      "specials": []
+    },
+    {
+      "states": [
+        {
+          "Name": "matteroverdrive:decorative_floor_tiles"
+        }
+      ],
+      "noise": false,
+      "group": 16753152,
+      "specials": []
+    },
+    {
+      "states": [
+        {
+          "Name": "matteroverdrive:decorative_beams",
+          "Properties": {
+            "axis": "y"
+          }
+        },
+        {
+          "Name": "matteroverdrive:decorative_carbon_fiber_plate"
+        },
+        {
+          "Name": "matteroverdrive:decorative_white_plate"
+        }
+      ],
+      "noise": false,
+      "group": 65532,
+      "specials": []
+    },
+    {
+      "states": [
+        {
+          "Name": "matteroverdrive:decorative_holo_matrix"
+        }
+      ],
+      "noise": false,
+      "group": 16774656,
+      "specials": []
+    },
+    {
+      "states": [
+        {
+          "Name": "minecraft:grass_block"
+        }
+      ],
+      "noise": false,
+      "group": 8436054,
+      "specials": []
+    },
+    {
+      "states": [
+        {
+          "Name": "matteroverdrive:decorative_tritanium_plate"
+        }
+      ],
+      "noise": false,
+      "group": 5479107,
+      "specials": []
+    },
+    {
+      "states": [
+        {
+          "Name": "matteroverdrive:decorative_floor_noise"
+        },
+        {
+          "Name": "matteroverdrive:decorative_floor_tiles_green"
+        },
+        {
+          "Name": "matteroverdrive:decorative_floor_tile_white"
+        }
+      ],
+      "noise": false,
+      "group": 11651285,
+      "specials": []
+    },
+    {
+      "states": [
+        {
+          "Name": "minecraft:air"
+        }
+      ],
+      "noise": false,
+      "group": 15856113,
+      "specials": []
+    },
+    {
+      "states": [
+        {
+          "Name": "matteroverdrive:decorative_holo_matrix"
+        }
+      ],
+      "noise": false,
+      "group": 14942463,
+      "specials": []
+    },
+    {
+      "states": [
+        {
+          "Name": "matteroverdrive:decorative_vent_dark"
+        }
+      ],
+      "noise": false,
+      "group": 6251881,
+      "specials": []
+    },
+    {
+      "states": [
+        {
+          "Name": "matteroverdrive:decorative_clean"
+        }
+      ],
+      "noise": false,
+      "group": 1593517,
+      "specials": []
+    },
+    {
+      "states": [
+        {
+          "Name": "matteroverdrive:network_switch"
+        }
+      ],
+      "noise": false,
+      "group": 3530897,
+      "specials": []
+    },
+    {
+      "states": [
+        {
+          "Name": "matteroverdrive:charging_station"
+        }
+      ],
+      "noise": false,
+      "group": 10578494,
+      "specials": []
+    },
+    {
+      "states": [
+        {
+          "Name": "matteroverdrive:network_pipe"
+        }
+      ],
+      "noise": false,
+      "group": 10567263,
+      "specials": [
+        "connect"
+      ]
+    },
+    {
+      "states": [
+        {
+          "Name": "matteroverdrive:replicator",
+          "Properties": {
+            "facing": "north"
+          }
+        }
+      ],
+      "noise": false,
+      "group": 3528416,
+      "specials": []
+    },
+    {
+      "states": [
+        {
+          "Name": "matteroverdrive:tritanium_crate_black"
+        },
+        {
+          "Name": "matteroverdrive:tritanium_crate_red"
+        },
+        {
+          "Name": "matteroverdrive:tritanium_crate_green"
+        },
+        {
+          "Name": "matteroverdrive:tritanium_crate_brown"
+        },
+        {
+          "Name": "matteroverdrive:tritanium_crate_blue"
+        },
+        {
+          "Name": "matteroverdrive:tritanium_crate_purple"
+        },
+        {
+          "Name": "matteroverdrive:tritanium_crate_cyan"
+        },
+        {
+          "Name": "matteroverdrive:tritanium_crate_light_gray"
+        },
+        {
+          "Name": "matteroverdrive:tritanium_crate_gray"
+        },
+        {
+          "Name": "matteroverdrive:tritanium_crate_pink"
+        },
+        {
+          "Name": "matteroverdrive:tritanium_crate_lime"
+        },
+        {
+          "Name": "matteroverdrive:tritanium_crate_yellow"
+        },
+        {
+          "Name": "matteroverdrive:tritanium_crate_light_blue"
+        },
+        {
+          "Name": "matteroverdrive:tritanium_crate_magenta"
+        },
+        {
+          "Name": "matteroverdrive:tritanium_crate_orange"
+        },
+        {
+          "Name": "matteroverdrive:tritanium_crate_white"
+        }
+      ],
+      "noise": false,
+      "group": 13161533,
+      "specials": [
+        "crate_loot"
+      ]
+    },
+    {
+      "states": [
+        {
+          "Name": "matteroverdrive:android_station"
+        },
+        {
+          "Name": "matteroverdrive:weapon_station"
+        }
+      ],
+      "noise": false,
+      "group": 2769009,
+      "specials": []
+    },
+    {
+      "states": [
+        {
+          "Name": "matteroverdrive:force_glass"
+        }
+      ],
+      "noise": false,
+      "group": 9786307,
+      "specials": []
+    },
+    {
+      "states": [
+        {
+          "Name": "matteroverdrive:decorative_tritanium_plate_stripe"
+        }
+      ],
+      "noise": false,
+      "group": 4284787,
+      "specials": []
+    },
+    {
+      "states": [
+        {
+          "Name": "matteroverdrive:pattern_monitor",
+          "Properties": {
+            "facing": "east"
+          }
+        }
+      ],
+      "noise": false,
+      "group": 1603350,
+      "specials": []
+    },
+    {
+      "states": [
+        {
+          "Name": "matteroverdrive:decorative_vent_bright"
+        }
+      ],
+      "noise": false,
+      "group": 11303966,
+      "specials": []
+    },
+    {
+      "states": [
+        {
+          "Name": "matteroverdrive:decorative_stripes"
+        }
+      ],
+      "noise": false,
+      "group": 32511,
+      "specials": []
+    }
+  ],
+  "layers": [
+    "AAAAAAAAAAABAQEBAQEBAAAAAAAAAAAAAAAAAQEBAQEBAQEBAAAAAAAAAAAAAAABAQEBAQEBAQEBAQAAAAAAAAAAAAEBAQEBAQEBAQEBAQAAAAAAAAAAAAEBAQEBAQEBAQEBAQEAAAAAAAAAAAEBAQEBAQEBAQEBAQEAAAAAAAAAAAEBAQEBAQEBAQEBAQEAAAAAAAAAAAEBAQEBAQEBAQEBAQEAAAAAAAAAAAEBAQEBAQEBAQEBAQEAAAAAAAAAAAEBAQEBAQEBAQEBAQEAAAAAAAAAAAEBAQEBAQEBAQEBAQEAAAAAAAAAAAEBAQEBAQEBAQEBAQEAAAAAAAAAAAEBAQEBAQEBAQEBAQEAAAAAAAAAAAEBAQEBAQEBAQEBAQEAAAAAAAAAAAEBAQEBAQEBAQEBAQEAAAAAAAAAAAEBAQEBAQEBAQEBAQEAAAAAAAAAAAABAQEBAQEBAQEBAQAAAAAAAAAAAAABAQEBAQEBAQEBAQAAAAAAAAAAAAAAAQEBAQEBAQEBAAAAAAAAAAAAAAAAAQEBAQEBAQEBAAAAAAAAAAAAAAAAAAABAQEBAQAAAAAAAAAA",
+    "AAAAAAAAAAABAQEBAQEBAAAAAAAAAAAAAAAAAQEBAQEBAQEBAAAAAAAAAAAAAAABAQEBAQEBAQEBAQAAAAAAAAAAAAEBAQEBAQEBAQEBAQAAAAAAAAAAAAEBAQEBAQEBAQEBAQEAAAAAAAAAAAEBAQEBAQEBAQEBAQEAAAAAAAAAAAEBAQEBAQEBAQEBAQEAAAAAAAAAAAEBAQECAgICAgEBAQEAAAAAAAAAAAEBAQECAwQDAgEBAQEAAAAAAAAAAAEBAQECBAIEAgEBAQEAAAAAAAAAAAEBAQECAwQDAgEBAQEAAAAAAAAAAAEBAQECAgMCAgEBAQEAAAAAAAAAAAEBAQEBAgICAQEBAQEAAAAAAAAAAAEBAQEBAQEBAQEBAQEAAAAAAAAAAAEBAQEBAQEBAQEBAQEAAAAAAAAAAAEBAQEBAQEBAQEBAQEAAAAAAAAAAAABAQEBAQEBAQEBAQAAAAAAAAAAAAABAQEBAQEBAQEBAQAAAAAAAAAAAAAAAQEBAQEBAQEBAAAAAAAAAAAAAAAAAQEBAQEBAQEBAAAAAAAAAAAAAAAAAAABAQEBAQAAAAAAAAAA",
+    "AAAAAAAAAAAFBQUFBQUAAAAAAAAAAAAAAAAAAAUFBgYGBQUFAAAAAAAAAAAAAAAAAAUFBQUFBQUFBQAAAAAAAAAAAAAABQUFBQUFBQUFBQAAAAAAAAAAAAAFBQUFBQUFBQUFBQAAAAAAAAAAAAUFBQYGBgYGBgYFBQAAAAAAAAAAAAUFBgcHBwcHBwcGBQUAAAAAAAAAAAUGBwcCAgICAgcHBgAAAAAAAAAAAAAGBwcCCAgIAgcHBgUAAAAAAAAAAAUGBwcCCAkIAgcHBgAAAAAAAAAAAAAGBwcCCAgIAgcHBgUAAAAAAAAAAAUGBwcCAggCAgcHBgUAAAAAAAAAAAUFBgcHAgICBwcGBQUAAAAAAAAAAAAFBQYHBwcHBwYFBQUAAAAAAAAAAAAFBQUGBwcHBgUFBQUAAAAAAAAAAAAFBQYGBwcHBgYFBQAAAAAAAAAAAAAFBQUGBwcHBgUFBQAAAAAAAAAAAAAFBQYGBwcHBgYFAAAAAAAAAAAAAAAABQUGCgoKBgUFAAAAAAAAAAAAAAAAAAUFBQUFBQUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "AAAAAAAAAAAABQUFBQAAAAAAAAAAAAAAAAAAAAAFBgYGBQAAAAAAAAAAAAAAAAAAAAAABgYGBQUAAAAAAAAAAAAAAAAAAAAAAAAFAAAFAAAAAAAAAAAAAAAAAAAABQUFAAAFAAAAAAAAAAAAAAAAAAsLCwsLDAsAAAAAAAAAAAAAAAAACw0ICAgIDg0LAAAAAAAAAAAAAAALCAgICAgICAgICwAAAAAAAAAAAAALDwgICAgICAgQCwAAAAAAAAAAAAALDggICAgICAgRCwAAAAAAAAAAAAALDAgICAgICAgQCwAAAAAAAAAAAAALCAgICAgICAgICwAAAAAAAAAAAAAFCwgICAgICAgLAAAAAAAAAAAAAAAFBQsICAgICAsFAAAAAAAAAAAAAAAABQULCAgICwUFAAAAAAAAAAAAAAAABQYLCAgICwYFAAAAAAAAAAAAAAAAAAALCAgICwUFAAAAAAAAAAAAAAAAAAYLEhISCwYAAAAAAAAAAAAAAAAAAAAGAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgYGAAAAAAAAAAAAAAAAAAAAAAAABgYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYGBgYGBgYAAAAAAAAAAAAAAAAABggODg4ODggGAAAAAAAAAAAAAAAGCAgICAgICAgIBgAAAAAAAAAAAAAGCAgICAgICAgIEwAAAAAAAAAAAAAGCAgICAgICAgIEwAAAAAAAAAAAAAGDhQICAgICAgIEwAAAAAAAAAAAAAGCAgICAgICAgIBgAAAAAAAAAAAAAABggICAgICAgGAAAAAAAAAAAAAAAABQYICAgICAYAAAAAAAAAAAAAAAAAAAAGCAgIBgAAAAAAAAAAAAAAAAAAAAYTCAgIEwYAAAAAAAAAAAAAAAAAAAATCAgIEwAAAAAAAAAAAAAAAAAAAAYTEhISEwYAAAAAAAAAAAAAAAAAAAAGAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABUMBgYGBhUAAAAAAAAAAAAAAAAABggOCAgICAgGAAAAAAAAAAAAAAAVCAgICAgICAgIFQAAAAAAAAAAAAAGCAgICAgICAgIBgAAAAAAAAAAAAAGCAgICAgICAgIBgAAAAAAAAAAAAAGCAgICAgICAgIBgAAAAAAAAAAAAAVCAgICAgICAgIFQAAAAAAAAAAAAAABggICAgICAgGAAAAAAAAAAAAAAAAAAYICAgICAYAAAAAAAAAAAAAAAAAAAAGCAgIBgAAAAAAAAAAAAAAAAAAAAYGCAgIBgYAAAAAAAAAAAAAAAAAAAAGCAgIBgAAAAAAAAAAAAAAAAAAAAYGEhISBgYAAAAAAAAAAAAAAAAAAAAGFgAWBgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgYGAAAAAAAAAAAAAAAAAAAAAAAABgYGAAAAAAAAAAAAAAAAAAAAAAAABgYGAAAAAAAAAAAAAAAAAAAAAAAABhUGAAAAAAAAAAAAAAAAAAAAAAYGCAgIBgYAAAAAAAAAAAAAAAAGBggICAgICAgGBgAAAAAAAAAAAAAGBggICAgICAgGBgAAAAAAAAAAAAAGBggICAgICAgGBgAAAAAAAAAAAAAGBggICAgICAgGBgAAAAAAAAAAAAAGBggICAgICAgGBgAAAAAAAAAAAAAABgYGCAgIBgYGAAAAAAAAAAAAAAAAAAYGBgYGBgYAAAAAAAAAAAAAAAAAAAAABgYGAAAAAAAAAAAAAAAAAAAAAAYABgYGAAYAAAAAAAAAAAAAAAAAAAAABgYGAAAAAAAAAAAAAAAAAAAAAAYABgYGAAYAAAAAAAAAAAAAAAAAAAAABgYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgYGAAAAAAAAAAAAAAAAAAAAAAAABgYGAAAAAAAAAAAAAAAAAAAAAAAABgYGAAAAAAAAAAAAAAAAAAAAAAYGBgYGBgYAAAAAAAAAAAAAAAAAAAYGEhISBgYAAAAAAAAAAAAAAAAAAAYSEhISEgYAAAAAAAAAAAAAAAAAAAYSEhISEgYAAAAAAAAAAAAAAAAAAAYGBhIGBgYAAAAAAAAAAAAAAAAAAAAABgYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYGBgYGBgYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYGBgYGBgYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAABgAAAAAAAAAAAAAAAAAAAAAGAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAGAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+  ]
+}

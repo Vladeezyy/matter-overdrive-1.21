@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "matteroverdrive:sand_pit",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 16,
+    "separation": 6,
+    "salt": 1870232
+  }
+}

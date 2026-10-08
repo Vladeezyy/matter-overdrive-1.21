@@ -238,23 +238,46 @@
   component copied to the item; `preRemoveSideEffects` overridden so nothing spills). OBJ base + overlay; the overlay
   material has `neoforge_TintIndex 0` (new `tints` arg of `obj_model`) → dye colour from the block colour handler / item
   tint. 16-bit textures converted to 8-bit by ffmpeg. Recipe " D /TCT/ T " (dye, tritanium plate, chest). 67 GameTests.
+- **7f ✅** Image buildings (1.7.10 MOImageGen): android house, sand pit, crashed ship, underwater base, cargo ship.
+  - The generator turns `textures/world/*.png` into `data/matteroverdrive/mo_buildings/<id>.json`: layers cut left→right,
+    top→bottom (= y up), black = keep the world, palette of finished block states with the 1.7.10 metadata resolved
+    (machine facing = ForgeDirection 2-5; android house meta = (255-alpha)/255*10, others 255-alpha; ladders, stairs,
+    beds, iron doors (upper half takes facing from the pixel below), buttons, carpets/stained glass (wool order),
+    colored plates/crates (ItemDye order), crops age 7, charging station parts from the bounding-box pixels above it).
+    Multi-block mappings: `noise` = per block, otherwise one pick per building and colour (1.7.10 BlockMapping).
+  - `ImageStructure` (type `matteroverdrive:image`, field `building`) + `ImageStructurePiece` place them chunk by chunk;
+    random picks are seeded by piece seed + position so chunks agree. `Building.baseY` = the 1.7.10 checks (corner
+    heights/water via `getBaseHeight` WORLD_SURFACE_WG / OCEAN_FLOOR_WG). Pipes/fences are marked for post-processing.
+  - Hooks: android house crates get `chests/android_house` (1.7.10 ChestGenHooks list, 10-19 rolls) + 5% legendary
+    level 3 weapon; 3-5 rogue androids (60% ranged) + a legendary level 3 ranged one, persistent; crashed ship crate
+    loot, 30% holo sign texts, 5% weapon in the weapon station; underwater base: mutant scientist "Mitko'Urrr".
+  - `WeaponFactory.randomDecorated` (moved out of `RangedRogueAndroid`), legendary = gold "Legendary" name only.
+  - Placement (structure sets, random_spread spacing/separation in chunks): android house 24/8 overworld, sand pit 16/6
+    desert, crashed ship 20/16 overworld, underwater base 128/96 deep ocean, cargo ship 256/200 overworld + end.
+    Step `top_layer_modification`: built after the trees like 1.7.10 (with surface_structures jungle trees grew through).
+  - Verified: `/locate` finds all five; fresh chunks: android house with 6 androids and 2 looted crates, crashed ship
+    with a looted crate. 68 GameTests.
 
 ### Next in phase 7 (start here)
 1. ~~Failed animals~~ ✅ 7c.
 2. ~~Mutant scientist~~ ✅ 7d (underwater base spawns one named "Mitko'Urrr", persistent, on the star map block).
-3. Structures (world/MO*: android house, sand pit, crashed ship, cargo ship, underwater base, mad scientist house;
-   1.7.10 MOImageGen builds them from images in textures/world).
+3. ~~Structures~~ ✅ 7f (the mad scientist house is a village piece: comes with the mad scientist in item 5).
 4. Transporter + transport flash drive; omni tool (also 30% of rogue android weapons); matter scanner; portable
    decomposer; matter container tank; microwave.
 5. Star map / galaxy / ships / buildings / quests / dialogs / contract market; mad scientist villager (dialog + trades:
    TradeHandlerMadScientist); android spawner block (teams + path drives, not used by worldgen).
-- Deviations so far: legendary rogue android parts drop without bonus attributes; no rogue android teams/paths.
+- Deviations so far: legendary rogue android parts drop without bonus attributes; no rogue android teams/paths;
+  legendary weapons have no stat bonuses; buildings: star map → holo matrix and transporter → machine hull stand-ins
+  (swap STAR_MAP/TRANSPORTER in gen_resources.py when ported), no crashed-ship quest contract, android house loot has
+  empty matter containers (1.7.10 full ones), underwater base needs 16+ water (1.7.10: 27+, rare in today's deep
+  oceans) and sinks into the floor to stay submerged, no "generate buildings" config (use a datapack), not rotated
+  (1.7.10 never rotated them either).
 
 ## 1.21.10 / NeoForge 21.10.64 API notes (learned the hard way)
 **Workflow**
 - Resources: never hand-edit `src/main/resources/{assets,data}` — regenerate:
   `rm -rf src/main/resources/{assets,data} && python3 -I tools/gen_resources.py ~/mo-reference/mo-1.7.10/src/main/resources/assets/mo src/main/resources`
-- Tests: `./gradlew runGameTestServer` (66 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
+- Tests: `./gradlew runGameTestServer` (68 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
   `FunctionGameTestInstance`, custom 12³ structure `matteroverdrive:gametest_area`, time-of-day via `TestEnvironmentDefinition.TimeOfDay`,
   `makeMockServerPlayerInLevel`). Visual: `./gradlew runScene` → `run/screenshots/scene_*.png` (DevScene, world `run/saves/mo_scene`;
   pristine copy = "Новый мир (2)"; needs `pauseOnLostFocus=false`; selected hotbar slot is client-side; place blocks with

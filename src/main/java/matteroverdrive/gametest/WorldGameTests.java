@@ -15,6 +15,7 @@ final class WorldGameTests {
         MOGameTests.add("failed_animals", 20, false, WorldGameTests::failedAnimals);
         MOGameTests.add("mutant_scientist", 20, false, WorldGameTests::mutantScientist);
         MOGameTests.add("tritanium_crate", 20, false, WorldGameTests::tritaniumCrate);
+        MOGameTests.add("buildings", 20, false, WorldGameTests::buildings);
     }
 
     private static void check(GameTestHelper helper, boolean ok, String message) {
@@ -66,6 +67,21 @@ final class WorldGameTests {
         check(helper, drops.size() == 1, "drops " + drops);
         var contents = drops.get(0).get(net.minecraft.core.component.DataComponents.CONTAINER);
         check(helper, contents != null && contents.nonEmptyStream().anyMatch(s -> s.getCount() == 7), "contents not kept: " + contents);
+        helper.succeed();
+    }
+
+    /** Image buildings: every template loads with its 1.7.10 size and every structure is registered from its JSON. */
+    private static void buildings(GameTestHelper helper) {
+        var structures = helper.getLevel().registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.STRUCTURE);
+        int[][] sizes = {{21, 9, 21}, {24, 16, 24}, {11, 6, 35}, {43, 25, 43}, {58, 16, 23}};
+        for (var building : matteroverdrive.world.Building.values()) {
+            var t = building.template();
+            int[] size = sizes[building.ordinal()];
+            check(helper, t.width() == size[0] && t.height() == size[1] && t.depth() == size[2],
+                    building + " size " + t.width() + "x" + t.height() + "x" + t.depth());
+            var key = net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("matteroverdrive", building.getSerializedName());
+            check(helper, structures.get(key).isPresent(), "structure " + key + " missing");
+        }
         helper.succeed();
     }
 }
