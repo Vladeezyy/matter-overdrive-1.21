@@ -1,0 +1,12 @@
+{
+  "loader": "neoforge:obj",
+  "model": "matteroverdrive:models/block/replicator.obj",
+  "flip_v": true,
+  "textures": {
+    "base": "matteroverdrive:block/base",
+    "network_port": "matteroverdrive:block/network_port",
+    "replicator": "matteroverdrive:block/replicator",
+    "vent": "matteroverdrive:block/vent",
+    "particle": "matteroverdrive:block/replicator"
+  }
+}

@@ -51,15 +51,22 @@ public abstract class MachineMenu<T extends MachineBlockEntity> extends Abstract
         }
         machineSlotCount = slots.size();
 
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 9; col++) {
-                addSlot(new PlayerSlot(playerInventory, col + row * 9 + 9, 46 + col * 18, 99 + row * 18));
+        if (showMainInventory()) {
+            for (int row = 0; row < 3; row++) {
+                for (int col = 0; col < 9; col++) {
+                    addSlot(new PlayerSlot(playerInventory, col + row * 9 + 9, 46 + col * 18, 99 + row * 18));
+                }
             }
         }
         for (int col = 0; col < 9; col++) {
             addSlot(new Slot(playerInventory, col, 46 + col * 18, HEIGHT - 26));
         }
         addDataSlots(data);
+    }
+
+    /** Whether the main inventory rows are part of this GUI (1.7.10 left them out of the pattern monitor). */
+    protected boolean showMainInventory() {
+        return true;
     }
 
     /** Client constructor helper: the client copy of the machine and an empty data mirror. */

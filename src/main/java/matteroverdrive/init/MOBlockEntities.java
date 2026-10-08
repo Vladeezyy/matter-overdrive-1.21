@@ -5,6 +5,9 @@ import matteroverdrive.block.entity.AnalyzerBlockEntity;
 import matteroverdrive.block.entity.DecomposerBlockEntity;
 import matteroverdrive.block.entity.InscriberBlockEntity;
 import matteroverdrive.block.entity.MatterPipeBlockEntity;
+import matteroverdrive.block.entity.PatternMonitorBlockEntity;
+import matteroverdrive.block.entity.PatternStorageBlockEntity;
+import matteroverdrive.block.entity.ReplicatorBlockEntity;
 import matteroverdrive.block.entity.RecyclerBlockEntity;
 import matteroverdrive.block.entity.SolarPanelBlockEntity;
 import net.minecraft.core.registries.Registries;
@@ -31,6 +34,13 @@ public final class MOBlockEntities {
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<AnalyzerBlockEntity>> ANALYZER =
             BLOCK_ENTITIES.register("matter_analyzer", () -> new BlockEntityType<>(AnalyzerBlockEntity::new, MOBlocks.ANALYZER.get()));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<PatternStorageBlockEntity>> PATTERN_STORAGE =
+            BLOCK_ENTITIES.register("pattern_storage", () -> new BlockEntityType<>(PatternStorageBlockEntity::new, MOBlocks.PATTERN_STORAGE.get()));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<PatternMonitorBlockEntity>> PATTERN_MONITOR =
+            BLOCK_ENTITIES.register("pattern_monitor", () -> new BlockEntityType<>(PatternMonitorBlockEntity::new, MOBlocks.PATTERN_MONITOR.get()));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ReplicatorBlockEntity>> REPLICATOR =
+            BLOCK_ENTITIES.register("replicator", () -> new BlockEntityType<>(ReplicatorBlockEntity::new, MOBlocks.REPLICATOR.get()));
 
     private MOBlockEntities() {}
 }

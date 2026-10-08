@@ -21,6 +21,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
@@ -45,7 +46,7 @@ public final class DevScene {
     private static int tick;
     /** Where the player stood when the scene started; restored before quitting so every run builds in one place. */
     private static BlockPos origin;
-    private static BlockPos inscriberPos, solarPos, decomposerPos, recyclerPos, analyzerPos;
+    private static BlockPos inscriberPos, solarPos, decomposerPos, recyclerPos, analyzerPos, storagePos, monitorPos, replicatorPos;
 
     private record Step(int at, Consumer<Minecraft> action) {}
 
@@ -73,10 +74,21 @@ public final class DevScene {
         at(253, mc -> openMachine(mc, analyzerPos));
         at(275, mc -> shot(mc, "analyzer_home"));
         at(280, mc -> mc.player.closeContainer());
-        at(282, mc -> server(mc, p -> p.teleportTo(p.level(), p.getX() + 0.5, p.getY() + 1.5, p.getZ() + 1.5, Set.of(), 140f, 30f, false)));
-        at(290, mc -> shot(mc, "pipes"));
-        at(292, mc -> server(mc, p -> p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 35f, false)));
-        at(300, mc -> mc.stop());
+        at(282, mc -> openMachine(mc, storagePos));
+        at(300, mc -> shot(mc, "storage_home"));
+        at(303, mc -> mc.player.closeContainer());
+        at(306, mc -> openMachine(mc, monitorPos));
+        at(326, mc -> shot(mc, "monitor_home"));
+        at(329, mc -> mc.player.closeContainer());
+        at(332, mc -> openMachine(mc, replicatorPos));
+        at(352, mc -> shot(mc, "replicator_home"));
+        at(355, mc -> mc.player.closeContainer());
+        at(358, mc -> server(mc, p -> p.teleportTo(p.level(), p.getX() + 0.5, p.getY() + 1.5, p.getZ() + 1.5, Set.of(), 140f, 30f, false)));
+        at(366, mc -> shot(mc, "pipes"));
+        at(368, mc -> server(mc, p -> p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY() + 1, origin.getZ() - 3.5, Set.of(), 180f, 15f, false)));
+        at(378, mc -> shot(mc, "network"));
+        at(380, mc -> server(mc, p -> p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 35f, false)));
+        at(388, mc -> mc.stop());
     }
 
     private static void at(int t, Consumer<Minecraft> action) {
@@ -115,12 +127,12 @@ public final class DevScene {
         player.setGameMode(GameType.CREATIVE);
         BlockPos base = player.blockPosition();
         origin = base;
-        for (BlockPos p : BlockPos.betweenClosed(base.offset(-3, -1, -6), base.offset(3, -1, 0))) {
+        for (BlockPos p : BlockPos.betweenClosed(base.offset(-3, -1, -8), base.offset(3, -1, 0))) {
             level.setBlockAndUpdate(p, Blocks.SMOOTH_STONE.defaultBlockState());
         }
         // Clear the previous run's scene without machine side effects (they would drop their contents),
         // then remove any items already lying around.
-        for (BlockPos p : BlockPos.betweenClosed(base.offset(-3, 0, -6), base.offset(3, 4, 0))) {
+        for (BlockPos p : BlockPos.betweenClosed(base.offset(-3, 0, -8), base.offset(3, 4, 0))) {
             level.setBlock(p, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
         }
         level.getEntitiesOfClass(ItemEntity.class, new AABB(base).inflate(8)).forEach(e -> e.discard());
@@ -144,7 +156,30 @@ public final class DevScene {
         recycler.getEnergy().set(200000);
         recycler.getInventory().setStack(matteroverdrive.block.entity.RecyclerBlockEntity.INPUT,
                 matteroverdrive.item.MatterDustItem.withMatter(MOItems.MATTER_DUST.get(), 1).copyWithCount(16));
-        analyzerPos = base.offset(3, 0, -5);
+        // matter network row: analyzer - pipe - storage - pipe - monitor - pipe - replicator
+        analyzerPos = base.offset(-3, 0, -7);
+        storagePos = base.offset(-1, 0, -7);
+        monitorPos = base.offset(1, 0, -7);
+        replicatorPos = base.offset(3, 0, -7);
+        for (int x : new int[] {-2, 0, 2}) level.setBlockAndUpdate(base.offset(x, 0, -7), MOBlocks.NETWORK_PIPE.get().defaultBlockState());
+        level.setBlockAndUpdate(storagePos, MOBlocks.PATTERN_STORAGE.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
+        level.setBlockAndUpdate(monitorPos, MOBlocks.PATTERN_MONITOR.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
+        level.setBlockAndUpdate(replicatorPos, MOBlocks.REPLICATOR.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
+        var storage = (matteroverdrive.block.entity.PatternStorageBlockEntity) level.getBlockEntity(storagePos);
+        storage.getEnergy().set(60000);
+        Item[][] drives = {{Items.IRON_INGOT, Items.DIAMOND}, {Items.COBBLESTONE, Items.OAK_LOG}, {Items.GOLD_INGOT, Items.REDSTONE}};
+        int[][] progress = {{100, 60}, {100, 100}, {40, 100}};
+        for (int i = 0; i < drives.length; i++) {
+            ItemStack d = new ItemStack(MOItems.PATTERN_DRIVE.get());
+            for (int j = 0; j < 2; j++) MOItems.PATTERN_DRIVE.get().addProgress(d, drives[i][j], progress[i][j]);
+            storage.getInventory().setStack(i, d);
+        }
+        var replicator = (matteroverdrive.block.entity.ReplicatorBlockEntity) level.getBlockEntity(replicatorPos);
+        replicator.getEnergy().set(500000);
+        replicator.getMatterTank().setMatter(700);
+        replicator.getInventory().setStack(matteroverdrive.block.entity.ReplicatorBlockEntity.SHIELDING, new ItemStack(MOItems.TRITANIUM_PLATE.get(), 5));
+        replicator.setTask(new matteroverdrive.block.entity.ReplicatorBlockEntity.Task(
+                new matteroverdrive.matter.ItemPattern(Items.IRON_INGOT.builtInRegistryHolder(), 100), 12));
         level.setBlockAndUpdate(analyzerPos, MOBlocks.ANALYZER.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
         var analyzer = (matteroverdrive.block.entity.AnalyzerBlockEntity) level.getBlockEntity(analyzerPos);
         analyzer.getEnergy().set(500000);

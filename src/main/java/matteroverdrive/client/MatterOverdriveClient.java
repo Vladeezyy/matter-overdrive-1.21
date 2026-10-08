@@ -4,6 +4,9 @@ import matteroverdrive.MatterOverdrive;
 import matteroverdrive.client.screen.AnalyzerScreen;
 import matteroverdrive.client.screen.DecomposerScreen;
 import matteroverdrive.client.screen.InscriberScreen;
+import matteroverdrive.client.screen.PatternMonitorScreen;
+import matteroverdrive.client.screen.PatternStorageScreen;
+import matteroverdrive.client.screen.ReplicatorScreen;
 import matteroverdrive.client.screen.RecyclerScreen;
 import matteroverdrive.init.MOFluids;
 import net.minecraft.resources.ResourceLocation;
@@ -27,6 +30,9 @@ public class MatterOverdriveClient {
         event.register(MOMenus.DECOMPOSER.get(), DecomposerScreen::new);
         event.register(MOMenus.RECYCLER.get(), RecyclerScreen::new);
         event.register(MOMenus.ANALYZER.get(), AnalyzerScreen::new);
+        event.register(MOMenus.PATTERN_STORAGE.get(), PatternStorageScreen::new);
+        event.register(MOMenus.PATTERN_MONITOR.get(), PatternMonitorScreen::new);
+        event.register(MOMenus.REPLICATOR.get(), ReplicatorScreen::new);
     }
 
     /** Matter Plasma textures (1.7.10 matter_plasma_still / _flowing), shown by tanks of other mods. */

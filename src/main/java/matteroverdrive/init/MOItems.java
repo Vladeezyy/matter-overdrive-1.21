@@ -78,6 +78,12 @@ public final class MOItems {
     public static final DeferredItem<BlockItem> MATTER_PIPE = block("matter_pipe", MOBlocks.MATTER_PIPE);
     public static final DeferredItem<BlockItem> HEAVY_MATTER_PIPE = block("heavy_matter_pipe", MOBlocks.HEAVY_MATTER_PIPE);
     public static final DeferredItem<BlockItem> ANALYZER = block("matter_analyzer", MOBlocks.ANALYZER);
+    public static final DeferredItem<BlockItem> PATTERN_STORAGE = block("pattern_storage", MOBlocks.PATTERN_STORAGE);
+    public static final DeferredItem<BlockItem> PATTERN_MONITOR = block("pattern_monitor", MOBlocks.PATTERN_MONITOR);
+    public static final DeferredItem<BlockItem> REPLICATOR = block("replicator", MOBlocks.REPLICATOR);
+    public static final DeferredItem<BlockItem> NETWORK_PIPE = block("network_pipe", MOBlocks.NETWORK_PIPE);
+    public static final DeferredItem<BlockItem> NETWORK_ROUTER = block("network_router", MOBlocks.NETWORK_ROUTER);
+    public static final DeferredItem<BlockItem> NETWORK_SWITCH = block("network_switch", MOBlocks.NETWORK_SWITCH);
     // 1.7.10 PatternDrive("pattern_drive", 2)
     public static final DeferredItem<PatternDriveItem> PATTERN_DRIVE = item("pattern_drive", p -> new PatternDriveItem(2, p), p -> p);
     public static final DeferredItem<Item> NETWORK_FLASH_DRIVE = simple("network_flash_drive");

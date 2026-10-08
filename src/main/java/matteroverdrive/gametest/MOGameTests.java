@@ -68,6 +68,7 @@ public final class MOGameTests {
         add("tool_tiers", 100, false, MOGameTests::toolTiers);
         MachineGameTests.addAll();
         MatterGameTests.addAll();
+        NetworkGameTests.addAll();
         TESTS.forEach((name, spec) -> FUNCTIONS.register(name, () -> spec.body()));
     }
 

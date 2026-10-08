@@ -1,0 +1,4 @@
+newmtl pattern_storage
+map_Kd #pattern_storage
+newmtl vent
+map_Kd #vent

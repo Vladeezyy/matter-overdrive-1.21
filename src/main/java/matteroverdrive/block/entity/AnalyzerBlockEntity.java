@@ -8,6 +8,7 @@ import matteroverdrive.machine.MachineBlockEntity;
 import matteroverdrive.machine.MachineInventory;
 import matteroverdrive.machine.UpgradeType;
 import matteroverdrive.matter.MatterHelper;
+import matteroverdrive.matternet.MatterNetwork;
 import matteroverdrive.menu.AnalyzerMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Inventory;
@@ -33,6 +34,8 @@ public class AnalyzerBlockEntity extends MachineBlockEntity {
     public static final int ENERGY_PER_ITEM = 64000;
 
     private int analyzeTime;
+    /** Whether a pattern storage on the network can take the current input; refreshed once a second. */
+    private boolean networkAccepts;
 
     public AnalyzerBlockEntity(BlockPos pos, BlockState state) {
         super(MOBlockEntities.ANALYZER.get(), pos, state, slots(), true, 4, ENERGY_STORAGE, ENERGY_TRANSFER, ENERGY_TRANSFER,
@@ -46,16 +49,25 @@ public class AnalyzerBlockEntity extends MachineBlockEntity {
         return b;
     }
 
-    /** Whether the current input can be analysed into the drive. */
+    /**
+     * Whether the current input can be analysed: into the pattern drive in the database slot if there is one,
+     * otherwise into a pattern storage on the matter network (1.7.10 sent a store-pattern task).
+     */
     public boolean canAnalyze() {
         ItemStack input = inventory.getStack(INPUT);
+        if (input.isEmpty() || !MatterHelper.hasMatter(input)) return false;
         ItemStack drive = inventory.getStack(DATABASE);
-        return !input.isEmpty() && MatterHelper.hasMatter(input)
-                && drive.getItem() instanceof PatternDriveItem d && d.canAccept(drive, input.getItem());
+        if (drive.getItem() instanceof PatternDriveItem d) return d.canAccept(drive, input.getItem());
+        return networkAccepts;
     }
 
     @Override
     protected boolean tickMachine(boolean redstoneAllows) {
+        if (getLevel().getGameTime() % 20 == 0) {
+            ItemStack input = inventory.getStack(INPUT);
+            networkAccepts = !input.isEmpty()
+                    && MatterNetwork.of(getLevel(), getBlockPos()).storageAccepting(input.getItem()) != null;
+        }
         if (!redstoneAllows || !canAnalyze()) {
             analyzeTime = 0;
             return false;
@@ -72,12 +84,17 @@ public class AnalyzerBlockEntity extends MachineBlockEntity {
     }
 
     private void analyze() {
-        ItemStack drive = inventory.getStack(DATABASE).copy();
         ItemStack input = inventory.getStack(INPUT);
-        if (((PatternDriveItem) drive.getItem()).addProgress(drive, input.getItem(), PROGRESS_PER_ITEM)) {
-            inventory.setStack(DATABASE, drive);
-            inventory.shrink(INPUT, 1);
+        ItemStack drive = inventory.getStack(DATABASE).copy();
+        boolean stored;
+        if (drive.getItem() instanceof PatternDriveItem d) {
+            stored = d.addProgress(drive, input.getItem(), PROGRESS_PER_ITEM);
+            if (stored) inventory.setStack(DATABASE, drive);
+        } else {
+            PatternStorageBlockEntity storage = MatterNetwork.of(getLevel(), getBlockPos()).storageAccepting(input.getItem());
+            stored = storage != null && storage.addProgress(input.getItem(), PROGRESS_PER_ITEM);
         }
+        if (stored) inventory.shrink(INPUT, 1);
     }
 
     public int getSpeed() {

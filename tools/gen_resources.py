@@ -35,7 +35,8 @@ ITEMS.update({f"upgrade_{u}": (f"upgrade_{u}", "generated") for u in UPGRADES})
 BATTERIES = {"battery": (191, 228, 230), "hc_battery": (254, 203, 4), "creative_battery": (230, 80, 20)}
 BLOCKS = ["tritanium_ore", "dilithium_ore", "tritanium_block"]
 MACHINES = ["solar_panel", "inscriber"]
-MACHINES_P3 = ["decomposer", "matter_recycler", "matter_pipe", "heavy_matter_pipe", "matter_analyzer"]
+MACHINES_P3 = ["decomposer", "matter_recycler", "matter_pipe", "heavy_matter_pipe", "matter_analyzer", "pattern_storage",
+               "replicator", "pattern_monitor", "network_router", "network_switch", "network_pipe"]
 
 # lang keys that don't follow item.<name>.name / tile.<name>.name in the 1.7.10 files
 LANG_KEYS = {f"isolinear_circuit_mk{i}": f"item.isolinear_circuit.mk{i}.name" for i in range(1, 5)}
@@ -321,7 +322,8 @@ def machine_blockstate(n, model, active_model=None):
     w(A / "items" / f"{n}.json", {"model": {"type": "minecraft:model", "model": model}})
 
 
-for tex in ["base_stripes", "decomposer_top", "tank_empty", "tank_full", "recycler_side", "matter_pipe", "heavy_matter_pipe"]:
+for tex in ["base_stripes", "decomposer_top", "tank_empty", "tank_full", "recycler_side", "matter_pipe", "heavy_matter_pipe",
+            "network_pipe"]:
     cp(ref / "textures/blocks" / f"{tex}.png", A / "textures/block" / f"{tex}.png")
 cp(ref / "textures/blocks/recycler_side_anim.png", A / "textures/block/recycler_side_anim.png")
 cp(ref / "textures/blocks/recycler_side_anim.png.mcmeta", A / "textures/block/recycler_side_anim.png.mcmeta")
@@ -360,7 +362,7 @@ def cube(frm, to, uv, rot=0):
 ARM_BOX = {"north": ([P0, P0, 0], [P1, P1, P0]), "south": ([P0, P0, P1], [P1, P1, 16]),
            "west": ([0, P0, P0], [P0, P1, P1]), "east": ([P1, P0, P0], [16, P1, P1]),
            "down": ([P0, 0, P0], [P1, P0, P1]), "up": ([P0, P1, P0], [P1, 16, P1])}
-for pipe in ["matter_pipe", "heavy_matter_pipe"]:
+for pipe in ["matter_pipe", "heavy_matter_pipe", "network_pipe"]:
     tex = {"pipe": f"{MOD}:block/{pipe}", "particle": f"{MOD}:block/{pipe}"}
     w(A / f"models/block/{pipe}_core.json", {"textures": tex, "elements": [cube([P0, P0, P0], [P1, P1, P1], [0, 0, 6, 6])]})
     for d, (frm, to) in ARM_BOX.items():
@@ -446,6 +448,97 @@ shaped("matter_analyzer", mid("matter_analyzer"), [" C ", "PMF", "ONO"],
         "O": "minecraft:iron_block", "N": mid("integration_matrix")})
 
 
+# --- phase 3 step 4: the matter network -----------------------------------------------------------
+def obj_model(name, materials, shift_y=False, hidden=(), particle="base"):
+    """Copy a 1.7.10 Wavefront model for NeoForge's OBJ loader: one material per group (as the 1.7.10 renderer
+    picked an icon per group), block-corner coordinates (shift the centred models by half a block)."""
+    lines = [f"mtllib {name}.mtl"]
+    for line in (ref / "models/block" / f"{name}.obj").read_text().splitlines():
+        if line.startswith("v "):
+            _, x, y, z = line.split()
+            line = f"v {float(x) + 0.5:.4f} {float(y) + (0.5 if shift_y else 0):.4f} {float(z) + 0.5:.4f}"
+        if line.startswith("g "):
+            lines.append(line)
+            lines.append(f"usemtl {materials.get(line[2:].strip(), next(iter(materials.values())))}")
+            continue
+        lines.append(line)
+    (A / "models/block").mkdir(parents=True, exist_ok=True)
+    (A / "models/block" / f"{name}.obj").write_text("\n".join(lines) + "\n")
+    mats = sorted(set(materials.values()))
+    (A / "models/block" / f"{name}.mtl").write_text("".join(f"newmtl {m}\nmap_Kd #{m}\n" for m in mats))
+    model = {"loader": "neoforge:obj", "model": f"{MOD}:models/block/{name}.obj", "flip_v": True,
+             "textures": {m: f"{MOD}:block/{m}" for m in mats} | {"particle": f"{MOD}:block/{particle}"}}
+    if hidden:
+        model["visibility"] = {h: False for h in hidden}
+    w(A / "models/block" / f"{name}.json", model)
+
+
+for tex in ["pattern_storage", "replicator", "vent", "network_router", "network_switch", "holo_monitor", "pattern_monitor_holo"]:
+    cp(ref / "textures/blocks" / f"{tex}.png", A / "textures/block" / f"{tex}.png")
+# 1.7.10 RendererBlockPatternStorage: pattern_storage + vents; the drive group was drawn by the tile renderer.
+obj_model("pattern_storage", {"pattern_storage": "pattern_storage", "Vents": "vent", "drive": "pattern_storage"},
+          hidden=("drive",), particle="pattern_storage")
+facing_blockstate("pattern_storage", f"{MOD}:block/pattern_storage")
+# 1.7.10 RendererBlockReplicator: front + inside replicator, shell base, vents, back network port.
+obj_model("replicator", {"Front": "replicator", "Inside": "replicator", "Shell": "base", "Vents": "vent", "Back": "network_port"},
+          shift_y=True, particle="replicator")
+facing_blockstate("replicator", f"{MOD}:block/replicator")
+for n in ["network_router", "network_switch"]:
+    w(A / f"models/block/{n}.json", {"parent": "minecraft:block/cube_all", "textures": {"all": f"{MOD}:block/{n}"}})
+    w(A / f"blockstates/{n}.json", {"variants": {"": {"model": f"{MOD}:block/{n}"}}})
+    w(A / f"items/{n}.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:block/{n}"}})
+
+# Pattern monitor: a 5 px panel on the back of the block. Its screen is built from the four corners of the
+# 1.7.10 connected-texture atlas holo_monitor (64x64; 8 px corners = 2 UV units), with the holo icon on top.
+def quad(frm, to, uv, tex, cull=None):
+    face = {"uv": uv, "texture": tex}
+    return {"from": frm, "to": to, "faces": {"north": face}}
+
+
+screen = [quad([0, 8, 10.99], [8, 16, 10.99], [0, 0, 2, 2], "#screen"), quad([8, 8, 10.99], [16, 16, 10.99], [14, 0, 16, 2], "#screen"),
+          quad([0, 0, 10.99], [8, 8, 10.99], [0, 14, 2, 16], "#screen"), quad([8, 0, 10.99], [16, 8, 10.99], [14, 14, 16, 16], "#screen"),
+          quad([4, 4, 10.9], [12, 12, 10.9], [0, 0, 16, 16], "#holo")]
+body = {"from": [0, 0, 11], "to": [16, 16, 16], "faces": {d: {"texture": "#base"} for d in ["south", "east", "west", "up", "down"]}
+        | {"south": {"texture": "#port"}}}
+w(A / "models/block/pattern_monitor.json", {"parent": "minecraft:block/block", "render_type": "minecraft:cutout", "textures": {
+    "base": f"{MOD}:block/base", "port": f"{MOD}:block/network_port", "screen": f"{MOD}:block/holo_monitor",
+    "holo": f"{MOD}:block/pattern_monitor_holo", "particle": f"{MOD}:block/base"}, "elements": [body] + screen})
+facing_blockstate("pattern_monitor", f"{MOD}:block/pattern_monitor")
+
+for tex in ["refresh", "request"]:
+    cp(ref / "textures/gui/items" / f"{tex}.png", A / "textures/gui/elements" / f"{tex}.png")
+cp(ref / "textures/gui/elements/slot_big_main.png", A / "textures/gui/elements/slot_big_main.png")
+cp(ref / "textures/gui/elements/search_field.png", A / "textures/gui/elements/search_field.png")
+
+NET = ["pattern_storage", "replicator", "pattern_monitor", "network_router", "network_switch", "network_pipe"]
+for n in NET:
+    keep_energy = n in ("pattern_storage", "replicator")
+    w(D / f"loot_table/blocks/{n}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "bonus_rolls": 0,
+        "entries": [{"type": "minecraft:item", "name": mid(n)} | ({"functions": [{"function": "minecraft:copy_components",
+            "source": "block_entity", "include": [mid("energy")]}]} if keep_energy else {})],
+        "conditions": [{"condition": "minecraft:survives_explosion"}]}]})
+for tag in ["mineable/pickaxe", "needs_iron_tool"]:
+    p = TAGS / f"minecraft/tags/block/{tag}.json"
+    w(p, {"values": json.loads(p.read_text())["values"] + [mid(n) for n in NET if not (tag == "needs_iron_tool" and n == "network_pipe")]})
+
+shaped("replicator", mid("replicator"), ["PCF", "IHI", "NTM"],
+       {"P": mid("pattern_drive"), "C": MK[3], "F": mid("network_flash_drive"), "I": "minecraft:iron_ingot",
+        "H": mid("h_compensator"), "N": mid("integration_matrix"), "T": PLATE, "M": mid("me_conversion_matrix")})
+# 1.7.10 used an undefined 'O' in the router and switch patterns, which crafted as an empty cell.
+shaped("network_router", mid("network_router"), ["IGI", "DFC", " M "],
+       {"I": "minecraft:iron_ingot", "G": "minecraft:glass", "D": MK[2], "F": mid("network_flash_drive"), "C": MK[1],
+        "M": mid("machine_casing")})
+shaped("network_switch", mid("network_switch"), [" G ", "CFC", " M "],
+       {"G": "minecraft:glass", "C": MK[1], "F": mid("network_flash_drive"), "M": mid("machine_casing")})
+shaped("network_pipe", mid("network_pipe"), ["IGI", "BCB", "IGI"],
+       {"I": "minecraft:iron_ingot", "G": "minecraft:glass", "B": "minecraft:gold_ingot", "C": MK[1]}, count=16)
+shaped("pattern_storage", mid("pattern_storage"), ["B3B", "TCT", "2M1"],
+       {"B": "minecraft:black_wool", "3": MK[3], "T": INGOT, "C": "minecraft:chest", "2": MK[2], "M": mid("machine_casing"), "1": MK[1]})
+# The holo sign (phase 7) isn't ported yet; a glass pane stands in for it until then.
+shaped("pattern_monitor", mid("pattern_monitor"), [" H ", "1N1", " F "],
+       {"H": "minecraft:glass_pane", "1": MK[2], "N": mid("network_switch"), "F": mid("network_flash_drive")})
+
+
 # --- matter values (1.7.10 MatterOverdriveMatter.registerBasic*) -----------------------------------
 # Base values of the matteroverdrive:matter data map; everything else is calculated from recipes at runtime.
 # Ore dictionary names are mapped to today's tags. Tags come first so that single items can override them.
@@ -523,6 +616,12 @@ GUI_KEYS = {
     "tooltip.matteroverdrive.matter_stored": {"en_us": "Matter: %s / %s kM", "ru_ru": "Материя: %s / %s kM"},
     "item.matteroverdrive.matter_dust.details": "item.matter_dust.details",
     "item.matteroverdrive.pattern_drive.details": "item.pattern_drive.details",
+    "gui.matteroverdrive.refresh": "gui.tooltip.button.refresh",
+    "gui.matteroverdrive.request": "gui.tooltip.button.request",
+    "gui.matteroverdrive.search": {"en_us": "Search", "ru_ru": "Поиск"},
+    "gui.matteroverdrive.pattern": {"en_us": "%s (pattern %s%%)", "ru_ru": "%s (шаблон %s%%)"},
+    "gui.matteroverdrive.queue": {"en_us": "Queue: %s requests, %s items", "ru_ru": "Очередь: %s заказов, %s предметов"},
+    "gui.matteroverdrive.replicating": {"en_us": "%s x%s (pattern %s%%)", "ru_ru": "%s x%s (шаблон %s%%)"},
     "fluid.matteroverdrive.matter_plasma": {"en_us": "Matter Plasma", "ru_ru": "Плазменная материя"},
     "tooltip.matteroverdrive.energy_io": {"en_us": "Input/Output: %s/%s FE/t", "ru_ru": "Вход/выход: %s/%s FE/т"},
     "upgrade_type.matteroverdrive.speed": "upgradetype.Speed.name",

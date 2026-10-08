@@ -5,6 +5,12 @@ import matteroverdrive.block.AnalyzerBlock;
 import matteroverdrive.block.DecomposerBlock;
 import matteroverdrive.block.InscriberBlock;
 import matteroverdrive.block.MatterPipeBlock;
+import matteroverdrive.block.NetworkPipeBlock;
+import matteroverdrive.block.NetworkRouterBlock;
+import matteroverdrive.block.NetworkSwitchBlock;
+import matteroverdrive.block.PatternMonitorBlock;
+import matteroverdrive.block.PatternStorageBlock;
+import matteroverdrive.block.ReplicatorBlock;
 import matteroverdrive.block.RecyclerBlock;
 import matteroverdrive.block.SolarPanelBlock;
 import net.minecraft.util.valueproviders.UniformInt;
@@ -46,6 +52,20 @@ public final class MOBlocks {
 
     public static final DeferredBlock<AnalyzerBlock> ANALYZER = BLOCKS.registerBlock("matter_analyzer", AnalyzerBlock::new,
             p -> p.mapColor(MapColor.METAL).strength(20f, 9f).sound(SoundType.METAL).requiresCorrectToolForDrops());
+
+    // Matter network
+    public static final DeferredBlock<NetworkPipeBlock> NETWORK_PIPE = BLOCKS.registerBlock("network_pipe", NetworkPipeBlock::new,
+            p -> p.mapColor(MapColor.METAL).strength(1f, 5f).sound(SoundType.METAL).noOcclusion());
+    public static final DeferredBlock<NetworkRouterBlock> NETWORK_ROUTER = BLOCKS.registerBlock("network_router", NetworkRouterBlock::new,
+            p -> p.mapColor(MapColor.METAL).strength(20f, 9f).sound(SoundType.METAL).requiresCorrectToolForDrops());
+    public static final DeferredBlock<NetworkSwitchBlock> NETWORK_SWITCH = BLOCKS.registerBlock("network_switch", NetworkSwitchBlock::new,
+            p -> p.mapColor(MapColor.METAL).strength(20f, 9f).sound(SoundType.METAL).requiresCorrectToolForDrops());
+    public static final DeferredBlock<PatternStorageBlock> PATTERN_STORAGE = BLOCKS.registerBlock("pattern_storage", PatternStorageBlock::new,
+            p -> p.mapColor(MapColor.METAL).strength(20f, 9f).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion());
+    public static final DeferredBlock<PatternMonitorBlock> PATTERN_MONITOR = BLOCKS.registerBlock("pattern_monitor", PatternMonitorBlock::new,
+            p -> p.mapColor(MapColor.METAL).strength(20f, 9f).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion().lightLevel(s -> 8));
+    public static final DeferredBlock<ReplicatorBlock> REPLICATOR = BLOCKS.registerBlock("replicator", ReplicatorBlock::new,
+            p -> p.mapColor(MapColor.METAL).strength(20f, 9f).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion());
 
     private MOBlocks() {}
 }

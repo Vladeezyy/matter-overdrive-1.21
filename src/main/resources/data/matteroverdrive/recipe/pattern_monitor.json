@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " H ",
+    "1N1",
+    " F "
+  ],
+  "key": {
+    "H": "minecraft:glass_pane",
+    "1": "matteroverdrive:isolinear_circuit_mk2",
+    "N": "matteroverdrive:network_switch",
+    "F": "matteroverdrive:network_flash_drive"
+  },
+  "result": {
+    "id": "matteroverdrive:pattern_monitor",
+    "count": 1
+  }
+}

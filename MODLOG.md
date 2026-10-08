@@ -70,7 +70,37 @@
 11. `GuiGraphics` in 1.21.10: `blit(RenderPipelines.GUI_TEXTURED, ...)`, `blitSprite`, `submitOutline` (not renderOutline), ARGB colours.
 12. macOS: the terminal has no screen-recording permission, so `screencapture` fails; use Minecraft's own `Screenshot.grab` from the scene.
 
+## 2026-10-08 — phase 3: matter core ✅ (4 commits)
+1. **Matter registry** — base values = item data map `matteroverdrive:matter` (1.7.10 registerBasic*, ore dictionary -> tags,
+   + raw ores at one ingot); the rest derived like 1.7.10 (8 crafting passes: cheapest alternative per slot, / output count,
+   minus returned containers; then smelting outputs take the input's matter). Recalculated after each datapack load
+   (TagsUpdatedEvent SERVER_DATA_LOAD), synced in OnDatapackSyncEvent with a payload, shown in tooltips. 330 base + 557 calculated.
+2. **Decomposer, Matter Recycler, matter pipes** — Matter Plasma fluid (no block/bucket, 1 mB = 1 matter) through the fluid
+   capability; `MatterTank` on machines; formulas from 1.7.10; matter dust / refined dust carry matter in a component.
+   Pipes: 32/10 t and heavy 128/5 t; feed consumers first, then level with emptier pipes. Machines gained an `active` state.
+3. **Patterns** — `ItemPattern` (item + progress) on the pattern drive (2 patterns); matter analyzer (+20%/item, 800 t, 64000 FE)
+   writes to the drive in its database slot; network flash drive item.
+4. **Matter network** — network pipes / router / switch / network machines are `MatterNetworkBlock`s; `MatterNetwork.of()` is a BFS
+   over them. Analyzer without a drive stores on the network; pattern storage (6 drives, needs energy); pattern monitor (pattern grid
+   with search, left/right click ± 1/16, Request/Refresh, queue of up to 16 requests, dispatches to idle replicators every second);
+   replicator (1.7.10 formulas, failure -> matter dust, radiation without 5 tritanium plates). OBJ models for storage and replicator.
+
+### Deviations from 1.7.10
+- The network is a shared bus: router and switch only connect; flash-drive filters are not ported.
+- Pattern monitor recipe uses a glass pane instead of the holo sign until the holo sign (phase 7) exists.
+- Matter Scanner (handheld) not ported yet; the analyzer's database slot takes a pattern drive directly.
+- Pattern storage drives inside the block, replicator item animation, monitor hologram are renderer polish for later.
+
+### Gotchas
+13. Matter values must be computed on the logical server from the RecipeManager, after datapacks load; the client only
+    gets a copy. Slot filters run on both sides, so `MatterRegistry.getAnySide()` picks whichever table this JVM has.
+14. NeoForge 21.10 fluids: `FluidStacksResourceHandler` is the tank; `FluidResource.of(fluid)`; `Capabilities.Fluid.BLOCK`.
+15. Opening a GUI by `player.openMenu` without clicking the block skips block-use hooks: let the screen request its data
+    (the monitor sends an empty request = refresh on `init()`).
+16. Holo/overlay textures with transparency need `"render_type": "minecraft:cutout"` in the block model JSON.
+17. OBJ groups: insert `usemtl` per `g` line with one material per group; hide a group with `"visibility": {"group": false}`.
+
 ## Next
-- Phase 3 matter core: matter values (data map), Decomposer, Matter Recycler, matter pipes, Pattern Storage + drives, Matter Analyzer,
-  Replicator, Matter Scanner, network.
-- Polish later: machine item tooltip with stored energy, inscriber head animation (BER), machine sounds, custom tritanium armor model.
+- Phase 4: gravitational anomaly + stabilizer, fusion reactor multiblock.
+- Polish later: machine item tooltip with stored energy, inscriber head animation, machine sounds, custom tritanium armor model,
+  pattern storage drive rendering, replicator item animation, monitor hologram, router/switch filters, matter scanner.

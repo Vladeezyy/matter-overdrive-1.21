@@ -1,0 +1,8 @@
+newmtl base
+map_Kd #base
+newmtl network_port
+map_Kd #network_port
+newmtl replicator
+map_Kd #replicator
+newmtl vent
+map_Kd #vent

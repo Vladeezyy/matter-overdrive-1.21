@@ -1,0 +1,13 @@
+{
+  "loader": "neoforge:obj",
+  "model": "matteroverdrive:models/block/pattern_storage.obj",
+  "flip_v": true,
+  "textures": {
+    "pattern_storage": "matteroverdrive:block/pattern_storage",
+    "vent": "matteroverdrive:block/vent",
+    "particle": "matteroverdrive:block/pattern_storage"
+  },
+  "visibility": {
+    "drive": false
+  }
+}

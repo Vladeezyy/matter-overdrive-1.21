@@ -25,8 +25,9 @@ Each feature is rewritten against the 1.7.10 code as the spec and keeps its numb
 1. **Base content** ✅ — materials, ores + worldgen, tritanium block, tools, armor, isolinear circuits, recipes, tags, GameTests.
 2. **Machine framework** ✅ — base machine, FE energy (transfer API), menus + screens in MO style, upgrades,
    redstone config, wrench, batteries, solar panel, inscriber + its recipes, DevScene screenshots.
-3. **Matter core** — matter values (data map), Decomposer, Matter Recycler, matter pipes, Pattern Storage +
-   drives, Matter Analyzer, **Replicator**, Matter Scanner, network router/switch/pattern monitor.
+3. **Matter core** ✅ — matter values (data map + recipe calculation), Decomposer, Matter Recycler, matter pipes,
+   pattern drives, Matter Analyzer, network (pipes, router, switch), Pattern Storage, Pattern Monitor, **Replicator**.
+   Matter Scanner and router/switch filters still to do.
 4. **Power endgame** — Gravitational anomaly + stabilizer, Fusion reactor multiblock.
 5. **Weapons** — Phaser, Phaser Rifle, Plasma Shotgun, Ion Sniper, modules, Weapon Station, energy pack.
 6. **Androids** — player attachment for android state, biotic stats tree, Android Station, HUD, abilities,

@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PCF",
+    "IHI",
+    "NTM"
+  ],
+  "key": {
+    "P": "matteroverdrive:pattern_drive",
+    "C": "matteroverdrive:isolinear_circuit_mk3",
+    "F": "matteroverdrive:network_flash_drive",
+    "I": "minecraft:iron_ingot",
+    "H": "matteroverdrive:h_compensator",
+    "N": "matteroverdrive:integration_matrix",
+    "T": "#c:plates/tritanium",
+    "M": "matteroverdrive:me_conversion_matrix"
+  },
+  "result": {
+    "id": "matteroverdrive:replicator",
+    "count": 1
+  }
+}

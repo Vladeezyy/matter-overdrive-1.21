@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "active=false,facing=north": {
+      "model": "matteroverdrive:block/replicator"
+    },
+    "active=true,facing=north": {
+      "model": "matteroverdrive:block/replicator"
+    },
+    "active=false,facing=east": {
+      "model": "matteroverdrive:block/replicator",
+      "y": 90
+    },
+    "active=true,facing=east": {
+      "model": "matteroverdrive:block/replicator",
+      "y": 90
+    },
+    "active=false,facing=south": {
+      "model": "matteroverdrive:block/replicator",
+      "y": 180
+    },
+    "active=true,facing=south": {
+      "model": "matteroverdrive:block/replicator",
+      "y": 180
+    },
+    "active=false,facing=west": {
+      "model": "matteroverdrive:block/replicator",
+      "y": 270
+    },
+    "active=true,facing=west": {
+      "model": "matteroverdrive:block/replicator",
+      "y": 270
+    }
+  }
+}

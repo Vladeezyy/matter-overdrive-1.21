@@ -2,6 +2,8 @@ package matteroverdrive.matter;
 
 import matteroverdrive.MatterOverdrive;
 import matteroverdrive.network.MatterValuesPayload;
+import matteroverdrive.network.PatternListPayload;
+import matteroverdrive.network.PatternRequestPayload;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
@@ -19,7 +21,10 @@ public final class MatterEvents {
 
     @SubscribeEvent
     static void registerPayloads(RegisterPayloadHandlersEvent event) {
-        event.registrar("1").playToClient(MatterValuesPayload.TYPE, MatterValuesPayload.STREAM_CODEC, MatterValuesPayload::handle);
+        event.registrar("1")
+                .playToClient(MatterValuesPayload.TYPE, MatterValuesPayload.STREAM_CODEC, MatterValuesPayload::handle)
+                .playToClient(PatternListPayload.TYPE, PatternListPayload.STREAM_CODEC, PatternListPayload::handle)
+                .playToServer(PatternRequestPayload.TYPE, PatternRequestPayload.STREAM_CODEC, PatternRequestPayload::handle);
     }
 
     /** Recipes and data maps were (re)loaded on the server: recalculate on next use. */

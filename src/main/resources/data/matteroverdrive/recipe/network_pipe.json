@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "IGI",
+    "BCB",
+    "IGI"
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "G": "minecraft:glass",
+    "B": "minecraft:gold_ingot",
+    "C": "matteroverdrive:isolinear_circuit_mk1"
+  },
+  "result": {
+    "id": "matteroverdrive:network_pipe",
+    "count": 16
+  }
+}

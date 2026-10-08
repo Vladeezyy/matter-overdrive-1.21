@@ -6,6 +6,11 @@
     "matteroverdrive:inscriber",
     "matteroverdrive:decomposer",
     "matteroverdrive:matter_recycler",
-    "matteroverdrive:matter_analyzer"
+    "matteroverdrive:matter_analyzer",
+    "matteroverdrive:pattern_storage",
+    "matteroverdrive:replicator",
+    "matteroverdrive:pattern_monitor",
+    "matteroverdrive:network_router",
+    "matteroverdrive:network_switch"
   ]
 }

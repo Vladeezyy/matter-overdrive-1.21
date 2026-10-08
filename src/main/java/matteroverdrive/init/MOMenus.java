@@ -4,6 +4,9 @@ import matteroverdrive.MatterOverdrive;
 import matteroverdrive.menu.AnalyzerMenu;
 import matteroverdrive.menu.DecomposerMenu;
 import matteroverdrive.menu.InscriberMenu;
+import matteroverdrive.menu.PatternMonitorMenu;
+import matteroverdrive.menu.PatternStorageMenu;
+import matteroverdrive.menu.ReplicatorMenu;
 import matteroverdrive.menu.RecyclerMenu;
 import matteroverdrive.menu.SolarPanelMenu;
 import net.minecraft.core.registries.Registries;
@@ -27,6 +30,13 @@ public final class MOMenus {
 
     public static final DeferredHolder<MenuType<?>, MenuType<AnalyzerMenu>> ANALYZER =
             MENUS.register("matter_analyzer", () -> IMenuTypeExtension.create(AnalyzerMenu::new));
+
+    public static final DeferredHolder<MenuType<?>, MenuType<PatternStorageMenu>> PATTERN_STORAGE =
+            MENUS.register("pattern_storage", () -> IMenuTypeExtension.create(PatternStorageMenu::new));
+    public static final DeferredHolder<MenuType<?>, MenuType<PatternMonitorMenu>> PATTERN_MONITOR =
+            MENUS.register("pattern_monitor", () -> IMenuTypeExtension.create(PatternMonitorMenu::new));
+    public static final DeferredHolder<MenuType<?>, MenuType<ReplicatorMenu>> REPLICATOR =
+            MENUS.register("replicator", () -> IMenuTypeExtension.create(ReplicatorMenu::new));
 
     private MOMenus() {}
 }

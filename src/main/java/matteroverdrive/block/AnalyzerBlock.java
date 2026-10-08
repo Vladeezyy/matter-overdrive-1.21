@@ -6,7 +6,7 @@ import matteroverdrive.init.MOBlockEntities;
 import matteroverdrive.machine.MachineBlock;
 
 /** Matter Analyzer (1.7.10 BlockMatterAnalyzer). */
-public class AnalyzerBlock extends MachineBlock {
+public class AnalyzerBlock extends MachineBlock implements matteroverdrive.matternet.MatterNetworkBlock {
     public static final MapCodec<AnalyzerBlock> CODEC = simpleCodec(AnalyzerBlock::new);
 
     public AnalyzerBlock(Properties properties) {
