@@ -30,6 +30,10 @@ public final class HoloRenderTypes {
     public static final RenderPipeline TEXTURED = base("holo_textured").withVertexShader("core/position_tex_color")
             .withFragmentShader("core/position_tex_color").withSampler("Sampler0")
             .withVertexFormat(DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS).build();
+    /** The textured holo with back faces culled (the android shield seen from outside). */
+    public static final RenderPipeline TEXTURED_CULL = base("holo_textured_cull").withCull(true).withVertexShader("core/position_tex_color")
+            .withFragmentShader("core/position_tex_color").withSampler("Sampler0")
+            .withVertexFormat(DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS).build();
     public static final RenderPipeline QUADS = base("holo_quads").withVertexShader("core/position_color").withFragmentShader("core/position_color")
             .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS).build();
     public static final RenderPipeline TRIANGLES = base("holo_triangles").withVertexShader("core/position_color")
@@ -56,6 +60,7 @@ public final class HoloRenderTypes {
     public static void register(RegisterRenderPipelinesEvent event) {
         event.registerPipeline(SCREEN);
         event.registerPipeline(TEXTURED);
+        event.registerPipeline(TEXTURED_CULL);
         event.registerPipeline(QUADS);
         event.registerPipeline(TRIANGLES);
         event.registerPipeline(DEPTH_QUADS);
@@ -74,6 +79,13 @@ public final class HoloRenderTypes {
 
     public static RenderType textured(ResourceLocation texture) {
         return TEXTURED_TYPES.computeIfAbsent(texture, t -> RenderType.create("mo_holo_textured", 1536, false, true, TEXTURED,
+                RenderType.CompositeState.builder().setTextureState(new RenderStateShard.TextureStateShard(t, false)).createCompositeState(false)));
+    }
+
+    private static final Map<ResourceLocation, RenderType> CULLED_TYPES = new HashMap<>();
+
+    public static RenderType texturedCulled(ResourceLocation texture) {
+        return CULLED_TYPES.computeIfAbsent(texture, t -> RenderType.create("mo_holo_textured_cull", 1536, false, true, TEXTURED_CULL,
                 RenderType.CompositeState.builder().setTextureState(new RenderStateShard.TextureStateShard(t, false)).createCompositeState(false)));
     }
 

@@ -351,6 +351,9 @@ final class StatImpls {
         public float onIncomingDamage(ServerPlayer player, AndroidData data, int level, DamageSource source, float amount) {
             if (!data.getFlag(KEY) || !isDamageValid(source)) return amount;
             if (source.getDirectEntity() != null) {
+                net.minecraft.world.entity.Entity attacker = source.getDirectEntity();
+                matteroverdrive.network.AndroidPayloads.sendShieldHit(player, new net.minecraft.world.phys.Vec3(attacker.getX() - player.getX(),
+                        attacker.getY() - (player.getY() + 1.5), attacker.getZ() - player.getZ()));
                 player.level().playSound(null, player.blockPosition(), MOSounds.SHIELD_HIT.get(), SoundSource.PLAYERS, 0.5f,
                         0.9f + player.getRandom().nextFloat() * 0.2f);
             }

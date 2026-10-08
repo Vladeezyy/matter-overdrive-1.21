@@ -14,7 +14,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
-/** Client -> server android packets: 1.7.10 PacketBioticActionKey, PacketAndroidChangeAbility, PacketTeleportPlayer. */
+/** Android packets (client -> server unless noted): 1.7.10 PacketBioticActionKey, PacketAndroidChangeAbility, PacketTeleportPlayer. */
 public final class AndroidPayloads {
     public record Action() implements CustomPacketPayload {
         public static final Type<Action> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "android_action"));
@@ -48,7 +48,32 @@ public final class AndroidPayloads {
         }
     }
 
+    /** Server -> clients: a shield hit flash (1.7.10 BioticStatShield TAG_HITS): the attacker's offset from the player. */
+    public record ShieldHit(int player, float x, float y, float z) implements CustomPacketPayload {
+        public static final Type<ShieldHit> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "android_shield_hit"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ShieldHit> STREAM_CODEC = StreamCodec.composite(
+                ByteBufCodecs.VAR_INT, ShieldHit::player, ByteBufCodecs.FLOAT, ShieldHit::x, ByteBufCodecs.FLOAT, ShieldHit::y,
+                ByteBufCodecs.FLOAT, ShieldHit::z, ShieldHit::new);
+
+        @Override
+        public Type<ShieldHit> type() {
+            return TYPE;
+        }
+    }
+
+    /** Sends a shield hit to the player and everyone near enough to see the shield. */
+    public static void sendShieldHit(ServerPlayer player, Vec3 offset) {
+        ShieldHit hit = new ShieldHit(player.getId(), (float) offset.x, (float) offset.y, (float) offset.z);
+        for (ServerPlayer to : player.level().players()) {
+            if (to.distanceToSqr(player) < 128 * 128 && to.connection.hasChannel(ShieldHit.TYPE)) {
+                net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(to, hit);
+            }
+        }
+    }
+
     public static void register(PayloadRegistrar registrar) {
+        registrar.playToClient(ShieldHit.TYPE, ShieldHit.STREAM_CODEC, (payload, context) ->
+                matteroverdrive.android.AndroidClientHooks.shieldHit.accept(payload.player(), new Vec3(payload.x(), payload.y(), payload.z())));
         registrar.playToServer(Action.TYPE, Action.STREAM_CODEC, (payload, context) -> {
             if (context.player() instanceof ServerPlayer player) Android.onActionKey(player);
         });

@@ -1275,6 +1275,11 @@ shaped("star_map", mid("star_map"), [" S ", "CFC", "GMR"],
         "G": "minecraft:glowstone_dust", "M": mid("machine_casing"), "R": "minecraft:redstone"})
 # hologram: the beam texture, the additive particle sheet (star icons), holo icons; star names for the generator
 cp(ref / "textures/fx/hologram_beam.png", A / "textures/fx/hologram_beam.png")
+# android shield (1.7.10 BioticStatRendererShield): its textures and the two sphere meshes it draws
+for t in ["shield", "shield_damage", "forcefield_plasma", "forcefield_plasma_2"]:
+    cp(ref / f"textures/fx/{t}.png", A / f"textures/fx/{t}.png")
+cp(ref / "models/shield_sphere.obj", A / "models/fx/shield_sphere.obj")
+cp(ref / "models/block/sphere.obj", A / "models/fx/sphere.obj")
 cp(ref / "textures/particle/particles_additive.png", A / "textures/particle/particles_additive.png")
 for icon in ["page_icon_star", "page_icon_planet", "page_icon_galaxy", "page_icon_quadrant", "icon_size", "holo_factory",
              "icon_shuttle", "smile", "battery", "arrow_right"]:

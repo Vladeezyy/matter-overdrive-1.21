@@ -207,7 +207,7 @@
   (the 1.7.10 minimap also drew terrain); no custom crosshair.
 - No rogue-android hologram above the android station; the charging station rod doesn't pulse.
 - Bionic parts aren't drawn on the player model; rogue android mobs (their source) come in phase 7.
-- Teleport has no target marker; the shield has no visual bubble (hit flashes / shield_loop sound not ported).
+- Teleport has no target marker; the shield has no visual bubble (hit flashes / shield_loop sound not ported). (Done in the leftovers.)
 - Out of the 1.7.10 android commands, only test helpers exist (`Android.setTurning`, `Android.tick`).
 
 ## 2026-10-08 — phase 7: world & extras (in progress)
@@ -501,6 +501,20 @@
     now copies energy, machine_storage and security_owner (merged in gen_resources).
   - Deviations: no "Inventory:" list (the port drops a machine's slots when it breaks instead of keeping upgrades /
     battery / filter / shielding in the item like the 1.7.10 wrench); numbers use the port's compact format (512k).
+- **Leftovers: android shield bubble + teleport marker ✅** (1.7.10 BioticStatRendererShield, BioticStatShield TAG_HITS /
+  shield_loop, BioticStatRendererTeleporter). `client/android/ShieldRenderer` draws in `RenderLevelStageEvent.AfterEntities`
+  (main buffer source, camera-relative pose, `endBatch`): around every android player with the shield up the 1.7.10
+  shield_sphere.obj x3 (shield.png, holo blue x0.2, culled from outside), a hit spot per hit (sphere.obj + shield_damage.png,
+  turned towards the attacker exactly like renderAttack), forcefield_plasma x1.02 (x0.1) and the turning
+  forcefield_plasma_2 x1.01 (x0.05), additive, tilted by the player's motion. The own bubble fades in (+0.1) and out
+  (-0.2); hits fade over 10 ticks, only the oldest counting down (1.7.10 queue). Hits reach clients as
+  `AndroidPayloads.ShieldHit` (attacker offset from the chest). `client/ObjMesh` reads the OBJs (models/fx).
+  While the ability key is held with teleport selected (and fully unlocked), a spinning holo glow faces the view at
+  the landing spot. `HoloRenderTypes.texturedCulled` added.
+  - Deviations: the hits are a packet rather than synced NBT; fades step per tick (1.7.10 per frame x partial ticks);
+    shield_loop follows the player (1.7.10 created it without a position, so it played at the world origin).
+  - Kept quirks: the own bubble is centred 0.5 below the eyes, other players' 1 below their head top; the teleport
+    glow sits at foot level and is half hidden by the floor.
 - Cloud (Linux) notes: regenerating resources rewrites the .ogg and ffmpeg-made .png bytes (different ffmpeg/oggenc
   builds) - `git checkout` them. Screenshots: `Xvfb :99` + `DISPLAY=:99 ./gradlew runScene` (software GL is slow; give
   menus extra ticks), world created by `runServer` with a flat creative server.properties, then moved to run/saves;
@@ -573,16 +587,15 @@
 
 ## Next
 - Phase 7 ✅. Leftovers done: legendary bonuses, network destination filters, machine renderers, machine sounds,
-  machine item tooltip.
+  machine item tooltip, android shield bubble + teleport marker.
 - Leftovers still to do (user: any order):
-  1. android shield bubble, hit flash and shield loop sound; teleport target marker;
-  2. custom tritanium armor model (1.7.10 Tritanium_Armor2_*);
-  3. noticed while doing the sounds: the stabilizer's beam is END_ROD particles, not the 1.7.10 coloured beam
+  1. custom tritanium armor model (1.7.10 Tritanium_Armor2_*);
+  2. noticed while doing the sounds: the stabilizer's beam is END_ROD particles, not the 1.7.10 coloured beam
      (GravitationalStabilizerBeamParticle; colours are `getBeamColorR/G/B` now); missing weapon sounds sizzle,
      laser_ricochet (plasma bolt hits), plasma_shotgun_charging, gui button_expand.
 
 ## Handover (2026-10-08, cloud -> local)
-- Branch `main-uvidhk`, everything committed and pushed. Last commit: "Leftovers: machine item tooltip ...". 94 GameTests
+- Branch `main-uvidhk`, everything committed and pushed. Last commit: "Leftovers: android shield bubble ...". 94 GameTests
   pass (`./gradlew runGameTestServer`).
 - DevScene now builds the scene at the world spawn on the flat surface (`level.getMinY() + 4`), not at the player's
   saved position. A local mo_scene world that isn't a default superflat may put the floor elsewhere: adjust `build()`

@@ -11,6 +11,9 @@ public final class AndroidClientHooks {
     /** The ability key's name for stat descriptions ("X"). */
     public static java.util.function.Supplier<String> abilityKeyName = () -> "X";
 
+    /** A shield hit on the player with that entity id; the vector points from the player's chest to the attacker. */
+    public static java.util.function.BiConsumer<Integer, net.minecraft.world.phys.Vec3> shieldHit = (id, offset) -> {};
+
     static void onTransformationStarted(Player player) {
         transformationStarted.accept(player);
     }

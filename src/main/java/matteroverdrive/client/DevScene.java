@@ -1221,7 +1221,53 @@ public final class DevScene {
             MachineTooltip.sceneShift = false;
             mc.setScreen(null);
         });
-        at(3204, mc -> mc.stop());
+        // leftovers: the android shield bubble with two hit flashes (third and first person), then the teleport marker
+        at(3202, mc -> server(mc, p -> {
+            BlockPos base = origin.above(30);
+            for (BlockPos b : BlockPos.betweenClosed(base.offset(-6, -1, -12), base.offset(6, 4, 6))) {
+                p.level().setBlock(b, b.getY() < base.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
+                        Block.UPDATE_CLIENTS | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
+            }
+            p.level().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, new AABB(base).inflate(10)).forEach(e -> e.discard());
+            matteroverdrive.android.Android.setAndroid(p, true);
+            var data = matteroverdrive.android.Android.get(p);
+            data.setStack(matteroverdrive.android.AndroidData.SLOT_BATTERY, MOItems.BATTERY.get().charged());
+            data.getStats().put(matteroverdrive.android.BioticStats.SHIELD.id(), 1);
+            data.getStats().put(matteroverdrive.android.BioticStats.TELEPORT.id(), 1);
+            data.setActiveStat(matteroverdrive.android.BioticStats.SHIELD.id());
+            data.setEffect("ShieldLastUse", 0);
+            matteroverdrive.android.Android.onActionKey(p);
+            matteroverdrive.android.Android.sync(p);
+            p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() + 0.5, Set.of(), 180f, 10f, false);
+        }));
+        at(3204, mc -> {
+            mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT);
+            mc.options.hideGui = true;
+        });
+        at(3212, mc -> server(mc, p -> {
+            matteroverdrive.network.AndroidPayloads.sendShieldHit(p, new net.minecraft.world.phys.Vec3(-3, 0.5, -3));
+            matteroverdrive.network.AndroidPayloads.sendShieldHit(p, new net.minecraft.world.phys.Vec3(3, -0.5, -2));
+        }));
+        at(3213, mc -> shot(mc, "android_shield"));
+        at(3218, mc -> mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON));
+        at(3228, mc -> shot(mc, "android_shield_first_person"));
+        at(3230, mc -> server(mc, p -> {
+            var data = matteroverdrive.android.Android.get(p);
+            data.setEffect("Shield", 0);
+            data.setActiveStat(matteroverdrive.android.BioticStats.TELEPORT.id());
+            matteroverdrive.android.Android.sync(p);
+            BlockPos base = origin.above(30);
+            p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() + 4.5, Set.of(), 180f, 35f, false);
+        }));
+        at(3236, mc -> matteroverdrive.client.android.AndroidKeys.ABILITY_USE.setDown(true));
+        at(3246, mc -> shot(mc, "android_teleport_marker"));
+        at(3248, mc -> matteroverdrive.client.android.AndroidKeys.ABILITY_USE.setDown(false));
+        at(3256, mc -> server(mc, p -> {
+            MatterOverdrive.LOGGER.info("[scene] after teleport: {}", p.position());
+            matteroverdrive.android.Android.setAndroid(p, false);
+        }));
+        at(3258, mc -> mc.options.hideGui = false);
+        at(3262, mc -> mc.stop());
     }
 
     /** Shows one item's tooltip in the middle of the screen. */
