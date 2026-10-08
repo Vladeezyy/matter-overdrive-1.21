@@ -194,6 +194,9 @@
 - **6d** HUD layer: health/battery/speed + weapon ammo/heat top left, parts and stats (active background, cooldown
   seconds) top right, radar bottom left, glitch overlay, cloak tint, transformation typing text + spinner; vanilla
   health/food/air hidden for androids.
+- Fix (phase 4 look): the anomaly was the sphere OBJ with the core texture (mostly transparent → looked half empty).
+  Now `AnomalyRenderer` like 1.7.10: a solid black sphere of radius 0.5 x pulsing event horizon + a camera-facing plane
+  (2 x horizon) with the core disc and the additive white glow ring.
 - **6e** Charging station: 3 blocks high (base + 2 invisible parts, breaks as one), OBJ base+rod, 512000 FE, charges
   androids within 8 blocks (range upgrades up to x8) with up to 512 FE/t scaled by distance.
 - 63 GameTests pass (survival mock player helper: vanilla's mock is hard-wired to creative, invulnerable until

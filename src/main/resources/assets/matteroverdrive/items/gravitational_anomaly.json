@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "matteroverdrive:block/gravitational_anomaly"
+    "model": "matteroverdrive:block/sphere"
   }
 }

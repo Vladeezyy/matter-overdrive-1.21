@@ -1337,7 +1337,7 @@ vt 0.3000 0.0000 50.0000
 # 202 texture coords
 
 g GeoSphere001
-usemtl gravitational_anomaly_core
+usemtl black
 s 1
 f 1/163/1 13/13/2 16/16/3 
 f 13/13/4 14/14/5 103/103/6 

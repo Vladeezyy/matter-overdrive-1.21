@@ -1,10 +1,5 @@
 {
-  "loader": "neoforge:obj",
-  "model": "matteroverdrive:models/block/sphere.obj",
-  "flip_v": true,
   "textures": {
-    "gravitational_anomaly_core": "matteroverdrive:block/gravitational_anomaly_core",
     "particle": "matteroverdrive:block/gravitational_anomaly_core"
-  },
-  "render_type": "minecraft:cutout"
+  }
 }

@@ -1,0 +1,9 @@
+{
+  "loader": "neoforge:obj",
+  "model": "matteroverdrive:models/block/sphere.obj",
+  "flip_v": true,
+  "textures": {
+    "black": "matteroverdrive:block/black",
+    "particle": "matteroverdrive:block/gravitational_anomaly_core"
+  }
+}

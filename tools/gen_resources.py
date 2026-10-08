@@ -553,12 +553,14 @@ cp(ref / "textures/items/spacetime_equalizer.png", A / "textures/item/spacetime_
 w(A / "models/item/spacetime_equalizer.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{MOD}:item/spacetime_equalizer"}})
 w(A / "items/spacetime_equalizer.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:item/spacetime_equalizer"}})
 # The anomaly: the 1.7.10 sphere.obj (centred, radius 0.5) with the black core texture.
-obj_model("sphere", {"GeoSphere001": "gravitational_anomaly_core"}, shift_y=True, particle="gravitational_anomaly_core")
-anomaly_model = json.loads((A / "models/block/sphere.json").read_text()) | {"render_type": "minecraft:cutout"}
-(A / "models/block/sphere.json").unlink()
-w(A / "models/block/gravitational_anomaly.json", anomaly_model)
+# In the world the anomaly is drawn by AnomalyRenderer (1.7.10 TileEntityRendererGravitationalAnomaly: black sphere +
+# core/glow billboard); the block model only carries the particle. The item shows the sphere.obj in black.
+for tex in ["black", "gravitational_anomaly_glow"]:
+    cp(ref / "textures/blocks" / f"{tex}.png", A / "textures/block" / f"{tex}.png")
+obj_model("sphere", {"GeoSphere001": "black"}, shift_y=True, particle="gravitational_anomaly_core")
+w(A / "models/block/gravitational_anomaly.json", {"textures": {"particle": f"{MOD}:block/gravitational_anomaly_core"}})
 w(A / "blockstates/gravitational_anomaly.json", {"variants": {"": {"model": f"{MOD}:block/gravitational_anomaly"}}})
-w(A / "items/gravitational_anomaly.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:block/gravitational_anomaly"}})
+w(A / "items/gravitational_anomaly.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:block/sphere"}})
 # 1.7.10 BlockGravitationalStabilizer: front network port (the emitter), back monitor, sides vent2, top/bottom coils.
 w(A / "models/block/gravitational_stabilizer.json", six_sided("network_port", "base", "vent2", "base_coil", "base_coil"))
 facing_blockstate("gravitational_stabilizer", f"{MOD}:block/gravitational_stabilizer")
