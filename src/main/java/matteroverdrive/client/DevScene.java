@@ -554,7 +554,7 @@ public final class DevScene {
             p.level().getEntitiesOfClass(net.minecraft.world.entity.Mob.class, new AABB(base).inflate(20)).forEach(e -> e.discard());
             var scoreboard = p.level().getScoreboard();
             if (scoreboard.getPlayerTeam("rogues") == null) scoreboard.addPlayerTeam("rogues").setColor(net.minecraft.ChatFormatting.RED);
-            BlockPos spawnerPos = base.offset(-4, -1, -10);
+            BlockPos spawnerPos = base.offset(-2, -1, -5);
             p.level().setBlockAndUpdate(spawnerPos, MOBlocks.ANDROID_SPAWNER.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
             if (p.level().getBlockEntity(spawnerPos) instanceof matteroverdrive.block.entity.AndroidSpawnerBlockEntity s) {
                 s.getInventory().setStack(matteroverdrive.block.entity.AndroidSpawnerBlockEntity.COLOR_MODULE_SLOT,
@@ -567,7 +567,7 @@ public final class DevScene {
             p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() + 0.5, Set.of(), 180f, 25f, false);
         }));
         at(1560, mc -> server(mc, p -> {
-            BlockPos spawnerPos = origin.above(30).offset(-4, -1, -10);
+            BlockPos spawnerPos = origin.above(30).offset(-2, -1, -5);
             if (p.level().getBlockEntity(spawnerPos) instanceof matteroverdrive.block.entity.AndroidSpawnerBlockEntity s) {
                 s.setConfig(4, 4, 600, "rogues");
                 p.openMenu(s, buf -> buf.writeBlockPos(spawnerPos));
@@ -579,7 +579,7 @@ public final class DevScene {
         at(1577, mc -> server(mc, ServerPlayer::closeContainer));
         at(1630, mc -> shot(mc, "android_spawner_world"));
         at(1631, mc -> server(mc, p -> {
-            BlockPos spawnerPos = origin.above(30).offset(-4, -1, -10);
+            BlockPos spawnerPos = origin.above(30).offset(-2, -1, -5);
             if (p.level().getBlockEntity(spawnerPos) instanceof matteroverdrive.block.entity.AndroidSpawnerBlockEntity s) s.removeAllAndroids();
         }));
         at(1634, mc -> mc.stop());
