@@ -9,7 +9,7 @@ import matteroverdrive.menu.MachineMenu;
 import matteroverdrive.util.MOText;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.input.MouseButtonEvent;
+import matteroverdrive.compat.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -171,7 +171,7 @@ public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractCo
         g.drawString(font, Component.translatable("gui.matteroverdrive.config.redstone"), x + REDSTONE_X, y + REDSTONE_Y - 12, COLOR_TEXT, false);
         boolean over = in(mx, my, REDSTONE_X, REDSTONE_Y, REDSTONE_W, REDSTONE_H);
         g.fill(x + REDSTONE_X, y + REDSTONE_Y, x + REDSTONE_X + REDSTONE_W, y + REDSTONE_Y + REDSTONE_H, over ? 0xFF4F6669 : 0xFF3E5154);
-        g.submitOutline(x + REDSTONE_X, y + REDSTONE_Y, REDSTONE_W, REDSTONE_H, 0xFF22282A);
+        g.renderOutline(x + REDSTONE_X, y + REDSTONE_Y, REDSTONE_W, REDSTONE_H, 0xFF22282A);
         Component mode = Component.translatable(menu.getRedstoneMode().translationKey());
         g.drawString(font, mode, x + REDSTONE_X + (REDSTONE_W - font.width(mode)) / 2, y + REDSTONE_Y + 6, 0xFFFFFFFF, false);
         if (menu.hasFilterSlot()) {
@@ -246,7 +246,9 @@ public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractCo
     // --- input -----------------------------------------------------------------------------------
 
     @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, button);
+        boolean doubleClick = false;
         double mx = event.x() - leftPos, my = event.y() - topPos;
         if (in(mx, my, closeX(), CLOSE_Y, 9, 9)) {
             onClose();
@@ -266,6 +268,6 @@ public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractCo
             minecraft.gameMode.handleInventoryButtonClick(menu.containerId, MachineMenu.BUTTON_REDSTONE);
             return true;
         }
-        return super.mouseClicked(event, doubleClick);
+        return super.mouseClicked(event.x(), event.y(), event.button());
     }
 }

@@ -12,7 +12,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FontDescription;
 import net.minecraft.world.item.ItemStack;
 
 /**
@@ -22,7 +21,7 @@ import net.minecraft.world.item.ItemStack;
  */
 public abstract class GuideElement {
     /** 1.7.10 setUnicodeFlag(true) = the uniform font. */
-    public static final FontDescription UNIFORM = new FontDescription.Resource(Minecraft.UNIFORM_FONT);
+    public static final net.minecraft.resources.ResourceLocation UNIFORM = Minecraft.UNIFORM_FONT;
 
     /** A clickable area (link) found while drawing, in screen coordinates. */
     public record Link(int x, int y, int w, int h, Runnable action) {}

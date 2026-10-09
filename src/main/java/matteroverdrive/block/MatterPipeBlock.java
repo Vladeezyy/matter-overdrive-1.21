@@ -89,7 +89,7 @@ public class MatterPipeBlock extends BaseEntityBlock {
     private static boolean connects(LevelReader level, BlockPos pos, Direction dir) {
         BlockPos other = pos.relative(dir);
         if (level.getBlockState(other).getBlock() instanceof MatterPipeBlock) return true;
-        return level instanceof Level l && l.getCapability(Capabilities.Fluid.BLOCK, other, dir.getOpposite()) != null;
+        return level instanceof Level l && l.getCapability(Capabilities.FluidHandler.BLOCK, other, dir.getOpposite()) != null;
     }
 
     @Override

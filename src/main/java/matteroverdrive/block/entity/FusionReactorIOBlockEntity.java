@@ -9,7 +9,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.energy.IEnergyStorage;
 
 /**
  * 1.7.10 TileEntityFusionReactorPart (fusion_reactor_io): a port in the reactor ring that exposes the controller's
@@ -38,7 +38,7 @@ public class FusionReactorIOBlockEntity extends BlockEntity {
         return null;
     }
 
-    public @Nullable EnergyHandler getEnergy() {
+    public @Nullable IEnergyStorage getEnergy() {
         FusionReactorControllerBlockEntity c = controller();
         return c == null ? null : c.getEnergy();
     }

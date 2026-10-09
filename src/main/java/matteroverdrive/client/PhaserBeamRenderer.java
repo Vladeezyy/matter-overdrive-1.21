@@ -9,7 +9,7 @@ import matteroverdrive.item.weapon.OmniToolItem;
 import matteroverdrive.item.weapon.PhaserItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.SubmitNodeCollector;
+import matteroverdrive.compat.render.SubmitNodeCollector;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ARGB;
@@ -34,7 +34,7 @@ public final class PhaserBeamRenderer {
 
     /** World-space beam relative to the player's render origin. */
     @SubscribeEvent
-    static void onRenderPlayer(RenderPlayerEvent.Post<?> event) {
+    static void onRenderPlayer(RenderPlayerEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || !(mc.level.getEntity(event.getRenderState().id) instanceof Player player)) return;
         if (!player.isUsingItem() || !(player.getUseItem().getItem() instanceof EnergyWeaponItem phaser) || !isBeam(phaser)) return;
@@ -46,7 +46,7 @@ public final class PhaserBeamRenderer {
         Vec3 start = eye.add(look.scale(0.7)).add(right.scale(0.35)).add(0, -0.25, 0).subtract(origin);
         Vec3 end = target(mc, player, phaser).subtract(origin);
         Vec3 camera = mc.gameRenderer.getMainCamera().position().subtract(origin);
-        submit(event.getSubmitNodeCollector(), event.getPoseStack(), start, end, camera, phaser, player);
+        submit(new SubmitNodeCollector(event.getMultiBufferSource()), event.getPoseStack(), start, end, camera, phaser, player);
     }
 
     /** First person: camera space, the crosshair looks down -z. */
@@ -59,7 +59,7 @@ public final class PhaserBeamRenderer {
         double distance = target(mc, player, phaser).distanceTo(player.getEyePosition(event.getPartialTick()));
         Vec3 start = new Vec3(0.36, -0.16, -0.7);
         Vec3 end = new Vec3(0, 0, -distance);
-        submit(event.getSubmitNodeCollector(), event.getPoseStack(), start, end, Vec3.ZERO, phaser, player);
+        submit(new SubmitNodeCollector(event.getMultiBufferSource()), event.getPoseStack(), start, end, Vec3.ZERO, phaser, player);
     }
 
     /** 1.7.10 RenderWeaponsBeam: the phaser's beam and the omni tool's digging beam. */

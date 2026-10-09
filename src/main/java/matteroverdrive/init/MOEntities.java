@@ -27,7 +27,7 @@ public final class MOEntities {
 
     public static final DeferredHolder<EntityType<?>, EntityType<matteroverdrive.entity.monster.MutantScientist>> MUTANT_SCIENTIST =
             ENTITIES.registerEntityType("mutant_scientist", matteroverdrive.entity.monster.MutantScientist::new, MobCategory.MONSTER,
-                    b -> b.sized(1f, 2.3f).clientTrackingRange(8).notInPeaceful());
+                    b -> b.sized(1f, 2.3f).clientTrackingRange(8));
 
     /** 1.7.10 EntityVillagerMadScientist: villager size. */
     public static final DeferredHolder<EntityType<?>, EntityType<matteroverdrive.entity.MadScientist>> MAD_SCIENTIST =

@@ -25,11 +25,10 @@ import matteroverdrive.starmap.StarMapPayloads;
 import matteroverdrive.starmap.Star;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.input.MouseButtonEvent;
+import matteroverdrive.compat.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FontDescription;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
@@ -50,7 +49,7 @@ public class StarMapScreen extends AbstractContainerScreen<StarMapMenu> {
     private static final int COLOR_MATTER = 0xBFE4E6;
     private static final String[] PAGE_ICONS = {"page_icon_galaxy", "page_icon_quadrant", "page_icon_star", "page_icon_planet", "icon_stats"};
     private static final String[] PAGE_NAMES = {"galaxy", "quadrant", "star", "planet", "planet_stats"};
-    private static final FontDescription ALT = new FontDescription.Resource(net.minecraft.client.Minecraft.ALT_FONT);
+    private static final net.minecraft.resources.ResourceLocation ALT = net.minecraft.client.Minecraft.ALT_FONT;
     private static final int[] SCROLL = new int[5];
     private final StarMapBlockEntity starMap;
     private int page;
@@ -502,8 +501,9 @@ public class StarMapScreen extends AbstractContainerScreen<StarMapMenu> {
     // --- input -------------------------------------------------------------------------------------------
 
     @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        double mouseX = event.x(), mouseY = event.y();
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, button);
+        boolean doubleClick = false;
         int x = width - 42 + 9;
         for (int i = 0; i < 5; i++) {
             int by = 20 + i * 26;
@@ -537,7 +537,7 @@ public class StarMapScreen extends AbstractContainerScreen<StarMapMenu> {
                 return true;
             }
         }
-        return super.mouseClicked(event, doubleClick);
+        return super.mouseClicked(event.x(), event.y(), event.button());
     }
 
     @Override

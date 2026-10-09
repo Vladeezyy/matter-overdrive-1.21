@@ -13,8 +13,7 @@ import net.neoforged.neoforge.attachment.AttachmentSyncHandler;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
 import net.neoforged.neoforge.common.util.ValueIOSerializable;
 import org.jetbrains.annotations.Nullable;
-import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
-import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.items.ItemStackHandler;
 
 /**
  * 1.7.10 AndroidPlayer's saved state, as a player attachment: whether the player is an android, the built-in energy,
@@ -35,7 +34,7 @@ public class AndroidData implements ValueIOSerializable {
     String activeStat = "";
     /** 1.7.10 AndroidPlayer.effects: toggles (Nightvision, Cloaked, Shield as 0/1) and timestamps (last teleport...). */
     final Map<String, Long> effects = new HashMap<>();
-    final ItemStacksResourceHandler inventory = new ItemStacksResourceHandler(SLOTS);
+    final ItemStackHandler inventory = new ItemStackHandler(SLOTS);
     /** Changed since the last sync to clients. */
     boolean dirty;
 
@@ -98,16 +97,16 @@ public class AndroidData implements ValueIOSerializable {
         dirty = true;
     }
 
-    public ItemStacksResourceHandler getInventory() {
+    public ItemStackHandler getInventory() {
         return inventory;
     }
 
     public ItemStack getStack(int slot) {
-        return inventory.getResource(slot).toStack(inventory.getAmountAsInt(slot));
+        return inventory.getStackInSlot(slot);
     }
 
     public void setStack(int slot, ItemStack stack) {
-        inventory.set(slot, ItemResource.of(stack), stack.getCount());
+        inventory.setStackInSlot(slot, stack);
         dirty = true;
     }
 
@@ -187,7 +186,7 @@ public class AndroidData implements ValueIOSerializable {
         effects.putAll(buf.readMap(b -> b.readUtf(), b -> b.readVarLong()));
         for (int i = 0; i < SLOTS; i++) {
             ItemStack stack = ItemStack.OPTIONAL_STREAM_CODEC.decode(buf);
-            inventory.set(i, ItemResource.of(stack), stack.getCount());
+            inventory.setStackInSlot(i, stack);
         }
     }
 }

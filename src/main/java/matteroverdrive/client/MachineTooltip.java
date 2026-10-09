@@ -32,7 +32,7 @@ public final class MachineTooltip {
         ItemStack stack = event.getItemStack();
         if (!(stack.getItem() instanceof MachineBlockItem)) return;
         List<Component> lines = new ArrayList<>();
-        if (sceneShift || Minecraft.getInstance().hasShiftDown()) {
+        if (sceneShift || net.minecraft.client.gui.screens.Screen.hasShiftDown()) {
             String details = stack.getItem().getDescriptionId() + ".details";
             if (I18n.exists(details)) lines.add(Component.translatable(details).withStyle(ChatFormatting.GRAY));
             MachineStorage storage = stack.get(MODataComponents.MACHINE_STORAGE.get());

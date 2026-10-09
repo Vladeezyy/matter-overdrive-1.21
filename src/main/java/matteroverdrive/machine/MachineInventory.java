@@ -4,22 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
+import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.transfer.DelegatingResourceHandler;
-import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.item.ItemResource;
-import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
-import net.neoforged.neoforge.transfer.transaction.TransactionContext;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.ItemStackHandler;
 
 /**
  * A machine's slots (1.7.10 machines kept upgrades and the battery slot in the same inventory).
  * Slots are declared with a role; {@link #automation()} is the view exposed to hoppers and pipes.
  */
-public class MachineInventory extends ItemStacksResourceHandler {
+public class MachineInventory extends ItemStackHandler {
     /** FILTER: the network destination filter (1.7.10 DestinationFilterSlot), shown on the Config page. */
     public enum Role { INPUT, OUTPUT, ENERGY, UPGRADE, OTHER, FILTER }
 
-    public record SlotSpec(Role role, Predicate<ItemResource> filter, int limit) {}
+    public record SlotSpec(Role role, Predicate<ItemStack> filter, int limit) {}
 
     private final List<SlotSpec> specs;
     private final Runnable onChanged;
@@ -34,49 +32,86 @@ public class MachineInventory extends ItemStacksResourceHandler {
         return specs.get(index);
     }
 
+    public int size() {
+        return getSlots();
+    }
+
     public ItemStack getStack(int index) {
         return stacks.get(index);
     }
 
     public void setStack(int index, ItemStack stack) {
-        set(index, ItemResource.of(stack), stack.getCount());
+        setStackInSlot(index, stack);
     }
 
-    /** Removes {@code amount} items from a slot outside of any transaction (machine logic on the server tick). */
+    /** Removes {@code amount} items from a slot (machine logic on the server tick). */
     public void shrink(int index, int amount) {
         ItemStack stack = getStack(index).copy();
         stack.shrink(amount);
         setStack(index, stack);
     }
 
-    @Override
-    public boolean isValid(int index, ItemResource resource) {
-        return resource.isEmpty() || specs.get(index).filter().test(resource);
+    public boolean isValid(int index, ItemStack stack) {
+        return stack.isEmpty() || specs.get(index).filter().test(stack);
     }
 
     @Override
-    protected int getCapacity(int index, ItemResource resource) {
-        int limit = specs.get(index).limit();
-        return resource.isEmpty() ? limit : Math.min(limit, resource.getMaxStackSize());
+    public boolean isItemValid(int index, ItemStack stack) {
+        return isValid(index, stack);
     }
 
     @Override
-    protected void onContentsChanged(int index, ItemStack previousContents) {
+    public int getSlotLimit(int index) {
+        return specs.get(index).limit();
+    }
+
+    @Override
+    protected void onContentsChanged(int index) {
         onChanged.run();
     }
 
+    /** ItemStackHandler.deserialize without its resize: the slots come from the machine. */
+    @Override
+    public void deserialize(ValueInput input) {
+        java.util.Collections.fill(stacks, ItemStack.EMPTY);
+        input.listOrEmpty("Items", net.minecraft.world.ItemStackWithSlot.CODEC).forEach(slot -> {
+            if (slot.isValidInContainer(stacks.size())) stacks.set(slot.slot(), slot.stack());
+        });
+        onLoad();
+    }
+
     /** Hoppers and pipes may insert into INPUT and ENERGY slots and extract from OUTPUT slots only. */
-    public ResourceHandler<ItemResource> automation() {
-        return new DelegatingResourceHandler<>(this) {
+    public IItemHandler automation() {
+        return new IItemHandler() {
             @Override
-            public int insert(int index, ItemResource resource, int amount, TransactionContext transaction) {
-                Role role = specs.get(index).role();
-                return role == Role.INPUT || role == Role.ENERGY ? super.insert(index, resource, amount, transaction) : 0;
+            public int getSlots() {
+                return MachineInventory.this.getSlots();
             }
 
             @Override
-            public int extract(int index, ItemResource resource, int amount, TransactionContext transaction) {
-                return specs.get(index).role() == Role.OUTPUT ? super.extract(index, resource, amount, transaction) : 0;
+            public ItemStack getStackInSlot(int index) {
+                return MachineInventory.this.getStackInSlot(index);
+            }
+
+            @Override
+            public ItemStack insertItem(int index, ItemStack stack, boolean simulate) {
+                Role role = specs.get(index).role();
+                return role == Role.INPUT || role == Role.ENERGY ? MachineInventory.this.insertItem(index, stack, simulate) : stack;
+            }
+
+            @Override
+            public ItemStack extractItem(int index, int amount, boolean simulate) {
+                return specs.get(index).role() == Role.OUTPUT ? MachineInventory.this.extractItem(index, amount, simulate) : ItemStack.EMPTY;
+            }
+
+            @Override
+            public int getSlotLimit(int index) {
+                return MachineInventory.this.getSlotLimit(index);
+            }
+
+            @Override
+            public boolean isItemValid(int index, ItemStack stack) {
+                return MachineInventory.this.isItemValid(index, stack);
             }
         };
     }
@@ -89,12 +124,12 @@ public class MachineInventory extends ItemStacksResourceHandler {
         private final List<SlotSpec> specs = new ArrayList<>();
 
         /** Adds a slot and returns its index. */
-        public int add(Role role, Predicate<ItemResource> filter, int limit) {
+        public int add(Role role, Predicate<ItemStack> filter, int limit) {
             specs.add(new SlotSpec(role, filter, limit));
             return specs.size() - 1;
         }
 
-        public int add(Role role, Predicate<ItemResource> filter) {
+        public int add(Role role, Predicate<ItemStack> filter) {
             return add(role, filter, 64);
         }
 

@@ -33,10 +33,8 @@ import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.energy.EnergyHandler;
-import net.neoforged.neoforge.transfer.energy.ItemAccessEnergyHandler;
-import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.energy.ComponentEnergyStorage;
+import net.neoforged.neoforge.energy.IEnergyStorage;
 
 /**
  * 1.7.10 EnergyWeapon. Fires with the attack key (held for automatic fire), aims/zooms with use. Every shot costs
@@ -188,18 +186,16 @@ public abstract class EnergyWeaponItem extends Item {
     // --- energy, heat --------------------------------------------------------------------------
 
     /** Charges and drains through {@link #getEnergy}/{@link #setEnergy}, so a battery module is used when installed. */
-    public EnergyHandler createEnergyHandler(ItemAccess access) {
-        return new ItemAccessEnergyHandler(access, MODataComponents.ENERGY.get(), getCapacity(access.getResource().toStack()), TRANSFER, TRANSFER) {
+    public IEnergyStorage createEnergyHandler(ItemStack weapon) {
+        return new ComponentEnergyStorage(weapon, MODataComponents.ENERGY.get(), getCapacity(weapon), TRANSFER, TRANSFER) {
             @Override
-            protected int getAmountFrom(ItemResource resource) {
-                return resource.is(validItem) ? getEnergy(resource.toStack()) : 0;
+            public int getEnergyStored() {
+                return weapon.is(EnergyWeaponItem.this) ? Math.min(getEnergy(weapon), getMaxEnergyStored()) : 0;
             }
 
             @Override
-            protected ItemResource update(ItemResource resource, int amount) {
-                ItemStack stack = resource.toStack();
-                setEnergy(stack, amount);
-                return ItemResource.of(stack);
+            protected void setEnergy(int energy) {
+                EnergyWeaponItem.setEnergy(weapon, Math.max(0, Math.min(energy, getMaxEnergyStored())));
             }
         };
     }

@@ -11,6 +11,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
@@ -19,10 +20,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.neoforged.neoforge.transfer.ItemAccessResourceHandler;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.item.ItemResource;
 
 /**
  * 1.7.10 MatterContainer: a bucket for Matter Plasma holding 32 mB (stacks of 8). Scoops up a plasma source block or
@@ -68,36 +65,59 @@ public class MatterContainerItem extends Item {
     }
 
     /** Empty ↔ full container with exactly 32 mB of Matter Plasma (1.7.10 FluidContainerRegistry). */
-    public static class FluidHandler extends ItemAccessResourceHandler<FluidResource> {
-        public FluidHandler(ItemAccess access) {
-            super(access, 1);
+    public static class FluidHandler implements net.neoforged.neoforge.fluids.capability.IFluidHandlerItem {
+        private ItemStack container;
+
+        public FluidHandler(ItemStack container) {
+            this.container = container;
+        }
+
+        private boolean full() {
+            return container.is(MOItems.MATTER_CONTAINER_FULL.get());
         }
 
         @Override
-        protected FluidResource getResourceFrom(ItemResource resource, int index) {
-            return resource.is(MOItems.MATTER_CONTAINER_FULL.get()) ? FluidResource.of(MOFluids.MATTER_PLASMA.get()) : FluidResource.EMPTY;
+        public ItemStack getContainer() {
+            return container;
         }
 
         @Override
-        protected int getAmountFrom(ItemResource resource, int index) {
-            return resource.is(MOItems.MATTER_CONTAINER_FULL.get()) ? CAPACITY : 0;
+        public int getTanks() {
+            return 1;
         }
 
         @Override
-        protected ItemResource update(ItemResource resource, int index, FluidResource newResource, int newAmount) {
-            if (newAmount == 0) return ItemResource.of(MOItems.MATTER_CONTAINER.get());
-            if (newAmount == CAPACITY && newResource.getFluid() == MOFluids.MATTER_PLASMA.get()) return ItemResource.of(MOItems.MATTER_CONTAINER_FULL.get());
-            return ItemResource.EMPTY;
+        public FluidStack getFluidInTank(int tank) {
+            return full() ? new FluidStack(MOFluids.MATTER_PLASMA.get(), CAPACITY) : FluidStack.EMPTY;
         }
 
         @Override
-        public boolean isValid(int index, FluidResource resource) {
-            return resource.getFluid() == MOFluids.MATTER_PLASMA.get();
-        }
-
-        @Override
-        protected int getCapacity(int index, FluidResource resource) {
+        public int getTankCapacity(int tank) {
             return CAPACITY;
+        }
+
+        @Override
+        public boolean isFluidValid(int tank, FluidStack stack) {
+            return stack.is(MOFluids.MATTER_PLASMA.get());
+        }
+
+        @Override
+        public int fill(FluidStack resource, FluidAction action) {
+            if (container.getCount() != 1 || full() || !isFluidValid(0, resource) || resource.getAmount() < CAPACITY) return 0;
+            if (action.execute()) container = container.transmuteCopy(MOItems.MATTER_CONTAINER_FULL.get(), 1);
+            return CAPACITY;
+        }
+
+        @Override
+        public FluidStack drain(FluidStack resource, FluidAction action) {
+            return isFluidValid(0, resource) ? drain(resource.getAmount(), action) : FluidStack.EMPTY;
+        }
+
+        @Override
+        public FluidStack drain(int maxDrain, FluidAction action) {
+            if (container.getCount() != 1 || !full() || maxDrain < CAPACITY) return FluidStack.EMPTY;
+            if (action.execute()) container = container.transmuteCopy(MOItems.MATTER_CONTAINER.get(), 1);
+            return new FluidStack(MOFluids.MATTER_PLASMA.get(), CAPACITY);
         }
     }
 }

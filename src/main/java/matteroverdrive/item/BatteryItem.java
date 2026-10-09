@@ -11,10 +11,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.energy.EnergyHandler;
-import net.neoforged.neoforge.transfer.energy.InfiniteEnergyHandler;
-import net.neoforged.neoforge.transfer.energy.ItemAccessEnergyHandler;
+import net.neoforged.neoforge.energy.IEnergyStorage;
+import matteroverdrive.compat.InfiniteEnergyHandler;
+import net.neoforged.neoforge.energy.ComponentEnergyStorage;
 
 /**
  * 1.7.10 Battery / CreativeBattery: an FE container item. The overlay layer is tinted per battery in its client item JSON.
@@ -33,11 +32,11 @@ public class BatteryItem extends Item {
         this.creative = creative;
     }
 
-    public EnergyHandler createEnergyHandler(ItemAccess access) {
+    public IEnergyStorage createEnergyHandler(ItemStack stack) {
         if (creative) {
             return InfiniteEnergyHandler.INSTANCE;
         }
-        return new ItemAccessEnergyHandler(access, MODataComponents.ENERGY.get(), capacity, maxInsert, maxExtract);
+        return new ComponentEnergyStorage(stack, MODataComponents.ENERGY.get(), capacity, maxInsert, maxExtract);
     }
 
     public int getCapacity() {

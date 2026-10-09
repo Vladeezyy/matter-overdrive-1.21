@@ -233,10 +233,9 @@ final class QuestGameTests {
     }
 
     private static java.util.List<String> guideFiles(String lang) {
-        var contents = net.neoforged.fml.ModList.get().getModFileById(matteroverdrive.MatterOverdrive.MODID).getFile().getContents();
+        var file = net.neoforged.fml.ModList.get().getModFileById(matteroverdrive.MatterOverdrive.MODID).getFile();
         java.util.List<String> names = new java.util.ArrayList<>();
-        for (java.nio.file.Path root : contents.getContentRoots()) {
-            java.nio.file.Path dir = root.resolve("assets/matteroverdrive/guide/" + lang);
+        for (java.nio.file.Path dir : java.util.List.of(file.findResource("assets", "matteroverdrive", "guide", lang))) {
             if (!java.nio.file.Files.isDirectory(dir)) continue;
             try (var stream = java.nio.file.Files.list(dir)) {
                 stream.map(p -> p.getFileName().toString()).filter(n -> n.endsWith(".xml")).forEach(names::add);
@@ -248,6 +247,7 @@ final class QuestGameTests {
     }
 
     private static byte[] guideFile(String path) throws java.io.IOException {
-        return net.neoforged.fml.ModList.get().getModFileById(matteroverdrive.MatterOverdrive.MODID).getFile().getContents().readFile(path);
+        var file = net.neoforged.fml.ModList.get().getModFileById(matteroverdrive.MatterOverdrive.MODID).getFile().findResource(path.split("/"));
+        return java.nio.file.Files.exists(file) ? java.nio.file.Files.readAllBytes(file) : null;
     }
 }

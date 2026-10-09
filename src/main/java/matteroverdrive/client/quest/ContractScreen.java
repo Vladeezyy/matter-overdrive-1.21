@@ -11,7 +11,7 @@ import matteroverdrive.quest.QuestStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.MouseButtonEvent;
+import matteroverdrive.compat.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -123,7 +123,9 @@ public class ContractScreen extends Screen {
     }
 
     @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, button);
+        boolean doubleClick = false;
         QuestStack stack = quest();
         if (stack != null && canAccept(stack) && in(event.x(), event.y(), left + 14, top + HEIGHT - 28, 68, 12)) {
             int slot = hand == InteractionHand.OFF_HAND ? 40 : minecraft.player.getInventory().getSelectedSlot();
@@ -131,7 +133,7 @@ public class ContractScreen extends Screen {
             onClose();
             return true;
         }
-        return super.mouseClicked(event, doubleClick);
+        return super.mouseClicked(event.x(), event.y(), event.button());
     }
 
     @Override

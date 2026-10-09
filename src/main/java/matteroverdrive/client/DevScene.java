@@ -1685,7 +1685,7 @@ public final class DevScene {
         level.setWeatherParameters(6000, 0, false, false);
         player.setGameMode(GameType.CREATIVE);
         // A fixed spot (the spawn, on the flat world's surface): the player's saved position drifts between runs.
-        BlockPos spawn = level.getRespawnData().pos();
+        BlockPos spawn = level.getSharedSpawnPos();
         BlockPos base = new BlockPos(spawn.getX(), level.getMinY() + 4, spawn.getZ());
         player.teleportTo(level, base.getX() + 0.5, base.getY(), base.getZ() + 0.5, Set.of(), 180f, 0f, false);
         origin = base;
@@ -1830,7 +1830,7 @@ public final class DevScene {
      */
     private static BlockPos gallerySite(ServerPlayer p, int dx) {
         ServerLevel level = p.level();
-        BlockPos spawn = level.getRespawnData().pos();
+        BlockPos spawn = level.getSharedSpawnPos();
         // far from the spawn: fresh terrain, none of the older scene runs' leftovers in view
         int x = spawn.getX() + 1000 + dx, z = spawn.getZ() + 1000;
         level.getChunkSource().getChunk(x >> 4, z >> 4, true);

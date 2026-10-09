@@ -9,7 +9,6 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
-import net.minecraft.world.entity.ContainerUser;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -101,22 +100,17 @@ public class TritaniumCrateBlockEntity extends RandomizableContainerBlockEntity 
     }
 
     @Override
-    public void startOpen(ContainerUser user) {
-        if (!remove && !user.getLivingEntity().isSpectator()) {
-            openers.incrementOpeners(user.getLivingEntity(), getLevel(), getBlockPos(), getBlockState(), user.getContainerInteractionRange());
+    public void startOpen(Player player) {
+        if (!remove && !player.isSpectator()) {
+            openers.incrementOpeners(player, getLevel(), getBlockPos(), getBlockState());
         }
     }
 
     @Override
-    public void stopOpen(ContainerUser user) {
-        if (!remove && !user.getLivingEntity().isSpectator()) {
-            openers.decrementOpeners(user.getLivingEntity(), getLevel(), getBlockPos(), getBlockState());
+    public void stopOpen(Player player) {
+        if (!remove && !player.isSpectator()) {
+            openers.decrementOpeners(player, getLevel(), getBlockPos(), getBlockState());
         }
-    }
-
-    @Override
-    public List<ContainerUser> getEntitiesWithContainerOpen() {
-        return openers.getEntitiesWithContainerOpen(getLevel(), getBlockPos());
     }
 
     public void recheckOpen() {

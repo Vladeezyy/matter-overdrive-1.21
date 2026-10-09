@@ -221,21 +221,21 @@ public final class MOItems {
     public static final List<DeferredItem<BlockItem>> TRITANIUM_CRATES = MOBlocks.TRITANIUM_CRATES.stream()
             .map(b -> block(b.getId().getPath(), b)).toList();
     public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> ROGUE_ANDROID_SPAWN_EGG = item("rogue_android_spawn_egg",
-            net.minecraft.world.item.SpawnEggItem::new, p -> p.spawnEgg(MOEntities.ROGUE_ANDROID.get()));
+            p -> new net.minecraft.world.item.SpawnEggItem(MOEntities.ROGUE_ANDROID.get(), p), p -> p);
     public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> RANGED_ROGUE_ANDROID_SPAWN_EGG = item("ranged_rogue_android_spawn_egg",
-            net.minecraft.world.item.SpawnEggItem::new, p -> p.spawnEgg(MOEntities.RANGED_ROGUE_ANDROID.get()));
+            p -> new net.minecraft.world.item.SpawnEggItem(MOEntities.RANGED_ROGUE_ANDROID.get(), p), p -> p);
     public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> MAD_SCIENTIST_SPAWN_EGG = item("mad_scientist_spawn_egg",
-            net.minecraft.world.item.SpawnEggItem::new, p -> p.spawnEgg(MOEntities.MAD_SCIENTIST.get()));
+            p -> new net.minecraft.world.item.SpawnEggItem(MOEntities.MAD_SCIENTIST.get(), p), p -> p);
     public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> MUTANT_SCIENTIST_SPAWN_EGG = item("mutant_scientist_spawn_egg",
-            net.minecraft.world.item.SpawnEggItem::new, p -> p.spawnEgg(MOEntities.MUTANT_SCIENTIST.get()));
+            p -> new net.minecraft.world.item.SpawnEggItem(MOEntities.MUTANT_SCIENTIST.get(), p), p -> p);
     public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> FAILED_PIG_SPAWN_EGG = item("failed_pig_spawn_egg",
-            net.minecraft.world.item.SpawnEggItem::new, p -> p.spawnEgg(MOEntities.FAILED_PIG.get()));
+            p -> new net.minecraft.world.item.SpawnEggItem(MOEntities.FAILED_PIG.get(), p), p -> p);
     public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> FAILED_COW_SPAWN_EGG = item("failed_cow_spawn_egg",
-            net.minecraft.world.item.SpawnEggItem::new, p -> p.spawnEgg(MOEntities.FAILED_COW.get()));
+            p -> new net.minecraft.world.item.SpawnEggItem(MOEntities.FAILED_COW.get(), p), p -> p);
     public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> FAILED_CHICKEN_SPAWN_EGG = item("failed_chicken_spawn_egg",
-            net.minecraft.world.item.SpawnEggItem::new, p -> p.spawnEgg(MOEntities.FAILED_CHICKEN.get()));
+            p -> new net.minecraft.world.item.SpawnEggItem(MOEntities.FAILED_CHICKEN.get(), p), p -> p);
     public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> FAILED_SHEEP_SPAWN_EGG = item("failed_sheep_spawn_egg",
-            net.minecraft.world.item.SpawnEggItem::new, p -> p.spawnEgg(MOEntities.FAILED_SHEEP.get()));
+            p -> new net.minecraft.world.item.SpawnEggItem(MOEntities.FAILED_SHEEP.get(), p), p -> p);
 
     public static final DeferredItem<AndroidPillItem> ANDROID_PILL_YELLOW = item("android_pill_yellow", p -> new AndroidPillItem(AndroidPillItem.Type.YELLOW, p), p -> p);
 
@@ -263,7 +263,8 @@ public final class MOItems {
     }
 
     private static <I extends Item> DeferredItem<I> item(String name, Function<Item.Properties, I> factory, UnaryOperator<Item.Properties> props) {
-        DeferredItem<I> item = ITEMS.registerItem(name, factory, props);
+        // the properties are built at registration (tool / armour properties look up registries)
+        DeferredItem<I> item = ITEMS.registerItem(name, p -> factory.apply(props.apply(p)));
         TAB_ORDER.add(item);
         return item;
     }
@@ -275,8 +276,8 @@ public final class MOItems {
     private static DeferredItem<BlockItem> block(String name, net.neoforged.neoforge.registries.DeferredBlock<?> block) {
         // machines get 1.7.10 MOMachineBlockItem: "[Configured]", the energy bar and the Shift tooltip
         DeferredItem<BlockItem> item = ITEMS.registerItem(name, props -> block.get() instanceof matteroverdrive.machine.MachineBlock
-                ? new matteroverdrive.machine.MachineBlockItem(block.get(), props) : new BlockItem(block.get(), props),
-                net.minecraft.world.item.Item.Properties::useBlockDescriptionPrefix);
+                ? new matteroverdrive.machine.MachineBlockItem(block.get(), props.useBlockDescriptionPrefix())
+                : new BlockItem(block.get(), props.useBlockDescriptionPrefix()));
         TAB_ORDER.add(item);
         return item;
     }

@@ -6,7 +6,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.SubmitNodeCollector;
+import matteroverdrive.compat.render.SubmitNodeCollector;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 
@@ -54,7 +54,7 @@ public interface HoloSink {
                 pose.pushPose();
                 pose.translate(x + 8, y + 8, 0);
                 pose.scale(16, -16, 16);
-                state.submit(pose, collector, 0xF000F0, net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY, 0);
+                state.render(pose, collector.buffers(), 0xF000F0, net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY);
                 pose.popPose();
             }
         };

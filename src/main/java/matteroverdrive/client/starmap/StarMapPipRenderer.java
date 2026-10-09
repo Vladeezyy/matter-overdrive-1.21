@@ -79,10 +79,9 @@ public class StarMapPipRenderer extends PictureInPictureRenderer<StarMapPipRende
         }
         pose.mulPose(Axis.YP.rotationDegrees(rotation));
         pose.translate(-0.5f, -1.8f, -0.5f);
-        // like GuiEntityRenderer: submit to the feature dispatcher, then render it into this texture
-        var features = mc.gameRenderer.getFeatureRenderDispatcher();
-        var ctx = new StarMapRenderer.Ctx(view, pose, HoloSink.of(features.getSubmitNodeStorage()), mc.font, yaw, pitch, orientation, mc.player, galaxy);
+        var ctx = new StarMapRenderer.Ctx(view, pose, HoloSink.of(new matteroverdrive.compat.render.SubmitNodeCollector(bufferSource)), mc.font,
+                yaw, pitch, orientation, mc.player, galaxy);
         StarMapRenderer.renderHologram(ctx);
-        features.renderAllFeatures();
+        bufferSource.endBatch();
     }
 }

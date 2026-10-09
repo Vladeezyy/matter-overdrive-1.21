@@ -7,12 +7,11 @@ import com.mojang.math.Axis;
 import matteroverdrive.MatterOverdrive;
 import matteroverdrive.block.entity.GravitationalAnomalyBlockEntity;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.SubmitNodeCollector;
+import matteroverdrive.compat.render.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.state.CameraRenderState;
+import matteroverdrive.compat.render.BlockEntityRenderState;
+import matteroverdrive.compat.render.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.AABB;
@@ -24,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
  * 10%), and in front of it a camera-facing plane twice that size with the core and glow textures, turning with the
  * anomaly's strength.
  */
-public class AnomalyRenderer implements BlockEntityRenderer<GravitationalAnomalyBlockEntity, AnomalyRenderer.State> {
+public class AnomalyRenderer implements matteroverdrive.compat.render.StateBlockEntityRenderer<GravitationalAnomalyBlockEntity, AnomalyRenderer.State> {
     private static final ResourceLocation BLACK = tex("black");
     private static final ResourceLocation CORE = tex("gravitational_anomaly_core");
     private static final ResourceLocation GLOW = tex("gravitational_anomaly_glow");
@@ -48,8 +47,8 @@ public class AnomalyRenderer implements BlockEntityRenderer<GravitationalAnomaly
 
     @Override
     public void extractRenderState(GravitationalAnomalyBlockEntity anomaly, State state, float partialTick, Vec3 camera,
-                                   @Nullable ModelFeatureRenderer.CrumblingOverlay crumbling) {
-        BlockEntityRenderer.super.extractRenderState(anomaly, state, partialTick, camera, crumbling);
+                                   @Nullable Object crumbling) {
+        matteroverdrive.compat.render.StateBlockEntityRenderer.super.extractRenderState(anomaly, state, partialTick, camera, crumbling);
         float time = anomaly.getLevel() == null ? 0 : anomaly.getLevel().getGameTime() + partialTick;
         double horizon = anomaly.getEventHorizon();
         state.radius = (float) (horizon * Math.sin(time * 0.2) * 0.1 + horizon * 0.9);

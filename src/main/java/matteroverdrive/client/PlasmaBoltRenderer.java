@@ -6,12 +6,12 @@ import com.mojang.math.Axis;
 
 import matteroverdrive.MatterOverdrive;
 import matteroverdrive.entity.PlasmaBolt;
-import net.minecraft.client.renderer.SubmitNodeCollector;
+import matteroverdrive.compat.render.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.state.CameraRenderState;
+import matteroverdrive.compat.render.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
@@ -21,7 +21,7 @@ import net.minecraft.util.ARGB;
  * 1.7.10 EntityRendererPhaserFire: two crossed, additive quads with PlasmaFire.png, tinted with the bolt's colour,
  * fading out over the bolt's range.
  */
-public class PlasmaBoltRenderer extends EntityRenderer<PlasmaBolt, PlasmaBoltRenderer.State> {
+public class PlasmaBoltRenderer extends matteroverdrive.compat.render.StateEntityRenderer<PlasmaBolt, PlasmaBoltRenderer.State> {
     private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/entity/plasma_fire.png");
 
     public static class State extends EntityRenderState {

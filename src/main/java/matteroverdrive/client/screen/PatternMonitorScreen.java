@@ -13,8 +13,8 @@ import matteroverdrive.menu.PatternMonitorMenu;
 import matteroverdrive.network.PatternRequestPayload;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
+import matteroverdrive.compat.KeyEvent;
+import matteroverdrive.compat.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -122,7 +122,9 @@ public class PatternMonitorScreen extends MachineScreen<PatternMonitorMenu> {
     }
 
     @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, button);
+        boolean doubleClick = false;
         if (menu.page == MachineMenu.Page.HOME) {
             double mx = event.x() - leftPos, my = event.y() - topPos;
             ItemPattern p = patternAt(mx, my);
@@ -147,7 +149,7 @@ public class PatternMonitorScreen extends MachineScreen<PatternMonitorMenu> {
                 return true;
             }
         }
-        return super.mouseClicked(event, doubleClick);
+        return super.mouseClicked(event.x(), event.y(), event.button());
     }
 
     @Override
@@ -158,15 +160,16 @@ public class PatternMonitorScreen extends MachineScreen<PatternMonitorMenu> {
     }
 
     @Override
-    public boolean keyPressed(KeyEvent event) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        KeyEvent event = new KeyEvent(keyCode, scanCode, modifiers);
         if (search.isFocused()) {
             if (event.key() == 256) {          // escape still closes
-                return super.keyPressed(event);
+                return super.keyPressed(event.key(), event.scancode(), event.modifiers());
             }
-            search.keyPressed(event);
+            search.keyPressed(event.key(), event.scancode(), event.modifiers());
             scroll = 0;
             return true;
         }
-        return super.keyPressed(event);
+        return super.keyPressed(event.key(), event.scancode(), event.modifiers());
     }
 }

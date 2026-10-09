@@ -198,10 +198,9 @@ public final class GuideElements {
         if (type.equalsIgnoreCase("rf")) {
             ItemStack stack = shortcodeStack(code);
             if (stack == null) return null;
-            var handler = net.neoforged.neoforge.transfer.access.ItemAccess.forStack(stack)
-                    .getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.ITEM);
+            var handler = stack.getCapability(net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.ITEM);
             if (handler == null) return null;
-            String text = handler.getCapacityAsInt() + " FE";
+            String text = handler.getMaxEnergyStored() + " FE";
             return new Chunk(text, uniWidth(text), null, 0);
         }
         if (type.equalsIgnoreCase("guide")) {

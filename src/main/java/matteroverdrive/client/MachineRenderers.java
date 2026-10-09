@@ -16,15 +16,14 @@ import matteroverdrive.machine.MachineBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.Sheets;
-import net.minecraft.client.renderer.SubmitNodeCollector;
+import matteroverdrive.compat.render.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import matteroverdrive.compat.render.BlockEntityRenderState;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
-import net.minecraft.client.renderer.state.CameraRenderState;
+import matteroverdrive.compat.render.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.ModelDebugName;
 import net.minecraft.core.Direction;
@@ -96,11 +95,11 @@ public final class MachineRenderers {
         int count;
     }
 
-    abstract static class Base<T extends MachineBlockEntity> implements BlockEntityRenderer<T, State> {
+    abstract static class Base<T extends MachineBlockEntity> implements matteroverdrive.compat.render.StateBlockEntityRenderer<T, State> {
         protected final ItemModelResolver items;
 
         Base(BlockEntityRendererProvider.Context context) {
-            this.items = context.itemModelResolver();
+            this.items = context.getItemModelResolver();
         }
 
         @Override
@@ -109,8 +108,8 @@ public final class MachineRenderers {
         }
 
         @Override
-        public void extractRenderState(T machine, State state, float partialTick, Vec3 camera, ModelFeatureRenderer.@Nullable CrumblingOverlay crumbling) {
-            BlockEntityRenderer.super.extractRenderState(machine, state, partialTick, camera, crumbling);
+        public void extractRenderState(T machine, State state, float partialTick, Vec3 camera, @Nullable Object crumbling) {
+            matteroverdrive.compat.render.StateBlockEntityRenderer.super.extractRenderState(machine, state, partialTick, camera, crumbling);
             var blockState = machine.getBlockState();
             state.facing = blockState.hasProperty(MachineBlock.FACING) ? blockState.getValue(MachineBlock.FACING) : Direction.NORTH;
             state.active = blockState.hasProperty(MachineBlock.ACTIVE) && blockState.getValue(MachineBlock.ACTIVE);
@@ -150,7 +149,7 @@ public final class MachineRenderers {
 
         @Override
         public void extractRenderState(PatternStorageBlockEntity storage, State state, float partialTick, Vec3 camera,
-                                       ModelFeatureRenderer.@Nullable CrumblingOverlay crumbling) {
+                                       @Nullable Object crumbling) {
             super.extractRenderState(storage, state, partialTick, camera, crumbling);
             state.drives = new boolean[PatternStorageBlockEntity.DRIVES];
             for (int i = 0; i < state.drives.length; i++) state.drives[i] = !storage.getInventory().getStack(i).isEmpty();
@@ -184,7 +183,7 @@ public final class MachineRenderers {
 
         @Override
         public void extractRenderState(ReplicatorBlockEntity replicator, State state, float partialTick, Vec3 camera,
-                                       ModelFeatureRenderer.@Nullable CrumblingOverlay crumbling) {
+                                       @Nullable Object crumbling) {
             super.extractRenderState(replicator, state, partialTick, camera, crumbling);
             items.updateForTopItem(state.item, replicator.getInventory().getStack(ReplicatorBlockEntity.OUTPUT), ItemDisplayContext.GROUND,
                     replicator.getLevel(), null, (int) state.seed);
@@ -200,7 +199,7 @@ public final class MachineRenderers {
             pose.translate(0.5, 0.25, 0.5);
             // 1.7.10 turned the item 90 degrees in world space (edge-on through a south window): face the window instead
             pose.mulPose(Axis.YP.rotationDegrees(-modelYaw(state.facing)));
-            state.item.submit(pose, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
+            state.item.render(pose, collector.buffers(), state.lightCoords, OverlayTexture.NO_OVERLAY);
             pose.popPose();
         }
     }
@@ -221,7 +220,7 @@ public final class MachineRenderers {
 
         @Override
         public void extractRenderState(InscriberBlockEntity inscriber, State state, float partialTick, Vec3 camera,
-                                       ModelFeatureRenderer.@Nullable CrumblingOverlay crumbling) {
+                                       @Nullable Object crumbling) {
             super.extractRenderState(inscriber, state, partialTick, camera, crumbling);
             ItemStack stack = inscriber.getInventory().getStack(InscriberBlockEntity.MAIN);
             if (stack.isEmpty()) stack = inscriber.getInventory().getStack(InscriberBlockEntity.OUTPUT);
@@ -259,7 +258,7 @@ public final class MachineRenderers {
                 pose.translate(-0.23, 0.69, 0);
                 pose.mulPose(Axis.YP.rotationDegrees(90));
                 pose.mulPose(Axis.XP.rotationDegrees(90));
-                state.item.submit(pose, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
+                state.item.render(pose, collector.buffers(), state.lightCoords, OverlayTexture.NO_OVERLAY);
                 pose.popPose();
             }
             pose.popPose();
@@ -279,11 +278,11 @@ public final class MachineRenderers {
         public Monitor(BlockEntityRendererProvider.Context context, String holo) {
             super(context);
             this.holo = id("textures/block/" + holo + ".png");
-            this.font = context.font();
+            this.font = context.getFont();
         }
 
         @Override
-        public void extractRenderState(T machine, State state, float partialTick, Vec3 camera, ModelFeatureRenderer.@Nullable CrumblingOverlay crumbling) {
+        public void extractRenderState(T machine, State state, float partialTick, Vec3 camera, @Nullable Object crumbling) {
             super.extractRenderState(machine, state, partialTick, camera, crumbling);
             state.count = machine instanceof PatternMonitorBlockEntity monitor ? monitor.getPatternCount() : -1;
         }

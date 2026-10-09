@@ -17,7 +17,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.transfer.energy.EnergyHandlerUtil;
+import matteroverdrive.compat.EnergyHandlerUtil;
 
 /** 1.7.10 TileEntityMachineSolarPanel: up to 16 FE/t in full daylight, pushes up to 512 FE/t to each neighbour. */
 public class SolarPanelBlockEntity extends MachineBlockEntity {
@@ -63,9 +63,9 @@ public class SolarPanelBlockEntity extends MachineBlockEntity {
     private void pushEnergy(Level level) {
         for (Direction dir : Direction.values()) {
             if (energy.getEnergy() <= 0) return;
-            var target = level.getCapability(Capabilities.Energy.BLOCK, getBlockPos().relative(dir), dir.getOpposite());
+            var target = level.getCapability(Capabilities.EnergyStorage.BLOCK, getBlockPos().relative(dir), dir.getOpposite());
             if (target != null) {
-                EnergyHandlerUtil.move(energy, target, MAX_ENERGY_EXTRACT, null);
+                EnergyHandlerUtil.move(energy, target, MAX_ENERGY_EXTRACT);
             }
         }
     }

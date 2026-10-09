@@ -18,12 +18,11 @@ import matteroverdrive.block.entity.GravitationalStabilizerBlockEntity;
 import matteroverdrive.client.starmap.HoloRenderTypes;
 import matteroverdrive.machine.MachineBlock;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.renderer.SubmitNodeCollector;
+import matteroverdrive.compat.render.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.state.CameraRenderState;
+import matteroverdrive.compat.render.BlockEntityRenderState;
+import matteroverdrive.compat.render.CameraRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -38,7 +37,7 @@ import net.minecraft.world.phys.Vec3;
  * runs to the anomaly, glowing motes spiral along it (a 20% chance per tick, 80 ticks to the anomaly; derived from the
  * game time here instead of particle entities) and a holo screen on the back lists the anomaly's numbers.
  */
-public class StabilizerRenderer implements BlockEntityRenderer<GravitationalStabilizerBlockEntity, StabilizerRenderer.State> {
+public class StabilizerRenderer implements matteroverdrive.compat.render.StateBlockEntityRenderer<GravitationalStabilizerBlockEntity, StabilizerRenderer.State> {
     private static final ResourceLocation BEAM = id("textures/fx/physbeam.png");
     private static final ResourceLocation MOTE = id("textures/fx/particles_additive.png");
     private static final ResourceLocation GLOW = id("textures/fx/holo_monitor_glow.png");
@@ -48,7 +47,7 @@ public class StabilizerRenderer implements BlockEntityRenderer<GravitationalStab
     private final Font font;
 
     public StabilizerRenderer(BlockEntityRendererProvider.Context context) {
-        this.font = context.font();
+        this.font = context.getFont();
     }
 
     private static ResourceLocation id(String path) {
@@ -74,8 +73,8 @@ public class StabilizerRenderer implements BlockEntityRenderer<GravitationalStab
 
     @Override
     public void extractRenderState(GravitationalStabilizerBlockEntity stabilizer, State state, float partialTick, Vec3 camera,
-                                   ModelFeatureRenderer.@Nullable CrumblingOverlay crumbling) {
-        BlockEntityRenderer.super.extractRenderState(stabilizer, state, partialTick, camera, crumbling);
+                                   @Nullable Object crumbling) {
+        matteroverdrive.compat.render.StateBlockEntityRenderer.super.extractRenderState(stabilizer, state, partialTick, camera, crumbling);
         var level = stabilizer.getLevel();
         state.target = null;
         state.info = List.of();

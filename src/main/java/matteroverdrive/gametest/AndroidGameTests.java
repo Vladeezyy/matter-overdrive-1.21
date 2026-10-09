@@ -276,10 +276,7 @@ final class AndroidGameTests {
         state.getBlock().setPlacedBy(helper.getLevel(), helper.absolutePos(pos), state, null, ItemStack.EMPTY);
         check(helper, helper.getBlockState(pos.above(2)).is(matteroverdrive.init.MOBlocks.CHARGING_STATION.get()), "no top part");
         var station = helper.getBlockEntity(pos, matteroverdrive.block.entity.ChargingStationBlockEntity.class);
-        try (var tx = net.neoforged.neoforge.transfer.transaction.Transaction.openRoot()) {
-            for (int i = 0; i < 100; i++) station.getEnergyHandler(null).insert(512, tx);
-            tx.commit();
-        }
+        for (int i = 0; i < 100; i++) station.getEnergyHandler(null).receiveEnergy(512, false);
         ServerPlayer player = player(helper);
         Android.setAndroid(player, true);
         Android.extractEnergy(player, 1000, false);

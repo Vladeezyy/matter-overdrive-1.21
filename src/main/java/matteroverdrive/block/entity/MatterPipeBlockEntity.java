@@ -16,8 +16,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
 
 /**
  * A matter pipe segment. Every transfer period it offers its matter to adjacent non-pipe tanks first (machines
@@ -62,15 +60,10 @@ public class MatterPipeBlockEntity extends BlockEntity {
 
     private void offer(Level level, BlockPos other, Direction dir, int amount) {
         if (amount <= 0) return;
-        var target = level.getCapability(Capabilities.Fluid.BLOCK, other, dir.getOpposite());
+        var target = level.getCapability(Capabilities.FluidHandler.BLOCK, other, dir.getOpposite());
         if (target == null) return;
-        try (Transaction tx = Transaction.openRoot()) {
-            int moved = target.insert(FluidResource.of(MOFluids.MATTER_PLASMA.get()), amount, tx);
-            if (moved > 0) {
-                tx.commit();
-                tank.add(-moved);
-            }
-        }
+        int moved = target.fill(new net.neoforged.neoforge.fluids.FluidStack(MOFluids.MATTER_PLASMA.get(), amount), net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
+        if (moved > 0) tank.add(-moved);
     }
 
     @Override

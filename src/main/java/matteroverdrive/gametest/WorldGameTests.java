@@ -91,22 +91,16 @@ final class WorldGameTests {
 
     /** Matter container: holds exactly 32 mB of Matter Plasma through the fluid item capability; the plasma block is a source. */
     private static void matterContainer(GameTestHelper helper) {
-        var plasma = net.neoforged.neoforge.transfer.fluid.FluidResource.of(matteroverdrive.init.MOFluids.MATTER_PLASMA.get());
-        var slots = new net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler(2);
-        slots.set(0, net.neoforged.neoforge.transfer.item.ItemResource.of(matteroverdrive.init.MOItems.MATTER_CONTAINER.get()), 1);
-        var access = net.neoforged.neoforge.transfer.access.ItemAccess.forHandlerIndex(slots, 0);
-        var tank = access.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Fluid.ITEM);
+        var plasma = matteroverdrive.init.MOFluids.MATTER_PLASMA.get();
+        var container = new net.minecraft.world.item.ItemStack(matteroverdrive.init.MOItems.MATTER_CONTAINER.get());
+        var tank = container.getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.ITEM);
         check(helper, tank != null, "no fluid capability");
-        int partial, full;
-        try (var tx = net.neoforged.neoforge.transfer.transaction.Transaction.openRoot()) {
-            partial = tank.insert(0, plasma, 10, tx);
-        }
-        try (var tx = net.neoforged.neoforge.transfer.transaction.Transaction.openRoot()) {
-            full = tank.insert(0, plasma, 100, tx);
-            tx.commit();
-        }
+        var simulate = net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.SIMULATE;
+        var execute = net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE;
+        int partial = tank.fill(new net.neoforged.neoforge.fluids.FluidStack(plasma, 10), simulate);
+        int full = tank.fill(new net.neoforged.neoforge.fluids.FluidStack(plasma, 100), execute);
         check(helper, partial == 0 && full == 32, "inserted " + partial + " / " + full);
-        check(helper, slots.getResource(0).is(matteroverdrive.init.MOItems.MATTER_CONTAINER_FULL.get()), "container not full: " + slots.getResource(0));
+        check(helper, tank.getContainer().is(matteroverdrive.init.MOItems.MATTER_CONTAINER_FULL.get()), "container not full: " + tank.getContainer());
         BlockPos pos = new BlockPos(3, 1, 3);
         helper.setBlock(pos, matteroverdrive.init.MOBlocks.MATTER_PLASMA.get());
         var fluid = helper.getLevel().getFluidState(helper.absolutePos(pos));

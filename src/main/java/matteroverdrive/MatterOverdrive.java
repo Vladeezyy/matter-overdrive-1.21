@@ -57,32 +57,32 @@ public class MatterOverdrive {
     }
 
     private static void registerCapabilities(RegisterCapabilitiesEvent event) {
-        event.registerItem(Capabilities.Fluid.ITEM, (stack, access) -> new matteroverdrive.item.MatterContainerItem.FluidHandler(access),
+        event.registerItem(Capabilities.FluidHandler.ITEM, (stack, ctx) -> new matteroverdrive.item.MatterContainerItem.FluidHandler(stack),
                 MOItems.MATTER_CONTAINER.get(), MOItems.MATTER_CONTAINER_FULL.get());
-        event.registerItem(Capabilities.Energy.ITEM, (stack, access) -> MOItems.PORTABLE_DECOMPOSER.get().createEnergyHandler(access),
+        event.registerItem(Capabilities.EnergyStorage.ITEM, (stack, ctx) -> MOItems.PORTABLE_DECOMPOSER.get().createEnergyHandler(stack),
                 MOItems.PORTABLE_DECOMPOSER.get());
         for (BatteryItem battery : new BatteryItem[] {MOItems.BATTERY.get(), MOItems.HC_BATTERY.get(), MOItems.CREATIVE_BATTERY.get()}) {
-            event.registerItem(Capabilities.Energy.ITEM, (stack, access) -> battery.createEnergyHandler(access), battery);
+            event.registerItem(Capabilities.EnergyStorage.ITEM, (stack, ctx) -> battery.createEnergyHandler(stack), battery);
         }
         for (var weapon : new matteroverdrive.item.weapon.EnergyWeaponItem[] {MOItems.PHASER.get(), MOItems.PHASER_RIFLE.get(), MOItems.PLASMA_SHOTGUN.get(), MOItems.ION_SNIPER.get(), MOItems.OMNI_TOOL.get()}) {
-            event.registerItem(Capabilities.Energy.ITEM, (stack, access) -> weapon.createEnergyHandler(access), weapon);
+            event.registerItem(Capabilities.EnergyStorage.ITEM, (stack, ctx) -> weapon.createEnergyHandler(stack), weapon);
         }
         machine(event, MOBlockEntities.SOLAR_PANEL.get());
         machine(event, MOBlockEntities.CHARGING_STATION.get());
-        event.registerBlockEntity(Capabilities.Item.BLOCK, MOBlockEntities.WEAPON_STATION.get(), (be, side) -> be.getInventory().automation());
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, MOBlockEntities.WEAPON_STATION.get(), (be, side) -> be.getInventory().automation());
         machine(event, MOBlockEntities.INSCRIBER.get());
         machine(event, MOBlockEntities.DECOMPOSER.get());
         machine(event, MOBlockEntities.RECYCLER.get());
         machine(event, MOBlockEntities.ANALYZER.get());
         machine(event, MOBlockEntities.TRANSPORTER.get());
-        event.registerBlockEntity(Capabilities.Item.BLOCK, MOBlockEntities.CONTRACT_MARKET.get(), (be, side) -> be.getInventory().automation());
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, MOBlockEntities.CONTRACT_MARKET.get(), (be, side) -> be.getInventory().automation());
         machine(event, MOBlockEntities.PATTERN_STORAGE.get());
         machine(event, MOBlockEntities.REPLICATOR.get());
-        event.registerBlockEntity(Capabilities.Fluid.BLOCK, MOBlockEntities.MATTER_PIPE.get(), (pipe, side) -> pipe.getTank());
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, MOBlockEntities.MATTER_PIPE.get(), (pipe, side) -> pipe.getTank());
         machine(event, MOBlockEntities.GRAVITATIONAL_STABILIZER.get());
         machine(event, MOBlockEntities.FUSION_REACTOR_CONTROLLER.get());
-        event.registerBlockEntity(Capabilities.Energy.BLOCK, MOBlockEntities.FUSION_REACTOR_IO.get(), (io, side) -> io.getEnergy());
-        event.registerBlockEntity(Capabilities.Fluid.BLOCK, MOBlockEntities.FUSION_REACTOR_IO.get(), (io, side) -> io.getMatter());
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, MOBlockEntities.FUSION_REACTOR_IO.get(), (io, side) -> io.getEnergy());
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, MOBlockEntities.FUSION_REACTOR_IO.get(), (io, side) -> io.getMatter());
     }
 
     private static void registerAttributes(net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent event) {
@@ -105,8 +105,8 @@ public class MatterOverdrive {
     }
 
     private static <T extends MachineBlockEntity> void machine(RegisterCapabilitiesEvent event, BlockEntityType<T> type) {
-        event.registerBlockEntity(Capabilities.Energy.BLOCK, type, MachineBlockEntity::getEnergyHandler);
-        event.registerBlockEntity(Capabilities.Item.BLOCK, type, (be, side) -> be.getInventory().automation());
-        event.registerBlockEntity(Capabilities.Fluid.BLOCK, type, (be, side) -> be.getMatterTank());
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, type, MachineBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, type, (be, side) -> be.getInventory().automation());
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, type, (be, side) -> be.getMatterTank());
     }
 }

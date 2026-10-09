@@ -2,25 +2,25 @@ package matteroverdrive.machine;
 
 import java.util.function.ToDoubleFunction;
 
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import matteroverdrive.init.MOFluids;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.fluid.FluidStacksResourceHandler;
-import net.neoforged.neoforge.transfer.transaction.TransactionContext;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
 /**
  * 1.7.10 MachineMatterStorage: a one-slot tank that only holds Matter Plasma. Capacity scales with MATTER_STORAGE
  * upgrades; maxInsert/maxExtract limit what pipes and neighbours may move (machine logic uses {@link #add}).
  */
-public class MatterTank extends FluidStacksResourceHandler {
+public class MatterTank implements IFluidHandler {
     private final int baseCapacity;
     private final int maxInsert;
     private final int maxExtract;
     private final ToDoubleFunction<UpgradeType> upgrades;
     private final Runnable onChanged;
+    private int matter;
 
     public MatterTank(int capacity, int maxInsert, int maxExtract, ToDoubleFunction<UpgradeType> upgrades, Runnable onChanged) {
-        super(1, capacity);
         this.baseCapacity = capacity;
         this.maxInsert = maxInsert;
         this.maxExtract = maxExtract;
@@ -29,7 +29,7 @@ public class MatterTank extends FluidStacksResourceHandler {
     }
 
     public int getMatter() {
-        return stacks.get(0).getAmount();
+        return matter;
     }
 
     public int getCapacity() {
@@ -54,35 +54,61 @@ public class MatterTank extends FluidStacksResourceHandler {
     }
 
     public void setMatter(int amount) {
-        if (amount <= 0) {
-            set(0, FluidResource.EMPTY, 0);
-        } else {
-            set(0, FluidResource.of(MOFluids.MATTER_PLASMA.get()), amount);
-        }
+        amount = Math.max(0, amount);
+        if (amount == matter) return;
+        matter = amount;
+        onChanged.run();
+    }
+
+    // --- IFluidHandler (pipes and neighbours) ------------------------------------------------------
+
+    @Override
+    public int getTanks() {
+        return 1;
     }
 
     @Override
-    public boolean isValid(int index, FluidResource resource) {
-        return resource.isEmpty() || resource.is(MOFluids.MATTER_PLASMA.get());
+    public FluidStack getFluidInTank(int tank) {
+        return matter <= 0 ? FluidStack.EMPTY : new FluidStack(MOFluids.MATTER_PLASMA.get(), matter);
     }
 
     @Override
-    protected int getCapacity(int index, FluidResource resource) {
+    public int getTankCapacity(int tank) {
         return getCapacity();
     }
 
     @Override
-    public int insert(int index, FluidResource resource, int amount, TransactionContext transaction) {
-        return super.insert(index, resource, Math.min(amount, maxInsert), transaction);
+    public boolean isFluidValid(int tank, FluidStack stack) {
+        return stack.isEmpty() || stack.is(MOFluids.MATTER_PLASMA.get());
     }
 
     @Override
-    public int extract(int index, FluidResource resource, int amount, TransactionContext transaction) {
-        return super.extract(index, resource, Math.min(amount, maxExtract), transaction);
+    public int fill(FluidStack resource, FluidAction action) {
+        if (resource.isEmpty() || !isFluidValid(0, resource)) return 0;
+        int filled = Math.min(Math.min(resource.getAmount(), maxInsert), getFreeSpace());
+        if (filled > 0 && action.execute()) setMatter(matter + filled);
+        return filled;
     }
 
     @Override
-    protected void onContentsChanged(int index, FluidStack previousContents) {
-        onChanged.run();
+    public FluidStack drain(FluidStack resource, FluidAction action) {
+        if (resource.isEmpty() || !resource.is(MOFluids.MATTER_PLASMA.get())) return FluidStack.EMPTY;
+        return drain(resource.getAmount(), action);
+    }
+
+    @Override
+    public FluidStack drain(int maxDrain, FluidAction action) {
+        int drained = Math.min(Math.min(maxDrain, maxExtract), matter);
+        if (drained <= 0) return FluidStack.EMPTY;
+        if (action.execute()) setMatter(matter - drained);
+        return new FluidStack(MOFluids.MATTER_PLASMA.get(), drained);
+    }
+
+    public void serialize(ValueOutput output) {
+        output.putInt("matter", matter);
+    }
+
+    public void deserialize(ValueInput input) {
+        matter = Math.max(0, input.getIntOr("matter", 0));
     }
 }

@@ -45,7 +45,7 @@ public class AnalyzerBlockEntity extends MachineBlockEntity {
 
     private static MachineInventory.Builder slots() {
         MachineInventory.Builder b = MachineInventory.builder();
-        b.add(MachineInventory.Role.INPUT, r -> MatterHelper.hasMatter(r.toStack()));
+        b.add(MachineInventory.Role.INPUT, r -> MatterHelper.hasMatter(r));
         b.add(MachineInventory.Role.OTHER, r -> r.getItem() instanceof PatternDriveItem || r.getItem() instanceof MatterScannerItem, 1);
         return b;
     }

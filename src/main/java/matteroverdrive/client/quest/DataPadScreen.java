@@ -17,9 +17,9 @@ import matteroverdrive.quest.QuestStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.input.KeyEvent;
+import matteroverdrive.compat.KeyEvent;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.MouseButtonEvent;
+import matteroverdrive.compat.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -416,7 +416,9 @@ public class DataPadScreen extends Screen {
     }
 
     @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, button);
+        boolean doubleClick = false;
         double mx = event.x() - left, my = event.y() - top;
         if (in(mx, my, WIDTH - 32, 20, 9, 9)) {
             onClose();
@@ -449,7 +451,7 @@ public class DataPadScreen extends Screen {
                 lastDragY = event.y();
                 search.setFocused(false);
             }
-            return super.mouseClicked(event, doubleClick);
+            return super.mouseClicked(event.x(), event.y(), event.button());
         }
         if (state.page() == DataPadItem.State.PAGE_DESCRIPTION) {
             for (GuideElement.Link link : List.copyOf(links)) {
@@ -472,7 +474,7 @@ public class DataPadScreen extends Screen {
                 goBack();
                 return true;
             }
-            return super.mouseClicked(event, doubleClick);
+            return super.mouseClicked(event.x(), event.y(), event.button());
         }
         List<QuestStack> quests = quests();
         if (in(mx, my, LIST_X, LIST_Y, LIST_W, ROWS * ROW)) {
@@ -490,11 +492,12 @@ public class DataPadScreen extends Screen {
             setState(state.withQuest(0, 0));
             return true;
         }
-        return super.mouseClicked(event, doubleClick);
+        return super.mouseClicked(event.x(), event.y(), event.button());
     }
 
     @Override
-    public boolean mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, button);
         if (dragging && state.page() == DataPadItem.State.PAGE_ENTRIES) {
             entriesScrollX += (int) (event.x() - lastDragX);
             entriesScrollY += (int) (event.y() - lastDragY);
@@ -505,22 +508,24 @@ public class DataPadScreen extends Screen {
             clampEntriesScroll(inner);
             return true;
         }
-        return super.mouseDragged(event, dragX, dragY);
+        return super.mouseDragged(event.x(), event.y(), event.button(), dragX, dragY);
     }
 
     @Override
-    public boolean mouseReleased(MouseButtonEvent event) {
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, button);
         dragging = false;
-        return super.mouseReleased(event);
+        return super.mouseReleased(event.x(), event.y(), event.button());
     }
 
     @Override
-    public boolean keyPressed(KeyEvent event) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        KeyEvent event = new KeyEvent(keyCode, scanCode, modifiers);
         if (search.isFocused() && event.key() != 256) {
-            search.keyPressed(event);
+            search.keyPressed(event.key(), event.scancode(), event.modifiers());
             return true;
         }
-        return super.keyPressed(event);
+        return super.keyPressed(event.key(), event.scancode(), event.modifiers());
     }
 
     @Override

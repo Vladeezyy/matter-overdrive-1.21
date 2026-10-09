@@ -23,9 +23,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.energy.EnergyHandler;
-import net.neoforged.neoforge.transfer.energy.EnergyHandlerUtil;
+import net.neoforged.neoforge.energy.IEnergyStorage;
+import matteroverdrive.compat.EnergyHandlerUtil;
 
 /**
  * Base of every powered Matter Overdrive machine (1.7.10 MOTileEntityMachine + MOTileEntityMachineEnergy):
@@ -57,7 +56,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
                                  Set<UpgradeType> affectedBy) {
         super(type, pos, state);
         this.affectedBy = affectedBy.isEmpty() ? EnumSet.noneOf(UpgradeType.class) : EnumSet.copyOf(affectedBy);
-        this.batterySlot = batterySlot ? slots.add(MachineInventory.Role.ENERGY, r -> ItemAccess.forStack(r.toStack()).getCapability(Capabilities.Energy.ITEM) != null, 1) : -1;
+        this.batterySlot = batterySlot ? slots.add(MachineInventory.Role.ENERGY, r -> r.getCapability(Capabilities.EnergyStorage.ITEM) != null, 1) : -1;
         for (int i = 0; i < upgradeSlots; i++) {
             slots.add(MachineInventory.Role.UPGRADE, r -> r.getItem() instanceof UpgradeItem, 1);
         }
@@ -123,11 +122,11 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
         if (batterySlot < 0) return;
         ItemStack stack = inventory.getStack(batterySlot);
         if (stack.isEmpty()) return;
-        EnergyHandler battery = ItemAccess.forHandlerIndex(inventory, batterySlot).getCapability(Capabilities.Energy.ITEM);
+        IEnergyStorage battery = stack.getCapability(Capabilities.EnergyStorage.ITEM);
         if (batteryChargesItem()) {
-            EnergyHandlerUtil.move(energy, battery, Integer.MAX_VALUE, null);
+            EnergyHandlerUtil.move(energy, battery, Integer.MAX_VALUE);
         } else {
-            EnergyHandlerUtil.move(battery, energy, Integer.MAX_VALUE, null);
+            EnergyHandlerUtil.move(battery, energy, Integer.MAX_VALUE);
         }
     }
 
@@ -190,7 +189,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
     }
 
     /** Energy capability for a side; null side means internal access. */
-    public @Nullable EnergyHandler getEnergyHandler(@Nullable net.minecraft.core.Direction side) {
+    public @Nullable IEnergyStorage getEnergyHandler(@Nullable net.minecraft.core.Direction side) {
         return energy;
     }
 

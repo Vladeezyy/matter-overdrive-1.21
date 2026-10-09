@@ -14,8 +14,7 @@ import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.entity.ArmorModelSet;
+import matteroverdrive.compat.render.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
@@ -83,8 +82,8 @@ public class RogueAndroidRenderer<T extends RogueAndroid> extends HumanoidMobRen
     private RogueAndroidRenderer(EntityRendererProvider.Context context, ModelLayerLocation layer, boolean ranged) {
         super(context, new HumanoidModel<>(context.bakeLayer(layer)), 0.5f);
         this.ranged = ranged;
-        addLayer(new HumanoidArmorLayer<>(this, ArmorModelSet.bake(ModelLayers.ZOMBIE_ARMOR, context.getModelSet(), HumanoidModel::new),
-                context.getEquipmentRenderer()));
+        addLayer(new HumanoidArmorLayer<>(this, new HumanoidModel<>(context.bakeLayer(ModelLayers.ZOMBIE_INNER_ARMOR)),
+                new HumanoidModel<>(context.bakeLayer(ModelLayers.ZOMBIE_OUTER_ARMOR)), context.getEquipmentRenderer()));
         if (ranged) addLayer(new VisorLayer(this, new HumanoidModel<>(context.bakeLayer(VISOR))));
     }
 
@@ -127,9 +126,10 @@ public class RogueAndroidRenderer<T extends RogueAndroid> extends HumanoidMobRen
         }
 
         @Override
-        public void submit(PoseStack pose, SubmitNodeCollector collector, int light, State state, float yRot, float xRot) {
-            collector.order(1).submitModel(visor, state, pose, RenderType.entityTranslucentEmissive(RANGED_TEXTURE), 0xF000F0,
-                    OverlayTexture.NO_OVERLAY, ARGB.color(255, state.visorColor), null, state.outlineColor, null);
+        public void render(PoseStack pose, net.minecraft.client.renderer.MultiBufferSource buffers, int light, State state, float yRot, float xRot) {
+            visor.setupAnim(state);
+            visor.renderToBuffer(pose, buffers.getBuffer(RenderType.entityTranslucentEmissive(RANGED_TEXTURE)), 0xF000F0,
+                    OverlayTexture.NO_OVERLAY, ARGB.color(255, state.visorColor));
         }
     }
 }

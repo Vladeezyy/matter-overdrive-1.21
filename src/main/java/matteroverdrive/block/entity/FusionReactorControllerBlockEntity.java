@@ -23,7 +23,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.transfer.energy.EnergyHandlerUtil;
+import matteroverdrive.compat.EnergyHandlerUtil;
 
 /**
  * 1.7.10 TileEntityMachineFusionReactorController. The reactor is a ring of 28 blocks behind the controller around
@@ -114,8 +114,8 @@ public class FusionReactorControllerBlockEntity extends MachineBlockEntity {
             if (energy.getEnergy() <= 0) return;
             BlockPos to = from.relative(dir);
             if (to.equals(getBlockPos()) || ioPorts.contains(to)) continue;
-            var target = level.getCapability(Capabilities.Energy.BLOCK, to, dir.getOpposite());
-            if (target != null) EnergyHandlerUtil.move(energy, target, energy.getEnergy(), null);
+            var target = level.getCapability(Capabilities.EnergyStorage.BLOCK, to, dir.getOpposite());
+            if (target != null) EnergyHandlerUtil.move(energy, target, energy.getEnergy());
         }
     }
 

@@ -12,7 +12,6 @@ import matteroverdrive.machine.MachineInventory;
 import matteroverdrive.matter.MatterRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
@@ -125,9 +124,9 @@ final class MatterGameTests {
     private static void decomposerRejects(GameTestHelper helper) {
         DecomposerBlockEntity d = decomposer(helper, A);
         var inv = d.getInventory();
-        helper.assertFalse(inv.isValid(DecomposerBlockEntity.INPUT, ItemResource.of(Items.DRAGON_EGG)), Component.literal("accepts dragon egg"));
-        helper.assertFalse(inv.isValid(DecomposerBlockEntity.INPUT, ItemResource.of(MOItems.MATTER_DUST.get())), Component.literal("accepts unrefined dust"));
-        helper.assertTrue(inv.isValid(DecomposerBlockEntity.INPUT, ItemResource.of(Items.DIAMOND)), Component.literal("rejects diamond"));
+        helper.assertFalse(inv.isValid(DecomposerBlockEntity.INPUT, new ItemStack(Items.DRAGON_EGG)), Component.literal("accepts dragon egg"));
+        helper.assertFalse(inv.isValid(DecomposerBlockEntity.INPUT, new ItemStack(MOItems.MATTER_DUST.get())), Component.literal("accepts unrefined dust"));
+        helper.assertTrue(inv.isValid(DecomposerBlockEntity.INPUT, new ItemStack(Items.DIAMOND)), Component.literal("rejects diamond"));
         helper.succeed();
     }
 

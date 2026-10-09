@@ -15,11 +15,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.energy.EnergyHandler;
-import net.neoforged.neoforge.transfer.energy.ItemAccessEnergyHandler;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.neoforged.neoforge.energy.IEnergyStorage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,8 +36,8 @@ public class PortableDecomposerItem extends Item {
         super(properties.stacksTo(1));
     }
 
-    public EnergyHandler createEnergyHandler(ItemAccess access) {
-        return new ItemAccessEnergyHandler(access, MODataComponents.ENERGY.get(), CAPACITY, CHARGE_RATE, 0);
+    public IEnergyStorage createEnergyHandler(ItemStack stack) {
+        return new net.neoforged.neoforge.energy.ComponentEnergyStorage(stack, MODataComponents.ENERGY.get(), CAPACITY, CHARGE_RATE, 0);
     }
 
     public static int getEnergy(ItemStack stack) {
@@ -84,17 +80,14 @@ public class PortableDecomposerItem extends Item {
     /** 1.7.10 onItemUse: fills the clicked block's fluid tank with the stored matter. */
     @Override
     public InteractionResult useOn(UseOnContext context) {
-        var tank = context.getLevel().getCapability(Capabilities.Fluid.BLOCK, context.getClickedPos(), context.getClickedFace());
+        var tank = context.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, context.getClickedPos(), context.getClickedFace());
         if (tank == null) return InteractionResult.PASS;
         if (context.getLevel().isClientSide()) return InteractionResult.SUCCESS;
         ItemStack decomposer = context.getItemInHand();
         int amount = (int) getMatter(decomposer);
         int filled = 0;
         if (amount > 0) {
-            try (var tx = Transaction.openRoot()) {
-                filled = tank.insert(FluidResource.of(MOFluids.MATTER_PLASMA.get()), amount, tx);
-                tx.commit();
-            }
+            filled = tank.fill(new net.neoforged.neoforge.fluids.FluidStack(MOFluids.MATTER_PLASMA.get(), amount), net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
         }
         decomposer.set(MODataComponents.STORED_MATTER.get(), (float) Math.max(0, amount - filled));
         return InteractionResult.SUCCESS;

@@ -11,8 +11,8 @@ import matteroverdrive.android.BioticStats;
 import matteroverdrive.network.AndroidPayloads;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
+import matteroverdrive.compat.KeyEvent;
+import matteroverdrive.compat.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -101,16 +101,19 @@ public class AbilityWheelScreen extends Screen {
     }
 
     @Override
-    public boolean keyReleased(KeyEvent event) {
-        if (AndroidKeys.ABILITY_SWITCH.matches(event)) {
+    public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
+        KeyEvent event = new KeyEvent(keyCode, scanCode, modifiers);
+        if (AndroidKeys.ABILITY_SWITCH.matches(event.key(), event.scancode())) {
             choose();
             return true;
         }
-        return super.keyReleased(event);
+        return super.keyReleased(event.key(), event.scancode(), event.modifiers());
     }
 
     @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, button);
+        boolean doubleClick = false;
         choose();
         return true;
     }

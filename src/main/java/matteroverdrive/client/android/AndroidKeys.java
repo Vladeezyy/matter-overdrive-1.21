@@ -35,14 +35,14 @@ import net.neoforged.neoforge.client.network.ClientPacketDistributor;
  */
 @EventBusSubscriber(modid = MatterOverdrive.MODID, value = Dist.CLIENT)
 public final class AndroidKeys {
-    public static final KeyMapping.Category CATEGORY = new KeyMapping.Category(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "android"));
+    /** Before 1.21.9 key categories are translation keys (the same one the 1.21.9+ KeyMapping.Category uses). */
+    public static final String CATEGORY = "key.category." + MatterOverdrive.MODID + ".android";
     public static final KeyMapping ABILITY_USE = new KeyMapping("key." + MatterOverdrive.MODID + ".ability_use", GLFW.GLFW_KEY_X, CATEGORY);
     public static final KeyMapping ABILITY_SWITCH = new KeyMapping("key." + MatterOverdrive.MODID + ".ability_switch", GLFW.GLFW_KEY_TAB, CATEGORY);
     private static boolean teleportHeld;
 
     @SubscribeEvent
     static void registerKeys(RegisterKeyMappingsEvent event) {
-        event.registerCategory(CATEGORY);
         event.register(ABILITY_USE);
         event.register(ABILITY_SWITCH);
         AndroidClientHooks.abilityKeyName = () -> ABILITY_USE.getTranslatedKeyMessage().getString();

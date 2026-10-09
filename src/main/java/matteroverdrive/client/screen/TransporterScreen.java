@@ -9,8 +9,8 @@ import matteroverdrive.network.TransporterPayload;
 import matteroverdrive.transport.TransportLocation;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
+import matteroverdrive.compat.KeyEvent;
+import matteroverdrive.compat.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -181,7 +181,9 @@ public class TransporterScreen extends MachineScreen<TransporterMenu> {
     }
 
     @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, button);
+        boolean doubleClick = false;
         if (menu.page == MachineMenu.Page.HOME) {
             double mx = event.x() - leftPos, my = event.y() - topPos;
             List<TransportLocation> locations = machine().getLocations();
@@ -207,7 +209,7 @@ public class TransporterScreen extends MachineScreen<TransporterMenu> {
                 return true;
             }
         }
-        return super.mouseClicked(event, doubleClick);
+        return super.mouseClicked(event.x(), event.y(), event.button());
     }
 
     @Override
@@ -217,13 +219,14 @@ public class TransporterScreen extends MachineScreen<TransporterMenu> {
     }
 
     @Override
-    public boolean keyPressed(KeyEvent event) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        KeyEvent event = new KeyEvent(keyCode, scanCode, modifiers);
         for (EditBox box : List.of(name, coords[0], coords[1], coords[2])) {
             if (box.isFocused() && event.key() != 256) {
-                box.keyPressed(event);
+                box.keyPressed(event.key(), event.scancode(), event.modifiers());
                 return true;
             }
         }
-        return super.keyPressed(event);
+        return super.keyPressed(event.key(), event.scancode(), event.modifiers());
     }
 }

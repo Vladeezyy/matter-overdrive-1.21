@@ -98,7 +98,7 @@ public final class TritaniumArmorModel {
     };
 
     @net.neoforged.bus.api.SubscribeEvent
-    static void hideSkinOverlay(net.neoforged.neoforge.client.event.RenderPlayerEvent.Pre<?> event) {
+    static void hideSkinOverlay(net.neoforged.neoforge.client.event.RenderPlayerEvent.Pre event) {
         var state = event.getRenderState();
         if (isTritanium(state.headEquipment)) state.showHat = false;
         if (isTritanium(state.chestEquipment)) {
