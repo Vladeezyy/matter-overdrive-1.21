@@ -15,7 +15,6 @@ import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 
 /**
@@ -33,10 +32,10 @@ public class AndroidPillItem extends Item {
     }
 
     @Override
-    public InteractionResult use(Level level, Player player, InteractionHand hand) {
+    public net.minecraft.world.InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         AndroidData data = Android.get(player);
         boolean allowed = type == Type.RED ? !data.isAndroid() && !data.isTurning() : data.isAndroid() && !data.isTurning();
-        return allowed ? super.use(level, player, hand) : InteractionResult.FAIL;
+        return allowed ? super.use(level, player, hand) : net.minecraft.world.InteractionResultHolder.fail(player.getItemInHand(hand));
     }
 
     @Override
@@ -56,7 +55,8 @@ public class AndroidPillItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+        Consumer<Component> tooltip = tooltipLines::add;
         tooltip.accept(Component.translatable(getDescriptionId() + ".details").withStyle(ChatFormatting.GRAY));
     }
 }

@@ -19,7 +19,7 @@ public record ItemPattern(Holder<Item> item, int progress) {
     public static final int MAX_PROGRESS = 100;
 
     public static final Codec<ItemPattern> CODEC = RecordCodecBuilder.create(i -> i.group(
-            Item.CODEC.fieldOf("item").forGetter(ItemPattern::item),
+            net.minecraft.core.registries.BuiltInRegistries.ITEM.holderByNameCodec().fieldOf("item").forGetter(ItemPattern::item),
             Codec.intRange(0, MAX_PROGRESS).fieldOf("progress").forGetter(ItemPattern::progress)
     ).apply(i, ItemPattern::new));
 

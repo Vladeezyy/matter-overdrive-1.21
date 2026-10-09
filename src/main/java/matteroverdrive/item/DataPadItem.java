@@ -25,9 +25,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemUseAnimation;
+import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -72,7 +71,7 @@ public class DataPadItem extends Item {
                 Codec.INT.optionalFieldOf("guide_page", 0).forGetter(State::guidePage),
                 Codec.INT.optionalFieldOf("ordering", 2).forGetter(State::ordering),
                 Codec.STRING.optionalFieldOf("category", "general").forGetter(State::category)).apply(i, State::new));
-        public static final StreamCodec<RegistryFriendlyByteBuf, State> STREAM_CODEC = StreamCodec.composite(
+        public static final StreamCodec<RegistryFriendlyByteBuf, State> STREAM_CODEC = net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs.composite(
                 ByteBufCodecs.VAR_INT, State::page, ByteBufCodecs.VAR_INT, State::selectedQuest, ByteBufCodecs.VAR_INT, State::scroll,
                 ByteBufCodecs.stringUtf8(128), State::guide, ByteBufCodecs.VAR_INT, State::guidePage, ByteBufCodecs.VAR_INT, State::ordering,
                 ByteBufCodecs.stringUtf8(64), State::category, State::new);
@@ -122,9 +121,9 @@ public class DataPadItem extends Item {
     }
 
     @Override
-    public InteractionResult use(Level level, Player player, InteractionHand hand) {
+    public net.minecraft.world.InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         if (level.isClientSide() && hasGui(player.getItemInHand(hand))) openScreen.accept(hand);
-        return InteractionResult.SUCCESS;
+        return net.minecraft.world.InteractionResultHolder.success(player.getItemInHand(hand));
     }
 
     @Override
@@ -143,8 +142,8 @@ public class DataPadItem extends Item {
     }
 
     @Override
-    public ItemUseAnimation getUseAnimation(ItemStack stack) {
-        return ItemUseAnimation.BLOCK;
+    public UseAnim getUseAnimation(ItemStack stack) {
+        return UseAnim.BLOCK;
     }
 
     /** 1.7.10 onUsingTick: looking away (or at nothing) stops the scan. */
@@ -171,7 +170,8 @@ public class DataPadItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+        Consumer<Component> tooltip = tooltipLines::add;
         tooltip.accept(Component.translatable("item.matteroverdrive.data_pad.details").withStyle(net.minecraft.ChatFormatting.GRAY));
     }
 }

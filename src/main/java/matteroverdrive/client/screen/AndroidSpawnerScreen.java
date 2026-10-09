@@ -9,13 +9,12 @@ import matteroverdrive.menu.MachineMenu;
 import matteroverdrive.network.AndroidSpawnerPayload;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.RenderPipelines;
+import matteroverdrive.compat.KeyEvent;
+import matteroverdrive.compat.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
  * 1.7.10 GuiAndroidSpawner: flash drive slots for the path, "Kill All", spawned/max and the time to the next spawn; the
@@ -83,7 +82,7 @@ public class AndroidSpawnerScreen extends MachineScreen<AndroidSpawnerMenu> {
     private void edited() {
         if (updating) return;
         try {
-            ClientPacketDistributor.sendToServer(new AndroidSpawnerPayload(menu.containerId, Integer.parseInt(fields[0].getValue()),
+            PacketDistributor.sendToServer(new AndroidSpawnerPayload(menu.containerId, Integer.parseInt(fields[0].getValue()),
                     Integer.parseInt(fields[1].getValue()), Integer.parseInt(fields[2].getValue()), fields[3].getValue()));
         } catch (NumberFormatException ignored) {
         }
@@ -100,7 +99,7 @@ public class AndroidSpawnerScreen extends MachineScreen<AndroidSpawnerMenu> {
     @Override
     protected void renderHome(GuiGraphics g, int x, int y, int mx, int my) {
         boolean over = in(mx, my, KILL_ALL[0], KILL_ALL[1], KILL_ALL[2], KILL_ALL[3]);
-        g.blitSprite(RenderPipelines.GUI_TEXTURED, over ? BUTTON_OVER : BUTTON, x + KILL_ALL[0], y + KILL_ALL[1], KILL_ALL[2], KILL_ALL[3]);
+        matteroverdrive.compat.Gui.blitSprite(g, over ? BUTTON_OVER : BUTTON, x + KILL_ALL[0], y + KILL_ALL[1], KILL_ALL[2], KILL_ALL[3]);
         Component kill = Component.translatable("gui.matteroverdrive.android_spawner.kill_all");
         g.drawString(font, kill, x + KILL_ALL[0] + (KILL_ALL[2] - font.width(kill)) / 2, y + KILL_ALL[1] + 6, 0xFFFFFFFF, false);
         g.drawString(font, menu.getSpawnedCount() + "/" + machine().getMaxSpawnAmount(), x + 130, y + 66, COLOR_TEXT, false);
@@ -124,7 +123,7 @@ public class AndroidSpawnerScreen extends MachineScreen<AndroidSpawnerMenu> {
         for (int i = 0; i < fields.length; i++) {
             int fy = y + FIELD_Y + i * ROW;
             g.drawString(font, Component.translatable("gui.matteroverdrive.config." + FIELDS[i]), x + 50, fy + 4, COLOR_TEXT, false);
-            g.blitSprite(RenderPipelines.GUI_TEXTURED, BUTTON_DARK, x + FIELD_X, fy, FIELD_W, 16);
+            matteroverdrive.compat.Gui.blitSprite(g, BUTTON_DARK, x + FIELD_X, fy, FIELD_W, 16);
         }
         if (!machine().isTeamValid()) {
             g.drawString(font, Component.translatable("gui.matteroverdrive.android_spawner.no_team"), x + 50, y + FIELD_Y + 4 * ROW + 2,
@@ -133,23 +132,26 @@ public class AndroidSpawnerScreen extends MachineScreen<AndroidSpawnerMenu> {
     }
 
     @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, button);
+        boolean doubleClick = false;
         double mx = event.x() - leftPos, my = event.y() - topPos;
         if (menu.page == MachineMenu.Page.HOME && in(mx, my, KILL_ALL[0], KILL_ALL[1], KILL_ALL[2], KILL_ALL[3])) {
             minecraft.gameMode.handleInventoryButtonClick(menu.containerId, AndroidSpawnerMenu.BUTTON_KILL_ALL);
             return true;
         }
-        return super.mouseClicked(event, doubleClick);
+        return super.mouseClicked(event.x(), event.y(), event.button());
     }
 
     @Override
-    public boolean keyPressed(KeyEvent event) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        KeyEvent event = new KeyEvent(keyCode, scanCode, modifiers);
         for (EditBox box : List.of(fields)) {
             if (box.isFocused() && event.key() != 256) {
-                box.keyPressed(event);
+                box.keyPressed(event.key(), event.scancode(), event.modifiers());
                 return true;
             }
         }
-        return super.keyPressed(event);
+        return super.keyPressed(event.key(), event.scancode(), event.modifiers());
     }
 }

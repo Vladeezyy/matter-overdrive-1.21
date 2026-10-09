@@ -51,6 +51,11 @@ public class EnergyPackRecipe extends CustomRecipe {
     }
 
     @Override
+    public boolean canCraftInDimensions(int width, int height) {
+        return width * height >= 3;
+    }
+
+    @Override
     public RecipeSerializer<EnergyPackRecipe> getSerializer() {
         return MORecipes.ENERGY_PACK_SERIALIZER.get();
     }

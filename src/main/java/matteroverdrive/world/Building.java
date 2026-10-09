@@ -72,7 +72,7 @@ public enum Building implements StringRepresentable {
             }
             case CARGO_SHIP -> {
                 if (context.random().nextDouble() >= 0.1) return Optional.empty();
-                int shipY = Math.min(y + yOffset, context.heightAccessor().getMaxY() + 1 - 18);
+                int shipY = Math.min(y + yOffset, context.heightAccessor().getMaxBuildHeight() - 1 + 1 - 18);
                 for (int[] c : corners) {
                     if (surface(context, c[0], c[1]) > shipY) return Optional.empty();
                 }

@@ -22,11 +22,11 @@ public class CraftLogic extends RandomItemLogic {
     }
 
     public int getCraftCount(QuestStack stack) {
-        return tag(stack).getIntOr("CraftCount", 0);
+        return tag(stack).getInt("CraftCount");
     }
 
     public int getMaxCraftCount(QuestStack stack) {
-        return getItem(stack).getCount() + tag(stack).getIntOr("MaxCraftCount", 0);
+        return getItem(stack).getCount() + tag(stack).getInt("MaxCraftCount");
     }
 
     private String replace(QuestStack stack, String text) {

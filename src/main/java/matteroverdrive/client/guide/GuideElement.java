@@ -12,7 +12,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FontDescription;
 import net.minecraft.world.item.ItemStack;
 
 /**
@@ -22,7 +21,7 @@ import net.minecraft.world.item.ItemStack;
  */
 public abstract class GuideElement {
     /** 1.7.10 setUnicodeFlag(true) = the uniform font. */
-    public static final FontDescription UNIFORM = new FontDescription.Resource(Minecraft.UNIFORM_FONT);
+    public static final net.minecraft.resources.ResourceLocation UNIFORM = Minecraft.UNIFORM_FONT;
 
     /** A clickable area (link) found while drawing, in screen coordinates. */
     public record Link(int x, int y, int w, int h, Runnable action) {}
@@ -186,11 +185,11 @@ public abstract class GuideElement {
     /** Draws a stack at (x, y) scaled, noting it for the tooltip when hovered. */
     static void drawStack(Context ctx, ItemStack stack, int x, int y, float scale) {
         if (stack == null || stack.isEmpty()) return;
-        ctx.g.pose().pushMatrix();
-        ctx.g.pose().translate(x, y);
-        ctx.g.pose().scale(scale, scale);
+        ctx.g.pose().pushPose();
+        ctx.g.pose().translate(x, y, 0);
+        ctx.g.pose().scale(scale, scale, 1);
         ctx.g.renderItem(stack, 0, 0);
-        ctx.g.pose().popMatrix();
+        ctx.g.pose().popPose();
         int size = (int) (16 * scale);
         if (ctx.mouseX >= x && ctx.mouseX < x + size && ctx.mouseY >= y && ctx.mouseY < y + size) ctx.hovered = stack;
     }

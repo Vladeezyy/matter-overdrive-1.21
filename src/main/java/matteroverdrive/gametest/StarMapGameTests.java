@@ -24,7 +24,7 @@ final class StarMapGameTests {
     }
 
     private static void check(GameTestHelper helper, boolean ok, String message) {
-        helper.assertTrue(ok, Component.literal(message));
+        helper.assertTrue(ok, message);
     }
 
     /** 1.7.10 defaults: 2048-2303 stars in 27 quadrants, 1-3 planets each; the same seed gives the same galaxy; NBT round trip. */
@@ -62,7 +62,7 @@ final class StarMapGameTests {
         Planet home = GalaxyServer.getHomeworld(player);
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, MOBlocks.STAR_MAP.get());
-        var starMap = helper.getBlockEntity(pos, StarMapBlockEntity.class);
+        var starMap = helper.<StarMapBlockEntity>getBlockEntity(pos);
         starMap.onPlaced(player);
         var menu = new matteroverdrive.menu.StarMapMenu(0, player.getInventory(), starMap);
         check(helper, menu.slots.size() == 4 + 36, "slots " + menu.slots.size());
@@ -181,7 +181,7 @@ final class StarMapGameTests {
         }
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, MOBlocks.STAR_MAP.get());
-        var starMap = helper.getBlockEntity(pos, StarMapBlockEntity.class);
+        var starMap = helper.<StarMapBlockEntity>getBlockEntity(pos);
         starMap.onPlaced(player);
         check(helper, starMap.getGalaxyPosition().equals(GalacticPosition.of(home)) && starMap.getDestination().equals(starMap.getGalaxyPosition()),
                 "position " + starMap.getGalaxyPosition());

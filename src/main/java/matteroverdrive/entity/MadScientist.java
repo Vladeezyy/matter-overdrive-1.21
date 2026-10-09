@@ -31,7 +31,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.AgeableMob;
-import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.SpawnGroupData;
@@ -54,8 +54,8 @@ import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.item.trading.MerchantOffers;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
+import matteroverdrive.compat.ValueInput;
+import matteroverdrive.compat.ValueOutput;
 
 /**
  * 1.7.10 EntityVillagerMadScientist (villager profession 666): talking to him opens a conversation instead of trades.
@@ -105,28 +105,30 @@ public class MadScientist extends AbstractVillager implements DialogNpc {
     }
 
     @Override
-    public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason reason,
+    public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason,
                                                   @Nullable SpawnGroupData data) {
         setJunkie(random.nextBoolean());
         return super.finalizeSpawn(level, difficulty, reason, data);
     }
 
     @Override
-    protected void addAdditionalSaveData(ValueOutput output) {
-        super.addAdditionalSaveData(output);
+    public void addAdditionalSaveData(net.minecraft.nbt.CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
+        ValueOutput output = ValueOutput.of(tag, registryAccess());
         output.putBoolean("junkie", isJunkie());
     }
 
     @Override
-    protected void readAdditionalSaveData(ValueInput input) {
-        super.readAdditionalSaveData(input);
+    public void readAdditionalSaveData(net.minecraft.nbt.CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+        ValueInput input = ValueInput.of(tag, registryAccess());
         entityData.set(JUNKIE, input.getBooleanOr("junkie", false));
     }
 
     @Override
     public @Nullable AgeableMob getBreedOffspring(ServerLevel level, AgeableMob other) {
-        MadScientist child = MOEntities.MAD_SCIENTIST.get().create(level, EntitySpawnReason.BREEDING);
-        if (child != null) child.finalizeSpawn(level, level.getCurrentDifficultyAt(blockPosition()), EntitySpawnReason.BREEDING, null);
+        MadScientist child = MOEntities.MAD_SCIENTIST.get().create(level);
+        if (child != null) child.finalizeSpawn(level, level.getCurrentDifficultyAt(blockPosition()), MobSpawnType.BREEDING, null);
         return child;
     }
 
@@ -222,10 +224,10 @@ public class MadScientist extends AbstractVillager implements DialogNpc {
             addEffect(new MobEffectInstance(MobEffects.WITHER, 1000, 1));
             server.playSound(null, getX(), getY(), getZ(), MOSounds.FAILED_ANIMAL_DIE.get(), SoundSource.NEUTRAL, 1, 1);
             discard();
-            var mutant = MOEntities.MUTANT_SCIENTIST.get().create(server, EntitySpawnReason.CONVERSION);
+            var mutant = MOEntities.MUTANT_SCIENTIST.get().create(server);
             if (mutant != null) {
-                mutant.snapTo(getX(), getY(), getZ(), getYRot(), getXRot());
-                mutant.finalizeSpawn(server, server.getCurrentDifficultyAt(blockPosition()), EntitySpawnReason.CONVERSION, null);
+                mutant.moveTo(getX(), getY(), getZ(), getYRot(), getXRot());
+                mutant.finalizeSpawn(server, server.getCurrentDifficultyAt(blockPosition()), MobSpawnType.CONVERSION, null);
                 server.addFreshEntity(mutant);
                 mutant.spawnAnim();
             }

@@ -44,7 +44,7 @@ final class NetworkGameTests {
 
     private static PatternStorageBlockEntity storage(GameTestHelper helper, BlockPos pos, Item patternItem, int progress) {
         helper.setBlock(pos, MOBlocks.PATTERN_STORAGE.get());
-        PatternStorageBlockEntity s = helper.getBlockEntity(pos, PatternStorageBlockEntity.class);
+        PatternStorageBlockEntity s = helper.<PatternStorageBlockEntity>getBlockEntity(pos);
         s.getEnergy().set(1000);
         ItemStack drive = new ItemStack(MOItems.PATTERN_DRIVE.get());
         if (patternItem != null) MOItems.PATTERN_DRIVE.get().addProgress(drive, patternItem, progress);
@@ -63,8 +63,8 @@ final class NetworkGameTests {
         helper.setBlock(new BlockPos(3, 1, 1), MOBlocks.PATTERN_MONITOR.get());
         pipes(helper, 1, 4, 4);
         storage(helper, new BlockPos(5, 1, 1), Items.DIRT, 100);
-        PatternMonitorBlockEntity monitor = helper.getBlockEntity(new BlockPos(3, 1, 1), PatternMonitorBlockEntity.class);
-        helper.assertTrue(monitor.networkPatterns().size() == 2, Component.literal("unfiltered " + monitor.networkPatterns()));
+        PatternMonitorBlockEntity monitor = helper.<PatternMonitorBlockEntity>getBlockEntity(new BlockPos(3, 1, 1));
+        helper.assertTrue(monitor.networkPatterns().size() == 2, "unfiltered " + monitor.networkPatterns());
         // use the drive on the dirt storage (marks it), on a pipe twice (marks and unmarks it)
         ItemStack drive = new ItemStack(MOItems.NETWORK_FLASH_DRIVE.get());
         var player = helper.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
@@ -75,10 +75,10 @@ final class NetworkGameTests {
                     new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(abs), net.minecraft.core.Direction.UP, abs, false)));
         }
         helper.assertTrue(matteroverdrive.item.NetworkFlashDriveItem.getConnections(drive).equals(List.of(helper.absolutePos(new BlockPos(5, 1, 1)))),
-                Component.literal("drive " + matteroverdrive.item.NetworkFlashDriveItem.getConnections(drive)));
+                "drive " + matteroverdrive.item.NetworkFlashDriveItem.getConnections(drive));
         monitor.getInventory().setStack(0, drive);
         List<ItemPattern> seen = monitor.networkPatterns();
-        helper.assertTrue(seen.size() == 1 && seen.get(0).is(Items.DIRT), Component.literal("filtered " + seen));
+        helper.assertTrue(seen.size() == 1 && seen.get(0).is(Items.DIRT), "filtered " + seen);
         helper.succeed();
     }
 
@@ -86,14 +86,14 @@ final class NetworkGameTests {
         helper.setBlock(new BlockPos(1, 1, 1), MOBlocks.ANALYZER.get());
         pipes(helper, 1, 2, 3);
         PatternStorageBlockEntity s = storage(helper, new BlockPos(4, 1, 1), null, 0);
-        AnalyzerBlockEntity a = helper.getBlockEntity(new BlockPos(1, 1, 1), AnalyzerBlockEntity.class);
+        AnalyzerBlockEntity a = helper.<AnalyzerBlockEntity>getBlockEntity(new BlockPos(1, 1, 1));
         upgrades(a, MOItems.UPGRADE_HYPER_SPEED.get(), 2);   // 80 ticks per item
         a.getEnergy().set(a.getEnergy().getCapacity());
         a.getInventory().setStack(AnalyzerBlockEntity.INPUT, new ItemStack(Items.IRON_INGOT));
         helper.runAfterDelay(140, () -> {
             List<ItemPattern> patterns = s.getPatterns();
             helper.assertTrue(patterns.size() == 1 && patterns.get(0).is(Items.IRON_INGOT) && patterns.get(0).progress() == 20,
-                    Component.literal("storage patterns: " + patterns));
+                    "storage patterns: " + patterns);
             helper.succeed();
         });
     }
@@ -107,13 +107,13 @@ final class NetworkGameTests {
         helper.runAfterDelay(5, () -> {
             ItemStack scanner = s.getInventory().getStack(PatternStorageBlockEntity.SCANNER);
             helper.assertTrue(matteroverdrive.item.MatterScannerItem.getDatabase(helper.getLevel(), scanner) == s,
-                    Component.literal("scanner not linked: " + matteroverdrive.item.MatterScannerItem.getLink(scanner)));
+                    "scanner not linked: " + matteroverdrive.item.MatterScannerItem.getLink(scanner));
             var player = helper.makeMockServerPlayerInLevel();
             boolean ok = matteroverdrive.item.MatterScannerItem.scan(helper.getLevel(), scanner, player, helper.absolutePos(target));
             List<ItemPattern> patterns = s.getPatterns();
             helper.assertTrue(ok && helper.getLevel().getBlockState(helper.absolutePos(target)).isAir()
                     && patterns.size() == 1 && patterns.get(0).is(Items.IRON_BLOCK) && patterns.get(0).progress() == 10,
-                    Component.literal("scan " + ok + ", patterns " + patterns));
+                    "scan " + ok + ", patterns " + patterns);
             helper.succeed();
         });
     }
@@ -125,20 +125,20 @@ final class NetworkGameTests {
         helper.setBlock(new BlockPos(3, 1, 1), MOBlocks.PATTERN_MONITOR.get());
         pipes(helper, 1, 4, 4);
         helper.setBlock(new BlockPos(5, 1, 1), MOBlocks.REPLICATOR.get());
-        PatternMonitorBlockEntity monitor = helper.getBlockEntity(new BlockPos(3, 1, 1), PatternMonitorBlockEntity.class);
-        ReplicatorBlockEntity r = helper.getBlockEntity(new BlockPos(5, 1, 1), ReplicatorBlockEntity.class);
+        PatternMonitorBlockEntity monitor = helper.<PatternMonitorBlockEntity>getBlockEntity(new BlockPos(3, 1, 1));
+        ReplicatorBlockEntity r = helper.<ReplicatorBlockEntity>getBlockEntity(new BlockPos(5, 1, 1));
         r.getEnergy().set(r.getEnergy().getCapacity());
         r.getMatterTank().setMatter(10);
         upgrades(r, MOItems.UPGRADE_FAILSAFE.get(), 2);   // 0.5% -> ~0.13% failure per item
         List<ItemPattern> seen = monitor.networkPatterns();
-        helper.assertTrue(seen.size() == 1 && seen.get(0).is(Items.COBBLESTONE), Component.literal("monitor sees " + seen));
+        helper.assertTrue(seen.size() == 1 && seen.get(0).is(Items.COBBLESTONE), "monitor sees " + seen);
         monitor.request(List.of(new Task(seen.get(0), 3)));
         // cobblestone (1 matter): ~60 ticks per item, x1.56 for the fail-safes; dispatch within 20 ticks
         helper.runAfterDelay(350, () -> {
             ItemStack out = r.getInventory().getStack(ReplicatorBlockEntity.OUTPUT);
-            helper.assertTrue(out.is(Items.COBBLESTONE) && out.getCount() == 3, Component.literal("replicated " + out));
-            helper.assertTrue(r.getMatterTank().getMatter() == 7, Component.literal("matter left " + r.getMatterTank().getMatter()));
-            helper.assertTrue(r.isIdle() && monitor.getQueue().isEmpty(), Component.literal("task not finished"));
+            helper.assertTrue(out.is(Items.COBBLESTONE) && out.getCount() == 3, "replicated " + out);
+            helper.assertTrue(r.getMatterTank().getMatter() == 7, "matter left " + r.getMatterTank().getMatter());
+            helper.assertTrue(r.isIdle() && monitor.getQueue().isEmpty(), "task not finished");
             helper.succeed();
         });
     }
@@ -148,19 +148,19 @@ final class NetworkGameTests {
         pipes(helper, 1, 2, 2);
         helper.setBlock(new BlockPos(3, 1, 1), MOBlocks.PATTERN_MONITOR.get());
         helper.setBlock(new BlockPos(5, 1, 1), MOBlocks.REPLICATOR.get());     // gap at x=4
-        PatternMonitorBlockEntity monitor = helper.getBlockEntity(new BlockPos(3, 1, 1), PatternMonitorBlockEntity.class);
+        PatternMonitorBlockEntity monitor = helper.<PatternMonitorBlockEntity>getBlockEntity(new BlockPos(3, 1, 1));
         monitor.request(List.of(new Task(monitor.networkPatterns().get(0), 1)));
         helper.runAfterDelay(45, () -> {
-            helper.assertTrue(helper.getBlockEntity(new BlockPos(5, 1, 1), ReplicatorBlockEntity.class).isIdle(),
-                    Component.literal("task reached an unconnected replicator"));
-            helper.assertTrue(monitor.getQueue().size() == 1, Component.literal("request lost"));
+            helper.assertTrue(helper.<ReplicatorBlockEntity>getBlockEntity(new BlockPos(5, 1, 1)).isIdle(),
+                    "task reached an unconnected replicator");
+            helper.assertTrue(monitor.getQueue().size() == 1, "request lost");
             helper.succeed();
         });
     }
 
     private static void replicatorFailChance(GameTestHelper helper) {
         helper.setBlock(new BlockPos(1, 1, 1), MOBlocks.REPLICATOR.get());
-        ReplicatorBlockEntity r = helper.getBlockEntity(new BlockPos(1, 1, 1), ReplicatorBlockEntity.class);
+        ReplicatorBlockEntity r = helper.<ReplicatorBlockEntity>getBlockEntity(new BlockPos(1, 1, 1));
         var item = Items.DIAMOND.builtInRegistryHolder();
         // 1.7.10: 0.005 * FAIL + (1 - progress) * 0.5 * (1 + FAIL)
         near(helper, r.getFailChance(new ItemPattern(item, 100)), 0.005, "complete pattern");
@@ -171,19 +171,19 @@ final class NetworkGameTests {
     private static void replicatorIrradiates(GameTestHelper helper) {
         storage(helper, new BlockPos(1, 1, 1), Items.COBBLESTONE, 100);
         helper.setBlock(new BlockPos(2, 1, 1), MOBlocks.REPLICATOR.get());
-        ReplicatorBlockEntity r = helper.getBlockEntity(new BlockPos(2, 1, 1), ReplicatorBlockEntity.class);
+        ReplicatorBlockEntity r = helper.<ReplicatorBlockEntity>getBlockEntity(new BlockPos(2, 1, 1));
         r.getEnergy().set(r.getEnergy().getCapacity());
         r.getMatterTank().setMatter(50);
         r.setTask(new Task(new ItemPattern(Items.COBBLESTONE.builtInRegistryHolder(), 100), 10));
         var pig = helper.spawnWithNoFreeWill(EntityType.PIG, new BlockPos(4, 2, 1));
         helper.runAfterDelay(40, () -> {
-            helper.assertTrue(pig.hasEffect(MobEffects.POISON), Component.literal("unshielded replicator didn't irradiate"));
+            helper.assertTrue(pig.hasEffect(MobEffects.POISON), "unshielded replicator didn't irradiate");
             helper.succeed();
         });
     }
 
     private static void near(GameTestHelper helper, double actual, double expected, String what) {
-        helper.assertTrue(Math.abs(actual - expected) < 1e-9, Component.literal(what + ": " + actual + " != " + expected));
+        helper.assertTrue(Math.abs(actual - expected) < 1e-9, what + ": " + actual + " != " + expected);
     }
 
     private NetworkGameTests() {}

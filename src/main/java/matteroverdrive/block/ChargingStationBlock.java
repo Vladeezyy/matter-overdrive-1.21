@@ -14,7 +14,6 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -75,7 +74,7 @@ public class ChargingStationBlock extends MachineBlock {
     public @Nullable BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockPos pos = context.getClickedPos();
         Level level = context.getLevel();
-        if (pos.getY() + 2 > level.getMaxY()) return null;
+        if (pos.getY() + 2 > level.getMaxBuildHeight() - 1) return null;
         for (int i = 1; i <= 2; i++) {
             if (!level.getBlockState(pos.above(i)).canBeReplaced(context)) return null;
         }
@@ -92,14 +91,14 @@ public class ChargingStationBlock extends MachineBlock {
 
     /** Any part without the rest of the station disappears (like a door half). */
     @Override
-    protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos, Direction direction,
-                                     BlockPos neighborPos, BlockState neighbor, RandomSource random) {
+    protected BlockState updateShape(BlockState state, Direction direction, BlockState neighbor, net.minecraft.world.level.LevelAccessor level,
+                                     BlockPos pos, BlockPos neighborPos) {
         int part = state.getValue(PART);
         boolean below = direction == Direction.DOWN && part > 0, above = direction == Direction.UP && part < 2;
         if ((below || above) && !(neighbor.is(this) && neighbor.getValue(PART) == part + (above ? 1 : -1))) {
             return net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
         }
-        return super.updateShape(state, level, ticks, pos, direction, neighborPos, neighbor, random);
+        return super.updateShape(state, direction, neighbor, level, pos, neighborPos);
     }
 
     /** Breaking an upper part breaks the base properly (it holds the machine and drops the item). */

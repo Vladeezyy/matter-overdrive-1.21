@@ -17,7 +17,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.RandomizableContainer;
-import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.ChunkPos;
@@ -54,8 +54,8 @@ public class ImageStructurePiece extends StructurePiece {
 
     public ImageStructurePiece(CompoundTag tag) {
         super(MOStructures.IMAGE_PIECE.get(), tag);
-        this.building = Building.valueOf(tag.getStringOr("Building", "ANDROID_HOUSE"));
-        this.seed = tag.getLongOr("Seed", 0);
+        this.building = Building.valueOf(tag.contains("Building") ? tag.getString("Building") : "ANDROID_HOUSE");
+        this.seed = tag.getLong("Seed");
     }
 
     private static BoundingBox box(Building building, BlockPos origin) {
@@ -149,10 +149,10 @@ public class ImageStructurePiece extends StructurePiece {
     }
 
     private static <T extends Mob> void spawn(WorldGenLevel level, EntityType<T> type, double x, double y, double z, Consumer<T> setup) {
-        T mob = type.create(level.getLevel(), EntitySpawnReason.STRUCTURE);
+        T mob = type.create(level.getLevel());
         if (mob == null) return;
-        mob.snapTo(x, y, z, level.getRandom().nextFloat() * 360, 0);
-        mob.finalizeSpawn(level, level.getCurrentDifficultyAt(mob.blockPosition()), EntitySpawnReason.STRUCTURE, null);
+        mob.moveTo(x, y, z, level.getRandom().nextFloat() * 360, 0);
+        mob.finalizeSpawn(level, level.getCurrentDifficultyAt(mob.blockPosition()), MobSpawnType.STRUCTURE, null);
         setup.accept(mob);
         mob.setPersistenceRequired();
         level.addFreshEntityWithPassengers(mob);

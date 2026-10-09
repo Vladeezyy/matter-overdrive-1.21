@@ -15,7 +15,6 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.PipeBlock;
@@ -81,15 +80,15 @@ public class MatterPipeBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos, Direction dir,
-                                     BlockPos neighborPos, BlockState neighbor, RandomSource random) {
+    protected BlockState updateShape(BlockState state, Direction dir, BlockState neighbor, net.minecraft.world.level.LevelAccessor level,
+                                     BlockPos pos, BlockPos neighborPos) {
         return state.setValue(SIDES.get(dir), connects(level, pos, dir));
     }
 
     private static boolean connects(LevelReader level, BlockPos pos, Direction dir) {
         BlockPos other = pos.relative(dir);
         if (level.getBlockState(other).getBlock() instanceof MatterPipeBlock) return true;
-        return level instanceof Level l && l.getCapability(Capabilities.Fluid.BLOCK, other, dir.getOpposite()) != null;
+        return level instanceof Level l && l.getCapability(Capabilities.FluidHandler.BLOCK, other, dir.getOpposite()) != null;
     }
 
     @Override

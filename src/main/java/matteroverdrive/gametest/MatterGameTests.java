@@ -12,7 +12,6 @@ import matteroverdrive.machine.MachineInventory;
 import matteroverdrive.matter.MatterRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
@@ -47,7 +46,7 @@ final class MatterGameTests {
         expect(helper, server, Items.IRON_NUGGET, Math.round(32 / 9f));
         // returned containers are subtracted: the cake's 3 milk buckets give their buckets back
         int cake = MatterRegistry.get(server, Items.CAKE);
-        helper.assertTrue(cake == 3 * 12 + 2 * 1 + 3 * 1 + 1, Component.literal("cake = " + cake));
+        helper.assertTrue(cake == 3 * 12 + 2 * 1 + 3 * 1 + 1, "cake = " + cake);
         // smelting: the result takes its input's matter
         expect(helper, server, Items.COOKED_BEEF, 2);
         // no base value and no recipe
@@ -62,15 +61,15 @@ final class MatterGameTests {
         // weathering + waxing (block conversions, then the waxing recipe)
         int copper = MatterRegistry.get(server, Items.CHISELED_COPPER);
         helper.assertTrue(copper > 0 && MatterRegistry.get(server, Items.WAXED_OXIDIZED_CHISELED_COPPER) > 0
-                && !estimated.contains(Items.WAXED_OXIDIZED_CHISELED_COPPER), Component.literal("waxed oxidized chiseled copper"));
+                && !estimated.contains(Items.WAXED_OXIDIZED_CHISELED_COPPER), "waxed oxidized chiseled copper");
         // (the stonecutter makes cut copper 4 per block, cheaper than the crafting table: either derivation may win)
         helper.assertTrue(MatterRegistry.get(server, Items.OXIDIZED_CHISELED_COPPER) > 0 && !estimated.contains(Items.OXIDIZED_CHISELED_COPPER),
-                Component.literal("oxidized chiseled copper"));
+                "oxidized chiseled copper");
         // smithing: netherite from ancient debris; stonecutting: polished tuff; concrete from its powder; infested stone
         helper.assertTrue(MatterRegistry.get(server, Items.NETHERITE_INGOT) > 4 * 512 && !estimated.contains(Items.NETHERITE_SWORD)
                 && MatterRegistry.get(server, Items.NETHERITE_SWORD) > MatterRegistry.get(server, Items.DIAMOND_SWORD),
-                Component.literal("netherite " + MatterRegistry.get(server, Items.NETHERITE_INGOT)));
-        helper.assertTrue(MatterRegistry.get(server, Items.POLISHED_TUFF) > 0 && !estimated.contains(Items.POLISHED_TUFF), Component.literal("polished tuff"));
+                "netherite " + MatterRegistry.get(server, Items.NETHERITE_INGOT));
+        helper.assertTrue(MatterRegistry.get(server, Items.POLISHED_TUFF) > 0 && !estimated.contains(Items.POLISHED_TUFF), "polished tuff");
         expect(helper, server, Items.WHITE_CONCRETE, MatterRegistry.get(server, Items.WHITE_CONCRETE_POWDER));
         expect(helper, server, Items.INFESTED_STONE, MatterRegistry.get(server, Items.STONE));
         expect(helper, server, Items.STRIPPED_OAK_LOG, 16);
@@ -80,7 +79,7 @@ final class MatterGameTests {
         }
         // an item no recipe or base value covers gets a "~" estimate
         helper.assertTrue(estimated.contains(Items.SKULL_POTTERY_SHERD) && MatterRegistry.get(server, Items.SKULL_POTTERY_SHERD) > 0,
-                Component.literal("pottery sherd estimate"));
+                "pottery sherd estimate");
         helper.succeed();
     }
 
@@ -89,7 +88,7 @@ final class MatterGameTests {
     /** Two fail-safe upgrades push the 0.5% failure chance down to ~0.03% so the test is deterministic in practice. */
     private static DecomposerBlockEntity decomposer(GameTestHelper helper, BlockPos pos) {
         helper.setBlock(pos, MOBlocks.DECOMPOSER.get());
-        DecomposerBlockEntity d = helper.getBlockEntity(pos, DecomposerBlockEntity.class);
+        DecomposerBlockEntity d = helper.<DecomposerBlockEntity>getBlockEntity(pos);
         d.getEnergy().set(d.getEnergy().getCapacity());
         int placed = 0;
         for (int i = 0; i < d.getInventory().size() && placed < 2; i++) {
@@ -107,16 +106,16 @@ final class MatterGameTests {
         d.getInventory().setStack(DecomposerBlockEntity.INPUT, new ItemStack(Items.COBBLESTONE, 3));
         d.getInventory().setStack(DecomposerBlockEntity.OUTPUT, ItemStack.EMPTY);
         helper.runAfterDelay(300, () -> {
-            helper.assertTrue(d.getInventory().getStack(DecomposerBlockEntity.INPUT).isEmpty(), Component.literal("input not consumed"));
+            helper.assertTrue(d.getInventory().getStack(DecomposerBlockEntity.INPUT).isEmpty(), "input not consumed");
             int matter = d.getMatterTank().getMatter();
             int dust = d.getInventory().getStack(DecomposerBlockEntity.OUTPUT).getCount();
-            helper.assertTrue(matter + dust == 3, Component.literal("matter " + matter + " + failed " + dust + " != 3"));
-            helper.assertTrue(d.getEnergy().getEnergy() < d.getEnergy().getCapacity(), Component.literal("no energy used"));
+            helper.assertTrue(matter + dust == 3, "matter " + matter + " + failed " + dust + " != 3");
+            helper.assertTrue(d.getEnergy().getEnergy() < d.getEnergy().getCapacity(), "no energy used");
             // refined dust decomposes into exactly its own matter (1 here: 60 ticks)
             d.getInventory().setStack(DecomposerBlockEntity.INPUT, MatterDustItem.withMatter(MOItems.MATTER_DUST_REFINED.get(), 1));
             helper.runAfterDelay(90, () -> {
                 int gained = d.getMatterTank().getMatter() - matter;
-                helper.assertTrue(gained == 1, Component.literal("refined dust gave " + gained));
+                helper.assertTrue(gained == 1, "refined dust gave " + gained);
                 helper.succeed();
             });
         });
@@ -125,22 +124,22 @@ final class MatterGameTests {
     private static void decomposerRejects(GameTestHelper helper) {
         DecomposerBlockEntity d = decomposer(helper, A);
         var inv = d.getInventory();
-        helper.assertFalse(inv.isValid(DecomposerBlockEntity.INPUT, ItemResource.of(Items.DRAGON_EGG)), Component.literal("accepts dragon egg"));
-        helper.assertFalse(inv.isValid(DecomposerBlockEntity.INPUT, ItemResource.of(MOItems.MATTER_DUST.get())), Component.literal("accepts unrefined dust"));
-        helper.assertTrue(inv.isValid(DecomposerBlockEntity.INPUT, ItemResource.of(Items.DIAMOND)), Component.literal("rejects diamond"));
+        helper.assertFalse(inv.isValid(DecomposerBlockEntity.INPUT, new ItemStack(Items.DRAGON_EGG)), "accepts dragon egg");
+        helper.assertFalse(inv.isValid(DecomposerBlockEntity.INPUT, new ItemStack(MOItems.MATTER_DUST.get())), "accepts unrefined dust");
+        helper.assertTrue(inv.isValid(DecomposerBlockEntity.INPUT, new ItemStack(Items.DIAMOND)), "rejects diamond");
         helper.succeed();
     }
 
     private static void recyclerRefines(GameTestHelper helper) {
         helper.setBlock(A, MOBlocks.RECYCLER.get());
-        RecyclerBlockEntity r = helper.getBlockEntity(A, RecyclerBlockEntity.class);
+        RecyclerBlockEntity r = helper.<RecyclerBlockEntity>getBlockEntity(A);
         r.getEnergy().set(r.getEnergy().getCapacity());
         // dust with 1 matter: 80 * ln(2)^2 = 38 ticks each
         r.getInventory().setStack(RecyclerBlockEntity.INPUT, MatterDustItem.withMatter(MOItems.MATTER_DUST.get(), 1).copyWithCount(2));
         helper.runAfterDelay(100, () -> {
             ItemStack out = r.getInventory().getStack(RecyclerBlockEntity.OUTPUT);
             helper.assertTrue(out.is(MOItems.MATTER_DUST_REFINED.get()) && out.getCount() == 2 && MatterDustItem.getMatter(out) == 1,
-                    Component.literal("recycler output " + out + " matter " + MatterDustItem.getMatter(out)));
+                    "recycler output " + out + " matter " + MatterDustItem.getMatter(out));
             helper.succeed();
         });
     }
@@ -152,19 +151,19 @@ final class MatterGameTests {
         helper.runAfterDelay(150, () -> {
             int inPipes = 0;
             for (int x = 2; x <= 5; x++) {
-                inPipes += helper.getBlockEntity(new BlockPos(x, 1, 1), MatterPipeBlockEntity.class).getTank().getMatter();
+                inPipes += helper.<MatterPipeBlockEntity>getBlockEntity(new BlockPos(x, 1, 1)).getTank().getMatter();
             }
-            int last = helper.getBlockEntity(new BlockPos(5, 1, 1), MatterPipeBlockEntity.class).getTank().getMatter();
-            helper.assertTrue(last > 0, Component.literal("matter never reached the last pipe"));
+            int last = helper.<MatterPipeBlockEntity>getBlockEntity(new BlockPos(5, 1, 1)).getTank().getMatter();
+            helper.assertTrue(last > 0, "matter never reached the last pipe");
             helper.assertTrue(inPipes + d.getMatterTank().getMatter() == 100,
-                    Component.literal("matter not conserved: pipes " + inPipes + " decomposer " + d.getMatterTank().getMatter()));
+                    "matter not conserved: pipes " + inPipes + " decomposer " + d.getMatterTank().getMatter());
             helper.succeed();
         });
     }
 
     private static void analyzerBuildsPattern(GameTestHelper helper) {
         helper.setBlock(A, MOBlocks.ANALYZER.get());
-        AnalyzerBlockEntity a = helper.getBlockEntity(A, AnalyzerBlockEntity.class);
+        AnalyzerBlockEntity a = helper.<AnalyzerBlockEntity>getBlockEntity(A);
         int placed = 0;
         for (int i = 0; i < a.getInventory().size() && placed < 2; i++) {
             if (a.getInventory().spec(i).role() == MachineInventory.Role.UPGRADE) {
@@ -179,8 +178,8 @@ final class MatterGameTests {
         helper.runAfterDelay(200, () -> {
             var patterns = PatternDriveItem.getPatterns(a.getInventory().getStack(AnalyzerBlockEntity.DATABASE));
             helper.assertTrue(patterns.size() == 1 && patterns.get(0).is(Items.IRON_INGOT) && patterns.get(0).progress() == 40,
-                    Component.literal("patterns after two ingots: " + patterns));
-            helper.assertTrue(a.getInventory().getStack(AnalyzerBlockEntity.INPUT).isEmpty(), Component.literal("ingots not consumed"));
+                    "patterns after two ingots: " + patterns);
+            helper.assertTrue(a.getInventory().getStack(AnalyzerBlockEntity.INPUT).isEmpty(), "ingots not consumed");
             helper.succeed();
         });
     }
@@ -189,17 +188,17 @@ final class MatterGameTests {
         PatternDriveItem item = MOItems.PATTERN_DRIVE.get();
         ItemStack drive = new ItemStack(item);
         for (int i = 0; i < 5; i++) item.addProgress(drive, Items.DIAMOND, AnalyzerBlockEntity.PROGRESS_PER_ITEM);
-        helper.assertTrue(PatternDriveItem.getPatterns(drive).get(0).isComplete(), Component.literal("5 analyses don't complete a pattern"));
-        helper.assertFalse(item.canAccept(drive, Items.DIAMOND), Component.literal("complete pattern still accepts"));
-        helper.assertTrue(item.addProgress(drive, Items.GOLD_INGOT, 20), Component.literal("second pattern rejected"));
-        helper.assertFalse(item.canAccept(drive, Items.EMERALD), Component.literal("drive holds more than 2 patterns"));
-        helper.assertTrue(item.canAccept(drive, Items.GOLD_INGOT), Component.literal("incomplete pattern refuses progress"));
+        helper.assertTrue(PatternDriveItem.getPatterns(drive).get(0).isComplete(), "5 analyses don't complete a pattern");
+        helper.assertFalse(item.canAccept(drive, Items.DIAMOND), "complete pattern still accepts");
+        helper.assertTrue(item.addProgress(drive, Items.GOLD_INGOT, 20), "second pattern rejected");
+        helper.assertFalse(item.canAccept(drive, Items.EMERALD), "drive holds more than 2 patterns");
+        helper.assertTrue(item.canAccept(drive, Items.GOLD_INGOT), "incomplete pattern refuses progress");
         helper.succeed();
     }
 
     private static void expect(GameTestHelper helper, net.minecraft.server.MinecraftServer server, Item item, int value) {
         int actual = MatterRegistry.get(server, item);
-        helper.assertTrue(actual == value, Component.literal(item + " has " + actual + " matter, expected " + value));
+        helper.assertTrue(actual == value, item + " has " + actual + " matter, expected " + value);
     }
 
     private MatterGameTests() {}

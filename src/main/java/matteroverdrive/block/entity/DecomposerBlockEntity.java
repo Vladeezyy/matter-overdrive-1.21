@@ -18,11 +18,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
+import matteroverdrive.compat.ValueInput;
+import matteroverdrive.compat.ValueOutput;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
 
 /**
  * 1.7.10 TileEntityMachineDecomposer: turns an item into its matter (as Matter Plasma) over
@@ -49,7 +47,7 @@ public class DecomposerBlockEntity extends MachineBlockEntity {
 
     private static MachineInventory.Builder slots() {
         MachineInventory.Builder b = MachineInventory.builder();
-        b.add(MachineInventory.Role.INPUT, r -> MatterHelper.hasMatter(r.toStack()));
+        b.add(MachineInventory.Role.INPUT, r -> MatterHelper.hasMatter(r));
         b.add(MachineInventory.Role.OUTPUT, r -> r.is(MOItems.MATTER_DUST.get()));
         return b;
     }
@@ -103,15 +101,10 @@ public class DecomposerBlockEntity extends MachineBlockEntity {
     private void pushMatter() {
         for (Direction dir : Direction.values()) {
             if (matter.getMatter() <= 0) return;
-            var target = getLevel().getCapability(Capabilities.Fluid.BLOCK, getBlockPos().relative(dir), dir.getOpposite());
+            var target = getLevel().getCapability(Capabilities.FluidHandler.BLOCK, getBlockPos().relative(dir), dir.getOpposite());
             if (target == null) continue;
-            try (Transaction tx = Transaction.openRoot()) {
-                int moved = target.insert(FluidResource.of(matteroverdrive.init.MOFluids.MATTER_PLASMA.get()), matter.getMatter(), tx);
-                if (moved > 0) {
-                    tx.commit();
-                    matter.add(-moved);
-                }
-            }
+            int moved = target.fill(new net.neoforged.neoforge.fluids.FluidStack(matteroverdrive.init.MOFluids.MATTER_PLASMA.get(), matter.getMatter()), net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
+            if (moved > 0) matter.add(-moved);
         }
     }
 

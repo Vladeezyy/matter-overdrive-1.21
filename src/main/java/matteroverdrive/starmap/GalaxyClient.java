@@ -9,7 +9,7 @@ import java.util.UUID;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
  * 1.7.10 GalaxyClient: the galaxy as the server sent it (stars without planets; a star's planets are asked for when it's
@@ -58,7 +58,7 @@ public final class GalaxyClient {
         if (star == null || star.getQuadrant() == null) return;
         long key = (long) star.getQuadrant().getId() << 32 | star.getId() & 0xFFFFFFFFL;
         if (requestedStars.add(key)) {
-            ClientPacketDistributor.sendToServer(new StarMapPayloads.StarRequest(star.getQuadrant().getId(), star.getId()));
+            PacketDistributor.sendToServer(new StarMapPayloads.StarRequest(star.getQuadrant().getId(), star.getId()));
         }
     }
 

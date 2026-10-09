@@ -61,7 +61,11 @@ public record GalacticPosition(int quadrantID, int starID, int planetID) {
     }
 
     public static GalacticPosition fromNBT(CompoundTag tag) {
-        return new GalacticPosition(tag.getIntOr("GalacticPositionQuadrant", -1), tag.getIntOr("GalacticPositionStar", -1),
-                tag.getIntOr("GalacticPositionPlanet", -1));
+        return new GalacticPosition(intOr(tag, "GalacticPositionQuadrant"), intOr(tag, "GalacticPositionStar"),
+                intOr(tag, "GalacticPositionPlanet"));
+    }
+
+    private static int intOr(CompoundTag tag, String key) {
+        return tag.contains(key) ? tag.getInt(key) : -1;
     }
 }

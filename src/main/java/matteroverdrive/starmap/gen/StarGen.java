@@ -70,9 +70,10 @@ public class StarGen implements SpaceBodyGen<Star> {
 
     private static String read(String file) {
         try {
-            byte[] bytes = net.neoforged.fml.ModList.get().getModFileById(MatterOverdrive.MODID).getFile().getContents()
-                    .readFile("assets/" + MatterOverdrive.MODID + "/info/" + file);
-            if (bytes == null) return "";
+            java.nio.file.Path path = net.neoforged.fml.ModList.get().getModFileById(MatterOverdrive.MODID).getFile()
+                    .findResource("assets", MatterOverdrive.MODID, "info", file);
+            if (!java.nio.file.Files.exists(path)) return "";
+            byte[] bytes = java.nio.file.Files.readAllBytes(path);
             // 1.7.10 readTextFile joined the lines without separators
             return new String(bytes, StandardCharsets.UTF_8).replace("\r", "").replace("\n", "");
         } catch (java.io.IOException e) {

@@ -18,8 +18,8 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
+import matteroverdrive.compat.ValueInput;
+import matteroverdrive.compat.ValueOutput;
 
 /**
  * 1.7.10 TileEntityInscriber: combines a main and a secondary item using an inscriber recipe.
@@ -83,7 +83,7 @@ public class InscriberBlockEntity extends MachineBlockEntity {
         if (main.isEmpty() || secondary.isEmpty() || !(getLevel() instanceof ServerLevel level)) {
             return Optional.empty();
         }
-        return level.recipeAccess().getRecipeFor(MORecipes.INSCRIBER_TYPE.get(), new InscriberRecipe.Input(main, secondary), level);
+        return level.getRecipeManager().getRecipeFor(MORecipes.INSCRIBER_TYPE.get(), new InscriberRecipe.Input(main, secondary), level);
     }
 
     /** 1.7.10 required an empty output slot; here the result may also stack onto a matching output. */

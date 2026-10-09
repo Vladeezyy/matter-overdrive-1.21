@@ -12,13 +12,10 @@ import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
-import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
-import net.minecraft.client.resources.model.EquipmentClientInfo;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.equipment.Equippable;
-import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 
 /**
@@ -34,9 +31,9 @@ import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
  */
 @net.neoforged.fml.common.EventBusSubscriber(modid = MatterOverdrive.MODID, value = net.neoforged.api.distmarker.Dist.CLIENT)
 public final class TritaniumArmorModel {
-    public static final ResourceLocation LAYER_1 = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/entity/equipment/humanoid/tritanium.png");
-    public static final ResourceLocation LAYER_2 = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/entity/equipment/humanoid_leggings/tritanium.png");
-    private static final Map<EquipmentSlot, HumanoidModel<HumanoidRenderState>> MODELS = new EnumMap<>(EquipmentSlot.class);
+    public static final ResourceLocation LAYER_1 = matteroverdrive.init.MOMaterials.ARMOR_LAYER_1;
+    public static final ResourceLocation LAYER_2 = matteroverdrive.init.MOMaterials.ARMOR_LAYER_2;
+    private static final Map<EquipmentSlot, HumanoidModel<LivingEntity>> MODELS = new EnumMap<>(EquipmentSlot.class);
 
     public static LayerDefinition createLayer(float expand) {
         CubeDeformation d = new CubeDeformation(expand);
@@ -69,9 +66,9 @@ public final class TritaniumArmorModel {
     }
 
     /** The baked model for one slot, with 1.7.10's part visibility. */
-    public static HumanoidModel<HumanoidRenderState> forSlot(EquipmentSlot slot) {
+    public static HumanoidModel<LivingEntity> forSlot(EquipmentSlot slot) {
         return MODELS.computeIfAbsent(slot, s -> {
-            HumanoidModel<HumanoidRenderState> model = new HumanoidModel<>(createLayer(s == EquipmentSlot.FEET ? 0.5f : 0).bakeRoot());
+            HumanoidModel<LivingEntity> model = new HumanoidModel<>(createLayer(s == EquipmentSlot.FEET ? 0.5f : 0).bakeRoot());
             model.setAllVisible(false);
             model.head.visible = s == EquipmentSlot.HEAD;
             model.hat.visible = false;   // 1.7.10 bipedHeadwear.isHidden
@@ -83,43 +80,38 @@ public final class TritaniumArmorModel {
         });
     }
 
-    /** Client extensions of the four tritanium armor pieces. */
+    /** Client extensions of the four tritanium armor pieces (the layer textures: MOItems' armor getArmorTexture). */
     public static final IClientItemExtensions EXTENSIONS = new IClientItemExtensions() {
         @Override
-        public Model getGenericArmorModel(ItemStack stack, EquipmentClientInfo.LayerType layerType, Model original) {
-            // the poses come from the render state in setupAnim; don't copy the vanilla model's visibility
-            return forSlot(slot(stack));
-        }
-
-        @Override
-        public ResourceLocation getArmorTexture(ItemStack stack, EquipmentClientInfo.LayerType type, EquipmentClientInfo.Layer layer, ResourceLocation _default) {
-            return slot(stack) == EquipmentSlot.FEET ? LAYER_2 : LAYER_1;
+        @SuppressWarnings({"unchecked", "rawtypes"})
+        public Model getGenericArmorModel(LivingEntity entity, ItemStack stack, EquipmentSlot slot, HumanoidModel<?> original) {
+            // the poses of the wearer's model; keep this model's own part visibility
+            HumanoidModel model = forSlot(slot);
+            ((HumanoidModel) original).copyPropertiesTo(model);
+            return model;
         }
     };
 
+    /** PlayerRenderer.setModelProperties ran just before this event: hide the skin overlay under the worn pieces. */
     @net.neoforged.bus.api.SubscribeEvent
-    static void hideSkinOverlay(net.neoforged.neoforge.client.event.RenderPlayerEvent.Pre<?> event) {
-        var state = event.getRenderState();
-        if (isTritanium(state.headEquipment)) state.showHat = false;
-        if (isTritanium(state.chestEquipment)) {
-            state.showJacket = false;
-            state.showLeftSleeve = false;
-            state.showRightSleeve = false;
+    static void hideSkinOverlay(net.neoforged.neoforge.client.event.RenderPlayerEvent.Pre event) {
+        var player = event.getEntity();
+        var model = event.getRenderer().getModel();
+        if (isTritanium(player.getItemBySlot(EquipmentSlot.HEAD))) model.hat.visible = false;
+        if (isTritanium(player.getItemBySlot(EquipmentSlot.CHEST))) {
+            model.jacket.visible = false;
+            model.leftSleeve.visible = false;
+            model.rightSleeve.visible = false;
         }
-        if (isTritanium(state.legsEquipment) || isTritanium(state.feetEquipment)) {
-            state.showLeftPants = false;
-            state.showRightPants = false;
+        if (isTritanium(player.getItemBySlot(EquipmentSlot.LEGS)) || isTritanium(player.getItemBySlot(EquipmentSlot.FEET))) {
+            model.leftPants.visible = false;
+            model.rightPants.visible = false;
         }
     }
 
     private static boolean isTritanium(ItemStack stack) {
         return stack.is(matteroverdrive.init.MOItems.TRITANIUM_HELMET.get()) || stack.is(matteroverdrive.init.MOItems.TRITANIUM_CHESTPLATE.get())
                 || stack.is(matteroverdrive.init.MOItems.TRITANIUM_LEGGINGS.get()) || stack.is(matteroverdrive.init.MOItems.TRITANIUM_BOOTS.get());
-    }
-
-    private static EquipmentSlot slot(ItemStack stack) {
-        Equippable equippable = stack.get(DataComponents.EQUIPPABLE);
-        return equippable == null ? EquipmentSlot.CHEST : equippable.slot();
     }
 
     private TritaniumArmorModel() {}

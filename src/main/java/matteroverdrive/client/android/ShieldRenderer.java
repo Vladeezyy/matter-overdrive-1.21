@@ -27,7 +27,7 @@ import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.ARGB;
+import matteroverdrive.compat.ARGB;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
@@ -105,11 +105,12 @@ public final class ShieldRenderer {
     }
 
     @SubscribeEvent
-    static void onRender(RenderLevelStageEvent.AfterEntities event) {
+    static void onRender(RenderLevelStageEvent event) {
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_ENTITIES) return;
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null) return;
-        float partial = mc.getDeltaTracker().getGameTimeDeltaPartialTick(false);
-        Vec3 camera = mc.gameRenderer.getMainCamera().position();
+        float partial = mc.getTimer().getGameTimeDeltaPartialTick(false);
+        Vec3 camera = mc.gameRenderer.getMainCamera().getPosition();
         MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
         PoseStack pose = event.getPoseStack();
         boolean drew = false;

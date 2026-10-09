@@ -23,7 +23,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -31,8 +31,8 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
+import matteroverdrive.compat.ValueInput;
+import matteroverdrive.compat.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.PlayerTeam;
 
@@ -127,19 +127,19 @@ public class AndroidSpawnerBlockEntity extends MachineBlockEntity {
 
     private void spawnOne(ServerLevel server) {
         RogueAndroid android = server.random.nextInt(10) < 3
-                ? MOEntities.ROGUE_ANDROID.get().create(server, EntitySpawnReason.SPAWNER)
-                : MOEntities.RANGED_ROGUE_ANDROID.get().create(server, EntitySpawnReason.SPAWNER);
+                ? MOEntities.ROGUE_ANDROID.get().create(server)
+                : MOEntities.RANGED_ROGUE_ANDROID.get().create(server);
         if (android == null) return;
         BlockPos pos = worldPosition;
         double x = pos.getX() + Mth.clamp(server.random.nextGaussian(), 0, 1) * spawnRange;
         double z = pos.getZ() + Mth.clamp(server.random.nextGaussian(), 0, 1) * spawnRange;
         int topY = Math.min(server.getHeight(Heightmap.Types.MOTION_BLOCKING, Mth.floor(x), Mth.floor(z)), pos.getY() + 3);
-        android.snapTo(x, topY, z, server.random.nextFloat() * 360, 0);
+        android.moveTo(x, topY, z, server.random.nextFloat() * 360, 0);
         // 1.7.10 getCanSpawnHere(true, true, true): not peaceful, no block collision, no liquid
         if (server.getDifficulty() == Difficulty.PEACEFUL || !server.noCollision(android) || server.containsAnyLiquid(android.getBoundingBox())) {
             return;
         }
-        android.finalizeSpawn(server, server.getCurrentDifficultyAt(android.blockPosition()), EntitySpawnReason.SPAWNER, null);
+        android.finalizeSpawn(server, server.getCurrentDifficultyAt(android.blockPosition()), MobSpawnType.SPAWNER, null);
         android.setSpawnerPos(pos);
         android.setPersistenceRequired();
         server.levelEvent(2004, pos, 0);

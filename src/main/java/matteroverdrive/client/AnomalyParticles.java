@@ -4,9 +4,9 @@ import matteroverdrive.MatterOverdrive;
 import matteroverdrive.block.entity.GravitationalAnomalyBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.particle.SingleQuadParticle;
+import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.client.particle.TextureSheetParticle;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.data.AtlasIds;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -39,12 +39,13 @@ public final class AnomalyParticles {
         Minecraft.getInstance().particleEngine.add(new Speck(level, at, centre));
     }
 
-    private static final class Speck extends SingleQuadParticle {
+    private static final class Speck extends TextureSheetParticle {
         private final Vec3 centre;
         private final float baseSize;
 
         Speck(ClientLevel level, Vec3 at, Vec3 centre) {
-            super(level, at.x, at.y, at.z, 0, 0, 0, sprite(7));
+            super(level, at.x, at.y, at.z, 0, 0, 0);
+            setSprite(sprite(7));
             this.centre = centre;
             float grey = (float) (Math.random() * 0.3);
             setColor(grey, grey, grey);
@@ -57,13 +58,13 @@ public final class AnomalyParticles {
         }
 
         private static TextureAtlasSprite sprite(int index) {
-            return Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(AtlasIds.PARTICLES)
-                    .getSprite(ResourceLocation.withDefaultNamespace("generic_" + index));
+            return Minecraft.getInstance().getTextureAtlas(net.minecraft.client.renderer.texture.TextureAtlas.LOCATION_PARTICLES)
+                    .apply(ResourceLocation.withDefaultNamespace("generic_" + index));
         }
 
         @Override
-        protected Layer getLayer() {
-            return Layer.OPAQUE;
+        public ParticleRenderType getRenderType() {
+            return ParticleRenderType.PARTICLE_SHEET_OPAQUE;
         }
 
         /** 1.7.10 renderParticle: full size after the first 32nd of its life. */

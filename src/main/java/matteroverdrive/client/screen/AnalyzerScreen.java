@@ -2,7 +2,6 @@ package matteroverdrive.client.screen;
 
 import matteroverdrive.menu.AnalyzerMenu;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -23,7 +22,7 @@ public class AnalyzerScreen extends MachineScreen<AnalyzerMenu> {
 
     @Override
     protected void renderHome(GuiGraphics g, int x, int y, int mx, int my) {
-        g.blit(RenderPipelines.GUI_TEXTURED, SCREEN, x + SCREEN_X, y + SCREEN_Y, 0, 0, 117, 47, 117, 47);
+        matteroverdrive.compat.Gui.blit(g, SCREEN, x + SCREEN_X, y + SCREEN_Y, 0, 0, 117, 47, 117, 47);
         int filled = Mth.floor(menu.getProgress() * BARS);
         long seed = menu.getMachine().getBlockPos().asLong();
         for (int i = 0; i < filled; i++) {

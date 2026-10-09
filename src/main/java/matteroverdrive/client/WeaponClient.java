@@ -10,7 +10,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.ComputeFovModifierEvent;
 import net.neoforged.neoforge.client.event.InputEvent;
-import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
  * Client side of the energy weapons (1.7.10 ClientWeaponHandler): the attack key fires instead of swinging, and
@@ -32,9 +32,9 @@ public final class WeaponClient {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.screen != null || !mc.options.keyAttack.isDown()) return;
         if (mc.player.getMainHandItem().getItem() instanceof EnergyWeaponItem weapon
-                && !mc.player.getCooldowns().isOnCooldown(mc.player.getMainHandItem())
+                && !mc.player.getCooldowns().isOnCooldown(mc.player.getMainHandItem().getItem())
                 && weapon.canFire(mc.player.getMainHandItem())) {
-            ClientPacketDistributor.sendToServer(new FireWeaponPayload(mc.player.isUsingItem()));
+            PacketDistributor.sendToServer(new FireWeaponPayload(mc.player.isUsingItem()));
         }
     }
 

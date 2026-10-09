@@ -1,20 +1,21 @@
 package matteroverdrive.client;
 
-import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
-import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import matteroverdrive.entity.monster.MutantScientist;
 import net.minecraft.util.Mth;
 
 /**
  * 1.7.10 ModelHulkingScientist: a hunched brute walking on bent legs, arms hanging from the tilted chest. The 1.7.10
  * parts set {@code mirror} after adding their boxes, so nothing is mirrored.
  */
-public class HulkingScientistModel extends EntityModel<LivingEntityRenderState> {
+public class HulkingScientistModel extends HierarchicalModel<MutantScientist> {
+    private final ModelPart root;
     private final ModelPart lowerBody;
     private final ModelPart body;
     private final ModelPart head;
@@ -28,7 +29,7 @@ public class HulkingScientistModel extends EntityModel<LivingEntityRenderState> 
     private final ModelPart lowerLeftLeg;
 
     public HulkingScientistModel(ModelPart root) {
-        super(root);
+        this.root = root;
         lowerBody = root.getChild("lower_body");
         body = lowerBody.getChild("body");
         head = body.getChild("head");
@@ -73,16 +74,21 @@ public class HulkingScientistModel extends EntityModel<LivingEntityRenderState> 
     }
 
     @Override
-    public void setupAnim(LivingEntityRenderState state) {
-        super.setupAnim(state);
-        float swing = state.walkAnimationPos * 0.6662f;
-        float amount = state.walkAnimationSpeed;
+    public ModelPart root() {
+        return root;
+    }
+
+    @Override
+    public void setupAnim(MutantScientist entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+        root.getAllParts().forEach(ModelPart::resetPose);
+        float swing = limbSwing * 0.6662f;
+        float amount = limbSwingAmount;
         body.xRot = Mth.cos(swing + Mth.PI) * 1.6f * amount * 0.3f + 0.5f;
         lowerBody.xRot = Mth.sin(swing) * 1.6f * amount * 0.3f - 0.1f;
         lowerBody.y = Mth.sin(swing) * 1.6f * amount * 3 + 11;
 
-        head.yRot = state.yRot * Mth.DEG_TO_RAD;
-        head.xRot = state.xRot * Mth.DEG_TO_RAD - 0.3f;
+        head.yRot = netHeadYaw * Mth.DEG_TO_RAD;
+        head.xRot = headPitch * Mth.DEG_TO_RAD - 0.3f;
 
         rightArm.xRot = Mth.cos(swing + Mth.HALF_PI) * 1.6f * amount * 0.8f;
         leftArm.xRot = Mth.cos(swing) * 1.6f * amount * 0.8f;

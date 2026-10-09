@@ -11,7 +11,6 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
@@ -83,10 +82,10 @@ public class HoloSignBlock extends HorizontalDirectionalBlock implements EntityB
     }
 
     @Override
-    protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos, Direction direction,
-                                     BlockPos neighborPos, BlockState neighbor, RandomSource random) {
+    protected BlockState updateShape(BlockState state, Direction direction, BlockState neighbor, net.minecraft.world.level.LevelAccessor level,
+                                     BlockPos pos, BlockPos neighborPos) {
         return direction == state.getValue(FACING).getOpposite() && !canSurvive(state, level, pos) ? Blocks.AIR.defaultBlockState()
-                : super.updateShape(state, level, ticks, pos, direction, neighborPos, neighbor, random);
+                : super.updateShape(state, direction, neighbor, level, pos, neighborPos);
     }
 
     @Override

@@ -10,7 +10,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.CommonComponents;
-import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 /** 1.7.10 GuiHoloSign: a text box for the sign's lines. */
 public class HoloSignScreen extends Screen {
@@ -27,8 +27,8 @@ public class HoloSignScreen extends Screen {
     @Override
     protected void init() {
         int w = 220, h = 110;
-        box = MultiLineEditBox.builder().setX(width / 2 - w / 2).setY(height / 2 - h / 2 - 10).setTextColor(0xFFA9E2FB)
-                .build(font, w, h, title);
+        // 1.21.1: MultiLineEditBox has no text colour setting (the 1.21.10 build draws it in the holo colour)
+        box = new MultiLineEditBox(font, width / 2 - w / 2, height / 2 - h / 2 - 10, w, h, net.minecraft.network.chat.Component.empty(), title);
         box.setCharacterLimit(HoloSignBlockEntity.MAX_LENGTH);
         box.setValue(initial);
         addRenderableWidget(box);
@@ -45,7 +45,7 @@ public class HoloSignScreen extends Screen {
 
     @Override
     public void removed() {
-        ClientPacketDistributor.sendToServer(new HoloSignPayload(pos, box.getValue()));
+        PacketDistributor.sendToServer(new HoloSignPayload(pos, box.getValue()));
     }
 
     @Override

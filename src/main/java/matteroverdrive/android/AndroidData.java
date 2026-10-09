@@ -7,14 +7,13 @@ import com.mojang.serialization.Codec;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
+import matteroverdrive.compat.ValueInput;
+import matteroverdrive.compat.ValueOutput;
 import net.neoforged.neoforge.attachment.AttachmentSyncHandler;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
-import net.neoforged.neoforge.common.util.ValueIOSerializable;
+import matteroverdrive.compat.ValueIOSerializable;
 import org.jetbrains.annotations.Nullable;
-import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
-import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.items.ItemStackHandler;
 
 /**
  * 1.7.10 AndroidPlayer's saved state, as a player attachment: whether the player is an android, the built-in energy,
@@ -35,7 +34,7 @@ public class AndroidData implements ValueIOSerializable {
     String activeStat = "";
     /** 1.7.10 AndroidPlayer.effects: toggles (Nightvision, Cloaked, Shield as 0/1) and timestamps (last teleport...). */
     final Map<String, Long> effects = new HashMap<>();
-    final ItemStacksResourceHandler inventory = new ItemStacksResourceHandler(SLOTS);
+    final ItemStackHandler inventory = new ItemStackHandler(SLOTS);
     /** Changed since the last sync to clients. */
     boolean dirty;
 
@@ -98,16 +97,16 @@ public class AndroidData implements ValueIOSerializable {
         dirty = true;
     }
 
-    public ItemStacksResourceHandler getInventory() {
+    public ItemStackHandler getInventory() {
         return inventory;
     }
 
     public ItemStack getStack(int slot) {
-        return inventory.getResource(slot).toStack(inventory.getAmountAsInt(slot));
+        return inventory.getStackInSlot(slot);
     }
 
     public void setStack(int slot, ItemStack stack) {
-        inventory.set(slot, ItemResource.of(stack), stack.getCount());
+        inventory.setStackInSlot(slot, stack);
         dirty = true;
     }
 
@@ -119,7 +118,7 @@ public class AndroidData implements ValueIOSerializable {
         output.putInt("turning", turning);
         output.putString("active_stat", activeStat);
         output.store("effects", EFFECTS_CODEC, effects);
-        inventory.serialize(output.child("inventory"));
+        output.tag().put("inventory", inventory.serializeNBT(output.lookup()));
     }
 
     @Override
@@ -132,7 +131,7 @@ public class AndroidData implements ValueIOSerializable {
         activeStat = input.getStringOr("active_stat", "");
         effects.clear();
         input.read("effects", EFFECTS_CODEC).ifPresent(effects::putAll);
-        input.child("inventory").ifPresent(inventory::deserialize);
+        input.child("inventory").ifPresent(c -> inventory.deserializeNBT(c.lookup(), c.tag()));
     }
 
     /** Sends the whole state (it is small); the client keeps its own glitch countdown running between syncs. */
@@ -187,7 +186,7 @@ public class AndroidData implements ValueIOSerializable {
         effects.putAll(buf.readMap(b -> b.readUtf(), b -> b.readVarLong()));
         for (int i = 0; i < SLOTS; i++) {
             ItemStack stack = ItemStack.OPTIONAL_STREAM_CODEC.decode(buf);
-            inventory.set(i, ItemResource.of(stack), stack.getCount());
+            inventory.setStackInSlot(i, stack);
         }
     }
 }

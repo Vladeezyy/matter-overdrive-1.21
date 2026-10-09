@@ -37,15 +37,15 @@ public class KillCreatureLogic extends AbstractLogic {
     }
 
     private Target target(QuestStack stack) {
-        return targets[Math.clamp(tag(stack).getByteOr("KillType", (byte) 0), 0, targets.length - 1)];
+        return targets[Math.clamp(tag(stack).getByte("KillType"), 0, targets.length - 1)];
     }
 
     public int getKillCount(QuestStack stack) {
-        return tag(stack).getIntOr("KillCount", 0);
+        return tag(stack).getInt("KillCount");
     }
 
     public int getMaxKillCount(QuestStack stack) {
-        return tag(stack).getIntOr("MaxKillCount", 0);
+        return tag(stack).getInt("MaxKillCount");
     }
 
     private String targetName(QuestStack stack) {

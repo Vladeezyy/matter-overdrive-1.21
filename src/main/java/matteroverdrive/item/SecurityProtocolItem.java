@@ -15,7 +15,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 
@@ -52,21 +51,21 @@ public class SecurityProtocolItem extends Item {
     }
 
     @Override
-    public InteractionResult use(Level level, Player player, InteractionHand hand) {
+    public net.minecraft.world.InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         UUID owner = getOwner(stack);
-        if (!player.isShiftKeyDown()) return InteractionResult.PASS;
+        if (!player.isShiftKeyDown()) return net.minecraft.world.InteractionResultHolder.pass(player.getItemInHand(hand));
         if (owner == null) {
             stack.set(MODataComponents.SECURITY_OWNER.get(), player.getUUID());
             stack.set(MODataComponents.SECURITY_TYPE.get(), CLAIM);
-            return InteractionResult.SUCCESS;
+            return net.minecraft.world.InteractionResultHolder.success(player.getItemInHand(hand));
         }
         if (owner.equals(player.getUUID()) || player.getAbilities().instabuild) {
             int type = getType(stack) + 1;
             stack.set(MODataComponents.SECURITY_TYPE.get(), type >= TYPES.length ? CLAIM : type);
-            return InteractionResult.SUCCESS;
+            return net.minecraft.world.InteractionResultHolder.success(player.getItemInHand(hand));
         }
-        return InteractionResult.PASS;
+        return net.minecraft.world.InteractionResultHolder.pass(player.getItemInHand(hand));
     }
 
     /** 1.7.10 onItemUseFirst: before the machine opens its screen. */
@@ -84,7 +83,8 @@ public class SecurityProtocolItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+        Consumer<Component> tooltip = tooltipLines::add;
         UUID owner = getOwner(stack);
         if (owner == null) return;
         Player player = ContractItem.clientPlayer.get();

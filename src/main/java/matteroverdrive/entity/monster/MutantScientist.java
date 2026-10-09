@@ -40,6 +40,6 @@ public class MutantScientist extends Monster {
         goalSelector.addGoal(8, new RandomLookAroundGoal(this));
         targetSelector.addGoal(1, new HurtByTargetGoal(this));
         targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, LivingEntity.class, 0, true, false,
-                (target, level) -> !(target instanceof MutantScientist) && !(target instanceof ArmorStand)));
+                target -> !(target instanceof MutantScientist) && !(target instanceof ArmorStand)));
     }
 }

@@ -7,15 +7,15 @@ import matteroverdrive.machine.MatterTank;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
-import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import matteroverdrive.compat.ValueInput;
+import matteroverdrive.compat.ValueOutput;
+import net.neoforged.neoforge.energy.IEnergyStorage;
 
 /**
  * 1.7.10 TileEntityFusionReactorPart (fusion_reactor_io): a port in the reactor ring that exposes the controller's
  * energy (out) and matter tank (in). The controller links its ports on every structure check.
  */
-public class FusionReactorIOBlockEntity extends BlockEntity {
+public class FusionReactorIOBlockEntity extends matteroverdrive.compat.CompatBlockEntity {
     private @Nullable BlockPos controller;
 
     public FusionReactorIOBlockEntity(BlockPos pos, BlockState state) {
@@ -38,7 +38,7 @@ public class FusionReactorIOBlockEntity extends BlockEntity {
         return null;
     }
 
-    public @Nullable EnergyHandler getEnergy() {
+    public @Nullable IEnergyStorage getEnergy() {
         FusionReactorControllerBlockEntity c = controller();
         return c == null ? null : c.getEnergy();
     }

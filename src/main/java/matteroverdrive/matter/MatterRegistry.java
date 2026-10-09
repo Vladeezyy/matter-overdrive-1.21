@@ -24,8 +24,6 @@ import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.display.RecipeDisplay;
-import net.minecraft.world.item.crafting.display.SlotDisplayContext;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Items;
@@ -140,7 +138,7 @@ public final class MatterRegistry {
         }
         int classic = values.size();
         // beyond 1.7.10: every recipe type and the block conversions, until nothing changes
-        var context = SlotDisplayContext.fromLevel(server.overworld());
+        var context = server.registryAccess();
         for (int pass = 0; pass < 16; pass++) {
             int before = values.size();
             for (RecipeHolder<?> holder : recipes) {
@@ -165,34 +163,28 @@ public final class MatterRegistry {
     }
 
     /** Any recipe: the sum of its ingredients' cheapest matter, split over the result count. */
-    private static void deriveFromAnyRecipe(Recipe<?> recipe, net.minecraft.util.context.ContextMap context, Map<Item, Integer> values) {
+    private static void deriveFromAnyRecipe(Recipe<?> recipe, net.minecraft.core.HolderLookup.Provider context, Map<Item, Integer> values) {
         List<Ingredient> ingredients;
-        List<RecipeDisplay> displays;
+        ItemStack output;
         try {
-            var placement = recipe.placementInfo();
-            if (placement.isImpossibleToPlace()) return;
-            ingredients = placement.ingredients();
-            displays = recipe.display();
+            ingredients = ingredients(recipe);
+            output = recipe.getResultItem(context);
         } catch (RuntimeException e) {
             return;     // a mod recipe that can't describe itself
         }
-        if (ingredients.isEmpty() || displays.isEmpty()) return;
+        if (ingredients.isEmpty() || output == null || output.isEmpty() || values.containsKey(output.getItem())) return;
         int total = 0;
         for (Ingredient ingredient : ingredients) {
             int cheapest = cheapest(ingredient, values);
             if (cheapest <= 0) return;
             total += cheapest;
         }
-        for (RecipeDisplay display : displays) {
-            ItemStack output;
-            try {
-                output = display.result().resolveForFirstStack(context);
-            } catch (RuntimeException e) {
-                continue;
-            }
-            if (output.isEmpty() || values.containsKey(output.getItem())) continue;
-            values.put(output.getItem(), Math.max(1, (int) Math.round((double) total / output.getCount())));
-        }
+        values.put(output.getItem(), Math.max(1, (int) Math.round((double) total / output.getCount())));
+    }
+
+    /** 1.21.1: the recipe's non-empty ingredients (shaped recipes list their blank cells as empty ingredients). */
+    private static List<Ingredient> ingredients(Recipe<?> recipe) {
+        return recipe.getIngredients().stream().filter(i -> !i.isEmpty()).toList();
     }
 
     /** Weathered / waxed copper and stripped logs hold the matter of the block they came from. */
@@ -249,7 +241,7 @@ public final class MatterRegistry {
     private static void deriveFromCrafting(CraftingRecipe recipe, MinecraftServer server, Map<Item, Integer> values) {
         ItemStack output = result(recipe, server, CraftingInput.EMPTY);
         if (output.isEmpty() || values.containsKey(output.getItem())) return;
-        List<Ingredient> ingredients = recipe.placementInfo().ingredients();
+        List<Ingredient> ingredients = ingredients(recipe);
         if (ingredients.isEmpty()) return;
         int total = 0;
         for (Ingredient ingredient : ingredients) {
@@ -264,10 +256,10 @@ public final class MatterRegistry {
     /** The cheapest valued alternative of an ingredient, minus what crafting gives back (water bucket -> bucket). */
     private static int cheapest(Ingredient ingredient, Map<Item, Integer> values) {
         int best = 0;
-        for (Holder<Item> holder : ingredient.items().toList()) {
-            Integer value = values.get(holder.value());
+        for (ItemStack alternative : ingredient.getItems()) {
+            Integer value = values.get(alternative.getItem());
             if (value == null || value <= 0) continue;
-            ItemStack remainder = holder.value().getCraftingRemainder(holder.value().getDefaultInstance());
+            ItemStack remainder = alternative.getItem().getCraftingRemainingItem(alternative);
             int net = value - (remainder.isEmpty() ? 0 : values.getOrDefault(remainder.getItem(), 0) * remainder.getCount());
             if (net > 0 && (best == 0 || net < best)) best = net;
         }
@@ -277,7 +269,7 @@ public final class MatterRegistry {
     private static void deriveFromCooking(AbstractCookingRecipe recipe, MinecraftServer server, Map<Item, Integer> values) {
         ItemStack output = result(recipe, server, new SingleRecipeInput(ItemStack.EMPTY));
         if (output.isEmpty() || values.containsKey(output.getItem())) return;
-        int input = cheapest(recipe.input(), values);
+        int input = recipe.getIngredients().isEmpty() ? 0 : cheapest(recipe.getIngredients().get(0), values);
         if (input > 0) values.put(output.getItem(), Math.max(1, input / output.getCount()));
     }
 

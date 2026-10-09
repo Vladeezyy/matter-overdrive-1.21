@@ -15,7 +15,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
@@ -33,7 +33,7 @@ final class QuestGameTests {
     }
 
     private static void check(GameTestHelper helper, boolean ok, String message) {
-        helper.assertTrue(ok, Component.literal(message));
+        helper.assertTrue(ok, message);
     }
 
     private static MadScientist scientist(GameTestHelper helper, boolean junkie) {
@@ -104,7 +104,7 @@ final class QuestGameTests {
         // creepers killed with a shovel count, others don't
         player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(Items.IRON_SHOVEL));
         for (int i = 0; i < 6; i++) {
-            var creeper = EntityType.CREEPER.create(helper.getLevel(), EntitySpawnReason.COMMAND);
+            var creeper = EntityType.CREEPER.create(helper.getLevel());
             QuestEvents.onEvent(player, new net.neoforged.neoforge.event.entity.living.LivingDeathEvent(creeper,
                     helper.getLevel().damageSources().playerAttack(player)));
         }
@@ -137,9 +137,9 @@ final class QuestGameTests {
     /** The house is in the plains and desert village house pools, and its template builds the 1.7.10 house with him. */
     private static void house(GameTestHelper helper) {
         var level = helper.getLevel();
-        var pools = level.registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.TEMPLATE_POOL);
+        var pools = level.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.TEMPLATE_POOL);
         for (String pool : new String[] {"village/plains/houses", "village/desert/houses"}) {
-            var templates = pools.getValue(net.minecraft.resources.ResourceLocation.withDefaultNamespace(pool)).templates;
+            var templates = pools.get(net.minecraft.resources.ResourceLocation.withDefaultNamespace(pool)).templates;
             long ours = templates.stream().filter(e -> e.toString().contains("mad_scientist_house")).count();
             check(helper, ours == matteroverdrive.world.VillageHouses.WEIGHT, pool + ": " + ours);
         }
@@ -233,10 +233,9 @@ final class QuestGameTests {
     }
 
     private static java.util.List<String> guideFiles(String lang) {
-        var contents = net.neoforged.fml.ModList.get().getModFileById(matteroverdrive.MatterOverdrive.MODID).getFile().getContents();
+        var file = net.neoforged.fml.ModList.get().getModFileById(matteroverdrive.MatterOverdrive.MODID).getFile();
         java.util.List<String> names = new java.util.ArrayList<>();
-        for (java.nio.file.Path root : contents.getContentRoots()) {
-            java.nio.file.Path dir = root.resolve("assets/matteroverdrive/guide/" + lang);
+        for (java.nio.file.Path dir : java.util.List.of(file.findResource("assets", "matteroverdrive", "guide", lang))) {
             if (!java.nio.file.Files.isDirectory(dir)) continue;
             try (var stream = java.nio.file.Files.list(dir)) {
                 stream.map(p -> p.getFileName().toString()).filter(n -> n.endsWith(".xml")).forEach(names::add);
@@ -248,6 +247,7 @@ final class QuestGameTests {
     }
 
     private static byte[] guideFile(String path) throws java.io.IOException {
-        return net.neoforged.fml.ModList.get().getModFileById(matteroverdrive.MatterOverdrive.MODID).getFile().getContents().readFile(path);
+        var file = net.neoforged.fml.ModList.get().getModFileById(matteroverdrive.MatterOverdrive.MODID).getFile().findResource(path.split("/"));
+        return java.nio.file.Files.exists(file) ? java.nio.file.Files.readAllBytes(file) : null;
     }
 }

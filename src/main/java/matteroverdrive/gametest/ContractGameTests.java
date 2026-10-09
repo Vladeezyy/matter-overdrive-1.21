@@ -17,7 +17,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
@@ -32,18 +32,17 @@ final class ContractGameTests {
     }
 
     private static void check(GameTestHelper helper, boolean ok, String message) {
-        helper.assertTrue(ok, Component.literal(message));
+        helper.assertTrue(ok, message);
     }
 
     /** The market waits 30 minutes, then puts a contract in; the next one waits 5 more minutes per filled slot. */
     private static void market(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, MOBlocks.CONTRACT_MARKET.get());
-        var market = helper.getBlockEntity(pos, ContractMarketBlockEntity.class);
+        var market = helper.<ContractMarketBlockEntity>getBlockEntity(pos);
         int wait = market.getTimeUntilNextQuest();
         check(helper, wait > ContractMarketBlockEntity.QUEST_GENERATE_DELAY_MIN - 40, "first delay " + wait);
-        market.loadWithComponents(net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING,
-                helper.getLevel().registryAccess(), new net.minecraft.nbt.CompoundTag()));
+        market.loadWithComponents(new net.minecraft.nbt.CompoundTag(), helper.getLevel().registryAccess());
         helper.runAfterDelay(2, () -> {
             ItemStack contract = market.getContract(0);
             check(helper, contract.is(MOItems.CONTRACT.get()) && ContractItem.getQuest(contract) != null, "no contract: " + contract);
@@ -71,7 +70,7 @@ final class ContractGameTests {
         var logic = (KillCreatureLogic) Quests.KILL_ANDROIDS.logic();
         int max = logic.getMaxKillCount(kill);
         check(helper, max >= 12 && max < 28, "kill count " + max);
-        var android = MOEntities.ROGUE_ANDROID.get().create(helper.getLevel(), EntitySpawnReason.COMMAND);
+        var android = MOEntities.ROGUE_ANDROID.get().create(helper.getLevel());
         for (int i = 0; i < max; i++) {
             QuestEvents.onEvent(player, new LivingDeathEvent(android, helper.getLevel().damageSources().playerAttack(player)));
         }
@@ -128,15 +127,15 @@ final class ContractGameTests {
         BlockPos at = helper.absolutePos(new BlockPos(1, 1, 1));
         QuestEvents.onEvent(player, new QuestEvents.Scan(at, Blocks.POTATOES.defaultBlockState(), pad));
         QuestEvents.onEvent(player, new QuestEvents.Scan(at, Blocks.CARROTS.defaultBlockState(), new ItemStack(MOItems.DATA_PAD.get())));
-        check(helper, active.getData().getCompoundOrEmpty("1").getShortOr("BlockScan", (short) 0) == 0
-                && active.getData().getCompoundOrEmpty("0").getShortOr("BlockScan", (short) 0) == 0, "counted the wrong scans " + active.getData());
+        check(helper, active.getData().getCompound("1").getShort("BlockScan") == 0
+                && active.getData().getCompound("0").getShort("BlockScan") == 0, "counted the wrong scans " + active.getData());
         for (int i = 0; i < 24; i++) QuestEvents.onEvent(player, new QuestEvents.Scan(at, Blocks.CARROTS.defaultBlockState(), pad));
         check(helper, multi.getObjectivesCount(active, player) == 2, "carrots done should show the potatoes " + active.getData());
         for (int i = 0; i < 24; i++) QuestEvents.onEvent(player, new QuestEvents.Scan(at, Blocks.POTATOES.defaultBlockState(), pad));
         QuestEvents.manageQuestCompletion(player);
         check(helper, PlayerQuests.get(player).hasCompletedQuest(gmo), "gmo not completed " + active.getData());
         ItemStack spine = ItemStack.EMPTY;
-        for (ItemStack s : player.getInventory()) {
+        for (ItemStack s : matteroverdrive.compat.ContainerItems.of(player.getInventory())) {
             if (s.is(MOItems.TRITANIUM_SPINE.get())) spine = s;
         }
         check(helper, !spine.isEmpty() && ((matteroverdrive.item.android.BionicPartItem) spine.getItem()).maxHealthBonus(spine) == 5, "hardened spine " + spine);

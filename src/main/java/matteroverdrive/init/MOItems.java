@@ -23,14 +23,15 @@ import matteroverdrive.item.weapon.SniperScopeItem;
 import matteroverdrive.item.android.AndroidPillItem;
 import matteroverdrive.item.android.BionicPartItem;
 import matteroverdrive.machine.UpgradeType;
+import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.DiggerItem;
 import net.minecraft.world.item.HoeItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.PickaxeItem;
+import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.equipment.ArmorType;
-import net.minecraft.world.item.equipment.Equippable;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -68,20 +69,20 @@ public final class MOItems {
     public static final DeferredItem<Item> ISOLINEAR_CIRCUIT_MK4 = simple("isolinear_circuit_mk4");
 
     // Tools: tritanium is iron-tier with 3122 durability; damage/speed follow the vanilla iron tools.
-    public static final DeferredItem<Item> TRITANIUM_SWORD = item("tritanium_sword", Item::new,
-            p -> p.sword(MOMaterials.TRITANIUM_TOOL, 3f, -2.4f));
-    public static final DeferredItem<Item> TRITANIUM_PICKAXE = item("tritanium_pickaxe", Item::new,
-            p -> p.pickaxe(MOMaterials.TRITANIUM_TOOL, 1f, -2.8f));
-    public static final DeferredItem<AxeItem> TRITANIUM_AXE = item("tritanium_axe",
-            p -> new AxeItem(MOMaterials.TRITANIUM_TOOL, 6f, -3.1f, p), p -> p);
-    public static final DeferredItem<HoeItem> TRITANIUM_HOE = item("tritanium_hoe",
-            p -> new HoeItem(MOMaterials.TRITANIUM_TOOL, -2f, -1f, p), p -> p);
+    public static final DeferredItem<SwordItem> TRITANIUM_SWORD = item("tritanium_sword", p -> new SwordItem(MOMaterials.TRITANIUM_TOOL, p),
+            p -> p.attributes(SwordItem.createAttributes(MOMaterials.TRITANIUM_TOOL, 3f, -2.4f)));
+    public static final DeferredItem<PickaxeItem> TRITANIUM_PICKAXE = item("tritanium_pickaxe", p -> new PickaxeItem(MOMaterials.TRITANIUM_TOOL, p),
+            p -> p.attributes(DiggerItem.createAttributes(MOMaterials.TRITANIUM_TOOL, 1f, -2.8f)));
+    public static final DeferredItem<AxeItem> TRITANIUM_AXE = item("tritanium_axe", p -> new AxeItem(MOMaterials.TRITANIUM_TOOL, p),
+            p -> p.attributes(DiggerItem.createAttributes(MOMaterials.TRITANIUM_TOOL, 6f, -3.1f)));
+    public static final DeferredItem<HoeItem> TRITANIUM_HOE = item("tritanium_hoe", p -> new HoeItem(MOMaterials.TRITANIUM_TOOL, p),
+            p -> p.attributes(DiggerItem.createAttributes(MOMaterials.TRITANIUM_TOOL, -2f, -1f)));
 
     // Armor
-    public static final DeferredItem<Item> TRITANIUM_HELMET = armor("tritanium_helmet", ArmorType.HELMET);
-    public static final DeferredItem<Item> TRITANIUM_CHESTPLATE = armor("tritanium_chestplate", ArmorType.CHESTPLATE);
-    public static final DeferredItem<Item> TRITANIUM_LEGGINGS = armor("tritanium_leggings", ArmorType.LEGGINGS);
-    public static final DeferredItem<Item> TRITANIUM_BOOTS = armor("tritanium_boots", ArmorType.BOOTS);
+    public static final DeferredItem<ArmorItem> TRITANIUM_HELMET = armor("tritanium_helmet", ArmorItem.Type.HELMET);
+    public static final DeferredItem<ArmorItem> TRITANIUM_CHESTPLATE = armor("tritanium_chestplate", ArmorItem.Type.CHESTPLATE);
+    public static final DeferredItem<ArmorItem> TRITANIUM_LEGGINGS = armor("tritanium_leggings", ArmorItem.Type.LEGGINGS);
+    public static final DeferredItem<ArmorItem> TRITANIUM_BOOTS = armor("tritanium_boots", ArmorItem.Type.BOOTS);
 
     // Machines
     public static final DeferredItem<BlockItem> SOLAR_PANEL = block("solar_panel", MOBlocks.SOLAR_PANEL);
@@ -104,8 +105,12 @@ public final class MOItems {
     public static final DeferredItem<BlockItem> FUSION_REACTOR_IO = block("fusion_reactor_io", MOBlocks.FUSION_REACTOR_IO);
     public static final DeferredItem<BlockItem> FUSION_REACTOR_CONTROLLER = block("fusion_reactor_controller", MOBlocks.FUSION_REACTOR_CONTROLLER);
     /** 1.7.10 SpacetimeEqualizer: worn on the chest, it cancels a gravitational anomaly's pull. */
-    public static final DeferredItem<Item> SPACETIME_EQUALIZER = item("spacetime_equalizer", Item::new,
-            p -> p.stacksTo(1).component(DataComponents.EQUIPPABLE, Equippable.builder(EquipmentSlot.CHEST).build()));
+    public static final DeferredItem<Item> SPACETIME_EQUALIZER = item("spacetime_equalizer", p -> new Item(p) {
+        @Override
+        public EquipmentSlot getEquipmentSlot(net.minecraft.world.item.ItemStack stack) {
+            return EquipmentSlot.CHEST;
+        }
+    }, p -> p.stacksTo(1));
     // 1.7.10 PatternDrive("pattern_drive", 2)
     public static final DeferredItem<PatternDriveItem> PATTERN_DRIVE = item("pattern_drive", p -> new PatternDriveItem(2, p), p -> p);
     public static final DeferredItem<matteroverdrive.item.NetworkFlashDriveItem> NETWORK_FLASH_DRIVE = item("network_flash_drive",
@@ -174,15 +179,13 @@ public final class MOItems {
     public static final DeferredItem<Item> EMERGENCY_RATION = item("emergency_ration", Item::new,
             p -> p.food(new net.minecraft.world.food.FoodProperties.Builder().nutrition(8).saturationModifier(0.8f).build()));
     /** 1.7.10 EarlGrayTea: 4 / 0.8, always drinkable, clears potion effects like milk, leaves the bottle. */
-    public static final DeferredItem<Item> EARL_GRAY_TEA = item("earl_gray_tea", Item::new,
-            p -> p.food(new net.minecraft.world.food.FoodProperties.Builder().nutrition(4).saturationModifier(0.8f).alwaysEdible().build(),
-                    net.minecraft.world.item.component.Consumables.defaultDrink()
-                            .onConsume(net.minecraft.world.item.consume_effects.ClearAllStatusEffectsConsumeEffect.INSTANCE).build())
-                    .usingConvertsTo(net.minecraft.world.item.Items.GLASS_BOTTLE).stacksTo(16));
+    public static final DeferredItem<matteroverdrive.item.food.DrinkItem> EARL_GRAY_TEA = item("earl_gray_tea",
+            p -> new matteroverdrive.item.food.DrinkItem(true, p),
+            p -> p.food(new net.minecraft.world.food.FoodProperties.Builder().nutrition(4).saturationModifier(0.8f).alwaysEdible()
+                    .usingConvertsTo(net.minecraft.world.item.Items.GLASS_BOTTLE).build()).stacksTo(16));
     public static final DeferredItem<matteroverdrive.item.food.RomulanAleItem> ROMULAN_ALE = item("romulan_ale", matteroverdrive.item.food.RomulanAleItem::new,
-            p -> p.food(new net.minecraft.world.food.FoodProperties.Builder().nutrition(4).saturationModifier(0.6f).alwaysEdible().build(),
-                    net.minecraft.world.item.component.Consumables.DEFAULT_DRINK)
-                    .usingConvertsTo(net.minecraft.world.item.Items.GLASS_BOTTLE).stacksTo(16));
+            p -> p.food(new net.minecraft.world.food.FoodProperties.Builder().nutrition(4).saturationModifier(0.6f).alwaysEdible()
+                    .usingConvertsTo(net.minecraft.world.item.Items.GLASS_BOTTLE).build()).stacksTo(16));
     public static final DeferredItem<BlockItem> HOLO_SIGN = block("holo_sign", MOBlocks.HOLO_SIGN);
     public static final DeferredItem<BlockItem> MICROWAVE = block("microwave", MOBlocks.MICROWAVE);
     public static final DeferredItem<BlockItem> TRANSPORTER = block("transporter", MOBlocks.TRANSPORTER);
@@ -220,22 +223,22 @@ public final class MOItems {
             matteroverdrive.item.PortableDecomposerItem::new, p -> p);
     public static final List<DeferredItem<BlockItem>> TRITANIUM_CRATES = MOBlocks.TRITANIUM_CRATES.stream()
             .map(b -> block(b.getId().getPath(), b)).toList();
-    public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> ROGUE_ANDROID_SPAWN_EGG = item("rogue_android_spawn_egg",
-            net.minecraft.world.item.SpawnEggItem::new, p -> p.spawnEgg(MOEntities.ROGUE_ANDROID.get()));
-    public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> RANGED_ROGUE_ANDROID_SPAWN_EGG = item("ranged_rogue_android_spawn_egg",
-            net.minecraft.world.item.SpawnEggItem::new, p -> p.spawnEgg(MOEntities.RANGED_ROGUE_ANDROID.get()));
-    public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> MAD_SCIENTIST_SPAWN_EGG = item("mad_scientist_spawn_egg",
-            net.minecraft.world.item.SpawnEggItem::new, p -> p.spawnEgg(MOEntities.MAD_SCIENTIST.get()));
-    public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> MUTANT_SCIENTIST_SPAWN_EGG = item("mutant_scientist_spawn_egg",
-            net.minecraft.world.item.SpawnEggItem::new, p -> p.spawnEgg(MOEntities.MUTANT_SCIENTIST.get()));
-    public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> FAILED_PIG_SPAWN_EGG = item("failed_pig_spawn_egg",
-            net.minecraft.world.item.SpawnEggItem::new, p -> p.spawnEgg(MOEntities.FAILED_PIG.get()));
-    public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> FAILED_COW_SPAWN_EGG = item("failed_cow_spawn_egg",
-            net.minecraft.world.item.SpawnEggItem::new, p -> p.spawnEgg(MOEntities.FAILED_COW.get()));
-    public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> FAILED_CHICKEN_SPAWN_EGG = item("failed_chicken_spawn_egg",
-            net.minecraft.world.item.SpawnEggItem::new, p -> p.spawnEgg(MOEntities.FAILED_CHICKEN.get()));
-    public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> FAILED_SHEEP_SPAWN_EGG = item("failed_sheep_spawn_egg",
-            net.minecraft.world.item.SpawnEggItem::new, p -> p.spawnEgg(MOEntities.FAILED_SHEEP.get()));
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> ROGUE_ANDROID_SPAWN_EGG = item("rogue_android_spawn_egg",
+            p -> new net.neoforged.neoforge.common.DeferredSpawnEggItem(MOEntities.ROGUE_ANDROID, 0x0FFFFF, 0, p), p -> p);
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> RANGED_ROGUE_ANDROID_SPAWN_EGG = item("ranged_rogue_android_spawn_egg",
+            p -> new net.neoforged.neoforge.common.DeferredSpawnEggItem(MOEntities.RANGED_ROGUE_ANDROID, 0x0FFFFF, 0, p), p -> p);
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> MAD_SCIENTIST_SPAWN_EGG = item("mad_scientist_spawn_egg",
+            p -> new net.neoforged.neoforge.common.DeferredSpawnEggItem(MOEntities.MAD_SCIENTIST, 0xFFFFFF, 0, p), p -> p);
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> MUTANT_SCIENTIST_SPAWN_EGG = item("mutant_scientist_spawn_egg",
+            p -> new net.neoforged.neoforge.common.DeferredSpawnEggItem(MOEntities.MUTANT_SCIENTIST, 0xFFFFFF, 0x00FF00, p), p -> p);
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> FAILED_PIG_SPAWN_EGG = item("failed_pig_spawn_egg",
+            p -> new net.neoforged.neoforge.common.DeferredSpawnEggItem(MOEntities.FAILED_PIG, 15771042, 0x33CC33, p), p -> p);
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> FAILED_COW_SPAWN_EGG = item("failed_cow_spawn_egg",
+            p -> new net.neoforged.neoforge.common.DeferredSpawnEggItem(MOEntities.FAILED_COW, 4470310, 0x33CC33, p), p -> p);
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> FAILED_CHICKEN_SPAWN_EGG = item("failed_chicken_spawn_egg",
+            p -> new net.neoforged.neoforge.common.DeferredSpawnEggItem(MOEntities.FAILED_CHICKEN, 10592673, 0x33CC33, p), p -> p);
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> FAILED_SHEEP_SPAWN_EGG = item("failed_sheep_spawn_egg",
+            p -> new net.neoforged.neoforge.common.DeferredSpawnEggItem(MOEntities.FAILED_SHEEP, 15198183, 0x33CC33, p), p -> p);
 
     public static final DeferredItem<AndroidPillItem> ANDROID_PILL_YELLOW = item("android_pill_yellow", p -> new AndroidPillItem(AndroidPillItem.Type.YELLOW, p), p -> p);
 
@@ -263,20 +266,25 @@ public final class MOItems {
     }
 
     private static <I extends Item> DeferredItem<I> item(String name, Function<Item.Properties, I> factory, UnaryOperator<Item.Properties> props) {
-        DeferredItem<I> item = ITEMS.registerItem(name, factory, props);
+        DeferredItem<I> item = ITEMS.registerItem(name, factory, props.apply(new Item.Properties()));
         TAB_ORDER.add(item);
         return item;
     }
 
-    private static DeferredItem<Item> armor(String name, ArmorType type) {
-        return item(name, Item::new, p -> p.humanoidArmor(MOMaterials.TRITANIUM_ARMOR, type));
+    private static DeferredItem<ArmorItem> armor(String name, ArmorItem.Type type) {
+        return item(name, p -> new ArmorItem(MOMaterials.TRITANIUM_ARMOR, type, p) {
+            @Override
+            public net.minecraft.resources.ResourceLocation getArmorTexture(net.minecraft.world.item.ItemStack stack, net.minecraft.world.entity.Entity entity,
+                    EquipmentSlot slot, net.minecraft.world.item.ArmorMaterial.Layer layer, boolean innerModel) {
+                return slot == EquipmentSlot.FEET ? MOMaterials.ARMOR_LAYER_2 : MOMaterials.ARMOR_LAYER_1;
+            }
+        }, p -> p.durability(type.getDurability(MOMaterials.TRITANIUM_ARMOR_DURABILITY)));
     }
 
     private static DeferredItem<BlockItem> block(String name, net.neoforged.neoforge.registries.DeferredBlock<?> block) {
         // machines get 1.7.10 MOMachineBlockItem: "[Configured]", the energy bar and the Shift tooltip
         DeferredItem<BlockItem> item = ITEMS.registerItem(name, props -> block.get() instanceof matteroverdrive.machine.MachineBlock
-                ? new matteroverdrive.machine.MachineBlockItem(block.get(), props) : new BlockItem(block.get(), props),
-                net.minecraft.world.item.Item.Properties::useBlockDescriptionPrefix);
+                ? new matteroverdrive.machine.MachineBlockItem(block.get(), props) : new BlockItem(block.get(), props));
         TAB_ORDER.add(item);
         return item;
     }

@@ -27,16 +27,13 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemUseAnimation;
+import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.ItemContainerContents;
-import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.energy.EnergyHandler;
-import net.neoforged.neoforge.transfer.energy.ItemAccessEnergyHandler;
-import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.energy.ComponentEnergyStorage;
+import net.neoforged.neoforge.energy.IEnergyStorage;
 
 /**
  * 1.7.10 EnergyWeapon. Fires with the attack key (held for automatic fire), aims/zooms with use. Every shot costs
@@ -188,18 +185,16 @@ public abstract class EnergyWeaponItem extends Item {
     // --- energy, heat --------------------------------------------------------------------------
 
     /** Charges and drains through {@link #getEnergy}/{@link #setEnergy}, so a battery module is used when installed. */
-    public EnergyHandler createEnergyHandler(ItemAccess access) {
-        return new ItemAccessEnergyHandler(access, MODataComponents.ENERGY.get(), getCapacity(access.getResource().toStack()), TRANSFER, TRANSFER) {
+    public IEnergyStorage createEnergyHandler(ItemStack weapon) {
+        return new ComponentEnergyStorage(weapon, MODataComponents.ENERGY.get(), getCapacity(weapon), TRANSFER, TRANSFER) {
             @Override
-            protected int getAmountFrom(ItemResource resource) {
-                return resource.is(validItem) ? getEnergy(resource.toStack()) : 0;
+            public int getEnergyStored() {
+                return weapon.is(EnergyWeaponItem.this) ? Math.min(getEnergy(weapon), getMaxEnergyStored()) : 0;
             }
 
             @Override
-            protected ItemResource update(ItemResource resource, int amount) {
-                ItemStack stack = resource.toStack();
-                setEnergy(stack, amount);
-                return ItemResource.of(stack);
+            protected void setEnergy(int energy) {
+                EnergyWeaponItem.setEnergy(weapon, Math.max(0, Math.min(energy, getMaxEnergyStored())));
             }
         };
     }
@@ -245,7 +240,8 @@ public abstract class EnergyWeaponItem extends Item {
 
     /** 1.7.10 manageCooling: heat drops by 4 * easeOutQuart(heat / max) per tick; overheat ends below 2. */
     @Override
-    public void inventoryTick(ItemStack stack, ServerLevel level, Entity entity, EquipmentSlot slot) {
+    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean selected) {
+        if (!(level instanceof ServerLevel)) return;
         float heat = getHeat(stack);
         if (heat > 0) {
             float t = Math.min(1, heat / getMaxHeat(stack));
@@ -276,10 +272,10 @@ public abstract class EnergyWeaponItem extends Item {
 
     /** Server side, from the fire key: fires if the weapon is off cooldown, cool enough and charged. */
     public void tryFire(ServerPlayer player, ItemStack weapon, boolean zoomed) {
-        if (player.getCooldowns().isOnCooldown(weapon) || !canFire(weapon)) return;
+        if (player.getCooldowns().isOnCooldown(weapon.getItem()) || !canFire(weapon)) return;
         setEnergy(weapon, getEnergy(weapon) - getEnergyPerShot(weapon));
         fire((ServerLevel) player.level(), player, weapon, zoomed);
-        player.getCooldowns().addCooldown(weapon, getShootCooldown(weapon));
+        player.getCooldowns().addCooldown(weapon.getItem(), getShootCooldown(weapon));
     }
 
     /**
@@ -316,17 +312,17 @@ public abstract class EnergyWeaponItem extends Item {
     // --- use: aim, reload --------------------------------------------------------------------------
 
     @Override
-    public InteractionResult use(Level level, Player player, InteractionHand hand) {
+    public net.minecraft.world.InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack weapon = player.getItemInHand(hand);
         if (getEnergy(weapon) < getEnergyPerShot(weapon) && EnergyPackItem.reload(player, weapon)) {
-            player.getCooldowns().addCooldown(weapon, 40);
-            return InteractionResult.SUCCESS;
+            player.getCooldowns().addCooldown(weapon.getItem(), 40);
+            return net.minecraft.world.InteractionResultHolder.success(player.getItemInHand(hand));
         }
         if (getZoom(weapon) > 0) {
             player.startUsingItem(hand);
-            return InteractionResult.CONSUME;
+            return net.minecraft.world.InteractionResultHolder.consume(player.getItemInHand(hand));
         }
-        return InteractionResult.PASS;
+        return net.minecraft.world.InteractionResultHolder.pass(player.getItemInHand(hand));
     }
 
     @Override
@@ -336,8 +332,8 @@ public abstract class EnergyWeaponItem extends Item {
 
     /** 1.7.10 kept the weapon's own pose while aiming or firing the beam (no bow draw). */
     @Override
-    public ItemUseAnimation getUseAnimation(ItemStack stack) {
-        return ItemUseAnimation.NONE;
+    public UseAnim getUseAnimation(ItemStack stack) {
+        return UseAnim.NONE;
     }
 
     @Override
@@ -363,7 +359,8 @@ public abstract class EnergyWeaponItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack weapon, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack weapon, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+        Consumer<Component> tooltip = tooltipLines::add;
         tooltip.accept(Component.translatable("tooltip.matteroverdrive.energy_stored", MOText.energy(getEnergy(weapon)),
                 MOText.energy(getCapacity(weapon))).withStyle(ChatFormatting.YELLOW));
         tooltip.accept(Component.translatable("tooltip.matteroverdrive.weapon.power_use", MOText.energy(getEnergyUse(weapon) * 20L))

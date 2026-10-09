@@ -9,7 +9,6 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
-import net.minecraft.world.entity.ContainerUser;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -19,10 +18,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.ContainerOpenersCounter;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
-
-import java.util.List;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 
 /** 1.7.10 TileEntityTritaniumCrate: 54 slots in the vanilla chest screen, crate open/close sounds, optional loot table. */
 public class TritaniumCrateBlockEntity extends RandomizableContainerBlockEntity {
@@ -54,25 +51,20 @@ public class TritaniumCrateBlockEntity extends RandomizableContainerBlockEntity 
     }
 
     @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
-        if (!trySaveLootTable(output)) {
-            ContainerHelper.saveAllItems(output, items);
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        if (!trySaveLootTable(tag)) {
+            ContainerHelper.saveAllItems(tag, items, registries);
         }
     }
 
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
         items = NonNullList.withSize(SIZE, ItemStack.EMPTY);
-        if (!tryLoadLootTable(input)) {
-            ContainerHelper.loadAllItems(input, items);
+        if (!tryLoadLootTable(tag)) {
+            ContainerHelper.loadAllItems(tag, items, registries);
         }
-    }
-
-    /** The contents go into the dropped item (container component), not onto the ground. */
-    @Override
-    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
     }
 
     @Override
@@ -101,22 +93,17 @@ public class TritaniumCrateBlockEntity extends RandomizableContainerBlockEntity 
     }
 
     @Override
-    public void startOpen(ContainerUser user) {
-        if (!remove && !user.getLivingEntity().isSpectator()) {
-            openers.incrementOpeners(user.getLivingEntity(), getLevel(), getBlockPos(), getBlockState(), user.getContainerInteractionRange());
+    public void startOpen(Player player) {
+        if (!remove && !player.isSpectator()) {
+            openers.incrementOpeners(player, getLevel(), getBlockPos(), getBlockState());
         }
     }
 
     @Override
-    public void stopOpen(ContainerUser user) {
-        if (!remove && !user.getLivingEntity().isSpectator()) {
-            openers.decrementOpeners(user.getLivingEntity(), getLevel(), getBlockPos(), getBlockState());
+    public void stopOpen(Player player) {
+        if (!remove && !player.isSpectator()) {
+            openers.decrementOpeners(player, getLevel(), getBlockPos(), getBlockState());
         }
-    }
-
-    @Override
-    public List<ContainerUser> getEntitiesWithContainerOpen() {
-        return openers.getEntitiesWithContainerOpen(getLevel(), getBlockPos());
     }
 
     public void recheckOpen() {

@@ -25,7 +25,7 @@ public class CollectItemLogic extends RandomItemLogic {
 
     /** 1.7.10 getMaxItemCount: the quest item's stack size (1) + the rolled count. */
     public int getMaxItemCount(QuestStack stack) {
-        return getItem(stack).getCount() + tag(stack).getIntOr("MaxItemCount", 0);
+        return getItem(stack).getCount() + tag(stack).getInt("MaxItemCount");
     }
 
     public int getItemCount(Player player, QuestStack stack) {

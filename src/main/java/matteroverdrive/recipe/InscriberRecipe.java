@@ -11,10 +11,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.PlacementInfo;
 import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeBookCategories;
-import net.minecraft.world.item.crafting.RecipeBookCategory;
 import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -65,13 +62,18 @@ public record InscriberRecipe(Ingredient main, Ingredient secondary, ItemStack r
     }
 
     @Override
-    public PlacementInfo placementInfo() {
-        return PlacementInfo.NOT_PLACEABLE;
+    public boolean canCraftInDimensions(int width, int height) {
+        return true;
     }
 
     @Override
-    public RecipeBookCategory recipeBookCategory() {
-        return RecipeBookCategories.CRAFTING_MISC;
+    public ItemStack getResultItem(HolderLookup.Provider registries) {
+        return result;
+    }
+
+    @Override
+    public net.minecraft.core.NonNullList<Ingredient> getIngredients() {
+        return net.minecraft.core.NonNullList.of(Ingredient.EMPTY, main, secondary);
     }
 
     public static final class Serializer implements RecipeSerializer<InscriberRecipe> {

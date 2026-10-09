@@ -15,8 +15,6 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
 
 /** Phase 5c checks: barrel and scope modules, the battery module, the weapon station. */
 final class ModuleGameTests {
@@ -30,13 +28,13 @@ final class ModuleGameTests {
     }
 
     private static void check(GameTestHelper helper, boolean ok, String message) {
-        helper.assertTrue(ok, Component.literal(message));
+        helper.assertTrue(ok, message);
     }
 
     private static ServerPlayer player(GameTestHelper helper) {
         ServerPlayer player = helper.makeMockServerPlayerInLevel();
         var pos = helper.absolutePos(new BlockPos(6, 1, 1)).getBottomCenter();
-        player.snapTo(pos.x, pos.y, pos.z, 0, 0);
+        player.moveTo(pos.x, pos.y, pos.z, 0, 0);
         return player;
     }
 
@@ -101,12 +99,8 @@ final class ModuleGameTests {
         ItemStack rifle = new ItemStack(MOItems.PHASER_RIFLE.get());
         EnergyWeaponItem.setModule(rifle, WeaponModule.SLOT_BATTERY, new ItemStack(MOItems.HC_BATTERY.get()));
         check(helper, EnergyWeaponItem.getCapacity(rifle) == 1 << 20, "capacity " + EnergyWeaponItem.getCapacity(rifle));
-        var handler = ItemAccess.forStack(rifle).getCapability(Capabilities.Energy.ITEM);
-        int inserted;
-        try (Transaction tx = Transaction.openRoot()) {
-            inserted = handler.insert(100, tx);
-            tx.commit();
-        }
+        var handler = rifle.getCapability(Capabilities.EnergyStorage.ITEM);
+        int inserted = handler.receiveEnergy(100, false);
         check(helper, inserted == 100, "inserted " + inserted);
         ItemStack battery = EnergyWeaponItem.getModule(rifle, WeaponModule.SLOT_BATTERY);
         check(helper, MOItems.HC_BATTERY.get().getEnergy(battery) == 100, "battery holds " + MOItems.HC_BATTERY.get().getEnergy(battery));
@@ -138,7 +132,7 @@ final class ModuleGameTests {
     private static void station(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, MOBlocks.WEAPON_STATION.get());
-        var station = (WeaponStationBlockEntity) helper.getBlockEntity(pos, WeaponStationBlockEntity.class);
+        var station = (WeaponStationBlockEntity) helper.<WeaponStationBlockEntity>getBlockEntity(pos);
         station.getInventory().setStack(WeaponStationBlockEntity.WEAPON, new ItemStack(MOItems.PHASER_RIFLE.get()));
         ServerPlayer player = player(helper);
         var menu = new WeaponStationMenu(1, player.getInventory(), station, new net.minecraft.world.inventory.SimpleContainerData(11));

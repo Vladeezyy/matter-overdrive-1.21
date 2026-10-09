@@ -6,7 +6,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.AgeableMob;
-import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.Cow;
 import net.minecraft.world.level.Level;
@@ -35,6 +35,6 @@ public class FailedCow extends Cow {
 
     @Override
     public @Nullable Cow getBreedOffspring(ServerLevel level, AgeableMob mate) {
-        return MOEntities.FAILED_COW.get().create(level, EntitySpawnReason.BREEDING);
+        return MOEntities.FAILED_COW.get().create(level);
     }
 }

@@ -6,12 +6,11 @@ import com.mojang.math.Axis;
 import matteroverdrive.block.HoloSignBlock;
 import matteroverdrive.block.entity.HoloSignBlockEntity;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.renderer.SubmitNodeCollector;
+import matteroverdrive.compat.render.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.state.CameraRenderState;
+import matteroverdrive.compat.render.BlockEntityRenderState;
+import matteroverdrive.compat.render.CameraRenderState;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec3;
@@ -21,12 +20,12 @@ import org.jetbrains.annotations.Nullable;
  * 1.7.10 TileEntityRendererHoloSign: the lines drawn in holo blue on the panel's face, all at the size that fits the
  * longest line (1.7.10 drawScreenInfoWithGlobalAutoSize, at most 4x), full bright.
  */
-public class HoloSignRenderer implements BlockEntityRenderer<HoloSignBlockEntity, HoloSignRenderer.State> {
+public class HoloSignRenderer implements matteroverdrive.compat.render.StateBlockEntityRenderer<HoloSignBlockEntity, HoloSignRenderer.State> {
     private static final int COLOR = 0xFFA9E2FB;
     private final Font font;
 
     public HoloSignRenderer(BlockEntityRendererProvider.Context context) {
-        this.font = context.font();
+        this.font = context.getFont();
     }
 
     public static class State extends BlockEntityRenderState {
@@ -41,8 +40,8 @@ public class HoloSignRenderer implements BlockEntityRenderer<HoloSignBlockEntity
 
     @Override
     public void extractRenderState(HoloSignBlockEntity sign, State state, float partialTick, Vec3 camera,
-                                   @Nullable ModelFeatureRenderer.CrumblingOverlay crumbling) {
-        BlockEntityRenderer.super.extractRenderState(sign, state, partialTick, camera, crumbling);
+                                   @Nullable Object crumbling) {
+        matteroverdrive.compat.render.StateBlockEntityRenderer.super.extractRenderState(sign, state, partialTick, camera, crumbling);
         state.lines = sign.getText().isEmpty() ? new String[0] : sign.getText().split("\n");
         state.facing = sign.getBlockState().getValue(HoloSignBlock.FACING);
     }

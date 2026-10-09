@@ -34,18 +34,8 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 @EventBusSubscriber(modid = MatterOverdrive.MODID, value = Dist.CLIENT)
 public class MatterOverdriveClient {
     @SubscribeEvent
-    static void standaloneModels(net.neoforged.neoforge.client.event.ModelEvent.RegisterStandalone event) {
+    static void standaloneModels(net.neoforged.neoforge.client.event.ModelEvent.RegisterAdditional event) {
         MachineRenderers.registerModels(event);
-    }
-
-    @SubscribeEvent
-    static void pictureInPicture(net.neoforged.neoforge.client.event.RegisterPictureInPictureRenderersEvent event) {
-        event.register(matteroverdrive.client.starmap.StarMapPipRenderer.State.class, matteroverdrive.client.starmap.StarMapPipRenderer::new);
-    }
-
-    @SubscribeEvent
-    static void pipelines(net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent event) {
-        matteroverdrive.client.starmap.HoloRenderTypes.register(event);
     }
 
     /** 1.7.10 GalaxyClient.onClientTick: the client's galaxy runs its travel events too. */
@@ -104,7 +94,7 @@ public class MatterOverdriveClient {
             var mc = net.minecraft.client.Minecraft.getInstance();
             if (player == mc.player) {
                 mc.getSoundManager().play(net.minecraft.client.resources.sounds.SimpleSoundInstance.forMusic(
-                        matteroverdrive.init.MOSounds.TRANSFORMATION_MUSIC.get(), 1));
+                        matteroverdrive.init.MOSounds.TRANSFORMATION_MUSIC.get()));
             }
         };
     }
@@ -127,11 +117,6 @@ public class MatterOverdriveClient {
         event.register(MOMenus.ANDROID_SPAWNER.get(), matteroverdrive.client.screen.AndroidSpawnerScreen::new);
         event.register(MOMenus.CONTRACT_MARKET.get(), matteroverdrive.client.screen.ContractMarketScreen::new);
         event.register(MOMenus.STAR_MAP.get(), matteroverdrive.client.screen.StarMapScreen::new);
-    }
-
-    @SubscribeEvent
-    static void registerSelectProperties(net.neoforged.neoforge.client.event.RegisterSelectItemModelPropertyEvent event) {
-        event.register(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "barrel"), BarrelProperty.TYPE);
     }
 
     @SubscribeEvent

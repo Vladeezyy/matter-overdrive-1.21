@@ -89,38 +89,38 @@ public final class DevScene {
         at(332, mc -> openMachine(mc, replicatorPos));
         at(352, mc -> shot(mc, "replicator_home"));
         at(355, mc -> mc.player.closeContainer());
-        at(358, mc -> server(mc, p -> p.teleportTo(p.level(), p.getX() + 0.5, p.getY() + 1.5, p.getZ() + 1.5, Set.of(), 140f, 30f, false)));
+        at(358, mc -> server(mc, p -> p.teleportTo(p.serverLevel(), p.getX() + 0.5, p.getY() + 1.5, p.getZ() + 1.5, Set.of(), 140f, 30f)));
         at(366, mc -> shot(mc, "pipes"));
-        at(368, mc -> server(mc, p -> p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY() + 1, origin.getZ() - 3.5, Set.of(), 180f, 15f, false)));
+        at(368, mc -> server(mc, p -> p.teleportTo(p.serverLevel(), origin.getX() + 0.5, origin.getY() + 1, origin.getZ() - 3.5, Set.of(), 180f, 15f)));
         at(378, mc -> shot(mc, "network"));
-        at(379, mc -> server(mc, p -> p.teleportTo(p.level(), origin.getX() + 3.5, origin.getY() + 3, origin.getZ() - 7.5, Set.of(), 120f, 5f, false)));
+        at(379, mc -> server(mc, p -> p.teleportTo(p.serverLevel(), origin.getX() + 3.5, origin.getY() + 3, origin.getZ() - 7.5, Set.of(), 120f, 5f)));
         at(386, mc -> shot(mc, "anomaly"));
         at(387, mc -> openMachine(mc, reactorPos));
         at(400, mc -> shot(mc, "reactor_gui"));
         at(402, mc -> mc.player.closeContainer());
-        at(404, mc -> server(mc, p -> p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY() + 14, origin.getZ() - 6.5, Set.of(), 180f, 60f, false)));
+        at(404, mc -> server(mc, p -> p.teleportTo(p.serverLevel(), origin.getX() + 0.5, origin.getY() + 14, origin.getZ() - 6.5, Set.of(), 180f, 60f)));
         at(414, mc -> shot(mc, "reactor"));
         // phase 5: weapons in hand, a bolt in flight, inventory icons
         at(416, mc -> server(mc, p -> {
-            p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 0f, false);
+            p.teleportTo(p.serverLevel(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 0f);
             for (var w : new matteroverdrive.item.weapon.EnergyWeaponItem[] {MOItems.PHASER_RIFLE.get(), MOItems.PLASMA_SHOTGUN.get(), MOItems.ION_SNIPER.get()}) {
                 ItemStack s = new ItemStack(w);
                 matteroverdrive.item.weapon.EnergyWeaponItem.setEnergy(s, 32000);
                 p.getInventory().add(s);
             }
             p.getInventory().setItem(0, findWeapon(p, MOItems.PHASER_RIFLE.get()));
-            p.getInventory().setSelectedSlot(0);
+            p.getInventory().selected = 0;
         }));
-        at(418, mc -> mc.player.getInventory().setSelectedSlot(0));   // the selected slot is client-authoritative
+        at(418, mc -> mc.player.getInventory().selected = 0);   // the selected slot is client-authoritative
         at(424, mc -> shot(mc, "rifle_hand"));
         // a slow bolt so the renderer can be seen (real ones cross the view in a tick or two)
         at(426, mc -> server(mc, p -> {
             for (int i = 0; i < 3; i++) {
-                var bolt = new matteroverdrive.entity.PlasmaBolt(p.level(), p, 0, 64, matteroverdrive.item.weapon.WeaponColorModuleItem.COLORS[i]);
+                var bolt = new matteroverdrive.entity.PlasmaBolt(p.serverLevel(), p, 0, 64, matteroverdrive.item.weapon.WeaponColorModuleItem.COLORS[i]);
                 var look = p.getLookAngle();
                 bolt.setPos(p.getX() + (i - 1) * 0.8, p.getEyeY() - 0.2, p.getZ() - 2.5);
                 bolt.shoot(look.x, look.y, look.z, 0.005f, 0);
-                p.level().addFreshEntity(bolt);
+                p.serverLevel().addFreshEntity(bolt);
             }
         }));
         at(428, mc -> shot(mc, "bolt"));
@@ -135,7 +135,7 @@ public final class DevScene {
             matteroverdrive.item.weapon.EnergyWeaponItem.setEnergy(phaser, 32000);
             phaser.set(matteroverdrive.init.MODataComponents.PHASER_LEVEL.get(), 4);
             p.getInventory().setItem(0, phaser);
-            p.teleportTo(p.level(), p.getX(), p.getY(), p.getZ(), Set.of(), 180f, 25f, false);
+            p.teleportTo(p.serverLevel(), p.getX(), p.getY(), p.getZ(), Set.of(), 180f, 25f);
         }));
         at(455, mc -> shot(mc, "phaser_hand"));
         // hold the use key: the client releases item use every tick the key is up
@@ -150,21 +150,21 @@ public final class DevScene {
         at(464, mc -> mc.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player)));
         at(469, mc -> shot(mc, "inventory"));
         at(471, mc -> mc.setScreen(null));
-        at(473, mc -> server(mc, p -> p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 35f, false)));
+        at(473, mc -> server(mc, p -> p.teleportTo(p.serverLevel(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 35f)));
         // phase 5c: weapon station with a fully fitted rifle, its GUI, then a phaser (no sights slot) with a barrel
         at(475, mc -> server(mc, p -> {
             BlockPos station = origin.offset(0, 0, -2);
-            p.level().setBlockAndUpdate(station, MOBlocks.WEAPON_STATION.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
+            p.serverLevel().setBlockAndUpdate(station, MOBlocks.WEAPON_STATION.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
             ItemStack rifle = new ItemStack(MOItems.PHASER_RIFLE.get());
             matteroverdrive.item.weapon.EnergyWeaponItem.setModule(rifle, 0, MOItems.HC_BATTERY.get().charged());
             matteroverdrive.item.weapon.EnergyWeaponItem.setModule(rifle, 1, new ItemStack(MOItems.COLOR_MODULES.get(0).get()));
             matteroverdrive.item.weapon.EnergyWeaponItem.setModule(rifle, 2, new ItemStack(MOItems.BARREL_FIRE.get()));
             matteroverdrive.item.weapon.EnergyWeaponItem.setModule(rifle, 3, new ItemStack(MOItems.SNIPER_SCOPE.get()));
-            ((matteroverdrive.block.entity.WeaponStationBlockEntity) p.level().getBlockEntity(station)).getInventory()
+            ((matteroverdrive.block.entity.WeaponStationBlockEntity) p.serverLevel().getBlockEntity(station)).getInventory()
                     .setStack(matteroverdrive.block.entity.WeaponStationBlockEntity.WEAPON, rifle);
             p.getInventory().add(new ItemStack(MOItems.BARREL_DAMAGE.get()));
             p.getInventory().add(new ItemStack(MOItems.SNIPER_SCOPE.get()));
-            p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 30f, false);
+            p.teleportTo(p.serverLevel(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 30f);
         }));
         at(484, mc -> shot(mc, "weapon_station"));
         at(485, mc -> openMachine(mc, origin.offset(0, 0, -2)));
@@ -172,7 +172,7 @@ public final class DevScene {
         at(493, mc -> server(mc, p -> {
             ItemStack phaser = new ItemStack(MOItems.PHASER.get());
             matteroverdrive.item.weapon.EnergyWeaponItem.setModule(phaser, 2, new ItemStack(MOItems.BARREL_EXPLOSION.get()));
-            ((matteroverdrive.block.entity.WeaponStationBlockEntity) p.level().getBlockEntity(origin.offset(0, 0, -2))).getInventory()
+            ((matteroverdrive.block.entity.WeaponStationBlockEntity) p.serverLevel().getBlockEntity(origin.offset(0, 0, -2))).getInventory()
                     .setStack(matteroverdrive.block.entity.WeaponStationBlockEntity.WEAPON, phaser);
         }));
         at(498, mc -> shot(mc, "weapon_station_phaser"));
@@ -182,14 +182,14 @@ public final class DevScene {
             matteroverdrive.item.weapon.EnergyWeaponItem.setEnergy(phaser, 32000);
             matteroverdrive.item.weapon.EnergyWeaponItem.setModule(phaser, 2, new ItemStack(MOItems.BARREL_HEAL.get()));
             p.getInventory().setItem(0, phaser);
-            p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 0f, false);
+            p.teleportTo(p.serverLevel(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 0f);
         }));
         at(508, mc -> shot(mc, "phaser_barrel"));
         // phase 6: become an android, buy a few stats, fit parts, android station GUI
         at(510, mc -> server(mc, p -> {
             BlockPos station = origin.offset(0, 0, -2);
-            p.level().setBlock(station, MOBlocks.ANDROID_STATION.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH),
-                    Block.UPDATE_ALL | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
+            p.serverLevel().setBlock(station, MOBlocks.ANDROID_STATION.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH),
+                    Block.UPDATE_ALL);
             matteroverdrive.android.Android.setAndroid(p, true);
             p.setExperienceLevels(200);
             matteroverdrive.android.Android.tryUnlock(p, matteroverdrive.android.BioticStats.NANOBOTS, 1);
@@ -205,7 +205,7 @@ public final class DevScene {
             p.getInventory().add(new ItemStack(MOItems.ANDROID_PILL_BLUE.get()));
             p.getInventory().add(new ItemStack(MOItems.ANDROID_PILL_YELLOW.get()));
             p.setExperienceLevels(40);
-            p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 30f, false);
+            p.teleportTo(p.serverLevel(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 30f);
         }));
         at(516, mc -> shot(mc, "android_station"));
         at(517, mc -> openMachine(mc, origin.offset(0, 0, -2)));
@@ -222,9 +222,9 @@ public final class DevScene {
             matteroverdrive.android.Android.get(p).setActiveStat(matteroverdrive.android.BioticStats.SHIELD.id());
             matteroverdrive.android.Android.onActionKey(p);
             p.getInventory().setItem(0, findWeapon(p, MOItems.PHASER_RIFLE.get()));
-            var pig = net.minecraft.world.entity.EntityType.PIG.create(p.level(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            var pig = net.minecraft.world.entity.EntityType.PIG.create(p.serverLevel());
             pig.setPos(origin.getX() + 3.5, origin.getY(), origin.getZ() - 4.5);
-            p.level().addFreshEntity(pig);
+            p.serverLevel().addFreshEntity(pig);
             matteroverdrive.android.Android.sync(p);
         }));
         at(534, mc -> shot(mc, "android_hud"));
@@ -241,8 +241,8 @@ public final class DevScene {
         at(552, mc -> server(mc, p -> {
             BlockPos charger = origin.offset(2, 0, -2);
             var state = MOBlocks.CHARGING_STATION.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH);
-            p.level().setBlockAndUpdate(charger, state);
-            state.getBlock().setPlacedBy(p.level(), charger, state, p, ItemStack.EMPTY);
+            p.serverLevel().setBlockAndUpdate(charger, state);
+            state.getBlock().setPlacedBy(p.serverLevel(), charger, state, p, ItemStack.EMPTY);
         }));
         at(558, mc -> shot(mc, "charging_station"));
         // 7a: every decorative block in a wall, tritanium glass, a holo sign with text
@@ -250,17 +250,17 @@ public final class DevScene {
             var blocks = matteroverdrive.init.MODecorative.ALL;
             for (int i = 0; i < blocks.size(); i++) {
                 BlockPos at = origin.offset(-9 + i % 19, i / 19, 3);
-                p.level().setBlockAndUpdate(at, blocks.get(i).get().defaultBlockState());
+                p.serverLevel().setBlockAndUpdate(at, blocks.get(i).get().defaultBlockState());
             }
             BlockPos wall = origin.offset(0, 2, 3);
-            p.level().setBlockAndUpdate(wall, matteroverdrive.init.MODecorative.TRITANIUM_PLATE.get().defaultBlockState());
+            p.serverLevel().setBlockAndUpdate(wall, matteroverdrive.init.MODecorative.TRITANIUM_PLATE.get().defaultBlockState());
             BlockPos sign = wall.north();
-            p.level().setBlockAndUpdate(sign, MOBlocks.HOLO_SIGN.get().defaultBlockState()
+            p.serverLevel().setBlockAndUpdate(sign, MOBlocks.HOLO_SIGN.get().defaultBlockState()
                     .setValue(matteroverdrive.block.HoloSignBlock.FACING, Direction.NORTH));
-            if (p.level().getBlockEntity(sign) instanceof matteroverdrive.block.entity.HoloSignBlockEntity holo) {
+            if (p.serverLevel().getBlockEntity(sign) instanceof matteroverdrive.block.entity.HoloSignBlockEntity holo) {
                 holo.setText("Matter\nOverdrive\n1.21.10");
             }
-            p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY() + 1, origin.getZ() - 4.5, Set.of(), 0f, 10f, false);
+            p.teleportTo(p.serverLevel(), origin.getX() + 0.5, origin.getY() + 1, origin.getZ() - 4.5, Set.of(), 0f, 10f);
         }));
         at(568, mc -> shot(mc, "decorative"));
         // 7b: rogue androids of each level (one legendary), melee and ranged
@@ -269,19 +269,19 @@ public final class DevScene {
             for (int i = 0; i < 4; i++) {
                 for (boolean ranged : new boolean[] {false, true}) {
                     var type = ranged ? matteroverdrive.init.MOEntities.RANGED_ROGUE_ANDROID.get() : matteroverdrive.init.MOEntities.ROGUE_ANDROID.get();
-                    var android = type.create(p.level(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
-                    android.snapTo(origin.getX() - 4.5 + i * 3 + (ranged ? 1.2 : 0), origin.getY(), origin.getZ() - 8.5, 0, 0);
-                    android.finalizeSpawn(p.level(), p.level().getCurrentDifficultyAt(android.blockPosition()),
-                            net.minecraft.world.entity.EntitySpawnReason.COMMAND, null);
+                    var android = type.create(p.serverLevel());
+                    android.moveTo(origin.getX() - 4.5 + i * 3 + (ranged ? 1.2 : 0), origin.getY(), origin.getZ() - 8.5, 0, 0);
+                    android.finalizeSpawn(p.serverLevel(), p.serverLevel().getCurrentDifficultyAt(android.blockPosition()),
+                            net.minecraft.world.entity.MobSpawnType.COMMAND, null);
                     android.setup(spec[i][0], spec[i][1] == 1);
                     android.setNoAi(true);
                     android.setYRot(0);
                     android.setYHeadRot(0);
                     android.yBodyRot = 0;
-                    p.level().addFreshEntity(android);
+                    p.serverLevel().addFreshEntity(android);
                 }
             }
-            p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY() + 1, origin.getZ() - 1.5, Set.of(), 180f, 10f, false);
+            p.teleportTo(p.serverLevel(), origin.getX() + 0.5, origin.getY() + 1, origin.getZ() - 1.5, Set.of(), 180f, 10f);
         }));
         at(578, mc -> shot(mc, "rogue_androids"));
         // 7c: failed animals (adults and a piglet) on a platform above the scene
@@ -289,50 +289,50 @@ public final class DevScene {
             BlockPos base = origin.above(14);
             for (int x = -7; x <= 7; x++) {
                 for (int z = -10; z <= 1; z++) {
-                    p.level().setBlockAndUpdate(base.offset(x, -1, z), Blocks.SMOOTH_STONE.defaultBlockState());
-                    for (int y = 0; y < 4; y++) p.level().setBlockAndUpdate(base.offset(x, y, z), Blocks.AIR.defaultBlockState());
+                    p.serverLevel().setBlockAndUpdate(base.offset(x, -1, z), Blocks.SMOOTH_STONE.defaultBlockState());
+                    for (int y = 0; y < 4; y++) p.serverLevel().setBlockAndUpdate(base.offset(x, y, z), Blocks.AIR.defaultBlockState());
                 }
             }
             var types = java.util.List.of(matteroverdrive.init.MOEntities.FAILED_PIG.get(), matteroverdrive.init.MOEntities.FAILED_COW.get(),
                     matteroverdrive.init.MOEntities.FAILED_CHICKEN.get(), matteroverdrive.init.MOEntities.FAILED_SHEEP.get(),
                     matteroverdrive.init.MOEntities.FAILED_PIG.get());
             for (int i = 0; i < types.size(); i++) {
-                var animal = types.get(i).create(p.level(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
-                animal.snapTo(base.getX() - 4.5 + i * 2.4, base.getY(), base.getZ() - 6.5, 0, 0);
+                var animal = types.get(i).create(p.serverLevel());
+                animal.moveTo(base.getX() - 4.5 + i * 2.4, base.getY(), base.getZ() - 6.5, 0, 0);
                 if (i == 4) animal.setAge(-24000);
                 animal.setNoAi(true);
                 animal.setYRot(-40);
                 animal.setYHeadRot(-40);
                 animal.yBodyRot = -40;
-                p.level().addFreshEntity(animal);
+                p.serverLevel().addFreshEntity(animal);
             }
-            p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() - 1.0, Set.of(), 180f, 20f, false);
+            p.teleportTo(p.serverLevel(), base.getX() + 0.5, base.getY(), base.getZ() - 1.0, Set.of(), 180f, 20f);
         }));
         at(588, mc -> shot(mc, "failed_animals"));
         // 7d: the mutant scientist on the same platform
         at(590, mc -> server(mc, p -> {
             BlockPos base = origin.above(14);
-            p.level().getEntitiesOfClass(net.minecraft.world.entity.animal.Animal.class, p.getBoundingBox().inflate(16)).forEach(e -> e.discard());
-            var mutant = matteroverdrive.init.MOEntities.MUTANT_SCIENTIST.get().create(p.level(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
-            mutant.snapTo(base.getX() + 0.5, base.getY(), base.getZ() - 4.5, 0, 0);
+            p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.animal.Animal.class, p.getBoundingBox().inflate(16)).forEach(e -> e.discard());
+            var mutant = matteroverdrive.init.MOEntities.MUTANT_SCIENTIST.get().create(p.serverLevel());
+            mutant.moveTo(base.getX() + 0.5, base.getY(), base.getZ() - 4.5, 0, 0);
             mutant.setNoAi(true);
             mutant.setYRot(25);
             mutant.setYHeadRot(25);
             mutant.yBodyRot = 25;
-            p.level().addFreshEntity(mutant);
+            p.serverLevel().addFreshEntity(mutant);
         }));
         at(598, mc -> shot(mc, "mutant_scientist"));
         // 7e: the 16 tritanium crates in two rows, facing the camera
         at(600, mc -> server(mc, p -> {
             BlockPos base = origin.above(14);
-            p.level().getEntitiesOfClass(matteroverdrive.entity.monster.MutantScientist.class, p.getBoundingBox().inflate(16)).forEach(e -> e.discard());
+            p.serverLevel().getEntitiesOfClass(matteroverdrive.entity.monster.MutantScientist.class, p.getBoundingBox().inflate(16)).forEach(e -> e.discard());
             for (int i = 0; i < 16; i++) {
                 BlockPos pos = base.offset(-4 + i % 8, i < 8 ? 0 : 1, -5 - (i < 8 ? 0 : 1));
-                if (i >= 8) p.level().setBlockAndUpdate(pos.below(), matteroverdrive.init.MODecorative.TRITANIUM_PLATE.get().defaultBlockState());
-                p.level().setBlockAndUpdate(pos, matteroverdrive.init.MOBlocks.TRITANIUM_CRATES.get(i).get().defaultBlockState()
+                if (i >= 8) p.serverLevel().setBlockAndUpdate(pos.below(), matteroverdrive.init.MODecorative.TRITANIUM_PLATE.get().defaultBlockState());
+                p.serverLevel().setBlockAndUpdate(pos, matteroverdrive.init.MOBlocks.TRITANIUM_CRATES.get(i).get().defaultBlockState()
                         .setValue(net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING, Direction.SOUTH));
             }
-            p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() - 1.0, Set.of(), 180f, 25f, false);
+            p.teleportTo(p.serverLevel(), base.getX() + 0.5, base.getY(), base.getZ() - 1.0, Set.of(), 180f, 25f);
         }));
         at(608, mc -> shot(mc, "tritanium_crates"));
         // 7f: every image building placed on the terrain far east of the scene, seen from above a corner
@@ -342,22 +342,22 @@ public final class DevScene {
             int t0 = 610 + i * 80;
             at(t0, mc -> server(mc, p -> {
                 BlockPos site = buildingSite(building);
-                p.teleportTo(p.level(), site.getX(), 200, site.getZ(), Set.of(), 0f, 0f, false);
+                p.teleportTo(p.serverLevel(), site.getX(), 200, site.getZ(), Set.of(), 0f, 0f);
             }));
             at(t0 + 60, mc -> server(mc, p -> {
                 var t = building.template();
                 BlockPos site = buildingSite(building);
-                int y = p.level().getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, site.getX(), site.getZ()) - 3;
+                int y = p.serverLevel().getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, site.getX(), site.getZ()) - 3;
                 BlockPos at = new BlockPos(site.getX(), y, site.getZ());
                 var piece = new matteroverdrive.world.ImageStructurePiece(building, at, 42);
-                piece.postProcess(p.level(), p.level().structureManager(), p.level().getChunkSource().getGenerator(), p.level().getRandom(),
+                piece.postProcess(p.serverLevel(), p.serverLevel().structureManager(), p.serverLevel().getChunkSource().getGenerator(), p.serverLevel().getRandom(),
                         piece.getBoundingBox(), new net.minecraft.world.level.ChunkPos(at), at);
                 double cx = at.getX() + t.width() / 2.0, cy = at.getY() + t.height() / 2.0, cz = at.getZ() + t.depth() / 2.0;
                 double size = Math.max(t.width(), t.depth());
                 double ex = cx - size * 0.75, ey = cy + size * 0.55 + 4, ez = cz - size * 0.75;
                 float yaw = (float) Math.toDegrees(Math.atan2(-(cx - ex), cz - ez));
                 float pitch = (float) Math.toDegrees(Math.atan2(ey - cy, Math.hypot(cx - ex, cz - ez)));
-                p.teleportTo(p.level(), ex, ey, ez, Set.of(), yaw, pitch, false);
+                p.teleportTo(p.serverLevel(), ex, ey, ez, Set.of(), yaw, pitch);
                 p.getAbilities().flying = true;
                 p.onUpdateAbilities();
             }));
@@ -368,7 +368,7 @@ public final class DevScene {
         // and where the world generator would put them
         at(1012, mc -> server(mc, p -> {
             for (var building : buildings) {
-                p.level().getServer().getCommands().performPrefixedCommand(p.level().getServer().createCommandSourceStack(),
+                p.serverLevel().getServer().getCommands().performPrefixedCommand(p.serverLevel().getServer().createCommandSourceStack(),
                         "locate structure matteroverdrive:" + building.getSerializedName());
             }
         }));
@@ -383,24 +383,24 @@ public final class DevScene {
             int t0 = 1020 + i * 160;
             BlockPos[] found = i == 0 ? found0 : new BlockPos[1];
             at(t0, mc -> server(mc, p -> {
-                var registry = p.level().registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.STRUCTURE);
+                var registry = p.serverLevel().registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.STRUCTURE);
                 var holder = registry.getOrThrow(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.STRUCTURE,
                         net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("matteroverdrive", id)));
-                var result = p.level().getChunkSource().getGenerator().findNearestMapStructure(p.level(),
+                var result = p.serverLevel().getChunkSource().getGenerator().findNearestMapStructure(p.serverLevel(),
                         net.minecraft.core.HolderSet.direct(holder), first ? searchFrom : found0[0], 100, false);
                 if (result == null) return;
                 found[0] = result.getFirst();
-                p.teleportTo(p.level(), found[0].getX(), 160, found[0].getZ(), Set.of(), 0f, 0f, false);
+                p.teleportTo(p.serverLevel(), found[0].getX(), 160, found[0].getZ(), Set.of(), 0f, 0f);
             }));
             at(t0 + 120, mc -> server(mc, p -> {
                 if (found[0] == null) return;
-                var holder = p.level().registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.STRUCTURE)
-                        .getValue(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("matteroverdrive", id));
-                var start = p.level().structureManager().getStructureAt(
-                        new BlockPos(found[0].getX(), p.level().getMinY() + 1, found[0].getZ()), holder);
+                var holder = p.serverLevel().registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.STRUCTURE)
+                        .get(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("matteroverdrive", id));
+                var start = p.serverLevel().structureManager().getStructureAt(
+                        new BlockPos(found[0].getX(), p.serverLevel().getMinBuildHeight() + 1, found[0].getZ()), holder);
                 BlockPos lookup = found[0];
                 if (!start.isValid()) {
-                    for (var s2 : p.level().structureManager().startsForStructure(new net.minecraft.world.level.ChunkPos(lookup), st -> st == holder)) {
+                    for (var s2 : p.serverLevel().structureManager().startsForStructure(new net.minecraft.world.level.ChunkPos(lookup), st -> st == holder)) {
                         start = s2;
                     }
                 }
@@ -410,11 +410,11 @@ public final class DevScene {
                 }
                 var box = start.getBoundingBox();
                 var aabb = AABB.of(box).inflate(4);
-                int androids = p.level().getEntitiesOfClass(matteroverdrive.entity.monster.RogueAndroid.class, aabb).size();
-                int mutants = p.level().getEntitiesOfClass(matteroverdrive.entity.monster.MutantScientist.class, aabb).size();
+                int androids = p.serverLevel().getEntitiesOfClass(matteroverdrive.entity.monster.RogueAndroid.class, aabb).size();
+                int mutants = p.serverLevel().getEntitiesOfClass(matteroverdrive.entity.monster.MutantScientist.class, aabb).size();
                 int crates = 0, lootCrates = 0;
                 for (BlockPos pos : BlockPos.betweenClosed(box.minX(), box.minY(), box.minZ(), box.maxX(), box.maxY(), box.maxZ())) {
-                    if (p.level().getBlockEntity(pos) instanceof matteroverdrive.block.entity.TritaniumCrateBlockEntity crate) {
+                    if (p.serverLevel().getBlockEntity(pos) instanceof matteroverdrive.block.entity.TritaniumCrateBlockEntity crate) {
                         crates++;
                         if (crate.getLootTable() != null || !crate.isEmpty()) lootCrates++;
                     }
@@ -425,7 +425,7 @@ public final class DevScene {
                 double ex = cx - size * 0.8, ey = cy + size * 0.6 + 4, ez = cz - size * 0.8;
                 float yaw = (float) Math.toDegrees(Math.atan2(-(cx - ex), cz - ez));
                 float pitch = (float) Math.toDegrees(Math.atan2(ey - cy, Math.hypot(cx - ex, cz - ez)));
-                p.teleportTo(p.level(), ex, ey, ez, Set.of(), yaw, pitch, false);
+                p.teleportTo(p.serverLevel(), ex, ey, ez, Set.of(), yaw, pitch);
             }));
             at(t0 + 121, mc -> mc.options.hideGui = true);
             at(t0 + 150, mc -> shot(mc, "natural_" + id));
@@ -434,19 +434,19 @@ public final class DevScene {
         // 7g: a Matter Plasma pool on the platform, the containers in the hotbar
         at(1340, mc -> server(mc, p -> {
             BlockPos base = origin.above(14);
-            p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() - 1.0, Set.of(), 180f, 35f, false);
+            p.teleportTo(p.serverLevel(), base.getX() + 0.5, base.getY(), base.getZ() - 1.0, Set.of(), 180f, 35f);
             p.getAbilities().flying = false;
             p.onUpdateAbilities();
             for (BlockPos pos : BlockPos.betweenClosed(base.offset(-4, 0, -9), base.offset(4, 1, -4))) {
-                p.level().setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
+                p.serverLevel().setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
             }
             for (BlockPos pos : BlockPos.betweenClosed(base.offset(-2, -1, -7), base.offset(2, -1, -5))) {
-                p.level().setBlockAndUpdate(pos, matteroverdrive.init.MODecorative.TRITANIUM_PLATE.get().defaultBlockState());
-                p.level().setBlockAndUpdate(pos.below(), matteroverdrive.init.MODecorative.TRITANIUM_PLATE.get().defaultBlockState());
-                p.level().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+                p.serverLevel().setBlockAndUpdate(pos, matteroverdrive.init.MODecorative.TRITANIUM_PLATE.get().defaultBlockState());
+                p.serverLevel().setBlockAndUpdate(pos.below(), matteroverdrive.init.MODecorative.TRITANIUM_PLATE.get().defaultBlockState());
+                p.serverLevel().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
             }
-            p.level().setBlockAndUpdate(base.offset(0, -1, -6), matteroverdrive.init.MOBlocks.MATTER_PLASMA.get().defaultBlockState());
-            p.level().setBlockAndUpdate(base.offset(-1, -1, -6), matteroverdrive.init.MOBlocks.MATTER_PLASMA.get().defaultBlockState());
+            p.serverLevel().setBlockAndUpdate(base.offset(0, -1, -6), matteroverdrive.init.MOBlocks.MATTER_PLASMA.get().defaultBlockState());
+            p.serverLevel().setBlockAndUpdate(base.offset(-1, -1, -6), matteroverdrive.init.MOBlocks.MATTER_PLASMA.get().defaultBlockState());
             p.getInventory().setItem(0, new ItemStack(MOItems.MATTER_CONTAINER.get(), 8));
             p.getInventory().setItem(1, new ItemStack(MOItems.MATTER_CONTAINER_FULL.get(), 3));
         }));
@@ -455,12 +455,12 @@ public final class DevScene {
         at(1402, mc -> server(mc, p -> {
             BlockPos base = origin.above(14);
             for (BlockPos pos : BlockPos.betweenClosed(base.offset(-2, 0, -7), base.offset(2, 2, -7))) {
-                p.level().setBlockAndUpdate(pos, Blocks.STONE.defaultBlockState());
+                p.serverLevel().setBlockAndUpdate(pos, Blocks.STONE.defaultBlockState());
             }
             ItemStack tool = new ItemStack(MOItems.OMNI_TOOL.get());
             matteroverdrive.item.weapon.EnergyWeaponItem.setEnergy(tool, 32000);
             p.getInventory().setItem(0, tool);
-            p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() - 1.0, Set.of(), 180f, 0f, false);
+            p.teleportTo(p.serverLevel(), base.getX() + 0.5, base.getY(), base.getZ() - 1.0, Set.of(), 180f, 0f);
         }));
         at(1410, mc -> mc.options.keyUse.setDown(true));
         at(1428, mc -> shot(mc, "omni_tool"));
@@ -474,24 +474,24 @@ public final class DevScene {
         at(1440, mc -> server(mc, p -> {
             BlockPos base = origin.above(14);
             for (BlockPos pos : BlockPos.betweenClosed(base.offset(-2, 0, -7), base.offset(2, 2, -7))) {
-                p.level().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+                p.serverLevel().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
             }
-            p.level().setBlockAndUpdate(base.offset(-1, 0, -4), MOBlocks.MICROWAVE.get().defaultBlockState()
+            p.serverLevel().setBlockAndUpdate(base.offset(-1, 0, -4), MOBlocks.MICROWAVE.get().defaultBlockState()
                     .setValue(net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING, Direction.SOUTH));
-            p.level().setBlockAndUpdate(base.offset(1, 0, -4), MOBlocks.MICROWAVE.get().defaultBlockState()
+            p.serverLevel().setBlockAndUpdate(base.offset(1, 0, -4), MOBlocks.MICROWAVE.get().defaultBlockState()
                     .setValue(net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING, Direction.EAST));
             ItemStack decomposer = new ItemStack(MOItems.PORTABLE_DECOMPOSER.get());
             decomposer.set(matteroverdrive.init.MODataComponents.ENERGY.get(), 90000);
             p.getInventory().setItem(0, decomposer);
-            p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() - 1.0, Set.of(), 180f, 40f, false);
+            p.teleportTo(p.serverLevel(), base.getX() + 0.5, base.getY(), base.getZ() - 1.0, Set.of(), 180f, 40f);
         }));
         at(1450, mc -> shot(mc, "microwave"));
         // 7j: a matter scanner linked to a pattern storage with a few patterns, its screen open
         at(1452, mc -> server(mc, p -> {
             BlockPos base = origin.above(14);
             BlockPos storagePos = base.offset(2, 0, -5);
-            p.level().setBlockAndUpdate(storagePos, MOBlocks.PATTERN_STORAGE.get().defaultBlockState());
-            if (p.level().getBlockEntity(storagePos) instanceof matteroverdrive.block.entity.PatternStorageBlockEntity storage) {
+            p.serverLevel().setBlockAndUpdate(storagePos, MOBlocks.PATTERN_STORAGE.get().defaultBlockState());
+            if (p.serverLevel().getBlockEntity(storagePos) instanceof matteroverdrive.block.entity.PatternStorageBlockEntity storage) {
                 storage.getEnergy().set(64000);
                 ItemStack drive = new ItemStack(MOItems.PATTERN_DRIVE.get());
                 MOItems.PATTERN_DRIVE.get().addProgress(drive, net.minecraft.world.item.Items.DIAMOND, 100);
@@ -503,8 +503,8 @@ public final class DevScene {
                 storage.getInventory().setStack(1, drive2);
             }
             ItemStack scanner = new ItemStack(MOItems.MATTER_SCANNER.get());
-            matteroverdrive.item.MatterScannerItem.link(scanner, p.level(), storagePos);
-            matteroverdrive.item.MatterScannerItem.select(p.level(), scanner, net.minecraft.world.item.Items.IRON_BLOCK);
+            matteroverdrive.item.MatterScannerItem.link(scanner, p.serverLevel(), storagePos);
+            matteroverdrive.item.MatterScannerItem.select(p.serverLevel(), scanner, net.minecraft.world.item.Items.IRON_BLOCK);
             p.getInventory().setItem(0, scanner);
         }));
         at(1460, mc -> mc.setScreen(new matteroverdrive.client.screen.MatterScannerScreen(0)));
@@ -516,11 +516,11 @@ public final class DevScene {
             BlockPos pad = base.offset(0, -1, -4);
             // a clean floor (the plasma pool and the microwaves go)
             for (BlockPos pos : BlockPos.betweenClosed(base.offset(-7, -2, -10), base.offset(7, 3, 1))) {
-                p.level().setBlock(pos, pos.getY() < base.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
-                        Block.UPDATE_CLIENTS | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
+                p.serverLevel().setBlock(pos, pos.getY() < base.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
+                        Block.UPDATE_CLIENTS);
             }
-            p.level().setBlockAndUpdate(pad, MOBlocks.TRANSPORTER.get().defaultBlockState());
-            if (p.level().getBlockEntity(pad) instanceof matteroverdrive.block.entity.TransporterBlockEntity t) {
+            p.serverLevel().setBlockAndUpdate(pad, MOBlocks.TRANSPORTER.get().defaultBlockState());
+            if (p.serverLevel().getBlockEntity(pad) instanceof matteroverdrive.block.entity.TransporterBlockEntity t) {
                 t.getEnergy().set(1000000);
                 t.addLocation("Platform edge");
                 t.setSelected("Platform edge", base.offset(-5, 0, -8));
@@ -535,7 +535,7 @@ public final class DevScene {
         // open the screen once the client has the new block entity
         at(1478, mc -> server(mc, p -> {
             BlockPos pad = origin.above(14).offset(0, -1, -4);
-            if (p.level().getBlockEntity(pad) instanceof matteroverdrive.block.entity.TransporterBlockEntity t) {
+            if (p.serverLevel().getBlockEntity(pad) instanceof matteroverdrive.block.entity.TransporterBlockEntity t) {
                 p.openMenu(t, buf -> buf.writeBlockPos(pad));
             }
         }));
@@ -543,7 +543,7 @@ public final class DevScene {
         at(1485, mc -> server(mc, p -> {
             p.closeContainer();
             BlockPos base = origin.above(14);
-            p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() - 3.5, Set.of(), 180f, 30f, false);
+            p.teleportTo(p.serverLevel(), base.getX() + 0.5, base.getY(), base.getZ() - 3.5, Set.of(), 180f, 30f);
         }));
         at(1488, mc -> mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT));
         at(1540, mc -> shot(mc, "transporter_transport"));
@@ -552,15 +552,15 @@ public final class DevScene {
         at(1544, mc -> server(mc, p -> {
             BlockPos base = origin.above(30);
             for (BlockPos pos : BlockPos.betweenClosed(base.offset(-8, -1, -14), base.offset(8, 5, 2))) {
-                p.level().setBlock(pos, pos.getY() < base.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
-                        Block.UPDATE_CLIENTS | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
+                p.serverLevel().setBlock(pos, pos.getY() < base.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
+                        Block.UPDATE_CLIENTS);
             }
-            p.level().getEntitiesOfClass(net.minecraft.world.entity.Mob.class, new AABB(base).inflate(20)).forEach(e -> e.discard());
-            var scoreboard = p.level().getScoreboard();
+            p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.Mob.class, new AABB(base).inflate(20)).forEach(e -> e.discard());
+            var scoreboard = p.serverLevel().getScoreboard();
             if (scoreboard.getPlayerTeam("rogues") == null) scoreboard.addPlayerTeam("rogues").setColor(net.minecraft.ChatFormatting.RED);
             BlockPos spawnerPos = base.offset(-2, -1, -5);
-            p.level().setBlockAndUpdate(spawnerPos, MOBlocks.ANDROID_SPAWNER.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
-            if (p.level().getBlockEntity(spawnerPos) instanceof matteroverdrive.block.entity.AndroidSpawnerBlockEntity s) {
+            p.serverLevel().setBlockAndUpdate(spawnerPos, MOBlocks.ANDROID_SPAWNER.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
+            if (p.serverLevel().getBlockEntity(spawnerPos) instanceof matteroverdrive.block.entity.AndroidSpawnerBlockEntity s) {
                 s.getInventory().setStack(matteroverdrive.block.entity.AndroidSpawnerBlockEntity.COLOR_MODULE_SLOT,
                         new ItemStack(MOItems.COLOR_MODULES.get(0).get()));
                 ItemStack drive = new ItemStack(MOItems.TRANSPORT_FLASH_DRIVE.get());
@@ -568,11 +568,11 @@ public final class DevScene {
                 s.getInventory().setStack(matteroverdrive.block.entity.AndroidSpawnerBlockEntity.FLASH_DRIVE_SLOT_START, drive);
                 s.setConfig(4, 4, 0, "rogues");
             }
-            p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() + 0.5, Set.of(), 180f, 25f, false);
+            p.teleportTo(p.serverLevel(), base.getX() + 0.5, base.getY(), base.getZ() + 0.5, Set.of(), 180f, 25f);
         }));
         at(1560, mc -> server(mc, p -> {
             BlockPos spawnerPos = origin.above(30).offset(-2, -1, -5);
-            if (p.level().getBlockEntity(spawnerPos) instanceof matteroverdrive.block.entity.AndroidSpawnerBlockEntity s) {
+            if (p.serverLevel().getBlockEntity(spawnerPos) instanceof matteroverdrive.block.entity.AndroidSpawnerBlockEntity s) {
                 s.setConfig(4, 4, 600, "rogues");
                 p.openMenu(s, buf -> buf.writeBlockPos(spawnerPos));
             }
@@ -584,28 +584,28 @@ public final class DevScene {
         at(1630, mc -> shot(mc, "android_spawner_world"));
         at(1631, mc -> server(mc, p -> {
             BlockPos spawnerPos = origin.above(30).offset(-2, -1, -5);
-            if (p.level().getBlockEntity(spawnerPos) instanceof matteroverdrive.block.entity.AndroidSpawnerBlockEntity s) s.removeAllAndroids();
+            if (p.serverLevel().getBlockEntity(spawnerPos) instanceof matteroverdrive.block.entity.AndroidSpawnerBlockEntity s) s.removeAllAndroids();
         }));
         // 7m: the mad scientist: a human's conversation, taking Puny Humans (HUD "Started"), the junkie's cocktail story, trades
         at(1636, mc -> server(mc, p -> {
             BlockPos base = origin.above(30);
             for (BlockPos pos : BlockPos.betweenClosed(base.offset(-8, -1, -14), base.offset(8, 5, 2))) {
-                p.level().setBlock(pos, pos.getY() < base.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
-                        Block.UPDATE_CLIENTS | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
+                p.serverLevel().setBlock(pos, pos.getY() < base.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
+                        Block.UPDATE_CLIENTS);
             }
-            p.level().getEntitiesOfClass(net.minecraft.world.entity.Mob.class, new AABB(base).inflate(20)).forEach(e -> e.discard());
+            p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.Mob.class, new AABB(base).inflate(20)).forEach(e -> e.discard());
             matteroverdrive.quest.PlayerQuests.get(p).getActiveQuests().clear();
             matteroverdrive.quest.PlayerQuests.get(p).getCompletedQuests().clear();
             matteroverdrive.quest.PlayerQuests.sync(p);
             matteroverdrive.android.Android.setAndroid(p, false);
-            p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() + 0.5, Set.of(), 180f, 5f, false);
-            var npc = matteroverdrive.init.MOEntities.MAD_SCIENTIST.get().create(p.level(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
-            npc.snapTo(base.getX() + 0.5, base.getY(), base.getZ() - 2.5, 0, 0);
+            p.teleportTo(p.serverLevel(), base.getX() + 0.5, base.getY(), base.getZ() + 0.5, Set.of(), 180f, 5f);
+            var npc = matteroverdrive.init.MOEntities.MAD_SCIENTIST.get().create(p.serverLevel());
+            npc.moveTo(base.getX() + 0.5, base.getY(), base.getZ() - 2.5, 0, 0);
             npc.setJunkie(false);
             npc.setNoAi(true);
-            p.level().addFreshEntity(npc);
+            p.serverLevel().addFreshEntity(npc);
         }));
-        at(1644, mc -> server(mc, p -> p.level().getEntitiesOfClass(matteroverdrive.entity.MadScientist.class, p.getBoundingBox().inflate(6))
+        at(1644, mc -> server(mc, p -> p.serverLevel().getEntitiesOfClass(matteroverdrive.entity.MadScientist.class, p.getBoundingBox().inflate(6))
                 .forEach(npc -> matteroverdrive.dialog.DialogPayloads.startConversation(p, npc))));
         at(1652, mc -> shot(mc, "dialog_human"));
         at(1653, mc -> {
@@ -613,10 +613,10 @@ public final class DevScene {
         });
         at(1680, mc -> shot(mc, "dialog_puny_humans"));
         at(1681, mc -> mc.setScreen(null));
-        at(1682, mc -> server(mc, p -> p.level().getEntitiesOfClass(matteroverdrive.entity.MadScientist.class, p.getBoundingBox().inflate(6))
+        at(1682, mc -> server(mc, p -> p.serverLevel().getEntitiesOfClass(matteroverdrive.entity.MadScientist.class, p.getBoundingBox().inflate(6))
                 .forEach(npc -> npc.setJunkie(true))));
         // the junkie flag reaches the client first: both sides build the same start message
-        at(1686, mc -> server(mc, p -> p.level().getEntitiesOfClass(matteroverdrive.entity.MadScientist.class, p.getBoundingBox().inflate(6))
+        at(1686, mc -> server(mc, p -> p.serverLevel().getEntitiesOfClass(matteroverdrive.entity.MadScientist.class, p.getBoundingBox().inflate(6))
                 .forEach(npc -> matteroverdrive.dialog.DialogPayloads.startConversation(p, npc))));
         at(1692, mc -> shot(mc, "dialog_junkie"));
         // the cocktail story: its first line, then on to the last line with Accept / Decline
@@ -653,59 +653,59 @@ public final class DevScene {
             int n = i;
             // the player goes first so the village's chunks (and its entities) are loaded, then the village is placed
             at(1766 + i * 30, mc -> server(mc, p -> {
-                if (!p.level().getEntities(matteroverdrive.init.MOEntities.MAD_SCIENTIST.get(), e -> e.getX() > origin.getX() + 1000).isEmpty()) return;
+                if (!p.serverLevel().getEntities(matteroverdrive.init.MOEntities.MAD_SCIENTIST.get(), e -> e.getX() > origin.getX() + 1000).isEmpty()) return;
                 BlockPos at = origin.offset(2000 + n * 300, 0, 0);
-                p.teleportTo(p.level(), at.getX(), at.getY() + 40, at.getZ(), Set.of(), 0, 90f, false);
+                p.teleportTo(p.serverLevel(), at.getX(), at.getY() + 40, at.getZ(), Set.of(), 0, 90f);
                 p.getAbilities().flying = true;
                 p.onUpdateAbilities();
             }));
             // /place needs every chunk of the village loaded: force-load 15 x 15 chunks around it first
             at(1770 + i * 30, mc -> server(mc, p -> {
-                if (!p.level().getEntities(matteroverdrive.init.MOEntities.MAD_SCIENTIST.get(), e -> e.getX() > origin.getX() + 1000).isEmpty()) return;
+                if (!p.serverLevel().getEntities(matteroverdrive.init.MOEntities.MAD_SCIENTIST.get(), e -> e.getX() > origin.getX() + 1000).isEmpty()) return;
                 BlockPos at = origin.offset(2000 + n * 300, 0, 0);
-                p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
+                p.serverLevel().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
                         "forceload add " + (at.getX() - 112) + " " + (at.getZ() - 112) + " " + (at.getX() + 112) + " " + (at.getZ() + 112));
             }));
             at(1786 + i * 30, mc -> server(mc, p -> {
-                if (!p.level().getEntities(matteroverdrive.init.MOEntities.MAD_SCIENTIST.get(), e -> e.getX() > origin.getX() + 1000).isEmpty()) return;
+                if (!p.serverLevel().getEntities(matteroverdrive.init.MOEntities.MAD_SCIENTIST.get(), e -> e.getX() > origin.getX() + 1000).isEmpty()) return;
                 BlockPos at = origin.offset(2000 + n * 300, 0, 0);
-                p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4)
+                p.serverLevel().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4)
                         .withCallback((ok, result) -> MatterOverdrive.LOGGER.info("[scene] village at {}: {}", at, ok)),
                         "place structure minecraft:village_plains " + at.getX() + " " + at.getY() + " " + at.getZ());
-                MatterOverdrive.LOGGER.info("[scene] scientists loaded: {}", p.level().getEntities(
+                MatterOverdrive.LOGGER.info("[scene] scientists loaded: {}", p.serverLevel().getEntities(
                         matteroverdrive.init.MOEntities.MAD_SCIENTIST.get(), e -> e.getX() > origin.getX() + 1000).size());
             }));
         }
         at(2010, mc -> server(mc, p -> {
-            var found = p.level().getEntities(matteroverdrive.init.MOEntities.MAD_SCIENTIST.get(), e -> e.getX() > origin.getX() + 1000);
+            var found = p.serverLevel().getEntities(matteroverdrive.init.MOEntities.MAD_SCIENTIST.get(), e -> e.getX() > origin.getX() + 1000);
             MatterOverdrive.LOGGER.info("[scene] mad scientists in villages: {}", found.size());
             if (found.isEmpty()) return;
             var npc = found.get(0);
             npc.setNoAi(true);
-            p.teleportTo(p.level(), npc.getX() + 6, npc.getY() + 14, npc.getZ() + 6, Set.of(), 135f, 55f, false);
+            p.teleportTo(p.serverLevel(), npc.getX() + 6, npc.getY() + 14, npc.getZ() + 6, Set.of(), 135f, 55f);
         }));
         at(2011, mc -> mc.options.hideGui = true);
         at(2050, mc -> shot(mc, "mad_scientist_house"));
         at(2051, mc -> server(mc, p -> {
-            var found = p.level().getEntities(matteroverdrive.init.MOEntities.MAD_SCIENTIST.get(), e -> e.getX() > origin.getX() + 1000);
+            var found = p.serverLevel().getEntities(matteroverdrive.init.MOEntities.MAD_SCIENTIST.get(), e -> e.getX() > origin.getX() + 1000);
             if (found.isEmpty()) return;
             var npc = found.get(0);
             // inside: from the scientist's spot, looking around the room towards the bookshelves
             BlockPos crate = BlockPos.betweenClosedStream(npc.blockPosition().offset(-4, -1, -4), npc.blockPosition().offset(4, 1, 4))
-                    .filter(b -> p.level().getBlockState(b).getBlock() instanceof matteroverdrive.block.TritaniumCrateBlock)
+                    .filter(b -> p.serverLevel().getBlockState(b).getBlock() instanceof matteroverdrive.block.TritaniumCrateBlock)
                     .map(BlockPos::immutable).findFirst().orElse(npc.blockPosition());
             var eye = npc.position().add(npc.position().subtract(crate.getCenter()).normalize().scale(2.5));
-            p.teleportTo(p.level(), eye.x, npc.getY(), eye.z, Set.of(), 0, 15f, false);
+            p.teleportTo(p.serverLevel(), eye.x, npc.getY(), eye.z, Set.of(), 0, 15f);
             p.lookAt(net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES, crate.getCenter());
         }));
         at(2070, mc -> shot(mc, "mad_scientist_house_inside"));
         at(2071, mc -> mc.options.hideGui = false);
         at(2072, mc -> server(mc, p -> {
-            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
+            p.serverLevel().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
                     "forceload remove all");
             p.getAbilities().flying = false;
             p.onUpdateAbilities();
-            p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 0f, false);
+            p.teleportTo(p.serverLevel(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 0f);
         }));
         // 7o: the Data Pad's quest log with two quests (the cocktail half done), then the other one selected
         at(2076, mc -> server(mc, p -> {
@@ -771,40 +771,40 @@ public final class DevScene {
         at(2302, mc -> server(mc, p -> {
             BlockPos base = origin.above(30);
             for (BlockPos pos : BlockPos.betweenClosed(base.offset(-8, -1, -14), base.offset(8, 5, 2))) {
-                p.level().setBlock(pos, pos.getY() < base.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
-                        Block.UPDATE_CLIENTS | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
+                p.serverLevel().setBlock(pos, pos.getY() < base.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
+                        Block.UPDATE_CLIENTS);
             }
-            p.level().getEntitiesOfClass(net.minecraft.world.entity.Mob.class, new AABB(base).inflate(20)).forEach(e -> e.discard());
+            p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.Mob.class, new AABB(base).inflate(20)).forEach(e -> e.discard());
             BlockPos market = base.offset(0, 0, -3);
-            p.level().setBlockAndUpdate(market, matteroverdrive.init.MOBlocks.CONTRACT_MARKET.get().defaultBlockState()
+            p.serverLevel().setBlockAndUpdate(market, matteroverdrive.init.MOBlocks.CONTRACT_MARKET.get().defaultBlockState()
                     .setValue(matteroverdrive.machine.MachineBlock.FACING, net.minecraft.core.Direction.SOUTH));
-            if (p.level().getBlockEntity(market) instanceof matteroverdrive.block.entity.ContractMarketBlockEntity m) {
+            if (p.serverLevel().getBlockEntity(market) instanceof matteroverdrive.block.entity.ContractMarketBlockEntity m) {
                 var quests = List.of(matteroverdrive.quest.Quests.KILL_ANDROIDS, matteroverdrive.quest.Quests.SACRIFICE,
                         matteroverdrive.quest.Quests.DEPARTMENT_OF_AGRICULTURE, matteroverdrive.quest.Quests.WEAPONS_OF_WAR,
                         matteroverdrive.quest.Quests.ONE_TRUE_LOVE, matteroverdrive.quest.Quests.IS_IT_REALLY_ME,
                         matteroverdrive.quest.Quests.BEAST_BELLY);
                 for (int i = 0; i < quests.size(); i++) {
-                    m.getInventory().setStack(i, matteroverdrive.item.ContractItem.of(quests.get(i).generate(p.level().random)));
+                    m.getInventory().setStack(i, matteroverdrive.item.ContractItem.of(quests.get(i).generate(p.serverLevel().random)));
                 }
                 m.addGenerationDelay();
             }
-            p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() + 0.5, Set.of(), 180f, 20f, false);
+            p.teleportTo(p.serverLevel(), base.getX() + 0.5, base.getY(), base.getZ() + 0.5, Set.of(), 180f, 20f);
         }));
         at(2310, mc -> server(mc, p -> {
             BlockPos market = origin.above(30).offset(0, 0, -3);
-            if (p.level().getBlockEntity(market) instanceof matteroverdrive.block.entity.ContractMarketBlockEntity m) {
+            if (p.serverLevel().getBlockEntity(market) instanceof matteroverdrive.block.entity.ContractMarketBlockEntity m) {
                 p.openMenu(m, buf -> buf.writeBlockPos(market));
             }
         }));
         at(2320, mc -> shot(mc, "contract_market"));
         at(2321, mc -> server(mc, ServerPlayer::closeContainer));
         at(2324, mc -> server(mc, p -> p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,
-                matteroverdrive.item.ContractItem.of(matteroverdrive.quest.Quests.KILL_ANDROIDS.generate(p.level().random)))));
+                matteroverdrive.item.ContractItem.of(matteroverdrive.quest.Quests.KILL_ANDROIDS.generate(p.serverLevel().random)))));
         at(2330, mc -> mc.setScreen(new matteroverdrive.client.quest.ContractScreen(net.minecraft.world.InteractionHand.MAIN_HAND)));
         at(2338, mc -> shot(mc, "contract_screen"));
         at(2339, mc -> mc.setScreen(null));
         at(2342, mc -> server(mc, p -> p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,
-                matteroverdrive.item.ContractItem.of(matteroverdrive.quest.Quests.GMO.generate(p.level().random)))));
+                matteroverdrive.item.ContractItem.of(matteroverdrive.quest.Quests.GMO.generate(p.serverLevel().random)))));
         at(2348, mc -> mc.setScreen(new matteroverdrive.client.quest.ContractScreen(net.minecraft.world.InteractionHand.MAIN_HAND)));
         at(2356, mc -> shot(mc, "contract_screen_gmo"));
         at(2357, mc -> mc.setScreen(null));
@@ -828,26 +828,26 @@ public final class DevScene {
         at(2378, mc -> shot(mc, "security_protocol_hand"));
         at(2380, mc -> server(mc, p -> {
             BlockPos market = origin.above(30).offset(0, 0, -3);
-            if (p.level().getBlockEntity(market) instanceof matteroverdrive.machine.MachineBlockEntity m) {
+            if (p.serverLevel().getBlockEntity(market) instanceof matteroverdrive.machine.MachineBlockEntity m) {
                 ItemStack foreign = new ItemStack(MOItems.SECURITY_PROTOCOL.get());
                 foreign.set(matteroverdrive.init.MODataComponents.SECURITY_OWNER.get(), STRANGER);
                 m.claim(foreign);
             }
             p.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
-            p.level().getBlockState(market).useWithoutItem(p.level(), p,
+            p.serverLevel().getBlockState(market).useWithoutItem(p.serverLevel(), p,
                     new net.minecraft.world.phys.BlockHitResult(market.getCenter(), net.minecraft.core.Direction.SOUTH, market, false));
         }));
         at(2388, mc -> shot(mc, "security_no_rights"));
         at(2390, mc -> server(mc, p -> {
             BlockPos market = origin.above(30).offset(0, 0, -3);
-            if (p.level().getBlockEntity(market) instanceof matteroverdrive.machine.MachineBlockEntity m) {
+            if (p.serverLevel().getBlockEntity(market) instanceof matteroverdrive.machine.MachineBlockEntity m) {
                 ItemStack remove = new ItemStack(MOItems.SECURITY_PROTOCOL.get());
                 remove.set(matteroverdrive.init.MODataComponents.SECURITY_OWNER.get(), STRANGER);
                 m.unclaim(remove);
             }
             p.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
             BlockPos crate = origin.above(30).offset(6, 0, -6);
-            var contract = matteroverdrive.quest.Quests.CRASH_LANDING.generate(p.level().random);
+            var contract = matteroverdrive.quest.Quests.CRASH_LANDING.generate(p.serverLevel().random);
             contract.getData().putIntArray("Pos", new int[] {crate.getX(), crate.getY(), crate.getZ()});
             p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, matteroverdrive.item.ContractItem.of(contract));
         }));
@@ -873,30 +873,30 @@ public final class DevScene {
         // a crashed ship far south: player first (loads the chunks), force-load, place, then look at it and open a crate
         at(2446, mc -> server(mc, p -> {
             BlockPos at = origin.offset(0, 0, 3000);
-            p.teleportTo(p.level(), at.getX(), at.getY() + 40, at.getZ(), Set.of(), 0, 90f, false);
+            p.teleportTo(p.serverLevel(), at.getX(), at.getY() + 40, at.getZ(), Set.of(), 0, 90f);
             p.getAbilities().flying = true;
             p.onUpdateAbilities();
         }));
         at(2450, mc -> server(mc, p -> {
             BlockPos at = origin.offset(0, 0, 3000);
-            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
+            p.serverLevel().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
                     "forceload add " + (at.getX() - 64) + " " + (at.getZ() - 64) + " " + (at.getX() + 64) + " " + (at.getZ() + 64));
         }));
         at(2466, mc -> server(mc, p -> {
             BlockPos at = origin.offset(0, 0, 3000);
-            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4)
+            p.serverLevel().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4)
                     .withCallback((ok, result) -> MatterOverdrive.LOGGER.info("[scene] crashed ship at {}: {}", at, ok)),
                     "place structure matteroverdrive:crashed_ship " + at.getX() + " " + at.getY() + " " + at.getZ());
         }));
         at(2472, mc -> server(mc, p -> {
             BlockPos at = origin.offset(0, 0, 3000);
-            BlockPos crate = BlockPos.betweenClosedStream(new BlockPos(at.getX() - 48, p.level().getMinY(), at.getZ() - 48), new BlockPos(at.getX() + 48, at.getY() + 30, at.getZ() + 48))
-                    .filter(b -> p.level().getBlockState(b).getBlock() instanceof matteroverdrive.block.TritaniumCrateBlock)
+            BlockPos crate = BlockPos.betweenClosedStream(new BlockPos(at.getX() - 48, p.serverLevel().getMinBuildHeight(), at.getZ() - 48), new BlockPos(at.getX() + 48, at.getY() + 30, at.getZ() + 48))
+                    .filter(b -> p.serverLevel().getBlockState(b).getBlock() instanceof matteroverdrive.block.TritaniumCrateBlock)
                     .map(BlockPos::immutable).findFirst().orElse(null);
             MatterOverdrive.LOGGER.info("[scene] crashed ship crate: {}", crate);
             if (crate == null) return;
             crashCrate = crate;
-            p.teleportTo(p.level(), crate.getX() + 9.5, crate.getY() + 9, crate.getZ() + 9.5, Set.of(), 135f, 35f, false);
+            p.teleportTo(p.serverLevel(), crate.getX() + 9.5, crate.getY() + 9, crate.getZ() + 9.5, Set.of(), 135f, 35f);
             p.lookAt(net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES, crate.getCenter());
         }));
         at(2473, mc -> mc.options.hideGui = true);
@@ -904,35 +904,35 @@ public final class DevScene {
         at(2501, mc -> mc.options.hideGui = false);
         at(2502, mc -> server(mc, p -> {
             if (crashCrate == null) return;
-            p.teleportTo(p.level(), crashCrate.getX() + 0.5, crashCrate.getY() + 1, crashCrate.getZ() + 0.5, Set.of(), 0, 60f, false);
-            p.level().getBlockState(crashCrate).useWithoutItem(p.level(), p,
+            p.teleportTo(p.serverLevel(), crashCrate.getX() + 0.5, crashCrate.getY() + 1, crashCrate.getZ() + 0.5, Set.of(), 0, 60f);
+            p.serverLevel().getBlockState(crashCrate).useWithoutItem(p.serverLevel(), p,
                     new net.minecraft.world.phys.BlockHitResult(crashCrate.getCenter(), net.minecraft.core.Direction.UP, crashCrate, false));
         }));
         at(2510, mc -> shot(mc, "crashed_ship_crate"));
         at(2511, mc -> server(mc, p -> {
             p.closeContainer();
-            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
+            p.serverLevel().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
                     "forceload remove all");
             p.getAbilities().flying = false;
             p.onUpdateAbilities();
-            p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 0f, false);
+            p.teleportTo(p.serverLevel(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 0f);
         }));
         // 7s: a star map showing the galaxy, then zoomed to the quadrant, the star, the planet, planet stats; access denied
         at(2520, mc -> server(mc, p -> {
             BlockPos base = origin.above(30);
             for (BlockPos pos : BlockPos.betweenClosed(base.offset(-8, -1, -14), base.offset(8, 8, 8))) {
-                p.level().setBlock(pos, pos.getY() < base.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
-                        Block.UPDATE_CLIENTS | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
+                p.serverLevel().setBlock(pos, pos.getY() < base.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
+                        Block.UPDATE_CLIENTS);
             }
             BlockPos map = base.offset(0, 0, -4);
-            p.level().setBlockAndUpdate(map, matteroverdrive.init.MOBlocks.STAR_MAP.get().defaultBlockState());
-            if (p.level().getBlockEntity(map) instanceof matteroverdrive.block.entity.StarMapBlockEntity m) m.onPlaced(p);
+            p.serverLevel().setBlockAndUpdate(map, matteroverdrive.init.MOBlocks.STAR_MAP.get().defaultBlockState());
+            if (p.serverLevel().getBlockEntity(map) instanceof matteroverdrive.block.entity.StarMapBlockEntity m) m.onPlaced(p);
             MatterOverdrive.LOGGER.info("[scene] homeworld: {}", matteroverdrive.starmap.GalaxyServer.getHomeworld(p) == null ? null
                     : matteroverdrive.starmap.GalaxyServer.getHomeworld(p).getName());
             p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
-            p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() + 1.5, Set.of(), 180f, -16f, false);
+            p.teleportTo(p.serverLevel(), base.getX() + 0.5, base.getY(), base.getZ() + 1.5, Set.of(), 180f, -16f);
             // the hologram is additive: night shows it like a dark room did in 1.7.10
-            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
+            p.serverLevel().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
                     "time set 18000");
         }));
         at(2522, mc -> mc.options.hideGui = true);
@@ -942,12 +942,12 @@ public final class DevScene {
             String name = zooms[i];
             at(t, mc -> shot(mc, "star_map_" + name));
             at(t + 2, mc -> server(mc, p -> {
-                if (p.level().getBlockEntity(origin.above(30).offset(0, 0, -4)) instanceof matteroverdrive.block.entity.StarMapBlockEntity m) m.zoom();
+                if (p.serverLevel().getBlockEntity(origin.above(30).offset(0, 0, -4)) instanceof matteroverdrive.block.entity.StarMapBlockEntity m) m.zoom();
             }));
         }
         // planet stats with another planet of the system selected: both planets side by side
         at(2694, mc -> server(mc, p -> {
-            if (!(p.level().getBlockEntity(origin.above(30).offset(0, 0, -4)) instanceof matteroverdrive.block.entity.StarMapBlockEntity m)) return;
+            if (!(p.serverLevel().getBlockEntity(origin.above(30).offset(0, 0, -4)) instanceof matteroverdrive.block.entity.StarMapBlockEntity m)) return;
             var home = matteroverdrive.starmap.GalaxyServer.getHomeworld(p);
             if (home == null) return;
             // another planet: of the home system, else of the nearest star with planets
@@ -969,7 +969,7 @@ public final class DevScene {
         }));
         at(2725, mc -> shot(mc, "star_map_planet_pair"));
         at(2728, mc -> server(mc, p -> {
-            if (!(p.level().getBlockEntity(origin.above(30).offset(0, 0, -4)) instanceof matteroverdrive.block.entity.StarMapBlockEntity m)) return;
+            if (!(p.serverLevel().getBlockEntity(origin.above(30).offset(0, 0, -4)) instanceof matteroverdrive.block.entity.StarMapBlockEntity m)) return;
             ItemStack remove = new ItemStack(MOItems.SECURITY_PROTOCOL.get());
             remove.set(matteroverdrive.init.MODataComponents.SECURITY_OWNER.get(), p.getUUID());
             m.unclaim(remove);
@@ -977,29 +977,29 @@ public final class DevScene {
             claim.set(matteroverdrive.init.MODataComponents.SECURITY_OWNER.get(), STRANGER);
             m.claim(claim);
             p.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
-            p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY() + 30, origin.getZ() - 1.5, Set.of(), 180f, 15f, false);
+            p.teleportTo(p.serverLevel(), origin.getX() + 0.5, origin.getY() + 30, origin.getZ() - 1.5, Set.of(), 180f, 15f);
         }));
         at(2745, mc -> shot(mc, "star_map_access_denied"));
         at(2746, mc -> server(mc, p -> {
             p.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
-            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
+            p.serverLevel().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
                     "time set 6000");
-            p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 0f, false);
+            p.teleportTo(p.serverLevel(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 0f);
         }));
         at(2747, mc -> mc.options.hideGui = false);
         // 7t: the star map screen, every page
         at(2752, mc -> server(mc, p -> {
             BlockPos map = origin.above(30).offset(0, 0, -4);
-            if (!(p.level().getBlockEntity(map) instanceof matteroverdrive.block.entity.StarMapBlockEntity m)) return;
+            if (!(p.serverLevel().getBlockEntity(map) instanceof matteroverdrive.block.entity.StarMapBlockEntity m)) return;
             ItemStack remove = new ItemStack(MOItems.SECURITY_PROTOCOL.get());
             remove.set(matteroverdrive.init.MODataComponents.SECURITY_OWNER.get(), STRANGER);
             m.unclaim(remove);
             m.onPlaced(p);
-            p.teleportTo(p.level(), map.getX() + 0.5, map.getY(), map.getZ() + 2.5, Set.of(), 180f, 10f, false);
+            p.teleportTo(p.serverLevel(), map.getX() + 0.5, map.getY(), map.getZ() + 2.5, Set.of(), 180f, 10f);
         }));
         at(2756, mc -> server(mc, p -> {
             BlockPos map = origin.above(30).offset(0, 0, -4);
-            if (p.level().getBlockEntity(map) instanceof matteroverdrive.block.entity.StarMapBlockEntity m) p.openMenu(m, buf -> buf.writeBlockPos(map));
+            if (p.serverLevel().getBlockEntity(map) instanceof matteroverdrive.block.entity.StarMapBlockEntity m) p.openMenu(m, buf -> buf.writeBlockPos(map));
         }));
         for (int i = 0; i < 5; i++) {
             int n = i;
@@ -1013,7 +1013,7 @@ public final class DevScene {
         at(2840, mc -> server(mc, p -> {
             var home = matteroverdrive.starmap.GalaxyServer.getHomeworld(p);
             if (home == null) return;
-            long now = p.level().getGameTime();
+            long now = p.serverLevel().getGameTime();
             home.getBuildings().clear();
             home.getFleet().clear();
             for (var item : List.of(MOItems.BUILDING_BASE.get(), MOItems.SHIP_FACTORY.get(), MOItems.BUILDING_RESIDENTIAL.get(),
@@ -1044,26 +1044,26 @@ public final class DevScene {
                 target = star.getPlanets().iterator().next();
             }
             if (target != null) {
-                matteroverdrive.starmap.GalaxyServer.createTravelEvent(p.level(), matteroverdrive.starmap.GalacticPosition.of(home),
+                matteroverdrive.starmap.GalaxyServer.createTravelEvent(p.serverLevel(), matteroverdrive.starmap.GalacticPosition.of(home),
                         matteroverdrive.starmap.GalacticPosition.of(target), 2);
-                matteroverdrive.starmap.GalaxyServer.sendTravelEvents(p.level().getServer());
+                matteroverdrive.starmap.GalaxyServer.sendTravelEvents(p.serverLevel().getServer());
                 scoutTarget = matteroverdrive.starmap.GalacticPosition.of(target);
             }
             BlockPos map = origin.above(30).offset(0, 0, -4);
-            if (p.level().getBlockEntity(map) instanceof matteroverdrive.block.entity.StarMapBlockEntity m) {
+            if (p.serverLevel().getBlockEntity(map) instanceof matteroverdrive.block.entity.StarMapBlockEntity m) {
                 m.setDestination(matteroverdrive.starmap.GalacticPosition.of(home));
                 m.setZoomLevel(3);
                 m.sync();
             }
-            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
+            p.serverLevel().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
                     "time set 18000");
-            p.teleportTo(p.level(), map.getX() + 0.5, map.getY(), map.getZ() + 4.0, Set.of(), 180f, -14f, false);
+            p.teleportTo(p.serverLevel(), map.getX() + 0.5, map.getY(), map.getZ() + 4.0, Set.of(), 180f, -14f);
         }));
         at(2842, mc -> mc.options.hideGui = true);
         at(2870, mc -> shot(mc, "starmap_planet_buildings"));
         at(2872, mc -> server(mc, p -> {
             BlockPos map = origin.above(30).offset(0, 0, -4);
-            if (p.level().getBlockEntity(map) instanceof matteroverdrive.block.entity.StarMapBlockEntity m) {
+            if (p.serverLevel().getBlockEntity(map) instanceof matteroverdrive.block.entity.StarMapBlockEntity m) {
                 m.setZoomLevel(0);
                 m.sync();
             }
@@ -1072,17 +1072,17 @@ public final class DevScene {
         at(2901, mc -> mc.options.hideGui = false);
         at(2904, mc -> server(mc, p -> {
             BlockPos map = origin.above(30).offset(0, 0, -4);
-            if (p.level().getBlockEntity(map) instanceof matteroverdrive.block.entity.StarMapBlockEntity m) {
+            if (p.serverLevel().getBlockEntity(map) instanceof matteroverdrive.block.entity.StarMapBlockEntity m) {
                 m.setZoomLevel(3);
                 m.sync();
-                p.teleportTo(p.level(), map.getX() + 0.5, map.getY(), map.getZ() + 2.5, Set.of(), 180f, 10f, false);
+                p.teleportTo(p.serverLevel(), map.getX() + 0.5, map.getY(), map.getZ() + 2.5, Set.of(), 180f, 10f);
                 p.openMenu(m, buf -> buf.writeBlockPos(map));
             }
         }));
         at(2924, mc -> shot(mc, "starmap_screen_construction"));
         at(2926, mc -> server(mc, p -> {
             BlockPos map = origin.above(30).offset(0, 0, -4);
-            if (scoutTarget != null && p.level().getBlockEntity(map) instanceof matteroverdrive.block.entity.StarMapBlockEntity m) {
+            if (scoutTarget != null && p.serverLevel().getBlockEntity(map) instanceof matteroverdrive.block.entity.StarMapBlockEntity m) {
                 m.setDestination(scoutTarget);
                 m.setZoomLevel(4);
                 m.sync();
@@ -1091,7 +1091,7 @@ public final class DevScene {
         at(2950, mc -> shot(mc, "starmap_screen_fleet"));
         at(2952, mc -> server(mc, p -> {
             p.closeContainer();
-            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
+            p.serverLevel().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
                     "time set 6000");
         }));
         // leftovers: legendary weapon and legendary part tooltips
@@ -1114,15 +1114,15 @@ public final class DevScene {
         at(2978, mc -> mc.setScreen(null));
         // leftovers: the analyzer's Config page with a network flash drive (two marked machines) in its destination filter
         at(2984, mc -> server(mc, p -> {
-            if (!(p.level().getBlockEntity(analyzerPos) instanceof matteroverdrive.machine.MachineBlockEntity m)) return;
+            if (!(p.serverLevel().getBlockEntity(analyzerPos) instanceof matteroverdrive.machine.MachineBlockEntity m)) return;
             ItemStack drive = new ItemStack(MOItems.NETWORK_FLASH_DRIVE.get());
             drive.set(matteroverdrive.init.MODataComponents.NETWORK_FILTER.get(), List.of(storagePos, replicatorPos));
             var inv = m.getInventory();
             for (int i = 0; i < inv.size(); i++) {
                 if (inv.spec(i).role() == matteroverdrive.machine.MachineInventory.Role.FILTER) inv.setStack(i, drive);
             }
-            p.getInventory().setItem(p.getInventory().getSelectedSlot(), drive.copy());
-            p.teleportTo(p.level(), analyzerPos.getX() + 0.5, analyzerPos.getY(), analyzerPos.getZ() + 2.5, Set.of(), 180f, 20f, false);
+            p.getInventory().setItem(p.getInventory().selected, drive.copy());
+            p.teleportTo(p.serverLevel(), analyzerPos.getX() + 0.5, analyzerPos.getY(), analyzerPos.getZ() + 2.5, Set.of(), 180f, 20f);
         }));
         at(2988, mc -> openMachine(mc, analyzerPos));
         at(2994, mc -> page(mc, MachineMenu.Page.CONFIG));
@@ -1133,66 +1133,66 @@ public final class DevScene {
         at(3014, mc -> mc.setScreen(null));
         // leftovers: machine renderers - the inscriber at work, pattern storage drives, the monitor screen, the replicated item
         at(3020, mc -> server(mc, p -> {
-            if (p.level().getBlockEntity(inscriberPos) instanceof matteroverdrive.block.entity.InscriberBlockEntity inscriber) {
+            if (p.serverLevel().getBlockEntity(inscriberPos) instanceof matteroverdrive.block.entity.InscriberBlockEntity inscriber) {
                 inscriber.getEnergy().set(inscriber.getEnergy().getCapacity());
                 inscriber.getInventory().setStack(matteroverdrive.block.entity.InscriberBlockEntity.MAIN, new ItemStack(MOItems.ISOLINEAR_CIRCUIT_MK1.get(), 4));
                 inscriber.getInventory().setStack(matteroverdrive.block.entity.InscriberBlockEntity.SECONDARY, new ItemStack(Items.GOLD_INGOT, 4));
             }
-            if (p.level().getBlockEntity(replicatorPos) instanceof matteroverdrive.block.entity.ReplicatorBlockEntity replicator) {
+            if (p.serverLevel().getBlockEntity(replicatorPos) instanceof matteroverdrive.block.entity.ReplicatorBlockEntity replicator) {
                 replicator.getInventory().setStack(matteroverdrive.block.entity.ReplicatorBlockEntity.OUTPUT, new ItemStack(Items.DIAMOND, 3));
             }
-            p.teleportTo(p.level(), inscriberPos.getX() + 0.5, inscriberPos.getY() + 0.4, inscriberPos.getZ() + 2.0, Set.of(), 180f, 35f, false);
+            p.teleportTo(p.serverLevel(), inscriberPos.getX() + 0.5, inscriberPos.getY() + 0.4, inscriberPos.getZ() + 2.0, Set.of(), 180f, 35f);
         }));
         at(3022, mc -> mc.options.hideGui = true);
         at(3040, mc -> shot(mc, "inscriber_working"));
         at(3050, mc -> shot(mc, "inscriber_working_2"));
-        at(3052, mc -> server(mc, p -> p.teleportTo(p.level(), monitorPos.getX() + 0.5, monitorPos.getY() + 0.2, monitorPos.getZ() + 3.0,
-                Set.of(), 180f, 18f, false)));
+        at(3052, mc -> server(mc, p -> p.teleportTo(p.serverLevel(), monitorPos.getX() + 0.5, monitorPos.getY() + 0.2, monitorPos.getZ() + 3.0,
+                Set.of(), 180f, 18f)));
         at(3080, mc -> shot(mc, "network_machines"));
-        at(3082, mc -> server(mc, p -> p.teleportTo(p.level(), inscriberPos.getX() + 0.5, inscriberPos.getY() + 0.6, inscriberPos.getZ() + 1.1,
-                Set.of(), 180f, 60f, false)));
+        at(3082, mc -> server(mc, p -> p.teleportTo(p.serverLevel(), inscriberPos.getX() + 0.5, inscriberPos.getY() + 0.6, inscriberPos.getZ() + 1.1,
+                Set.of(), 180f, 60f)));
         at(3100, mc -> shot(mc, "inscriber_close"));
         at(3102, mc -> server(mc, p -> {
             BlockPos pos = origin.above(30).offset(0, 0, -4);
             for (BlockPos b : BlockPos.betweenClosed(pos.offset(-3, -1, -3), pos.offset(3, 3, 3))) {
-                p.level().setBlock(b, b.getY() < pos.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
-                        Block.UPDATE_CLIENTS | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
+                p.serverLevel().setBlock(b, b.getY() < pos.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
+                        Block.UPDATE_CLIENTS);
             }
-            p.level().setBlockAndUpdate(pos, MOBlocks.PATTERN_STORAGE.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
-            if (p.level().getBlockEntity(pos) instanceof matteroverdrive.block.entity.PatternStorageBlockEntity storage) {
+            p.serverLevel().setBlockAndUpdate(pos, MOBlocks.PATTERN_STORAGE.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
+            if (p.serverLevel().getBlockEntity(pos) instanceof matteroverdrive.block.entity.PatternStorageBlockEntity storage) {
                 for (int i = 0; i < 6; i++) storage.getInventory().setStack(i, new ItemStack(MOItems.PATTERN_DRIVE.get()));
             }
-            p.teleportTo(p.level(), pos.getX() + 2.2, pos.getY(), pos.getZ() + 2.2, Set.of(), 135f, 30f, false);
+            p.teleportTo(p.serverLevel(), pos.getX() + 2.2, pos.getY(), pos.getZ() + 2.2, Set.of(), 135f, 30f);
         }));
         at(3120, mc -> shot(mc, "pattern_storage_drives"));
         at(3121, mc -> server(mc, p -> {
             BlockPos pos = origin.above(30).offset(0, 0, -4);
-            p.teleportTo(p.level(), pos.getX() - 1.2, pos.getY(), pos.getZ() + 2.2, Set.of(), 225f, 30f, false);
+            p.teleportTo(p.serverLevel(), pos.getX() - 1.2, pos.getY(), pos.getZ() + 2.2, Set.of(), 225f, 30f);
         }));
         at(3130, mc -> shot(mc, "pattern_storage_side"));
         at(3132, mc -> server(mc, p -> {
             BlockPos pos = origin.above(30).offset(0, 0, -4);
-            p.level().setBlockAndUpdate(pos, MOBlocks.REPLICATOR.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
-            if (p.level().getBlockEntity(pos) instanceof matteroverdrive.block.entity.ReplicatorBlockEntity replicator) {
+            p.serverLevel().setBlockAndUpdate(pos, MOBlocks.REPLICATOR.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
+            if (p.serverLevel().getBlockEntity(pos) instanceof matteroverdrive.block.entity.ReplicatorBlockEntity replicator) {
                 replicator.getInventory().setStack(matteroverdrive.block.entity.ReplicatorBlockEntity.OUTPUT, new ItemStack(Items.DIAMOND, 3));
             }
             // the replaced pattern storage dropped its drives
-            p.level().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, new net.minecraft.world.phys.AABB(pos).inflate(8))
+            p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, new net.minecraft.world.phys.AABB(pos).inflate(8))
                     .forEach(net.minecraft.world.entity.Entity::discard);
-            p.teleportTo(p.level(), pos.getX() + 0.5, pos.getY(), pos.getZ() + 2.8, Set.of(), 180f, 30f, false);
+            p.teleportTo(p.serverLevel(), pos.getX() + 0.5, pos.getY(), pos.getZ() + 2.8, Set.of(), 180f, 30f);
         }));
         at(3160, mc -> shot(mc, "replicator_item"));
         at(3161, mc -> mc.options.hideGui = false);
         // leftovers: machine sounds - the inscriber at work and the stabilizer aiming at the anomaly loop their sounds
         at(3162, mc -> server(mc, p -> {
-            if (p.level().getBlockEntity(inscriberPos) instanceof matteroverdrive.block.entity.InscriberBlockEntity inscriber) {
+            if (p.serverLevel().getBlockEntity(inscriberPos) instanceof matteroverdrive.block.entity.InscriberBlockEntity inscriber) {
                 inscriber.getEnergy().set(inscriber.getEnergy().getCapacity());
                 inscriber.getInventory().setStack(matteroverdrive.block.entity.InscriberBlockEntity.MAIN, new ItemStack(MOItems.ISOLINEAR_CIRCUIT_MK1.get(), 4));
                 inscriber.getInventory().setStack(matteroverdrive.block.entity.InscriberBlockEntity.SECONDARY, new ItemStack(Items.GOLD_INGOT, 4));
             }
             // the anomaly may have pulled a block into the beam
-            for (int z = -9; z <= -7; z++) p.level().setBlockAndUpdate(origin.offset(0, 3, z), Blocks.AIR.defaultBlockState());
-            p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() - 4.5, Set.of(), 180f, 0f, false);
+            for (int z = -9; z <= -7; z++) p.serverLevel().setBlockAndUpdate(origin.offset(0, 3, z), Blocks.AIR.defaultBlockState());
+            p.teleportTo(p.serverLevel(), origin.getX() + 0.5, origin.getY(), origin.getZ() - 4.5, Set.of(), 180f, 0f);
         }));
         at(3180, mc -> {
             var sounds = mc.getSoundManager();
@@ -1226,10 +1226,10 @@ public final class DevScene {
         at(3202, mc -> server(mc, p -> {
             BlockPos base = origin.above(30);
             for (BlockPos b : BlockPos.betweenClosed(base.offset(-6, -1, -12), base.offset(6, 4, 6))) {
-                p.level().setBlock(b, b.getY() < base.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
-                        Block.UPDATE_CLIENTS | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
+                p.serverLevel().setBlock(b, b.getY() < base.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
+                        Block.UPDATE_CLIENTS);
             }
-            p.level().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, new AABB(base).inflate(10)).forEach(e -> e.discard());
+            p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, new AABB(base).inflate(10)).forEach(e -> e.discard());
             matteroverdrive.android.Android.setAndroid(p, true);
             var data = matteroverdrive.android.Android.get(p);
             data.setStack(matteroverdrive.android.AndroidData.SLOT_BATTERY, MOItems.BATTERY.get().charged());
@@ -1239,7 +1239,7 @@ public final class DevScene {
             data.setEffect("ShieldLastUse", 0);
             matteroverdrive.android.Android.onActionKey(p);
             matteroverdrive.android.Android.sync(p);
-            p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() + 0.5, Set.of(), 180f, 10f, false);
+            p.teleportTo(p.serverLevel(), base.getX() + 0.5, base.getY(), base.getZ() + 0.5, Set.of(), 180f, 10f);
         }));
         at(3204, mc -> {
             mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT);
@@ -1258,7 +1258,7 @@ public final class DevScene {
             data.setActiveStat(matteroverdrive.android.BioticStats.TELEPORT.id());
             matteroverdrive.android.Android.sync(p);
             BlockPos base = origin.above(30);
-            p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() + 4.5, Set.of(), 180f, 35f, false);
+            p.teleportTo(p.serverLevel(), base.getX() + 0.5, base.getY(), base.getZ() + 4.5, Set.of(), 180f, 35f);
         }));
         at(3236, mc -> matteroverdrive.client.android.AndroidKeys.ABILITY_USE.setDown(true));
         at(3246, mc -> shot(mc, "android_teleport_marker"));
@@ -1271,18 +1271,18 @@ public final class DevScene {
         // and chestplate + leggings
         at(3258, mc -> server(mc, p -> {
             BlockPos base = origin.above(30);
-            p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() + 0.5, Set.of(), 180f, 0f, false);
+            p.teleportTo(p.serverLevel(), base.getX() + 0.5, base.getY(), base.getZ() + 0.5, Set.of(), 180f, 0f);
             p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.HEAD, new ItemStack(MOItems.TRITANIUM_HELMET.get()));
             p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, new ItemStack(MOItems.TRITANIUM_CHESTPLATE.get()));
             p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.LEGS, new ItemStack(MOItems.TRITANIUM_LEGGINGS.get()));
             p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.FEET, new ItemStack(MOItems.TRITANIUM_BOOTS.get()));
-            p.getInventory().setItem(p.getInventory().getSelectedSlot(), ItemStack.EMPTY);
+            p.getInventory().setItem(p.getInventory().selected, ItemStack.EMPTY);
             // the platform is underground: light it up and clear the mobs that wandered in
             p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION, 600, 0, false, false));
-            p.level().getEntitiesOfClass(net.minecraft.world.entity.monster.Monster.class, new AABB(base).inflate(24)).forEach(e -> e.discard());
+            p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.monster.Monster.class, new AABB(base).inflate(24)).forEach(e -> e.discard());
             for (int side : new int[] {-1, 1}) {
-                var stand = net.minecraft.world.entity.EntityType.ARMOR_STAND.create(p.level(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
-                stand.snapTo(base.getX() + 0.5 + side * 1.6, base.getY(), base.getZ() - 0.5, 0, 0);
+                var stand = net.minecraft.world.entity.EntityType.ARMOR_STAND.create(p.serverLevel());
+                stand.moveTo(base.getX() + 0.5 + side * 1.6, base.getY(), base.getZ() - 0.5, 0, 0);
                 if (side < 0) {
                     stand.setItemSlot(net.minecraft.world.entity.EquipmentSlot.HEAD, new ItemStack(MOItems.TRITANIUM_HELMET.get()));
                     stand.setItemSlot(net.minecraft.world.entity.EquipmentSlot.FEET, new ItemStack(MOItems.TRITANIUM_BOOTS.get()));
@@ -1291,7 +1291,7 @@ public final class DevScene {
                     stand.setItemSlot(net.minecraft.world.entity.EquipmentSlot.LEGS, new ItemStack(MOItems.TRITANIUM_LEGGINGS.get()));
                 }
                 stand.addTag("mo_scene_armor");
-                p.level().addFreshEntity(stand);
+                p.serverLevel().addFreshEntity(stand);
             }
         }));
         at(3260, mc -> {
@@ -1307,7 +1307,7 @@ public final class DevScene {
                 p.setItemSlot(slot, ItemStack.EMPTY);
             }
             p.removeEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION);
-            p.level().getEntitiesOfClass(net.minecraft.world.entity.decoration.ArmorStand.class, new AABB(origin.above(30)).inflate(8),
+            p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.decoration.ArmorStand.class, new AABB(origin.above(30)).inflate(8),
                     e -> e.getTags().contains("mo_scene_armor")).forEach(net.minecraft.world.entity.Entity::discard);
         }));
         // leftovers: the stabilizer's beam with its motes, and the anomaly screen on its back (in the clean room)
@@ -1316,33 +1316,33 @@ public final class DevScene {
             mc.options.hideGui = true;
             server(mc, p -> {
                 BlockPos base = origin.above(30);
-                p.level().setBlockAndUpdate(base.offset(0, 1, -9), MOBlocks.GRAVITATIONAL_ANOMALY.get().defaultBlockState());
-                if (p.level().getBlockEntity(base.offset(0, 1, -9)) instanceof matteroverdrive.block.entity.GravitationalAnomalyBlockEntity a) a.setMass(1500);
-                p.level().setBlockAndUpdate(base.offset(0, 1, -3), MOBlocks.GRAVITATIONAL_STABILIZER.get().defaultBlockState()
+                p.serverLevel().setBlockAndUpdate(base.offset(0, 1, -9), MOBlocks.GRAVITATIONAL_ANOMALY.get().defaultBlockState());
+                if (p.serverLevel().getBlockEntity(base.offset(0, 1, -9)) instanceof matteroverdrive.block.entity.GravitationalAnomalyBlockEntity a) a.setMass(1500);
+                p.serverLevel().setBlockAndUpdate(base.offset(0, 1, -3), MOBlocks.GRAVITATIONAL_STABILIZER.get().defaultBlockState()
                         .setValue(MachineBlock.FACING, Direction.NORTH));
                 p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION, 600, 0, false, false));
                 p.getAbilities().flying = true;
                 p.onUpdateAbilities();
-                p.teleportTo(p.level(), base.getX() + 4.5, base.getY() + 1, base.getZ() - 5.5, Set.of(), 90f, 10f, false);
+                p.teleportTo(p.serverLevel(), base.getX() + 4.5, base.getY() + 1, base.getZ() - 5.5, Set.of(), 90f, 10f);
             });
         });
         at(3310, mc -> shot(mc, "stabilizer_beam"));
         // the anomaly close up, off the beam (1.7.10: black sphere, thin white ring, dark specks drawn in)
         at(3311, mc -> server(mc, p -> {
             BlockPos base = origin.above(30);
-            p.teleportTo(p.level(), base.getX() + 3.5, base.getY() + 1, base.getZ() - 9 + 0.5, Set.of(), 90f, 0f, false);
+            p.teleportTo(p.serverLevel(), base.getX() + 3.5, base.getY() + 1, base.getZ() - 9 + 0.5, Set.of(), 90f, 0f);
         }));
         at(3318, mc -> shot(mc, "anomaly_close"));
         at(3319, mc -> server(mc, p -> {
             BlockPos base = origin.above(30);
-            p.teleportTo(p.level(), base.getX() + 0.5, base.getY() + 0.4, base.getZ() - 0.6, Set.of(), 180f, 0f, false);
+            p.teleportTo(p.serverLevel(), base.getX() + 0.5, base.getY() + 0.4, base.getZ() - 0.6, Set.of(), 180f, 0f);
         }));
         at(3324, mc -> shot(mc, "stabilizer_screen"));
         at(3325, mc -> server(mc, p -> {
             BlockPos base = origin.above(30);
             p.removeEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION);
-            p.level().setBlock(base.offset(0, 1, -9), Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
-            p.level().setBlock(base.offset(0, 1, -3), Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
+            p.serverLevel().setBlock(base.offset(0, 1, -9), Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+            p.serverLevel().setBlock(base.offset(0, 1, -3), Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
         }));
         // leftovers: plasma shotgun - the full spread (thin bolts) and a charged shot (one big bolt): in flight and their
         // hits on the wall (sparks, puff)
@@ -1352,38 +1352,38 @@ public final class DevScene {
                 BlockPos base = origin.above(30);
                 ItemStack shotgun = new ItemStack(MOItems.PLASMA_SHOTGUN.get());
                 matteroverdrive.item.weapon.EnergyWeaponItem.setEnergy(shotgun, matteroverdrive.item.weapon.EnergyWeaponItem.CAPACITY);
-                p.getInventory().setItem(p.getInventory().getSelectedSlot(), shotgun);
+                p.getInventory().setItem(p.getInventory().selected, shotgun);
                 for (var slot : new net.minecraft.world.entity.EquipmentSlot[] {net.minecraft.world.entity.EquipmentSlot.HEAD,
                         net.minecraft.world.entity.EquipmentSlot.CHEST, net.minecraft.world.entity.EquipmentSlot.LEGS, net.minecraft.world.entity.EquipmentSlot.FEET}) {
                     p.setItemSlot(slot, ItemStack.EMPTY);
                 }
                 p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION, 900, 0, false, false));
-                p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() + 5.5, Set.of(), 180f, 0f, false);
+                p.teleportTo(p.serverLevel(), base.getX() + 0.5, base.getY(), base.getZ() + 5.5, Set.of(), 180f, 0f);
             });
         });
         at(3335, mc -> server(mc, p -> MOItems.PLASMA_SHOTGUN.get().tryFire(p, p.getMainHandItem(), false)));
         at(3336, mc -> shot(mc, "shotgun_spread"));
         at(3362, mc -> server(mc, p -> {
             var shotgun = MOItems.PLASMA_SHOTGUN.get();
-            shotgun.releaseUsing(p.getMainHandItem(), p.level(), p, shotgun.getUseDuration(p.getMainHandItem(), p) - 25);
+            shotgun.release(p.getMainHandItem(), p.serverLevel(), p, shotgun.getUseDuration(p.getMainHandItem(), p) - 25);
         }));
         at(3363, mc -> shot(mc, "shotgun_charged"));
         at(3366, mc -> {
             mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
             server(mc, p -> {
                 BlockPos base = origin.above(30);
-                p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() - 8.5, Set.of(), 180f, 0f, false);
+                p.teleportTo(p.serverLevel(), base.getX() + 0.5, base.getY(), base.getZ() - 8.5, Set.of(), 180f, 0f);
             });
         });
         at(3390, mc -> server(mc, p -> MOItems.PLASMA_SHOTGUN.get().tryFire(p, p.getMainHandItem(), false)));
         at(3392, mc -> shot(mc, "shotgun_spread_hit"));
         at(3418, mc -> server(mc, p -> {
             var shotgun = MOItems.PLASMA_SHOTGUN.get();
-            shotgun.releaseUsing(p.getMainHandItem(), p.level(), p, shotgun.getUseDuration(p.getMainHandItem(), p) - 25);
+            shotgun.release(p.getMainHandItem(), p.serverLevel(), p, shotgun.getUseDuration(p.getMainHandItem(), p) - 25);
         }));
         at(3420, mc -> shot(mc, "shotgun_charged_hit"));
         at(3421, mc -> server(mc, p -> {
-            p.getInventory().setItem(p.getInventory().getSelectedSlot(), ItemStack.EMPTY);
+            p.getInventory().setItem(p.getInventory().selected, ItemStack.EMPTY);
             p.removeEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION);
         }));
         at(3423, mc -> mc.options.hideGui = false);
@@ -1395,7 +1395,7 @@ public final class DevScene {
                 galleryReset(p, 6000);
                 BlockPos c = gallerySite(p, 40);
                 galleryA = c;
-                ServerLevel level = p.level();
+                ServerLevel level = p.serverLevel();
                 // the matter network row: analyzer - storage - monitor - replicator (network pipes), decomposer feeding it
                 BlockPos row = c.offset(0, 0, -2);
                 level.setBlockAndUpdate(row.offset(-4, 0, 0), MOBlocks.ANALYZER.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
@@ -1450,7 +1450,7 @@ public final class DevScene {
         // gravitational anomaly held by three stabilizers (1.7.10 guide picture)
         at(3502, mc -> server(mc, p -> {
             BlockPos c = gallerySite(p, 80);
-            ServerLevel level = p.level();
+            ServerLevel level = p.serverLevel();
             BlockPos a = c.offset(0, 2, -2);
             level.setBlockAndUpdate(a, MOBlocks.GRAVITATIONAL_ANOMALY.get().defaultBlockState());
             if (level.getBlockEntity(a) instanceof matteroverdrive.block.entity.GravitationalAnomalyBlockEntity anomaly) anomaly.setMass(4000);
@@ -1468,24 +1468,24 @@ public final class DevScene {
         }));
         at(3534, mc -> server(mc, p -> {
             for (BlockPos sp : new BlockPos[] {galleryAnomaly.offset(0, 0, -6), galleryAnomaly.offset(-6, 0, 0), galleryAnomaly.offset(6, 0, 0)}) {
-                if (p.level().getBlockEntity(sp) instanceof matteroverdrive.block.entity.GravitationalStabilizerBlockEntity st) {
+                if (p.serverLevel().getBlockEntity(sp) instanceof matteroverdrive.block.entity.GravitationalStabilizerBlockEntity st) {
                     MatterOverdrive.LOGGER.info("[scene] stabilizer {} active={} rgb={},{},{}", sp, st.isActive(), st.getBeamColorR(), st.getBeamColorG(), st.getBeamColorB());
                 } else {
-                    MatterOverdrive.LOGGER.info("[scene] stabilizer {} missing: {}", sp, p.level().getBlockState(sp));
+                    MatterOverdrive.LOGGER.info("[scene] stabilizer {} missing: {}", sp, p.serverLevel().getBlockState(sp));
                 }
             }
-            MatterOverdrive.LOGGER.info("[scene] anomaly: {}", p.level().getBlockState(galleryAnomaly));
+            MatterOverdrive.LOGGER.info("[scene] anomaly: {}", p.serverLevel().getBlockState(galleryAnomaly));
         }));
         at(3535, mc -> shot(mc, "gallery_anomaly"));
         // fusion reactor around an anomaly
         at(3537, mc -> server(mc, p -> {
-            p.level().setDayTime(6000);
+            p.serverLevel().setDayTime(6000);
             BlockPos c = gallerySite(p, 120);
             BlockPos controller = c.offset(0, 0, 4);
-            buildReactor(p.level(), controller);
+            buildReactor(p.serverLevel(), controller);
             galleryCamera(p, controller.offset(6, 0, 4), 0.5, 4.5, 0.5, 145f, 28f);
         }));
-        at(3566, mc -> server(mc, p -> p.level().getEntitiesOfClass(ItemEntity.class, p.getBoundingBox().inflate(24)).forEach(e -> e.discard())));
+        at(3566, mc -> server(mc, p -> p.serverLevel().getEntitiesOfClass(ItemEntity.class, p.getBoundingBox().inflate(24)).forEach(e -> e.discard())));
         at(3570, mc -> shot(mc, "gallery_fusion_reactor"));
         // an android with its shield up in front of the machines
         at(3572, mc -> {
@@ -1535,11 +1535,11 @@ public final class DevScene {
                 matteroverdrive.item.weapon.EnergyWeaponItem.setEnergy(phaser, 32000);
                 phaser.set(matteroverdrive.init.MODataComponents.PHASER_LEVEL.get(), 2);
                 p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, phaser);
-                var rogue = matteroverdrive.init.MOEntities.ROGUE_ANDROID.get().create(p.level(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
-                rogue.snapTo(galleryA.getX() + 1.5, galleryA.getY(), galleryA.getZ() + 8.5, 180, 0);
+                var rogue = matteroverdrive.init.MOEntities.ROGUE_ANDROID.get().create(p.serverLevel());
+                rogue.moveTo(galleryA.getX() + 1.5, galleryA.getY(), galleryA.getZ() + 8.5, 180, 0);
                 rogue.setNoAi(true);
                 rogue.addTag("mo_gallery");
-                p.level().addFreshEntity(rogue);
+                p.serverLevel().addFreshEntity(rogue);
                 galleryCamera(p, galleryA.offset(0, 0, 2), 0.5, 0, 0.5, -9.5f, 6f);
             });
         });
@@ -1557,7 +1557,7 @@ public final class DevScene {
         at(3631, mc -> {
             mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT);
             server(mc, p -> {
-                p.level().getEntitiesOfClass(net.minecraft.world.entity.Entity.class, new AABB(galleryA).inflate(20),
+                p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.Entity.class, new AABB(galleryA).inflate(20),
                         e -> e.getTags().contains("mo_gallery")).forEach(net.minecraft.world.entity.Entity::discard);
                 p.setItemSlot(EquipmentSlot.HEAD, new ItemStack(MOItems.TRITANIUM_HELMET.get()));
                 p.setItemSlot(EquipmentSlot.CHEST, new ItemStack(MOItems.TRITANIUM_CHESTPLATE.get()));
@@ -1567,14 +1567,14 @@ public final class DevScene {
                 matteroverdrive.item.weapon.EnergyWeaponItem.setEnergy(shotgun, matteroverdrive.item.weapon.EnergyWeaponItem.CAPACITY);
                 p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, shotgun);
                 for (int side : new int[] {-1, 1}) {
-                    var stand = net.minecraft.world.entity.EntityType.ARMOR_STAND.create(p.level(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
-                    stand.snapTo(galleryA.getX() + 0.5 + side * 1.6, galleryA.getY(), galleryA.getZ() + 1.0, 0, 0);
+                    var stand = net.minecraft.world.entity.EntityType.ARMOR_STAND.create(p.serverLevel());
+                    stand.moveTo(galleryA.getX() + 0.5 + side * 1.6, galleryA.getY(), galleryA.getZ() + 1.0, 0, 0);
                     stand.setItemSlot(EquipmentSlot.HEAD, new ItemStack(MOItems.TRITANIUM_HELMET.get()));
                     stand.setItemSlot(EquipmentSlot.CHEST, new ItemStack(MOItems.TRITANIUM_CHESTPLATE.get()));
                     stand.setItemSlot(EquipmentSlot.LEGS, new ItemStack(MOItems.TRITANIUM_LEGGINGS.get()));
                     stand.setItemSlot(EquipmentSlot.FEET, new ItemStack(MOItems.TRITANIUM_BOOTS.get()));
                     stand.addTag("mo_gallery");
-                    p.level().addFreshEntity(stand);
+                    p.serverLevel().addFreshEntity(stand);
                 }
                 galleryCamera(p, galleryA.offset(0, 0, 1), 0.5, 0, 0.5, 0f, 5f);
             });
@@ -1584,7 +1584,7 @@ public final class DevScene {
         at(3652, mc -> {
             mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
             server(mc, p -> {
-                p.level().getEntitiesOfClass(net.minecraft.world.entity.Entity.class, new AABB(galleryA).inflate(20),
+                p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.Entity.class, new AABB(galleryA).inflate(20),
                         e -> e.getTags().contains("mo_gallery")).forEach(net.minecraft.world.entity.Entity::discard);
                 for (EquipmentSlot slot : new EquipmentSlot[] {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
                     p.setItemSlot(slot, ItemStack.EMPTY);
@@ -1592,9 +1592,9 @@ public final class DevScene {
                 p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
                 BlockPos c = gallerySite(p, 160);
                 galleryMap = c.offset(0, 0, -2);
-                p.level().setBlockAndUpdate(galleryMap, MOBlocks.STAR_MAP.get().defaultBlockState());
-                if (p.level().getBlockEntity(galleryMap) instanceof matteroverdrive.block.entity.StarMapBlockEntity m) m.onPlaced(p);
-                p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
+                p.serverLevel().setBlockAndUpdate(galleryMap, MOBlocks.STAR_MAP.get().defaultBlockState());
+                if (p.serverLevel().getBlockEntity(galleryMap) instanceof matteroverdrive.block.entity.StarMapBlockEntity m) m.onPlaced(p);
+                p.serverLevel().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
                         "time set 18000");
                 galleryCamera(p, c.offset(0, 0, 1), 0.5, 0.0, 0.3, 180f, -22f);
             });
@@ -1603,13 +1603,13 @@ public final class DevScene {
         for (int i = 0; i < 3; i++) {
             int t = 3682 + i * 26;
             at(t, mc -> server(mc, p -> {
-                if (p.level().getBlockEntity(galleryMap) instanceof matteroverdrive.block.entity.StarMapBlockEntity m) m.zoom();
+                if (p.serverLevel().getBlockEntity(galleryMap) instanceof matteroverdrive.block.entity.StarMapBlockEntity m) m.zoom();
             }));
             String name = "gallery_star_map_" + (i + 1);
             at(t + 24, mc -> shot(mc, name));
         }
         at(3762, mc -> server(mc, p -> {
-            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
+            p.serverLevel().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
                     "time set 6000");
             p.getAbilities().flying = false;
             p.onUpdateAbilities();
@@ -1640,7 +1640,7 @@ public final class DevScene {
             super.render(g, mouseX, mouseY, partialTick);
             g.renderItem(stack, width / 2 - 100, height / 2 - 40);
             g.renderItemDecorations(font, stack, width / 2 - 100, height / 2 - 40);
-            g.setTooltipForNextFrame(font, stack, width / 2 - 80, height / 2 - 40);
+            matteroverdrive.compat.Gui.setTooltipForNextFrame(g, font, stack, width / 2 - 80, height / 2 - 40);
         }
 
         @Override
@@ -1680,14 +1680,14 @@ public final class DevScene {
 
     /** Machines on a stone floor north of the player, the player facing them; noon, clear sky. */
     private static void build(ServerPlayer player) {
-        ServerLevel level = player.level();
+        ServerLevel level = player.serverLevel();
         level.setDayTime(6000);
         level.setWeatherParameters(6000, 0, false, false);
         player.setGameMode(GameType.CREATIVE);
         // A fixed spot (the spawn, on the flat world's surface): the player's saved position drifts between runs.
-        BlockPos spawn = level.getRespawnData().pos();
-        BlockPos base = new BlockPos(spawn.getX(), level.getMinY() + 4, spawn.getZ());
-        player.teleportTo(level, base.getX() + 0.5, base.getY(), base.getZ() + 0.5, Set.of(), 180f, 0f, false);
+        BlockPos spawn = level.getSharedSpawnPos();
+        BlockPos base = new BlockPos(spawn.getX(), level.getMinBuildHeight() + 4, spawn.getZ());
+        player.teleportTo(level, base.getX() + 0.5, base.getY(), base.getZ() + 0.5, Set.of(), 180f, 0f);
         origin = base;
         for (BlockPos p : BlockPos.betweenClosed(base.offset(-3, -1, -8), base.offset(3, -1, 0))) {
             level.setBlockAndUpdate(p, Blocks.SMOOTH_STONE.defaultBlockState());
@@ -1695,7 +1695,7 @@ public final class DevScene {
         // Clear the previous run's scene without machine side effects (they would drop their contents),
         // then remove any items already lying around.
         for (BlockPos p : BlockPos.betweenClosed(base.offset(-3, 0, -8), base.offset(3, 4, 0))) {
-            level.setBlock(p, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
+            level.setBlock(p, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
         }
         level.getEntitiesOfClass(ItemEntity.class, new AABB(base).inflate(8)).forEach(e -> e.discard());
         inscriberPos = base.offset(-1, 0, -3);
@@ -1779,8 +1779,8 @@ public final class DevScene {
         for (int i = 0; i < 8; i++) inv.setItem(9 + i, new ItemStack(MOItems.TAB_ORDER.get(i).get()));
         player.setItemSlot(EquipmentSlot.HEAD, new ItemStack(MOItems.TRITANIUM_HELMET.get()));
         player.setItemSlot(EquipmentSlot.CHEST, new ItemStack(MOItems.TRITANIUM_CHESTPLATE.get()));
-        inv.setSelectedSlot(6);
-        player.teleportTo(level, base.getX() + 0.5, base.getY(), base.getZ() + 0.5, Set.of(), 180f, 35f, false);
+        inv.selected = 6;
+        player.teleportTo(level, base.getX() + 0.5, base.getY(), base.getZ() + 0.5, Set.of(), 180f, 35f);
     }
 
     /** A complete fusion reactor: controller facing the player, the ring and an anomaly behind it. */
@@ -1789,7 +1789,7 @@ public final class DevScene {
             level.setBlock(p, Blocks.SMOOTH_STONE.defaultBlockState(), Block.UPDATE_CLIENTS);
         }
         for (BlockPos p : BlockPos.betweenClosed(controller.offset(-6, 0, -11), controller.offset(6, 4, 1))) {
-            level.setBlock(p, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
+            level.setBlock(p, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
         }
         reactorPos = controller;
         level.setBlockAndUpdate(controller, MOBlocks.FUSION_REACTOR_CONTROLLER.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
@@ -1809,7 +1809,7 @@ public final class DevScene {
 
     /** Gallery: day or night, clear sky, a plain player (not an android, no effects or armor), flying. */
     private static void galleryReset(ServerPlayer p, long time) {
-        ServerLevel level = p.level();
+        ServerLevel level = p.serverLevel();
         level.setDayTime(time);
         level.setWeatherParameters(6000, 0, false, false);
         p.removeAllEffects();
@@ -1829,8 +1829,8 @@ public final class DevScene {
      * the floor (the first air block). Everything above it is cleared, the ground below filled.
      */
     private static BlockPos gallerySite(ServerPlayer p, int dx) {
-        ServerLevel level = p.level();
-        BlockPos spawn = level.getRespawnData().pos();
+        ServerLevel level = p.serverLevel();
+        BlockPos spawn = level.getSharedSpawnPos();
         // far from the spawn: fresh terrain, none of the older scene runs' leftovers in view
         int x = spawn.getX() + 1000 + dx, z = spawn.getZ() + 1000;
         level.getChunkSource().getChunk(x >> 4, z >> 4, true);
@@ -1844,7 +1844,7 @@ public final class DevScene {
             var state = dy >= 0 ? Blocks.AIR.defaultBlockState()
                     : dy == -1 ? (edge ? matteroverdrive.init.MODecorative.TRITANIUM_PLATE_STRIPE.get() : matteroverdrive.init.MODecorative.FLOOR_TILES.get()).defaultBlockState()
                     : Blocks.STONE.defaultBlockState();
-            level.setBlock(b, state, Block.UPDATE_CLIENTS | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
+            level.setBlock(b, state, Block.UPDATE_CLIENTS);
         }
         level.getEntitiesOfClass(net.minecraft.world.entity.Entity.class, new AABB(c).inflate(14),
                 e -> !(e instanceof net.minecraft.world.entity.player.Player)).forEach(net.minecraft.world.entity.Entity::discard);
@@ -1852,7 +1852,7 @@ public final class DevScene {
     }
 
     private static void galleryCamera(ServerPlayer p, BlockPos at, double dx, double dy, double dz, float yaw, float pitch) {
-        p.teleportTo(p.level(), at.getX() + dx, at.getY() + dy, at.getZ() + dz, Set.of(), yaw, pitch, false);
+        p.teleportTo(p.serverLevel(), at.getX() + dx, at.getY() + dy, at.getZ() + dz, Set.of(), yaw, pitch);
     }
 
     private static ItemStack findWeapon(ServerPlayer p, net.minecraft.world.item.Item item) {
@@ -1883,7 +1883,7 @@ public final class DevScene {
     }
 
     private static void shot(Minecraft mc, String name) {
-        Screenshot.grab(mc.gameDirectory, "scene_" + name + ".png", mc.getMainRenderTarget(), 1,
+        Screenshot.grab(mc.gameDirectory, "scene_" + name + ".png", mc.getMainRenderTarget(),
                 msg -> MatterOverdrive.LOGGER.info("[scene] {}", msg.getString()));
     }
 

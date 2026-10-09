@@ -16,7 +16,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.ARGB;
+import matteroverdrive.compat.ARGB;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -135,11 +135,11 @@ public final class QuestHud {
             int y = (int) (sh * 0.15);
             Component title = Component.literal(completedName).withStyle(net.minecraft.ChatFormatting.BOLD);
             int titleWidth = (int) (font.width(title) * 1.5);
-            g.pose().pushMatrix();
-            g.pose().translate(sw - titleWidth - 30 - v * 30, y - 20);
-            g.pose().scale(1.5f, 1.5f);
+            g.pose().pushPose();
+            g.pose().translate(sw - titleWidth - 30 - v * 30, y - 20, 0);
+            g.pose().scale(1.5f, 1.5f, 1);
             g.drawString(font, title, 0, 40, color(v), true);
-            g.pose().popMatrix();
+            g.pose().popPose();
             g.drawString(font, Component.translatable("gui." + MatterOverdrive.MODID + ".quest.completed"), sw - titleWidth - 20 - (int) (v * 40),
                     y + 28, color(v), true);
             if (completedXp > 0) g.drawString(font, "+" + (int) (v * completedXp) + "xp", sw - 50 - (int) (20 * v), y + 58, color(v), true);
@@ -149,11 +149,11 @@ public final class QuestHud {
         if (startedTime >= 0) {
             float v = value(startedTime, startedLength, FADE_IN, OBJECTIVES_FADE);
             int y = (int) (sh * 0.65);
-            g.pose().pushMatrix();
-            g.pose().translate(-10 + v * 30, y);
-            g.pose().scale(1.5f, 1.5f);
+            g.pose().pushPose();
+            g.pose().translate(-10 + v * 30, y, 0);
+            g.pose().scale(1.5f, 1.5f, 1);
             g.drawString(font, Component.literal(startedName).withStyle(net.minecraft.ChatFormatting.BOLD), 0, 0, color(v), true);
-            g.pose().popMatrix();
+            g.pose().popPose();
             g.drawString(font, Component.translatable("gui." + MatterOverdrive.MODID + ".quest.started"), (int) (v * 20), y - 12, color(v), true);
             startedTime += dt;
             if (startedTime > startedLength) startedTime = -1;

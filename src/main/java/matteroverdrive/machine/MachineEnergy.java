@@ -2,13 +2,15 @@ package matteroverdrive.machine;
 
 import java.util.function.ToDoubleFunction;
 
-import net.neoforged.neoforge.transfer.energy.SimpleEnergyHandler;
+import matteroverdrive.compat.ValueInput;
+import matteroverdrive.compat.ValueOutput;
+import net.neoforged.neoforge.energy.EnergyStorage;
 
 /**
  * 1.7.10 MachineEnergyStorage: capacity scales with POWER_STORAGE upgrades, transfer rates with POWER_TRANSFER.
  * Call {@link #refresh()} whenever the upgrades change.
  */
-public class MachineEnergy extends SimpleEnergyHandler {
+public class MachineEnergy extends EnergyStorage {
     private final int baseCapacity;
     private final int baseInsert;
     private final int baseExtract;
@@ -27,7 +29,7 @@ public class MachineEnergy extends SimpleEnergyHandler {
     public void refresh() {
         capacity = (int) Math.min(Integer.MAX_VALUE, baseCapacity * upgrades.applyAsDouble(UpgradeType.POWER_STORAGE));
         double transfer = upgrades.applyAsDouble(UpgradeType.POWER_TRANSFER);
-        maxInsert = (int) (baseInsert * transfer);
+        maxReceive = (int) (baseInsert * transfer);
         maxExtract = (int) (baseExtract * transfer);
         if (energy > capacity) {
             set(capacity);
@@ -43,11 +45,17 @@ public class MachineEnergy extends SimpleEnergyHandler {
     }
 
     public int getMaxInsert() {
-        return maxInsert;
+        return maxReceive;
     }
 
     public int getMaxExtract() {
         return maxExtract;
+    }
+
+    public void set(int amount) {
+        if (amount == energy) return;
+        energy = amount;
+        onChanged.run();
     }
 
     /** Machine-side change that ignores the insert/extract limits (generation and consumption). */
@@ -56,7 +64,24 @@ public class MachineEnergy extends SimpleEnergyHandler {
     }
 
     @Override
-    protected void onEnergyChanged(int previousAmount) {
-        onChanged.run();
+    public int receiveEnergy(int toReceive, boolean simulate) {
+        int received = super.receiveEnergy(toReceive, simulate);
+        if (received > 0 && !simulate) onChanged.run();
+        return received;
+    }
+
+    @Override
+    public int extractEnergy(int toExtract, boolean simulate) {
+        int extracted = super.extractEnergy(toExtract, simulate);
+        if (extracted > 0 && !simulate) onChanged.run();
+        return extracted;
+    }
+
+    public void serialize(ValueOutput output) {
+        output.putInt("energy", energy);
+    }
+
+    public void deserialize(ValueInput input) {
+        energy = Math.max(0, input.getIntOr("energy", 0));
     }
 }

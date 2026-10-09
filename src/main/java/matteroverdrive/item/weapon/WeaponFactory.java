@@ -41,7 +41,7 @@ public final class WeaponFactory {
 
     /** 1.7.10 Reference.UNICODE_LEGENDARY + gold "Legendary" + the item's name. */
     public static Component legendaryName(ItemStack stack) {
-        return Component.literal("\u272a ").append(Component.translatable("rarity.matteroverdrive.legendary")).append(" ").append(stack.getItemName())
+        return Component.literal("\u272a ").append(Component.translatable("rarity.matteroverdrive.legendary")).append(" ").append(stack.getItem().getName(stack))
                 .withStyle(s -> s.withItalic(false).withColor(ChatFormatting.GOLD));
     }
 

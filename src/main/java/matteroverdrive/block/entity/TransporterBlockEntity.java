@@ -10,21 +10,21 @@ import matteroverdrive.machine.UpgradeType;
 import matteroverdrive.menu.TransporterMenu;
 import matteroverdrive.transport.TransportLocation;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.component.DataComponentGetter;
+import matteroverdrive.compat.DataComponentGetter;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.Relative;
+import net.minecraft.world.entity.RelativeMovement;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
+import matteroverdrive.compat.ValueInput;
+import matteroverdrive.compat.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -182,7 +182,7 @@ public class TransporterBlockEntity extends MachineBlockEntity {
             Vec3 to = Vec3.atBottomCenterOf(target.pos());
             for (int i = 0; i < Math.min(entities.size(), MAX_ENTITIES_PER_TRANSPORT); i++) {
                 Entity e = entities.get(i);
-                e.teleportTo(level, to.x, to.y, to.z, Relative.union(Relative.ROTATION), e.getYRot(), e.getXRot(), true);
+                e.teleportTo(level, to.x, to.y, to.z, RelativeMovement.ROTATION, e.getYRot(), e.getXRot());
                 e.resetFallDistance();
                 // 1.7.10 MOEventTransport ("Is it really me?")
                 if (e instanceof net.minecraft.world.entity.player.Player player) {

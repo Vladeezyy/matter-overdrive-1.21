@@ -25,16 +25,16 @@ public final class VillageHouses {
     @SubscribeEvent
     static void onServerAboutToStart(ServerAboutToStartEvent event) {
         var registries = event.getServer().registryAccess();
-        Registry<StructureTemplatePool> pools = registries.lookupOrThrow(Registries.TEMPLATE_POOL);
-        Registry<StructureProcessorList> processors = registries.lookupOrThrow(Registries.PROCESSOR_LIST);
+        Registry<StructureTemplatePool> pools = registries.registryOrThrow(Registries.TEMPLATE_POOL);
+        Registry<StructureProcessorList> processors = registries.registryOrThrow(Registries.PROCESSOR_LIST);
         add(pools, processors, "village/plains/houses", "village/mad_scientist_house", "mad_scientist_house");
         add(pools, processors, "village/desert/houses", "village/mad_scientist_house_desert", "mad_scientist_house_desert");
     }
 
     private static void add(Registry<StructureTemplatePool> pools, Registry<StructureProcessorList> processors, String pool, String template,
                             String processorList) {
-        StructureTemplatePool target = pools.getValue(ResourceLocation.withDefaultNamespace(pool));
-        Holder<StructureProcessorList> list = processors.get(ResourceKey.create(Registries.PROCESSOR_LIST,
+        StructureTemplatePool target = pools.get(ResourceLocation.withDefaultNamespace(pool));
+        Holder<StructureProcessorList> list = processors.getHolder(ResourceKey.create(Registries.PROCESSOR_LIST,
                 ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, processorList))).orElse(null);
         if (target == null || list == null) return;
         StructurePoolElement element = StructurePoolElement.legacy(MatterOverdrive.MODID + ":" + template, list)

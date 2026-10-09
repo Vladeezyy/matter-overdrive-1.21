@@ -11,14 +11,13 @@ import matteroverdrive.dialog.DialogPayloads;
 import matteroverdrive.dialog.DialogRegistry;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.RenderPipelines;
+import matteroverdrive.compat.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.ARGB;
+import matteroverdrive.compat.ARGB;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
  * 1.7.10 GuiDialog: letterbox bars, the NPC's line right-aligned left of a holo separator, the player's options on the
@@ -99,7 +98,7 @@ public class DialogScreen extends Screen {
                 g.drawString(font, lines.get(i), width / 2 - font.width(lines.get(i)) - 16, y, HOLO, false);
             }
         }
-        g.blit(RenderPipelines.GUI_TEXTURED, SEPARATOR, width / 2 - 5, height - height / 8 - 128, 0, 0, 11, 128, 11, 128,
+        matteroverdrive.compat.Gui.blit(g, SEPARATOR, width / 2 - 5, height - height / 8 - 128, 0, 0, 11, 128, 11, 128,
                 ARGB.color(128, ARGB.scaleRGB(HOLO, 0.5f)));
 
         List<DialogMessage> options = visibleOptions();
@@ -115,11 +114,11 @@ public class DialogScreen extends Screen {
             if (mouseX > x && mouseX <= x + w && mouseY > y && mouseY <= y + font.lineHeight) {
                 g.fill(x - 2, y - 4, x + w + 8, y + font.lineHeight + 4, 0x66000000);
                 g.fill(x + w + 8, y - 4, x + w + 10, y + font.lineHeight + 4, canInteract ? 0x99FFFFFF : HOLO_RED);
-                if (iconTex != null) g.blit(RenderPipelines.GUI_TEXTURED, iconTex, x - 18, y + font.lineHeight / 2 - 8, 0, 0, 16, 16, 16, 16);
+                if (iconTex != null) matteroverdrive.compat.Gui.blit(g, iconTex, x - 18, y + font.lineHeight / 2 - 8, 0, 0, 16, 16, 16, 16);
                 g.drawString(font, text, x + 2, y, canInteract ? 0xFFFFFFFF : HOLO_RED, false);
             } else {
                 if (iconTex != null) {
-                    g.blit(RenderPipelines.GUI_TEXTURED, iconTex, x - 18, y + font.lineHeight / 2 - 8, 0, 0, 16, 16, 16, 16, HOLO);
+                    matteroverdrive.compat.Gui.blit(g, iconTex, x - 18, y + font.lineHeight / 2 - 8, 0, 0, 16, 16, 16, 16, HOLO);
                 }
                 g.drawString(font, text, x, y, canInteract ? HOLO : HOLO_RED, false);
             }
@@ -127,7 +126,9 @@ public class DialogScreen extends Screen {
     }
 
     @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, button);
+        boolean doubleClick = false;
         List<DialogMessage> all = current.getOptions(npc, player);
         List<DialogMessage> options = visibleOptions();
         for (int i = 0; i < options.size(); i++) {
@@ -140,7 +141,7 @@ public class DialogScreen extends Screen {
                 return true;
             }
         }
-        return super.mouseClicked(event, doubleClick);
+        return super.mouseClicked(event.x(), event.y(), event.button());
     }
 
     /** 1.7.10 onQuestionClick: act on the client, tell the server which option of which message. */
@@ -149,13 +150,13 @@ public class DialogScreen extends Screen {
         lastInteraction = INTERACTION_DELAY;
         DialogMessage message = current;
         message.onOptionsInteract(npc, player, option);
-        ClientPacketDistributor.sendToServer(new DialogPayloads.Interact(npc.getEntity().getId(), DialogRegistry.getId(message), option));
+        PacketDistributor.sendToServer(new DialogPayloads.Interact(npc.getEntity().getId(), DialogRegistry.getId(message), option));
     }
 
     @Override
     public void removed() {
         npc.setDialogPlayer(null);
-        ClientPacketDistributor.sendToServer(new DialogPayloads.Manage(npc.getEntity().getId(), false));
+        PacketDistributor.sendToServer(new DialogPayloads.Manage(npc.getEntity().getId(), false));
     }
 
     @Override

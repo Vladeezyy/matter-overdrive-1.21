@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import matteroverdrive.init.MODataComponents;
 import matteroverdrive.item.UpgradeItem;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.component.DataComponentGetter;
+import matteroverdrive.compat.DataComponentGetter;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Containers;
@@ -17,21 +17,19 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
+import matteroverdrive.compat.ValueInput;
+import matteroverdrive.compat.ValueOutput;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.energy.EnergyHandler;
-import net.neoforged.neoforge.transfer.energy.EnergyHandlerUtil;
+import net.neoforged.neoforge.energy.IEnergyStorage;
+import matteroverdrive.compat.EnergyHandlerUtil;
 
 /**
  * Base of every powered Matter Overdrive machine (1.7.10 MOTileEntityMachine + MOTileEntityMachineEnergy):
  * inventory with upgrade slots and an optional battery slot, FE storage, redstone mode, active state.
  */
-public abstract class MachineBlockEntity extends BlockEntity implements MenuProvider {
+public abstract class MachineBlockEntity extends matteroverdrive.compat.CompatBlockEntity implements MenuProvider {
     /** 1.7.10 basicUpgradeHandler: no multiplier below 0.05, speed not below 0.1. */
     private static final double MIN_MULTIPLIER = 0.05;
     private static final double MIN_SPEED = 0.1;
@@ -57,7 +55,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
                                  Set<UpgradeType> affectedBy) {
         super(type, pos, state);
         this.affectedBy = affectedBy.isEmpty() ? EnumSet.noneOf(UpgradeType.class) : EnumSet.copyOf(affectedBy);
-        this.batterySlot = batterySlot ? slots.add(MachineInventory.Role.ENERGY, r -> ItemAccess.forStack(r.toStack()).getCapability(Capabilities.Energy.ITEM) != null, 1) : -1;
+        this.batterySlot = batterySlot ? slots.add(MachineInventory.Role.ENERGY, r -> r.getCapability(Capabilities.EnergyStorage.ITEM) != null, 1) : -1;
         for (int i = 0; i < upgradeSlots; i++) {
             slots.add(MachineInventory.Role.UPGRADE, r -> r.getItem() instanceof UpgradeItem, 1);
         }
@@ -123,11 +121,11 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
         if (batterySlot < 0) return;
         ItemStack stack = inventory.getStack(batterySlot);
         if (stack.isEmpty()) return;
-        EnergyHandler battery = ItemAccess.forHandlerIndex(inventory, batterySlot).getCapability(Capabilities.Energy.ITEM);
+        IEnergyStorage battery = stack.getCapability(Capabilities.EnergyStorage.ITEM);
         if (batteryChargesItem()) {
-            EnergyHandlerUtil.move(energy, battery, Integer.MAX_VALUE, null);
+            EnergyHandlerUtil.move(energy, battery, Integer.MAX_VALUE);
         } else {
-            EnergyHandlerUtil.move(battery, energy, Integer.MAX_VALUE, null);
+            EnergyHandlerUtil.move(battery, energy, Integer.MAX_VALUE);
         }
     }
 
@@ -190,7 +188,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
     }
 
     /** Energy capability for a side; null side means internal access. */
-    public @Nullable EnergyHandler getEnergyHandler(@Nullable net.minecraft.core.Direction side) {
+    public @Nullable IEnergyStorage getEnergyHandler(@Nullable net.minecraft.core.Direction side) {
         return energy;
     }
 
@@ -291,7 +289,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
     /** Unclaimed, or the owner, a creative player or someone carrying the owner's [Access] protocol. */
     public boolean isUseableByPlayer(net.minecraft.world.entity.player.Player player) {
         if (owner == null || owner.equals(player.getUUID()) || player.getAbilities().instabuild) return true;
-        for (ItemStack stack : player.getInventory()) {
+        for (ItemStack stack : matteroverdrive.compat.ContainerItems.of(player.getInventory())) {
             if (matteroverdrive.item.SecurityProtocolItem.is(stack, matteroverdrive.item.SecurityProtocolItem.ACCESS, owner)) return true;
         }
         return false;

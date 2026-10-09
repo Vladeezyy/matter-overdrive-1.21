@@ -59,31 +59,36 @@ public class PlasmaShotgunItem extends EnergyWeaponItem {
 
     /** 1.7.10 onItemRightClick: start charging when the weapon could fire. */
     @Override
-    public InteractionResult use(Level level, Player player, InteractionHand hand) {
-        InteractionResult reload = super.use(level, player, hand);
-        if (reload != InteractionResult.PASS) return reload;
+    public net.minecraft.world.InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+        var reload = super.use(level, player, hand);
+        if (reload.getResult() != InteractionResult.PASS) return reload;
         ItemStack weapon = player.getItemInHand(hand);
-        if (player.getCooldowns().isOnCooldown(weapon) || !canFire(weapon) || player.isUsingItem()) return InteractionResult.PASS;
+        if (player.getCooldowns().isOnCooldown(weapon.getItem()) || !canFire(weapon) || player.isUsingItem()) return net.minecraft.world.InteractionResultHolder.pass(player.getItemInHand(hand));
         player.startUsingItem(hand);
         if (level instanceof ServerLevel server) {
             // 1.7.10: volume 3-3.2, pitch 0.9 x rand x 0.2 (clamped to the 0.5 minimum)
             server.playSound(null, player.getX(), player.getY(), player.getZ(), MOSounds.PLASMA_SHOTGUN_CHARGING.get(), SoundSource.PLAYERS,
                     3 + server.getRandom().nextFloat() * 0.2f, 0.9f * server.getRandom().nextFloat() * 0.2f);
         }
-        return InteractionResult.CONSUME;
+        return net.minecraft.world.InteractionResultHolder.consume(player.getItemInHand(hand));
     }
 
     /** 1.7.10 onPlayerStoppedUsing: the longer the charge, the fewer bolts. */
     @Override
-    public boolean releaseUsing(ItemStack weapon, Level level, LivingEntity entity, int timeLeft) {
+    public void releaseUsing(ItemStack weapon, Level level, LivingEntity entity, int timeLeft) {
+        release(weapon, level, entity, timeLeft);
+    }
+
+    /** releaseUsing; returns whether it fired (1.21.10's releaseUsing result, used by the GameTests). */
+    public boolean release(ItemStack weapon, Level level, LivingEntity entity, int timeLeft) {
         if (!(level instanceof ServerLevel server) || !(entity instanceof ServerPlayer player)) return false;
         stopChargingSound(server, player);
-        if (player.getCooldowns().isOnCooldown(weapon) || !canFire(weapon)) return false;
+        if (player.getCooldowns().isOnCooldown(weapon.getItem()) || !canFire(weapon)) return false;
         int elapsed = getUseDuration(weapon, entity) - timeLeft;
         int count = chargedShots(elapsed);
         setEnergy(weapon, getEnergy(weapon) - getEnergyPerShot(weapon));
         fireBolts(server, player, weapon, count, false);
-        player.getCooldowns().addCooldown(weapon, getShootCooldown(weapon));
+        player.getCooldowns().addCooldown(weapon.getItem(), getShootCooldown(weapon));
         return true;
     }
 

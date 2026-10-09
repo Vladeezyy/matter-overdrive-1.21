@@ -43,7 +43,7 @@ public final class DialogPayloads {
     }
 
     public static void register(PayloadRegistrar registrar) {
-        registrar.playBidirectional(Manage.TYPE, Manage.STREAM_CODEC, DialogPayloads::handleManage, DialogPayloads::handleManage)
+        registrar.playBidirectional(Manage.TYPE, Manage.STREAM_CODEC, DialogPayloads::handleManage)
                 .playToServer(Interact.TYPE, Interact.STREAM_CODEC, DialogPayloads::handleInteract);
     }
 

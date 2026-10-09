@@ -4,14 +4,13 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 
 import matteroverdrive.block.entity.WeaponStationBlockEntity;
-import net.minecraft.client.renderer.SubmitNodeCollector;
+import matteroverdrive.compat.render.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.item.ItemModelResolver;
-import net.minecraft.client.renderer.item.ItemStackRenderState;
-import net.minecraft.client.renderer.state.CameraRenderState;
+import matteroverdrive.compat.render.BlockEntityRenderState;
+import matteroverdrive.compat.render.ItemModelResolver;
+import matteroverdrive.compat.render.ItemStackRenderState;
+import matteroverdrive.compat.render.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.phys.Vec3;
@@ -21,11 +20,11 @@ import org.jetbrains.annotations.Nullable;
  * 1.7.10 TileEntityRendererWeaponStation: the weapon on the station floats above it, slowly turning
  * (it was rendered as a bobbing item entity at y + 0.8).
  */
-public class WeaponStationRenderer implements BlockEntityRenderer<WeaponStationBlockEntity, WeaponStationRenderer.State> {
+public class WeaponStationRenderer implements matteroverdrive.compat.render.StateBlockEntityRenderer<WeaponStationBlockEntity, WeaponStationRenderer.State> {
     private final ItemModelResolver itemModelResolver;
 
     public WeaponStationRenderer(BlockEntityRendererProvider.Context context) {
-        this.itemModelResolver = context.itemModelResolver();
+        this.itemModelResolver = matteroverdrive.compat.render.ItemModelResolver.INSTANCE;
     }
 
     public static class State extends BlockEntityRenderState {
@@ -40,8 +39,8 @@ public class WeaponStationRenderer implements BlockEntityRenderer<WeaponStationB
 
     @Override
     public void extractRenderState(WeaponStationBlockEntity station, State state, float partialTick, Vec3 camera,
-                                   @Nullable ModelFeatureRenderer.CrumblingOverlay crumbling) {
-        BlockEntityRenderer.super.extractRenderState(station, state, partialTick, camera, crumbling);
+                                   @Nullable Object crumbling) {
+        matteroverdrive.compat.render.StateBlockEntityRenderer.super.extractRenderState(station, state, partialTick, camera, crumbling);
         itemModelResolver.updateForTopItem(state.item, station.getWeapon(), ItemDisplayContext.GROUND, station.getLevel(), null,
                 (int) station.getBlockPos().asLong());
         // 1.7.10 hoverStart = worldTime * 0.05 + noise: the item entity renderer turned it by age + hoverStart

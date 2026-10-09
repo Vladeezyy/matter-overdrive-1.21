@@ -6,12 +6,12 @@ import matteroverdrive.network.BoltHitPayload;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.SingleQuadParticle;
+import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.client.particle.TextureSheetParticle;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.data.AtlasIds;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -39,7 +39,7 @@ public final class BoltHitEffects {
         RandomSource rand = level.getRandom();
         float r = (hit.color() >> 16 & 255) / 255f, g = (hit.color() >> 8 & 255) / 255f, b = (hit.color() & 255) / 255f;
         Particle puff = mc.particleEngine.createParticle(ParticleTypes.POOF, hit.x(), hit.y(), hit.z(), 0, 0, 0);
-        if (puff instanceof SingleQuadParticle quad) quad.setColor(r, g, b);
+        if (puff != null) puff.setColor(r, g, b);
         int setting = mc.options.particles().get().ordinal();   // 1.7.10 particleSetting: 0 all, 1 decreased, 2 minimal
         if (rand.nextFloat() < 0.8f) {
             int sparks = Math.max(0, (int) (16 * hit.size()) - (int) (8 * hit.size()) * setting);
@@ -67,11 +67,12 @@ public final class BoltHitEffects {
     }
 
     /** 1.7.10 PhaserBoltRecoil: a full-bright generic spark in the bolt's colour, thrown off the hit side, shrinking. */
-    private static final class Spark extends SingleQuadParticle {
+    private static final class Spark extends TextureSheetParticle {
         private final float baseSize;
 
         Spark(ClientLevel level, BoltHitPayload hit, float r, float g, float b) {
-            super(level, hit.x(), hit.y(), hit.z(), hit.nx() * 30, hit.ny() * 30, hit.nz() * 30, sprite(level.getRandom().nextInt(2)));
+            super(level, hit.x(), hit.y(), hit.z(), hit.nx() * 30, hit.ny() * 30, hit.nz() * 30);
+            setSprite(sprite(level.getRandom().nextInt(2)));
             this.xd += (random.nextFloat() - 0.5f) * 0.2f;
             this.yd += (random.nextFloat() - 0.5f) * 0.2f;
             this.zd += (random.nextFloat() - 0.5f) * 0.2f;
@@ -85,13 +86,13 @@ public final class BoltHitEffects {
         }
 
         private static TextureAtlasSprite sprite(int index) {
-            return Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(AtlasIds.PARTICLES)
-                    .getSprite(ResourceLocation.withDefaultNamespace("generic_" + index));
+            return Minecraft.getInstance().getTextureAtlas(net.minecraft.client.renderer.texture.TextureAtlas.LOCATION_PARTICLES)
+                    .apply(ResourceLocation.withDefaultNamespace("generic_" + index));
         }
 
         @Override
-        protected Layer getLayer() {
-            return Layer.OPAQUE;
+        public ParticleRenderType getRenderType() {
+            return ParticleRenderType.PARTICLE_SHEET_OPAQUE;
         }
 
         @Override

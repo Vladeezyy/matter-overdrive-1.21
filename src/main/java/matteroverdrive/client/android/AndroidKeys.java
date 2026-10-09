@@ -27,7 +27,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
  * 1.7.10 KeyHandler: X uses the selected android ability (and toggles others), Tab holds the ability wheel. Teleport
@@ -35,14 +35,14 @@ import net.neoforged.neoforge.client.network.ClientPacketDistributor;
  */
 @EventBusSubscriber(modid = MatterOverdrive.MODID, value = Dist.CLIENT)
 public final class AndroidKeys {
-    public static final KeyMapping.Category CATEGORY = new KeyMapping.Category(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "android"));
+    /** 1.21.1: key categories are translation keys (the same one the 1.21.10 KeyMapping.Category uses). */
+    public static final String CATEGORY = "key.category." + MatterOverdrive.MODID + ".android";
     public static final KeyMapping ABILITY_USE = new KeyMapping("key." + MatterOverdrive.MODID + ".ability_use", GLFW.GLFW_KEY_X, CATEGORY);
     public static final KeyMapping ABILITY_SWITCH = new KeyMapping("key." + MatterOverdrive.MODID + ".ability_switch", GLFW.GLFW_KEY_TAB, CATEGORY);
     private static boolean teleportHeld;
 
     @SubscribeEvent
     static void registerKeys(RegisterKeyMappingsEvent event) {
-        event.registerCategory(CATEGORY);
         event.register(ABILITY_USE);
         event.register(ABILITY_SWITCH);
         AndroidClientHooks.abilityKeyName = () -> ABILITY_USE.getTranslatedKeyMessage().getString();
@@ -58,7 +58,7 @@ public final class AndroidKeys {
         }
         AndroidData data = Android.get(player);
         while (ABILITY_USE.consumeClick()) {
-            ClientPacketDistributor.sendToServer(new AndroidPayloads.Action());
+            PacketDistributor.sendToServer(new AndroidPayloads.Action());
         }
         // 1.7.10 BioticStatTeleport.manageActivate
         BioticStat teleport = BioticStats.TELEPORT;
@@ -68,7 +68,7 @@ public final class AndroidKeys {
         } else if (teleportHeld) {
             teleportHeld = false;
             Vec3 target = teleportTarget(player);
-            if (target != null) ClientPacketDistributor.sendToServer(new AndroidPayloads.Teleport(target.x, target.y, target.z));
+            if (target != null) PacketDistributor.sendToServer(new AndroidPayloads.Teleport(target.x, target.y, target.z));
         }
         while (ABILITY_SWITCH.consumeClick()) {
             if (mc.screen == null && AbilityWheelScreen.hasStats(player)) mc.setScreen(new AbilityWheelScreen());
@@ -96,7 +96,7 @@ public final class AndroidKeys {
     static BlockPos topSafeBlock(Level level, BlockPos pos, Direction side) {
         int heightCheck = side == Direction.UP ? 3 : 8;
         int air = 0;
-        for (int y = pos.getY(); y < Math.min(pos.getY() + heightCheck, level.getMaxY()); y++) {
+        for (int y = pos.getY(); y < Math.min(pos.getY() + heightCheck, level.getMaxBuildHeight() - 1); y++) {
             BlockPos at = new BlockPos(pos.getX(), y, pos.getZ());
             BlockState state = level.getBlockState(at);
             if (state.is(Blocks.SOUL_SAND) || state.is(Blocks.BARRIER) || state.is(Blocks.BEDROCK)) return null;

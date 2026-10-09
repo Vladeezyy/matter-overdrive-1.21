@@ -51,7 +51,7 @@ public class RangedRogueAndroid extends RogueAndroid implements RangedAttackMob,
         goalSelector.addGoal(6, new RandomLookAroundGoal(this));
         targetSelector.addGoal(1, new HurtByTargetGoal(this));
         targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, LivingEntity.class, 10, true, true,
-                (target, level) -> RogueAndroid.isEnemy(target)));
+                target -> RogueAndroid.isEnemy(target)));
     }
 
     /** 1.7.10 WeaponFactory.getRandomDecoratedEnergyWeapon. */
@@ -94,8 +94,8 @@ public class RangedRogueAndroid extends RogueAndroid implements RangedAttackMob,
         setItemSlot(EquipmentSlot.MAINHAND, weapon);
         float looting = MeleeRogueAndroid.lootingBonus(level, source);
         int packs = random.nextInt(2 + (int) (looting * 10));
-        for (int i = 0; i < packs; i++) spawnAtLocation(level, new ItemStack(MOItems.ENERGY_PACK.get()));
-        if (recentlyHit && (random.nextFloat() < 0.15f + looting || isLegendary())) spawnAtLocation(level, randomPart());
-        if (recentlyHit && (random.nextInt(400) - looting * 10 < 5 || isLegendary())) spawnAtLocation(level, getMainHandItem().copy());
+        for (int i = 0; i < packs; i++) spawnAtLocation(new ItemStack(MOItems.ENERGY_PACK.get()));
+        if (recentlyHit && (random.nextFloat() < 0.15f + looting || isLegendary())) spawnAtLocation(randomPart());
+        if (recentlyHit && (random.nextInt(400) - looting * 10 < 5 || isLegendary())) spawnAtLocation(getMainHandItem().copy());
     }
 }

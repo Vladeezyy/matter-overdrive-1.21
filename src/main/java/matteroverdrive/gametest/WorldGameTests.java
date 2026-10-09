@@ -23,7 +23,7 @@ final class WorldGameTests {
     }
 
     private static void check(GameTestHelper helper, boolean ok, String message) {
-        helper.assertTrue(ok, Component.literal(message));
+        helper.assertTrue(ok, message);
     }
 
     /** Failed animals breed failed young, and only with their own kind. */
@@ -37,7 +37,7 @@ final class WorldGameTests {
         pig2.setInLove(null);
         vanilla.setInLove(null);
         check(helper, pig.canMate(pig2) && !pig.canMate(vanilla), "failed pigs mate with normal pigs");
-        check(helper, MOEntities.FAILED_COW.get().create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND)
+        check(helper, MOEntities.FAILED_COW.get().create(level)
                 .getBreedOffspring(level, null).getType() == MOEntities.FAILED_COW.get(), "calf isn't a failed cow");
         var chicken = helper.spawnWithNoFreeWill(MOEntities.FAILED_CHICKEN.get(), new BlockPos(6, 1, 6));
         check(helper, chicken.getBreedOffspring(level, chicken).getType() == MOEntities.FAILED_CHICKEN.get(), "chick isn't a failed chicken");
@@ -62,7 +62,7 @@ final class WorldGameTests {
     private static void tritaniumCrate(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, matteroverdrive.init.MOBlocks.crate(DyeColor.ORANGE).get());
-        var crate = (matteroverdrive.block.entity.TritaniumCrateBlockEntity) helper.getBlockEntity(pos, matteroverdrive.block.entity.TritaniumCrateBlockEntity.class);
+        var crate = (matteroverdrive.block.entity.TritaniumCrateBlockEntity) helper.<matteroverdrive.block.entity.TritaniumCrateBlockEntity>getBlockEntity(pos);
         check(helper, crate.getContainerSize() == 54, "size " + crate.getContainerSize());
         crate.setItem(53, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DIAMOND, 7));
         BlockPos abs = helper.absolutePos(pos);
@@ -76,7 +76,7 @@ final class WorldGameTests {
 
     /** Image buildings: every template loads with its 1.7.10 size and every structure is registered from its JSON. */
     private static void buildings(GameTestHelper helper) {
-        var structures = helper.getLevel().registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.STRUCTURE);
+        var structures = helper.getLevel().registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.STRUCTURE);
         int[][] sizes = {{21, 9, 21}, {24, 16, 24}, {11, 6, 35}, {43, 25, 43}, {58, 16, 23}};
         for (var building : matteroverdrive.world.Building.values()) {
             var t = building.template();
@@ -84,29 +84,23 @@ final class WorldGameTests {
             check(helper, t.width() == size[0] && t.height() == size[1] && t.depth() == size[2],
                     building + " size " + t.width() + "x" + t.height() + "x" + t.depth());
             var key = net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("matteroverdrive", building.getSerializedName());
-            check(helper, structures.get(key).isPresent(), "structure " + key + " missing");
+            check(helper, structures.getOptional(key).isPresent(), "structure " + key + " missing");
         }
         helper.succeed();
     }
 
     /** Matter container: holds exactly 32 mB of Matter Plasma through the fluid item capability; the plasma block is a source. */
     private static void matterContainer(GameTestHelper helper) {
-        var plasma = net.neoforged.neoforge.transfer.fluid.FluidResource.of(matteroverdrive.init.MOFluids.MATTER_PLASMA.get());
-        var slots = new net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler(2);
-        slots.set(0, net.neoforged.neoforge.transfer.item.ItemResource.of(matteroverdrive.init.MOItems.MATTER_CONTAINER.get()), 1);
-        var access = net.neoforged.neoforge.transfer.access.ItemAccess.forHandlerIndex(slots, 0);
-        var tank = access.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Fluid.ITEM);
+        var plasma = matteroverdrive.init.MOFluids.MATTER_PLASMA.get();
+        var container = new net.minecraft.world.item.ItemStack(matteroverdrive.init.MOItems.MATTER_CONTAINER.get());
+        var tank = container.getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.ITEM);
         check(helper, tank != null, "no fluid capability");
-        int partial, full;
-        try (var tx = net.neoforged.neoforge.transfer.transaction.Transaction.openRoot()) {
-            partial = tank.insert(0, plasma, 10, tx);
-        }
-        try (var tx = net.neoforged.neoforge.transfer.transaction.Transaction.openRoot()) {
-            full = tank.insert(0, plasma, 100, tx);
-            tx.commit();
-        }
+        var simulate = net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.SIMULATE;
+        var execute = net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE;
+        int partial = tank.fill(new net.neoforged.neoforge.fluids.FluidStack(plasma, 10), simulate);
+        int full = tank.fill(new net.neoforged.neoforge.fluids.FluidStack(plasma, 100), execute);
         check(helper, partial == 0 && full == 32, "inserted " + partial + " / " + full);
-        check(helper, slots.getResource(0).is(matteroverdrive.init.MOItems.MATTER_CONTAINER_FULL.get()), "container not full: " + slots.getResource(0));
+        check(helper, tank.getContainer().is(matteroverdrive.init.MOItems.MATTER_CONTAINER_FULL.get()), "container not full: " + tank.getContainer());
         BlockPos pos = new BlockPos(3, 1, 3);
         helper.setBlock(pos, matteroverdrive.init.MOBlocks.MATTER_PLASMA.get());
         var fluid = helper.getLevel().getFluidState(helper.absolutePos(pos));
@@ -139,7 +133,7 @@ final class WorldGameTests {
     private static void transporter(GameTestHelper helper) {
         BlockPos pos = new BlockPos(1, 1, 1);
         helper.setBlock(pos, matteroverdrive.init.MOBlocks.TRANSPORTER.get());
-        var t = helper.getBlockEntity(pos, matteroverdrive.block.entity.TransporterBlockEntity.class);
+        var t = helper.<matteroverdrive.block.entity.TransporterBlockEntity>getBlockEntity(pos);
         t.getEnergy().set(100000);
         BlockPos abs = helper.absolutePos(pos);
         var drive = new net.minecraft.world.item.ItemStack(matteroverdrive.init.MOItems.TRANSPORT_FLASH_DRIVE.get());
@@ -158,7 +152,7 @@ final class WorldGameTests {
     private static void androidSpawner(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, matteroverdrive.init.MOBlocks.ANDROID_SPAWNER.get());
-        var spawner = helper.getBlockEntity(pos, matteroverdrive.block.entity.AndroidSpawnerBlockEntity.class);
+        var spawner = helper.<matteroverdrive.block.entity.AndroidSpawnerBlockEntity>getBlockEntity(pos);
         var scoreboard = helper.getLevel().getScoreboard();
         String teamName = "mo_spawner_test";
         if (scoreboard.getPlayerTeam(teamName) != null) scoreboard.removePlayerTeam(scoreboard.getPlayerTeam(teamName));

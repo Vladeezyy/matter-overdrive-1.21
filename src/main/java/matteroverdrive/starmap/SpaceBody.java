@@ -22,8 +22,8 @@ public abstract class SpaceBody {
     }
 
     protected void readBody(CompoundTag tag) {
-        id = tag.getIntOr("ID", 0);
-        name = tag.getStringOr("Name", "");
+        id = tag.getInt("ID");
+        name = tag.getString("Name");
     }
 
     public int getId() {

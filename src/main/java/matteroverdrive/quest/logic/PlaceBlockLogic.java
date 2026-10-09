@@ -32,15 +32,16 @@ public class PlaceBlockLogic extends AbstractLogic {
     }
 
     public int getBlockPlaced(QuestStack stack) {
-        return tag(stack).getShortOr("Placed", (short) 0);
+        return tag(stack).getShort("Placed");
     }
 
     public int getMaxBlockPlace(QuestStack stack) {
-        return tag(stack).getShortOr("MaxPlaced", (short) 0);
+        return tag(stack).getShort("MaxPlaced");
     }
 
     public @Nullable BlockPos getPos(QuestStack stack) {
-        return tag(stack).getIntArray("Pos").filter(a -> a.length == 3).map(a -> new BlockPos(a[0], a[1], a[2])).orElse(null);
+        int[] a = tag(stack).getIntArray("Pos");
+        return a.length == 3 ? new BlockPos(a[0], a[1], a[2]) : null;
     }
 
     @Override

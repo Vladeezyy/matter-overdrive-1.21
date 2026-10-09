@@ -10,11 +10,9 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.energy.EnergyHandler;
-import net.neoforged.neoforge.transfer.energy.InfiniteEnergyHandler;
-import net.neoforged.neoforge.transfer.energy.ItemAccessEnergyHandler;
+import matteroverdrive.compat.InfiniteEnergyHandler;
+import net.neoforged.neoforge.energy.ComponentEnergyStorage;
+import net.neoforged.neoforge.energy.IEnergyStorage;
 
 /**
  * 1.7.10 Battery / CreativeBattery: an FE container item. The overlay layer is tinted per battery in its client item JSON.
@@ -33,11 +31,11 @@ public class BatteryItem extends Item {
         this.creative = creative;
     }
 
-    public EnergyHandler createEnergyHandler(ItemAccess access) {
+    public IEnergyStorage createEnergyHandler(ItemStack stack) {
         if (creative) {
             return InfiniteEnergyHandler.INSTANCE;
         }
-        return new ItemAccessEnergyHandler(access, MODataComponents.ENERGY.get(), capacity, maxInsert, maxExtract);
+        return new ComponentEnergyStorage(stack, MODataComponents.ENERGY.get(), capacity, maxInsert, maxExtract);
     }
 
     public int getCapacity() {
@@ -75,7 +73,8 @@ public class BatteryItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+        Consumer<Component> tooltip = tooltipLines::add;
         tooltip.accept(Component.translatable("tooltip.matteroverdrive.energy_stored",
                 creative ? Component.literal("∞") : MOText.energy(getEnergy(stack)), MOText.energy(capacity)).withStyle(ChatFormatting.YELLOW));
         tooltip.accept(Component.translatable("tooltip.matteroverdrive.energy_io", maxInsert, maxExtract).withStyle(ChatFormatting.GRAY));

@@ -18,9 +18,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemUseAnimation;
+import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -90,15 +89,15 @@ public class MatterScannerItem extends Item {
 
     private static ItemStack blockItem(Level level, BlockPos pos) {
         BlockState state = level.getBlockState(pos);
-        return state.isAir() ? ItemStack.EMPTY : state.getCloneItemStack(level, pos, false);
+        return state.isAir() ? ItemStack.EMPTY : state.getBlock().getCloneItemStack(level, pos, state);
     }
 
     @Override
-    public InteractionResult use(Level level, Player player, InteractionHand hand) {
-        if (trace(level, player).getType() != HitResult.Type.BLOCK) return InteractionResult.PASS;
+    public net.minecraft.world.InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+        if (trace(level, player).getType() != HitResult.Type.BLOCK) return net.minecraft.world.InteractionResultHolder.pass(player.getItemInHand(hand));
         player.startUsingItem(hand);
         if (level.isClientSide()) startScanSound.accept(player);
-        return InteractionResult.CONSUME;
+        return net.minecraft.world.InteractionResultHolder.consume(player.getItemInHand(hand));
     }
 
     /** 1.7.10 getMaxItemUseDuration: 60 ticks + the selected item's matter. */
@@ -110,8 +109,8 @@ public class MatterScannerItem extends Item {
     }
 
     @Override
-    public ItemUseAnimation getUseAnimation(ItemStack stack) {
-        return ItemUseAnimation.BLOCK;
+    public UseAnim getUseAnimation(ItemStack stack) {
+        return UseAnim.BLOCK;
     }
 
     /** 1.7.10 onUsingTick: looking at another block selects it and stops the scan. */
@@ -179,7 +178,8 @@ public class MatterScannerItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack scanner, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack scanner, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+        Consumer<Component> tooltip = tooltipLines::add;
         GlobalPos link = getLink(scanner);
         if (link != null) {
             tooltip.accept(Component.translatable("tooltip.matteroverdrive.scanner.online", link.pos().toShortString()).withStyle(ChatFormatting.GREEN));

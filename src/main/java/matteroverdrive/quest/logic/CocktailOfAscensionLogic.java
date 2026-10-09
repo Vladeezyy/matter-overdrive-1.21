@@ -25,19 +25,19 @@ public class CocktailOfAscensionLogic implements QuestLogic {
     public static final int MAX_MUSHROOM_COUNT = 5;
 
     public static int getCreeperKills(QuestStack stack) {
-        return stack.getData().getByteOr("CreeperKills", (byte) 0);
+        return stack.getData().getByte("CreeperKills");
     }
 
     public static int getGunpowder(QuestStack stack) {
-        return stack.getData().getByteOr("GunpowderCount", (byte) 0);
+        return stack.getData().getByte("GunpowderCount");
     }
 
     public static int getMushrooms(QuestStack stack) {
-        return stack.getData().getByteOr("MushroomCount", (byte) 0);
+        return stack.getData().getByte("MushroomCount");
     }
 
     private static boolean hasTalkedTo(QuestStack stack) {
-        return !stack.hasGiver() || stack.getData().getBooleanOr("TalkedToGiver", false);
+        return !stack.hasGiver() || stack.getData().getBoolean("TalkedToGiver");
     }
 
     @Override

@@ -36,14 +36,14 @@ public class MeleeRogueAndroid extends RogueAndroid {
         goalSelector.addGoal(5, new RandomLookAroundGoal(this));
         targetSelector.addGoal(1, new HurtByTargetGoal(this));
         targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, LivingEntity.class, 10, false, true,
-                (target, level) -> RogueAndroid.isEnemy(target)));
+                target -> RogueAndroid.isEnemy(target)));
     }
 
     @Override
     protected void dropCustomDeathLoot(ServerLevel level, DamageSource source, boolean recentlyHit) {
         super.dropCustomDeathLoot(level, source, recentlyHit);
         if (recentlyHit && (random.nextFloat() < 0.1f + lootingBonus(level, source) || isLegendary())) {
-            spawnAtLocation(level, randomPart());
+            spawnAtLocation(randomPart());
         }
     }
 

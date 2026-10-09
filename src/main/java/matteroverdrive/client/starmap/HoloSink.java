@@ -4,9 +4,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.SubmitNodeCollector;
+import matteroverdrive.compat.render.SubmitNodeCollector;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 
@@ -48,8 +47,8 @@ public interface HoloSink {
             @Override
             public void item(PoseStack pose, net.minecraft.world.item.ItemStack stack, float x, float y) {
                 var mc = net.minecraft.client.Minecraft.getInstance();
-                var state = new net.minecraft.client.renderer.item.ItemStackRenderState();
-                mc.getItemModelResolver().updateForTopItem(state, stack, net.minecraft.world.item.ItemDisplayContext.GUI, mc.level, null, 0);
+                var state = new matteroverdrive.compat.render.ItemStackRenderState();
+                matteroverdrive.compat.render.ItemModelResolver.INSTANCE.updateForTopItem(state, stack, net.minecraft.world.item.ItemDisplayContext.GUI, mc.level, null, 0);
                 if (state.isEmpty()) return;
                 pose.pushPose();
                 pose.translate(x + 8, y + 8, 0);
@@ -73,7 +72,7 @@ public interface HoloSink {
 
             @Override
             public void icon(PoseStack pose, ResourceLocation texture, float x, float y, float w, float h, int rgb) {
-                g.blit(RenderPipelines.GUI_TEXTURED, texture, Math.round(x), Math.round(y), 0, 0, Math.round(w), Math.round(h),
+                matteroverdrive.compat.Gui.blit(g, texture, Math.round(x), Math.round(y), 0, 0, Math.round(w), Math.round(h),
                         Math.round(w), Math.round(h), 0xFF000000 | rgb);
             }
 

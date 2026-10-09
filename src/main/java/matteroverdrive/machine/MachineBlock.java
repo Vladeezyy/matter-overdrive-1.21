@@ -24,12 +24,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
 
 /** Base block for machines: horizontal facing, opens the machine GUI, server ticker, wrench dismantling. */
 public abstract class MachineBlock extends BaseEntityBlock {
-    public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     /** Whether the machine is working; models may show it (1.7.10 swapped icons, e.g. the recycler animation). */
     public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
 
@@ -71,6 +71,15 @@ public abstract class MachineBlock extends BaseEntityBlock {
         return type.get().create(pos, state);
     }
 
+    /** 1.21.1: the 1.21.10 preRemoveSideEffects hook (drops the contents, etc.). */
+    @Override
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        if (!state.is(newState.getBlock()) && level.getBlockEntity(pos) instanceof matteroverdrive.compat.CompatBlockEntity be) {
+            be.preRemoveSideEffects(pos, state);
+        }
+        super.onRemove(state, level, pos, newState, movedByPiston);
+    }
+
     @Override
     public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
         return createTickerHelper(blockEntityType, type.get(), level.isClientSide() ? MachineBlockEntity::clientTick : MachineBlockEntity::serverTick);
@@ -97,13 +106,13 @@ public abstract class MachineBlock extends BaseEntityBlock {
 
     /** 1.7.10 MachineHelper.canRemoveMachine: only the owner breaks a claimed machine. */
     @Override
-    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, ItemStack toolStack, boolean willHarvest,
+    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest,
                                        net.minecraft.world.level.material.FluidState fluid) {
         if (level.getBlockEntity(pos) instanceof MachineBlockEntity machine && !machine.canRemove(player)) {
             if (!level.isClientSide()) alert(player, "alert.matteroverdrive.no_rights.break", state);
             return false;
         }
-        return super.onDestroyedByPlayer(state, level, pos, player, toolStack, willHarvest, fluid);
+        return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
     }
 
     /** Wrench sneak-use: break the machine as if mined, so it drops itself with its stored energy, plus its contents. */

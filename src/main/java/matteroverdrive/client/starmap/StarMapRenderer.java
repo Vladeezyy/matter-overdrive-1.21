@@ -22,14 +22,12 @@ import matteroverdrive.starmap.Star;
 import matteroverdrive.starmap.TravelEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.renderer.SubmitNodeCollector;
+import matteroverdrive.compat.render.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.state.CameraRenderState;
+import matteroverdrive.compat.render.BlockEntityRenderState;
+import matteroverdrive.compat.render.CameraRenderState;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FontDescription;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
@@ -41,17 +39,17 @@ import net.minecraft.world.phys.Vec3;
  * PlanetStats): the hologram beam rising from the table, the zoomed space body above it and its info panel on the side
  * facing the player (snapped to 90 degrees), or "ACCESS DENIED" for players who can't use the map.
  */
-public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, StarMapRenderer.State> {
+public class StarMapRenderer implements matteroverdrive.compat.render.StateBlockEntityRenderer<StarMapBlockEntity, StarMapRenderer.State> {
     private static final ResourceLocation BEAM = tex("textures/fx/hologram_beam.png");
     private static final ResourceLocation PARTICLES = tex("textures/particle/particles_additive.png");
-    private static final FontDescription ALT = new FontDescription.Resource(Minecraft.ALT_FONT);
+    private static final net.minecraft.resources.ResourceLocation ALT = Minecraft.ALT_FONT;
     // 1.7.10 StarMapRendererAbstract icons on the 128 px additive particle sheet
     private static final float[] STAR_ICON = {0, 0, 32 / 128f, 32 / 128f}, SELECTED_ICON = {32 / 128f, 0, 64 / 128f, 32 / 128f},
             CURRENT_ICON = {64 / 128f, 0, 96 / 128f, 32 / 128f};
     private final Font font;
 
     public StarMapRenderer(BlockEntityRendererProvider.Context context) {
-        this.font = context.font();
+        this.font = context.getFont();
     }
 
     private static ResourceLocation tex(String path) {
@@ -76,8 +74,8 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
 
     @Override
     public void extractRenderState(StarMapBlockEntity starMap, State state, float partialTick, Vec3 camera,
-                                   @Nullable ModelFeatureRenderer.CrumblingOverlay crumbling) {
-        BlockEntityRenderer.super.extractRenderState(starMap, state, partialTick, camera, crumbling);
+                                   @Nullable Object crumbling) {
+        matteroverdrive.compat.render.StateBlockEntityRenderer.super.extractRenderState(starMap, state, partialTick, camera, crumbling);
         state.zoom = starMap.getZoomLevel();
         state.position = starMap.getGalaxyPosition();
         state.destination = starMap.getDestination();
@@ -143,7 +141,7 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
         pose.translate(0.5, 0.5, 0.5);
         pose.translate(0, renderer.height(), 0);
         // 1.7.10 drawHoloGuiInfo: the side facing the player, snapped to 90 degrees
-        Vec3 viewer = cam.position();
+        Vec3 viewer = cam.getPosition();
         double dx = viewer.x - state.blockCenter.x, dz = viewer.z - state.blockCenter.z;
         double angle = Math.atan2(dz, dx);
         if (angle < 0) angle += Math.PI * 2;

@@ -27,8 +27,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
+import matteroverdrive.compat.ValueInput;
+import matteroverdrive.compat.ValueOutput;
 import net.minecraft.world.phys.AABB;
 
 /**
@@ -162,7 +162,7 @@ public class ReplicatorBlockEntity extends MachineBlockEntity {
         for (LivingEntity e : getLevel().getEntitiesOfClass(LivingEntity.class, new AABB(pos).inflate(RADIATION_RANGE))) {
             double d = 1 - Mth.clamp(Math.sqrt(e.distanceToSqr(pos.getCenter())) / RADIATION_RANGE, 0, 1);
             d *= FULL_SHIELDING - shielding;
-            addEffect(e, MobEffects.NAUSEA, Math.pow(5, d));
+            addEffect(e, MobEffects.CONFUSION, Math.pow(5, d));
             addEffect(e, MobEffects.WEAKNESS, Math.pow(10, d));
             addEffect(e, MobEffects.HUNGER, Math.pow(12, d));
             addEffect(e, MobEffects.POISON, Math.pow(5, d));

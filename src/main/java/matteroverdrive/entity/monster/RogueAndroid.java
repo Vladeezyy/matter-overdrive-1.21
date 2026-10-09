@@ -22,7 +22,7 @@ import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityDimensions;
-import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -35,8 +35,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
+import matteroverdrive.compat.ValueInput;
+import matteroverdrive.compat.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -123,7 +123,7 @@ public abstract class RogueAndroid extends Monster {
     }
 
     @Override
-    public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason reason,
+    public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason,
                                                   @Nullable SpawnGroupData data) {
         data = super.finalizeSpawn(level, difficulty, reason, data);
         // 1.7.10: |gaussian x (1 + difficulty x 0.25)| clamped to 0..3; legendary 5% per level
@@ -194,8 +194,9 @@ public abstract class RogueAndroid extends Monster {
     }
 
     @Override
-    protected void addAdditionalSaveData(ValueOutput output) {
-        super.addAdditionalSaveData(output);
+    public void addAdditionalSaveData(net.minecraft.nbt.CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
+        ValueOutput output = ValueOutput.of(tag, registryAccess());
         output.putInt("android_level", getAndroidLevel());
         output.putBoolean("legendary", isLegendary());
         if (entityData.get(VISOR_COLOR) >= 0) output.putInt("visor_color", entityData.get(VISOR_COLOR));
@@ -204,8 +205,9 @@ public abstract class RogueAndroid extends Monster {
     }
 
     @Override
-    protected void readAdditionalSaveData(ValueInput input) {
-        super.readAdditionalSaveData(input);
+    public void readAdditionalSaveData(net.minecraft.nbt.CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+        ValueInput input = ValueInput.of(tag, registryAccess());
         entityData.set(LEVEL, input.getIntOr("android_level", 0));
         entityData.set(LEGENDARY, input.getBooleanOr("legendary", false));
         entityData.set(VISOR_COLOR, input.getIntOr("visor_color", -1));
@@ -294,11 +296,11 @@ public abstract class RogueAndroid extends Monster {
     }
 
     /** 1.7.10 hasToManyAndroids + getCanSpawnHere: normal monster rules, at most 4 per chunk. */
-    public static boolean checkSpawnRules(EntityType<? extends RogueAndroid> type, ServerLevelAccessor level, EntitySpawnReason reason,
+    public static boolean checkSpawnRules(EntityType<? extends RogueAndroid> type, ServerLevelAccessor level, MobSpawnType reason,
                                           net.minecraft.core.BlockPos pos, RandomSource random) {
         if (!Monster.checkMonsterSpawnRules(type, level, reason, pos, random)) return false;
-        var chunk = new net.minecraft.world.phys.AABB(pos.getX() & ~15, level.getMinY(), pos.getZ() & ~15,
-                (pos.getX() & ~15) + 16, level.getMaxY(), (pos.getZ() & ~15) + 16);
+        var chunk = new net.minecraft.world.phys.AABB(pos.getX() & ~15, level.getMinBuildHeight(), pos.getZ() & ~15,
+                (pos.getX() & ~15) + 16, level.getMaxBuildHeight() - 1, (pos.getZ() & ~15) + 16);
         return level.getEntitiesOfClass(RogueAndroid.class, chunk).size() < MAX_ANDROIDS_PER_CHUNK;
     }
 

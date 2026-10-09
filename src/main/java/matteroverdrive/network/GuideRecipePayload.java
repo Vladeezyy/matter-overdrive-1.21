@@ -15,11 +15,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
-import net.minecraft.world.item.crafting.display.RecipeDisplay;
-import net.minecraft.world.item.crafting.display.ShapedCraftingRecipeDisplay;
-import net.minecraft.world.item.crafting.display.ShapelessCraftingRecipeDisplay;
-import net.minecraft.world.item.crafting.display.SlotDisplay;
-import net.minecraft.world.item.crafting.display.SlotDisplayContext;
+import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
@@ -65,31 +61,34 @@ public final class GuideRecipePayload {
 
     /** The first crafting recipe making the item, as a 3x3 grid of options per slot. */
     public static List<List<ItemStack>> find(ServerPlayer player, Item item) {
-        var ctx = SlotDisplayContext.fromLevel(player.level());
+        var registries = player.level().registryAccess();
         for (var holder : player.level().getServer().getRecipeManager().getRecipes()) {
-            if (!(holder.value() instanceof CraftingRecipe recipe)) continue;
-            for (RecipeDisplay display : recipe.display()) {
-                if (!display.result().resolveForStacks(ctx).stream().anyMatch(s -> s.is(item))) continue;
-                List<List<ItemStack>> grid = new ArrayList<>();
-                for (int i = 0; i < 9; i++) grid.add(List.of());
-                if (display instanceof ShapedCraftingRecipeDisplay shaped) {
-                    for (int i = 0; i < shaped.ingredients().size(); i++) {
-                        int x = i % shaped.width(), y = i / shaped.width();
-                        grid.set(x + y * 3, stacks(shaped.ingredients().get(i), ctx));
-                    }
-                    return grid;
-                }
-                if (display instanceof ShapelessCraftingRecipeDisplay shapeless) {
-                    for (int i = 0; i < Math.min(9, shapeless.ingredients().size()); i++) grid.set(i, stacks(shapeless.ingredients().get(i), ctx));
-                    return grid;
-                }
+            if (!(holder.value() instanceof CraftingRecipe recipe) || recipe.isSpecial()) continue;
+            ItemStack result;
+            try {
+                result = recipe.getResultItem(registries);
+            } catch (RuntimeException e) {
+                continue;
             }
+            if (result == null || !result.is(item)) continue;
+            List<List<ItemStack>> grid = new ArrayList<>();
+            for (int i = 0; i < 9; i++) grid.add(List.of());
+            var ingredients = recipe.getIngredients();
+            if (recipe instanceof ShapedRecipe shaped) {
+                for (int i = 0; i < ingredients.size(); i++) {
+                    int x = i % shaped.getWidth(), y = i / shaped.getWidth();
+                    grid.set(x + y * 3, stacks(ingredients.get(i)));
+                }
+                return grid;
+            }
+            for (int i = 0; i < Math.min(9, ingredients.size()); i++) grid.set(i, stacks(ingredients.get(i)));
+            return grid;
         }
         return null;
     }
 
-    private static List<ItemStack> stacks(SlotDisplay slot, net.minecraft.util.context.ContextMap ctx) {
-        return slot.resolveForStacks(ctx).stream().limit(16).toList();
+    private static List<ItemStack> stacks(net.minecraft.world.item.crafting.Ingredient ingredient) {
+        return java.util.Arrays.stream(ingredient.getItems()).limit(16).toList();
     }
 
     private GuideRecipePayload() {}

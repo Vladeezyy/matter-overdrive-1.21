@@ -101,15 +101,15 @@ public class Galaxy extends SpaceBody {
         readBody(tag);
         quadrants.clear();
         travelEvents.clear();
-        version = tag.getIntOr("Version", 0);
-        ListTag list = tag.getListOrEmpty("Quadrants");
+        version = tag.getInt("Version");
+        ListTag list = tag.getList("Quadrants", net.minecraft.nbt.Tag.TAG_COMPOUND);
         for (int i = 0; i < list.size(); i++) {
             Quadrant quadrant = new Quadrant();
-            quadrant.readNBT(list.getCompoundOrEmpty(i), registries);
+            quadrant.readNBT(list.getCompound(i), registries);
             addQuadrant(quadrant);
         }
-        ListTag events = tag.getListOrEmpty("TravelEvents");
-        for (int i = 0; i < events.size(); i++) travelEvents.add(TravelEvent.fromNBT(events.getCompoundOrEmpty(i), registries));
+        ListTag events = tag.getList("TravelEvents", net.minecraft.nbt.Tag.TAG_COMPOUND);
+        for (int i = 0; i < events.size(); i++) travelEvents.add(TravelEvent.fromNBT(events.getCompound(i), registries));
         quadrantUpdateIterator = quadrants.values().iterator();
     }
 

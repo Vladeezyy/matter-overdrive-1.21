@@ -7,12 +7,11 @@ import matteroverdrive.matter.MatterRegistry;
 import matteroverdrive.network.ScannerPayloads;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.RenderPipelines;
+import matteroverdrive.compat.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -51,7 +50,7 @@ public class MatterScannerScreen extends Screen {
                 received = true;
             }
         };
-        ClientPacketDistributor.sendToServer(new ScannerPayloads.Request(slot));
+        PacketDistributor.sendToServer(new ScannerPayloads.Request(slot));
     }
 
     @Override
@@ -71,7 +70,7 @@ public class MatterScannerScreen extends Screen {
             onClose();
             return;
         }
-        g.blitSprite(RenderPipelines.GUI_TEXTURED, BACKGROUND, left, top, WIDTH, HEIGHT);
+        matteroverdrive.compat.Gui.blitSprite(g, BACKGROUND, left, top, WIDTH, HEIGHT);
         // the title bar like the machine screens
         g.drawString(font, title, left + WIDTH / 2 - font.width(title) / 2, top + 7, COLOR_TITLE, false);
         Component status = MatterScannerItem.getLink(scanner) == null ? Component.translatable("tooltip.matteroverdrive.scanner.offline")
@@ -84,7 +83,7 @@ public class MatterScannerScreen extends Screen {
         ItemPattern hovered = null;
         for (int i = 0; i < COLS * ROWS; i++) {
             int cx = left + GRID_X + (i % COLS) * CELL, cy = top + GRID_Y + (i / COLS) * CELL;
-            g.blit(RenderPipelines.GUI_TEXTURED, SLOT, cx, cy, 0, 0, 22, 22, 22, 22);
+            matteroverdrive.compat.Gui.blit(g, SLOT, cx, cy, 0, 0, 22, 22, 22, 22);
             if (first + i >= patterns.size()) continue;
             ItemPattern p = patterns.get(first + i);
             g.renderItem(p.toStack(), cx + 3, cy + 3);
@@ -97,11 +96,11 @@ public class MatterScannerScreen extends Screen {
         int ix = left + INFO_X, iy = top + GRID_Y + 14;
         if (selected != null) {
             ItemStack stack = selected.toStack();
-            g.pose().pushMatrix();
-            g.pose().translate(ix, iy);
-            g.pose().scale(3, 3);
+            g.pose().pushPose();
+            g.pose().translate(ix, iy, 0);
+            g.pose().scale(3, 3, 1);
             g.renderItem(stack, 0, 0);
-            g.pose().popMatrix();
+            g.pose().popPose();
             int ty = iy + 56;
             for (var line : font.split(stack.getHoverName(), INFO_W)) {
                 g.drawString(font, line, ix, ty, 0xFFFFFFFF, false);
@@ -117,10 +116,10 @@ public class MatterScannerScreen extends Screen {
             g.fill(ix, ty, ix + Math.round(barW * selected.progress() / (float) ItemPattern.MAX_PROGRESS), ty + 4,
                     selected.isComplete() ? 0xFF6BE36B : 0xFFE3C46B);
         } else {
-            g.drawWordWrap(font, Component.translatable("gui.matteroverdrive.scanner.nothing_selected"), ix, iy, INFO_W, COLOR_TEXT, false);
+            g.drawWordWrap(font, Component.translatable("gui.matteroverdrive.scanner.nothing_selected"), ix, iy, INFO_W, COLOR_TEXT);
         }
         if (hovered != null) {
-            g.setTooltipForNextFrame(font, Component.translatable("gui.matteroverdrive.pattern", hovered.toStack().getHoverName(), hovered.progress()),
+            matteroverdrive.compat.Gui.setTooltipForNextFrame(g, font, Component.translatable("gui.matteroverdrive.pattern", hovered.toStack().getHoverName(), hovered.progress()),
                     mouseX, mouseY);
         }
     }
@@ -138,13 +137,15 @@ public class MatterScannerScreen extends Screen {
     }
 
     @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, button);
+        boolean doubleClick = false;
         ItemPattern p = patternAt(event.x(), event.y());
         if (p != null) {
-            ClientPacketDistributor.sendToServer(new ScannerPayloads.Select(slot, p.item()));
+            PacketDistributor.sendToServer(new ScannerPayloads.Select(slot, p.item()));
             return true;
         }
-        return super.mouseClicked(event, doubleClick);
+        return super.mouseClicked(event.x(), event.y(), event.button());
     }
 
     @Override

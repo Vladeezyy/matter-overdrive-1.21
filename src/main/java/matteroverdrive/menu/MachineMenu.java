@@ -13,8 +13,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.transfer.item.ItemResource;
-import net.neoforged.neoforge.transfer.item.ResourceHandlerSlot;
+import net.neoforged.neoforge.items.SlotItemHandler;
 
 /**
  * Container for a machine GUI, laid out like the 1.7.10 MOGuiMachine (225x186): machine slots on the Home page,
@@ -186,13 +185,13 @@ public abstract class MachineMenu<T extends MachineBlockEntity> extends Abstract
     }
 
     /** A slot of the machine inventory that only shows on one page. */
-    public class PageSlot extends ResourceHandlerSlot {
+    public class PageSlot extends SlotItemHandler {
         private final Page slotPage;
         private final MachineInventory inv;
         private final int index;
 
         PageSlot(MachineInventory inv, int index, int x, int y, Page page) {
-            super(inv, inv::set, index, x, y);
+            super(inv, index, x, y);
             this.inv = inv;
             this.index = index;
             this.slotPage = page;
@@ -204,7 +203,7 @@ public abstract class MachineMenu<T extends MachineBlockEntity> extends Abstract
 
         @Override
         public boolean mayPlace(ItemStack stack) {
-            return role() != MachineInventory.Role.OUTPUT && inv.isValid(index, ItemResource.of(stack));
+            return role() != MachineInventory.Role.OUTPUT && inv.isValid(index, stack);
         }
 
         @Override

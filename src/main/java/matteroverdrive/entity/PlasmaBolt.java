@@ -21,8 +21,8 @@ import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.TntBlock;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
+import matteroverdrive.compat.ValueInput;
+import matteroverdrive.compat.ValueOutput;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -117,7 +117,7 @@ public class PlasmaBolt extends Projectile {
         Vec3 before = target.getDeltaMovement();
         DamageSource source = server.damageSources().source(PLASMA, this, getOwner());
         target.invulnerableTime = 0;
-        if (damage > 0 && target.hurtServer(server, source, damage)) {
+        if (damage > 0 && target.hurt(source, damage)) {
             target.setDeltaMovement(before);     // 1.7.10 restored the target's motion: no knockback
             if (fireMultiplier > 0) target.igniteForSeconds(10 * fireMultiplier);   // 1.7.10 setFire(10 x multiplier)
         }
@@ -144,16 +144,18 @@ public class PlasmaBolt extends Projectile {
     }
 
     @Override
-    protected void addAdditionalSaveData(ValueOutput output) {
-        super.addAdditionalSaveData(output);
+    public void addAdditionalSaveData(net.minecraft.nbt.CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
+        ValueOutput output = ValueOutput.of(tag, registryAccess());
         output.putFloat("damage", damage);
         output.putFloat("range", range);
         output.putDouble("travelled", travelled);
     }
 
     @Override
-    protected void readAdditionalSaveData(ValueInput input) {
-        super.readAdditionalSaveData(input);
+    public void readAdditionalSaveData(net.minecraft.nbt.CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+        ValueInput input = ValueInput.of(tag, registryAccess());
         damage = input.getFloatOr("damage", 0);
         range = input.getFloatOr("range", 32);
         travelled = input.getDoubleOr("travelled", 0);

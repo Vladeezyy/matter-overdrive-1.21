@@ -38,7 +38,7 @@ public final class ScannerClient {
         while (OPEN.consumeClick()) {
             if (mc.player == null || mc.screen != null) continue;
             var inventory = mc.player.getInventory();
-            int slot = inventory.getSelectedItem().getItem() instanceof MatterScannerItem ? inventory.getSelectedSlot() : -1;
+            int slot = inventory.getSelected().getItem() instanceof MatterScannerItem ? inventory.selected : -1;
             for (int i = 0; slot < 0 && i < inventory.getContainerSize(); i++) {
                 if (inventory.getItem(i).getItem() instanceof MatterScannerItem) slot = i;
             }

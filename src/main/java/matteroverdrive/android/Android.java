@@ -30,9 +30,7 @@ import net.neoforged.neoforge.event.entity.living.LivingEvent;
 import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.energy.EnergyHandler;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.neoforged.neoforge.energy.IEnergyStorage;
 
 /**
  * 1.7.10 AndroidPlayer's behaviour: energy (the battery slot, or the built-in store), the transformation, and what
@@ -71,34 +69,31 @@ public final class Android {
 
     // --- energy -------------------------------------------------------------------------------------
 
-    private static EnergyHandler battery(AndroidData data) {
+    private static IEnergyStorage battery(AndroidData data) {
         if (data.getStack(AndroidData.SLOT_BATTERY).isEmpty()) return null;
-        return ItemAccess.forHandlerIndex(data.inventory, AndroidData.SLOT_BATTERY).getCapability(Capabilities.Energy.ITEM);
+        return data.getStack(AndroidData.SLOT_BATTERY).getCapability(Capabilities.EnergyStorage.ITEM);
     }
 
     public static int getEnergy(Player player) {
         AndroidData data = get(player);
         if (player.isCreative()) return getMaxEnergy(player);
-        EnergyHandler battery = battery(data);
-        return battery != null ? battery.getAmountAsInt() : data.energy;
+        IEnergyStorage battery = battery(data);
+        return battery != null ? battery.getEnergyStored() : data.energy;
     }
 
     public static int getMaxEnergy(Player player) {
-        EnergyHandler battery = battery(get(player));
-        return battery != null ? battery.getCapacityAsInt() : AndroidData.MAX_ENERGY;
+        IEnergyStorage battery = battery(get(player));
+        return battery != null ? battery.getMaxEnergyStored() : AndroidData.MAX_ENERGY;
     }
 
     /** 1.7.10 extractEnergyRaw: from the battery, else at most 1024 FE from the built-in store; free in creative. */
     public static int extractEnergy(Player player, int amount, boolean simulate) {
         if (player.isCreative()) return amount;
         AndroidData data = get(player);
-        EnergyHandler battery = battery(data);
+        IEnergyStorage battery = battery(data);
         int extracted;
         if (battery != null) {
-            try (Transaction tx = Transaction.openRoot()) {
-                extracted = battery.extract(amount, tx);
-                if (!simulate) tx.commit();
-            }
+            extracted = battery.extractEnergy(amount, simulate);
         } else {
             extracted = Math.min(Math.min(data.energy, amount), BUILTIN_ENERGY_TRANSFER);
             if (!simulate) data.energy = Mth.clamp(data.energy - extracted, 0, AndroidData.MAX_ENERGY);
@@ -109,13 +104,10 @@ public final class Android {
 
     public static int receiveEnergy(Player player, int amount, boolean simulate) {
         AndroidData data = get(player);
-        EnergyHandler battery = battery(data);
+        IEnergyStorage battery = battery(data);
         int received;
         if (battery != null) {
-            try (Transaction tx = Transaction.openRoot()) {
-                received = battery.insert(amount, tx);
-                if (!simulate) tx.commit();
-            }
+            received = battery.receiveEnergy(amount, simulate);
         } else {
             received = Math.min(Math.min(AndroidData.MAX_ENERGY - data.energy, amount), BUILTIN_ENERGY_TRANSFER);
             if (!simulate) data.energy += received;
@@ -298,16 +290,13 @@ public final class Android {
     private static void manageCharging(Player player) {
         ItemStack held = player.getMainHandItem();
         if (!player.isShiftKeyDown() || !(held.is(MOItems.BATTERY.get()) || held.is(MOItems.HC_BATTERY.get()))) return;
-        EnergyHandler item = ItemAccess.forPlayerInteraction(player, net.minecraft.world.InteractionHand.MAIN_HAND).getCapability(Capabilities.Energy.ITEM);
+        IEnergyStorage item = held.getCapability(Capabilities.EnergyStorage.ITEM);
         if (item == null) return;
         int free = getMaxEnergy(player) - getEnergy(player);
         if (free <= 0) return;
         int canTake = receiveEnergy(player, free, true);
-        try (Transaction tx = Transaction.openRoot()) {
-            int taken = item.extract(canTake, tx);
-            tx.commit();
-            receiveEnergy(player, taken, false);
-        }
+        int taken = item.extractEnergy(canTake, false);
+        receiveEnergy(player, taken, false);
     }
 
     /** 1.7.10 manageOutOfPower: half speed (the client glitches every 3 s, see the HUD). */
@@ -326,23 +315,23 @@ public final class Android {
     /** 1.7.10 manageTurning: sickness while turning, a hit every 2 s, then android - and (by default) death. */
     private static void manageTurning(ServerPlayer player, AndroidData data) {
         if (data.turning <= 0) return;
-        ServerLevel level = player.level();
+        ServerLevel level = player.serverLevel();
         var damage = level.damageSources().source(TRANSFORMATION_DAMAGE);
         data.turning--;
         if (data.turning > 0) {
-            player.addEffect(new MobEffectInstance(MobEffects.NAUSEA, TRANSFORM_TIME));
-            player.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, TRANSFORM_TIME, 1));
+            player.addEffect(new MobEffectInstance(MobEffects.CONFUSION, TRANSFORM_TIME));
+            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, TRANSFORM_TIME, 1));
             player.addEffect(new MobEffectInstance(MobEffects.HUNGER, TRANSFORM_TIME));
             player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, TRANSFORM_TIME));
             if (data.turning % 40 == 0) {
-                player.hurtServer(level, damage, 0.1f);
+                player.hurt(damage, 0.1f);
                 playGlitch(player, 0.2f);
             }
         } else {
             setAndroid(player, true);
             playGlitch(player, 0.8f);
             if (!player.isCreative() && !level.getLevelData().isHardcore() && TRANSFORMATION_DEATH) {
-                player.hurtServer(level, damage, Float.MAX_VALUE);
+                player.hurt(damage, Float.MAX_VALUE);
             }
         }
         data.dirty = true;

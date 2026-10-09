@@ -9,14 +9,13 @@ import matteroverdrive.network.TransporterPayload;
 import matteroverdrive.transport.TransportLocation;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.RenderPipelines;
+import matteroverdrive.compat.KeyEvent;
+import matteroverdrive.compat.MouseButtonEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.List;
 
@@ -86,7 +85,7 @@ public class TransporterScreen extends MachineScreen<TransporterMenu> {
     }
 
     private void send(TransporterPayload.Action action, int index, BlockPos pos) {
-        ClientPacketDistributor.sendToServer(new TransporterPayload(menu.containerId, action, index, name.getValue(), pos));
+        PacketDistributor.sendToServer(new TransporterPayload(menu.containerId, action, index, name.getValue(), pos));
     }
 
     /** Refreshes the fields when the selection or the server's copy changed (and the user isn't typing in it). */
@@ -135,13 +134,13 @@ public class TransporterScreen extends MachineScreen<TransporterMenu> {
         button(g, x, y, mx, my, REMOVE, "gui.matteroverdrive.transporter.remove", !locations.isEmpty());
         button(g, x, y, mx, my, IMPORT, "gui.matteroverdrive.transporter.import", canImport());
         button(g, x, y, mx, my, RESET, "gui.matteroverdrive.transporter.reset", !locations.isEmpty());
-        g.blitSprite(RenderPipelines.GUI_TEXTURED, BUTTON_DARK, x + FIELD_X - 12, y + NAME_Y, 112, 16);
+        matteroverdrive.compat.Gui.blitSprite(g, BUTTON_DARK, x + FIELD_X - 12, y + NAME_Y, 112, 16);
         BlockPos me = machine().getBlockPos();
         int[] mine = {me.getX(), me.getY(), me.getZ()};
         for (int i = 0; i < 3; i++) {
             int fy = y + X_Y + i * 16;
             g.drawString(font, "XYZ".charAt(i) + ":", x + FIELD_X - 12, fy + 4, 0xFFFFFFFF, false);
-            g.blitSprite(RenderPipelines.GUI_TEXTURED, BUTTON_DARK, x + FIELD_X, fy, 40, 16);
+            matteroverdrive.compat.Gui.blitSprite(g, BUTTON_DARK, x + FIELD_X, fy, 40, 16);
             try {
                 int offset = Integer.parseInt(coords[i].getValue()) - mine[i];
                 g.drawString(font, (offset > 0 ? "+" : "") + offset, x + FIELD_X + 44, fy + 4, 0xFF8B9EA0, false);
@@ -155,7 +154,7 @@ public class TransporterScreen extends MachineScreen<TransporterMenu> {
 
     private void button(GuiGraphics g, int x, int y, int mx, int my, int[] b, String key, boolean enabled) {
         boolean over = enabled && in(mx, my, b[0], b[1], b[2], b[3]);
-        g.blitSprite(RenderPipelines.GUI_TEXTURED, !enabled ? BUTTON_DARK : over ? BUTTON_OVER : BUTTON, x + b[0], y + b[1], b[2], b[3]);
+        matteroverdrive.compat.Gui.blitSprite(g, !enabled ? BUTTON_DARK : over ? BUTTON_OVER : BUTTON, x + b[0], y + b[1], b[2], b[3]);
         Component text = Component.translatable(key);
         g.drawString(font, text, x + b[0] + (b[2] - font.width(text)) / 2, y + b[1] + (b[3] - 8) / 2, enabled ? 0xFFFFFFFF : 0xFF8B9EA0, false);
     }
@@ -166,22 +165,24 @@ public class TransporterScreen extends MachineScreen<TransporterMenu> {
         matterTooltip(g, mx, my, MATTER_X, MATTER_Y, mouseX, mouseY);
         if (in(mx, my, IMPORT[0], IMPORT[1], IMPORT[2], IMPORT[3]) && !canImport()
                 && TransportFlashDriveItem.getTarget(machine().getInventory().getStack(TransporterBlockEntity.FLASH_DRIVE)) != null) {
-            g.setTooltipForNextFrame(font, Component.translatable("gui.matteroverdrive.transporter.too_far"), mouseX, mouseY);
+            matteroverdrive.compat.Gui.setTooltipForNextFrame(g, font, Component.translatable("gui.matteroverdrive.transporter.too_far"), mouseX, mouseY);
         }
         TransportLocation selected = machine().getSelected();
         if (in(mx, my, LIST_X, LIST_Y, LIST_W, ROWS * ROW) && !machine().getLocations().isEmpty()) {
             int index = scroll + (my - LIST_Y - 1) / ROW;
             if (index >= 0 && index < machine().getLocations().size() && !machine().isLocationValid(machine().getLocations().get(index))) {
-                g.setTooltipForNextFrame(font, Component.translatable("gui.matteroverdrive.transporter.invalid"), mouseX, mouseY);
+                matteroverdrive.compat.Gui.setTooltipForNextFrame(g, font, Component.translatable("gui.matteroverdrive.transporter.invalid"), mouseX, mouseY);
             }
         } else if (in(mx, my, ENERGY_X - 4, 140, 24, 16)) {
-            g.setTooltipForNextFrame(font, Component.translatable("gui.matteroverdrive.transporter.cost", machine().getEnergyDrain(),
+            matteroverdrive.compat.Gui.setTooltipForNextFrame(g, font, Component.translatable("gui.matteroverdrive.transporter.cost", machine().getEnergyDrain(),
                     selected.name()), mouseX, mouseY);
         }
     }
 
     @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, button);
+        boolean doubleClick = false;
         if (menu.page == MachineMenu.Page.HOME) {
             double mx = event.x() - leftPos, my = event.y() - topPos;
             List<TransportLocation> locations = machine().getLocations();
@@ -207,7 +208,7 @@ public class TransporterScreen extends MachineScreen<TransporterMenu> {
                 return true;
             }
         }
-        return super.mouseClicked(event, doubleClick);
+        return super.mouseClicked(event.x(), event.y(), event.button());
     }
 
     @Override
@@ -217,13 +218,14 @@ public class TransporterScreen extends MachineScreen<TransporterMenu> {
     }
 
     @Override
-    public boolean keyPressed(KeyEvent event) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        KeyEvent event = new KeyEvent(keyCode, scanCode, modifiers);
         for (EditBox box : List.of(name, coords[0], coords[1], coords[2])) {
             if (box.isFocused() && event.key() != 256) {
-                box.keyPressed(event);
+                box.keyPressed(event.key(), event.scancode(), event.modifiers());
                 return true;
             }
         }
-        return super.keyPressed(event);
+        return super.keyPressed(event.key(), event.scancode(), event.modifiers());
     }
 }

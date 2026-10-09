@@ -10,7 +10,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
 
 /**
  * 1.7.10 WeaponModuleBarrel: one item per barrel. Each multiplies or adds to a few weapon stats; explosion and
@@ -71,7 +70,8 @@ public class WeaponBarrelItem extends Item implements WeaponModule {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+        Consumer<Component> tooltip = tooltipLines::add;
         for (WeaponStat stat : TOOLTIP.get(type)) {
             float[] change = type.stats.get(stat);
             // 1.7.10 weaponStatToInfo: multipliers as %, additive stats as the amount added; heal is good above 0

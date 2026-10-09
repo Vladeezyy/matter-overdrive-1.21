@@ -32,7 +32,7 @@ public final class MODecorative {
     public static final DeferredBlock<Block> TRITANIUM_PLATE = metal("decorative_tritanium_plate", 10, 10, MapColor.COLOR_GRAY);
     public static final DeferredBlock<Block> CARBON_FIBER_PLATE = metal("decorative_carbon_fiber_plate", 10, 12, MapColor.COLOR_BLACK);
     public static final DeferredBlock<RotatedPillarBlock> MATTER_TUBE = add(MOBlocks.BLOCKS.registerBlock("decorative_matter_tube", RotatedPillarBlock::new,
-            p -> p.mapColor(MapColor.COLOR_LIGHT_BLUE).strength(3, 4).sound(SoundType.GLASS).noOcclusion().requiresCorrectToolForDrops()));
+            MOBlocks.props(p -> p.mapColor(MapColor.COLOR_LIGHT_BLUE).strength(3, 4).sound(SoundType.GLASS).noOcclusion().requiresCorrectToolForDrops())));
     public static final DeferredBlock<RotatedPillarBlock> BEAMS = pillar("decorative_beams", 8, 8, MapColor.COLOR_BLACK);
     public static final DeferredBlock<Block> FLOOR_TILES = clay("decorative_floor_tiles", MapColor.SAND);
     public static final DeferredBlock<Block> FLOOR_TILES_GREEN = clay("decorative_floor_tiles_green", MapColor.COLOR_GREEN);
@@ -42,13 +42,13 @@ public final class MODecorative {
     public static final DeferredBlock<Block> WHITE_PLATE = metal("decorative_white_plate", 8, 8, MapColor.SNOW);
     public static final DeferredBlock<RotatedPillarBlock> SEPARATOR = pillar("decorative_separator", 8, 8, MapColor.COLOR_GRAY);
     public static final DeferredBlock<Block> TRITANIUM_LAMP = add(MOBlocks.BLOCKS.registerSimpleBlock("decorative_tritanium_lamp",
-            p -> p.mapColor(MapColor.ICE).strength(2, 4).sound(SoundType.METAL).requiresCorrectToolForDrops().lightLevel(s -> 15)));
+            MOBlocks.props(p -> p.mapColor(MapColor.ICE).strength(2, 4).sound(SoundType.METAL).requiresCorrectToolForDrops().lightLevel(s -> 15))));
     public static final DeferredBlock<Block> ENGINE_EXHAUST_PLASMA = add(MOBlocks.BLOCKS.registerSimpleBlock("decorative_engine_exhaust_plasma",
-            p -> p.mapColor(MapColor.COLOR_LIGHT_BLUE).strength(1, 1).sound(SoundType.WOOL).lightLevel(s -> 15)));
+            MOBlocks.props(p -> p.mapColor(MapColor.COLOR_LIGHT_BLUE).strength(1, 1).sound(SoundType.WOOL).lightLevel(s -> 15))));
     public static final DeferredBlock<TransparentBlock> FORCE_GLASS = add(MOBlocks.BLOCKS.registerBlock("force_glass", TransparentBlock::new,
-            p -> p.mapColor(MapColor.NONE).strength(40, 6).sound(SoundType.GLASS).noOcclusion()
+            MOBlocks.props(p -> p.mapColor(MapColor.NONE).strength(40, 6).sound(SoundType.GLASS).noOcclusion()
                     .isValidSpawn((s, l, pos, type) -> false).isRedstoneConductor((s, l, pos) -> false)
-                    .isSuffocating((s, l, pos) -> false).isViewBlocking((s, l, pos) -> false)));
+                    .isSuffocating((s, l, pos) -> false).isViewBlocking((s, l, pos) -> false))));
 
     static {
         for (DyeColor color : DyeColor.values()) {
@@ -76,16 +76,16 @@ public final class MODecorative {
 
     /** 1.7.10 Material.iron, pickaxe level 1. */
     private static DeferredBlock<Block> metal(String id, float hardness, float resistance, MapColor color) {
-        return add(MOBlocks.BLOCKS.registerSimpleBlock(id, p -> props(p, hardness, resistance, color, SoundType.METAL)));
+        return add(MOBlocks.BLOCKS.registerSimpleBlock(id, MOBlocks.props(p -> props(p, hardness, resistance, color, SoundType.METAL))));
     }
 
     private static DeferredBlock<RotatedPillarBlock> pillar(String id, float hardness, float resistance, MapColor color) {
-        return add(MOBlocks.BLOCKS.registerBlock(id, RotatedPillarBlock::new, p -> props(p, hardness, resistance, color, SoundType.METAL)));
+        return add(MOBlocks.BLOCKS.registerBlock(id, RotatedPillarBlock::new, MOBlocks.props(p -> props(p, hardness, resistance, color, SoundType.METAL))));
     }
 
     /** 1.7.10 Material.clay floors: 4/4, any pickaxe. */
     private static DeferredBlock<Block> clay(String id, MapColor color) {
-        return add(MOBlocks.BLOCKS.registerSimpleBlock(id, p -> props(p, 4, 4, color, SoundType.STONE)));
+        return add(MOBlocks.BLOCKS.registerSimpleBlock(id, MOBlocks.props(p -> props(p, 4, 4, color, SoundType.STONE))));
     }
 
     private static BlockBehaviour.Properties props(BlockBehaviour.Properties p, float hardness, float resistance, MapColor color, SoundType sound) {

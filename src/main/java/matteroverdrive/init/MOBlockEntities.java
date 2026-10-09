@@ -28,65 +28,71 @@ public final class MOBlockEntities {
             DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, MatterOverdrive.MODID);
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<SolarPanelBlockEntity>> SOLAR_PANEL =
-            BLOCK_ENTITIES.register("solar_panel", () -> new BlockEntityType<>(SolarPanelBlockEntity::new, MOBlocks.SOLAR_PANEL.get()));
+            BLOCK_ENTITIES.register("solar_panel", () -> type(SolarPanelBlockEntity::new, MOBlocks.SOLAR_PANEL.get()));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<InscriberBlockEntity>> INSCRIBER =
-            BLOCK_ENTITIES.register("inscriber", () -> new BlockEntityType<>(InscriberBlockEntity::new, MOBlocks.INSCRIBER.get()));
+            BLOCK_ENTITIES.register("inscriber", () -> type(InscriberBlockEntity::new, MOBlocks.INSCRIBER.get()));
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<DecomposerBlockEntity>> DECOMPOSER =
-            BLOCK_ENTITIES.register("decomposer", () -> new BlockEntityType<>(DecomposerBlockEntity::new, MOBlocks.DECOMPOSER.get()));
+            BLOCK_ENTITIES.register("decomposer", () -> type(DecomposerBlockEntity::new, MOBlocks.DECOMPOSER.get()));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<RecyclerBlockEntity>> RECYCLER =
-            BLOCK_ENTITIES.register("matter_recycler", () -> new BlockEntityType<>(RecyclerBlockEntity::new, MOBlocks.RECYCLER.get()));
+            BLOCK_ENTITIES.register("matter_recycler", () -> type(RecyclerBlockEntity::new, MOBlocks.RECYCLER.get()));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<MatterPipeBlockEntity>> MATTER_PIPE =
-            BLOCK_ENTITIES.register("matter_pipe", () -> new BlockEntityType<>(MatterPipeBlockEntity::new,
+            BLOCK_ENTITIES.register("matter_pipe", () -> type(MatterPipeBlockEntity::new,
                     MOBlocks.MATTER_PIPE.get(), MOBlocks.HEAVY_MATTER_PIPE.get()));
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<AnalyzerBlockEntity>> ANALYZER =
-            BLOCK_ENTITIES.register("matter_analyzer", () -> new BlockEntityType<>(AnalyzerBlockEntity::new, MOBlocks.ANALYZER.get()));
+            BLOCK_ENTITIES.register("matter_analyzer", () -> type(AnalyzerBlockEntity::new, MOBlocks.ANALYZER.get()));
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<PatternStorageBlockEntity>> PATTERN_STORAGE =
-            BLOCK_ENTITIES.register("pattern_storage", () -> new BlockEntityType<>(PatternStorageBlockEntity::new, MOBlocks.PATTERN_STORAGE.get()));
+            BLOCK_ENTITIES.register("pattern_storage", () -> type(PatternStorageBlockEntity::new, MOBlocks.PATTERN_STORAGE.get()));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<PatternMonitorBlockEntity>> PATTERN_MONITOR =
-            BLOCK_ENTITIES.register("pattern_monitor", () -> new BlockEntityType<>(PatternMonitorBlockEntity::new, MOBlocks.PATTERN_MONITOR.get()));
+            BLOCK_ENTITIES.register("pattern_monitor", () -> type(PatternMonitorBlockEntity::new, MOBlocks.PATTERN_MONITOR.get()));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ReplicatorBlockEntity>> REPLICATOR =
-            BLOCK_ENTITIES.register("replicator", () -> new BlockEntityType<>(ReplicatorBlockEntity::new, MOBlocks.REPLICATOR.get()));
+            BLOCK_ENTITIES.register("replicator", () -> type(ReplicatorBlockEntity::new, MOBlocks.REPLICATOR.get()));
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<GravitationalAnomalyBlockEntity>> GRAVITATIONAL_ANOMALY =
-            BLOCK_ENTITIES.register("gravitational_anomaly", () -> new BlockEntityType<>(GravitationalAnomalyBlockEntity::new, MOBlocks.GRAVITATIONAL_ANOMALY.get()));
+            BLOCK_ENTITIES.register("gravitational_anomaly", () -> type(GravitationalAnomalyBlockEntity::new, MOBlocks.GRAVITATIONAL_ANOMALY.get()));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<GravitationalStabilizerBlockEntity>> GRAVITATIONAL_STABILIZER =
-            BLOCK_ENTITIES.register("gravitational_stabilizer", () -> new BlockEntityType<>(GravitationalStabilizerBlockEntity::new, MOBlocks.GRAVITATIONAL_STABILIZER.get()));
+            BLOCK_ENTITIES.register("gravitational_stabilizer", () -> type(GravitationalStabilizerBlockEntity::new, MOBlocks.GRAVITATIONAL_STABILIZER.get()));
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<FusionReactorControllerBlockEntity>> FUSION_REACTOR_CONTROLLER =
-            BLOCK_ENTITIES.register("fusion_reactor_controller", () -> new BlockEntityType<>(FusionReactorControllerBlockEntity::new, MOBlocks.FUSION_REACTOR_CONTROLLER.get()));
+            BLOCK_ENTITIES.register("fusion_reactor_controller", () -> type(FusionReactorControllerBlockEntity::new, MOBlocks.FUSION_REACTOR_CONTROLLER.get()));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<WeaponStationBlockEntity>> WEAPON_STATION =
-            BLOCK_ENTITIES.register("weapon_station", () -> new BlockEntityType<>(WeaponStationBlockEntity::new, MOBlocks.WEAPON_STATION.get()));
+            BLOCK_ENTITIES.register("weapon_station", () -> type(WeaponStationBlockEntity::new, MOBlocks.WEAPON_STATION.get()));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<AndroidStationBlockEntity>> ANDROID_STATION =
-            BLOCK_ENTITIES.register("android_station", () -> new BlockEntityType<>(AndroidStationBlockEntity::new, MOBlocks.ANDROID_STATION.get()));
+            BLOCK_ENTITIES.register("android_station", () -> type(AndroidStationBlockEntity::new, MOBlocks.ANDROID_STATION.get()));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ChargingStationBlockEntity>> CHARGING_STATION =
-            BLOCK_ENTITIES.register("charging_station", () -> new BlockEntityType<>(ChargingStationBlockEntity::new, MOBlocks.CHARGING_STATION.get()));
+            BLOCK_ENTITIES.register("charging_station", () -> type(ChargingStationBlockEntity::new, MOBlocks.CHARGING_STATION.get()));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<HoloSignBlockEntity>> HOLO_SIGN =
-            BLOCK_ENTITIES.register("holo_sign", () -> new BlockEntityType<>(HoloSignBlockEntity::new, MOBlocks.HOLO_SIGN.get()));
+            BLOCK_ENTITIES.register("holo_sign", () -> type(HoloSignBlockEntity::new, MOBlocks.HOLO_SIGN.get()));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<FusionReactorIOBlockEntity>> FUSION_REACTOR_IO =
-            BLOCK_ENTITIES.register("fusion_reactor_io", () -> new BlockEntityType<>(FusionReactorIOBlockEntity::new, MOBlocks.FUSION_REACTOR_IO.get()));
+            BLOCK_ENTITIES.register("fusion_reactor_io", () -> type(FusionReactorIOBlockEntity::new, MOBlocks.FUSION_REACTOR_IO.get()));
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<matteroverdrive.block.entity.TritaniumCrateBlockEntity>> TRITANIUM_CRATE =
-            BLOCK_ENTITIES.register("tritanium_crate", () -> new BlockEntityType<>(matteroverdrive.block.entity.TritaniumCrateBlockEntity::new,
-                    MOBlocks.TRITANIUM_CRATES.stream().map(b -> (net.minecraft.world.level.block.Block) b.get()).collect(java.util.stream.Collectors.toSet())));
+            BLOCK_ENTITIES.register("tritanium_crate", () -> type(matteroverdrive.block.entity.TritaniumCrateBlockEntity::new,
+                    MOBlocks.TRITANIUM_CRATES.stream().map(b -> (net.minecraft.world.level.block.Block) b.get()).toArray(net.minecraft.world.level.block.Block[]::new)));
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<matteroverdrive.block.entity.TransporterBlockEntity>> TRANSPORTER =
-            BLOCK_ENTITIES.register("transporter", () -> new BlockEntityType<>(matteroverdrive.block.entity.TransporterBlockEntity::new,
+            BLOCK_ENTITIES.register("transporter", () -> type(matteroverdrive.block.entity.TransporterBlockEntity::new,
                     MOBlocks.TRANSPORTER.get()));
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<matteroverdrive.block.entity.AndroidSpawnerBlockEntity>> ANDROID_SPAWNER =
-            BLOCK_ENTITIES.register("android_spawner", () -> new BlockEntityType<>(matteroverdrive.block.entity.AndroidSpawnerBlockEntity::new,
+            BLOCK_ENTITIES.register("android_spawner", () -> type(matteroverdrive.block.entity.AndroidSpawnerBlockEntity::new,
                     MOBlocks.ANDROID_SPAWNER.get()));
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<matteroverdrive.block.entity.ContractMarketBlockEntity>> CONTRACT_MARKET =
-            BLOCK_ENTITIES.register("contract_market", () -> new BlockEntityType<>(matteroverdrive.block.entity.ContractMarketBlockEntity::new,
+            BLOCK_ENTITIES.register("contract_market", () -> type(matteroverdrive.block.entity.ContractMarketBlockEntity::new,
                     MOBlocks.CONTRACT_MARKET.get()));
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<matteroverdrive.block.entity.StarMapBlockEntity>> STAR_MAP =
-            BLOCK_ENTITIES.register("star_map", () -> new BlockEntityType<>(matteroverdrive.block.entity.StarMapBlockEntity::new,
+            BLOCK_ENTITIES.register("star_map", () -> type(matteroverdrive.block.entity.StarMapBlockEntity::new,
                     MOBlocks.STAR_MAP.get()));
+
+    /** 1.21.1: block entity types are built with BlockEntityType.Builder. */
+    private static <T extends net.minecraft.world.level.block.entity.BlockEntity> BlockEntityType<T> type(
+            BlockEntityType.BlockEntitySupplier<T> factory, net.minecraft.world.level.block.Block... blocks) {
+        return BlockEntityType.Builder.of(factory, blocks).build(null);
+    }
 
     private MOBlockEntities() {}
 }

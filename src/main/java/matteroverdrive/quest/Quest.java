@@ -147,7 +147,7 @@ public class Quest {
         }
 
         public static int variation(QuestStack stack) {
-            return stack.getData().getShortOr("Variation", (short) 0);
+            return stack.getData().getShort("Variation");
         }
 
         @Override
@@ -195,7 +195,7 @@ public class Quest {
         }
 
         public int getCurrentObjective(QuestStack stack) {
-            return Math.clamp(stack.getData().getByteOr("CurrentObjective", (byte) 0), 0, logics.length - 1);
+            return Math.clamp(stack.getData().getByte("CurrentObjective"), 0, logics.length - 1);
         }
 
         private void setCurrentObjective(QuestStack stack, int objective) {

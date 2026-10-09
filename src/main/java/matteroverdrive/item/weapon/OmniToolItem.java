@@ -60,15 +60,15 @@ public class OmniToolItem extends EnergyWeaponItem {
     }
 
     @Override
-    public InteractionResult use(Level level, Player player, InteractionHand hand) {
+    public net.minecraft.world.InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack tool = player.getItemInHand(hand);
         if (getEnergy(tool) < getEnergyPerShot(tool) && EnergyPackItem.reload(player, tool)) {
-            player.getCooldowns().addCooldown(tool, 40);
-            return InteractionResult.SUCCESS;
+            player.getCooldowns().addCooldown(tool.getItem(), 40);
+            return net.minecraft.world.InteractionResultHolder.success(player.getItemInHand(hand));
         }
-        if (isOverheated(tool)) return InteractionResult.FAIL;
+        if (isOverheated(tool)) return net.minecraft.world.InteractionResultHolder.fail(player.getItemInHand(hand));
         player.startUsingItem(hand);
-        return InteractionResult.CONSUME;
+        return net.minecraft.world.InteractionResultHolder.consume(player.getItemInHand(hand));
     }
 
     @Override
@@ -129,9 +129,8 @@ public class OmniToolItem extends EnergyWeaponItem {
     }
 
     @Override
-    public boolean releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeLeft) {
+    public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeLeft) {
         if (level instanceof ServerLevel server && entity instanceof Player player) stop(server, player);
-        return false;
     }
 
     @Override
