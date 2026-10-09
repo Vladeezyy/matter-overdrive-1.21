@@ -132,5 +132,31 @@
     "weapon_module_barrel_explosion": false,
     "weapon_module_barrel_fire": false,
     "weapon_module_barrel_heal": false
-  }
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "matteroverdrive:barrel": 0.1
+      },
+      "model": "matteroverdrive:item/phaser_damage"
+    },
+    {
+      "predicate": {
+        "matteroverdrive:barrel": 0.2
+      },
+      "model": "matteroverdrive:item/phaser_fire"
+    },
+    {
+      "predicate": {
+        "matteroverdrive:barrel": 0.3
+      },
+      "model": "matteroverdrive:item/phaser_explosion"
+    },
+    {
+      "predicate": {
+        "matteroverdrive:barrel": 0.4
+      },
+      "model": "matteroverdrive:item/phaser_heal"
+    }
+  ]
 }

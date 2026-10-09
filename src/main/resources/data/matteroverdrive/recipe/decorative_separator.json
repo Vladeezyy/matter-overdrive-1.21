@@ -7,8 +7,12 @@
     "#N#"
   ],
   "key": {
-    "#": "matteroverdrive:decorative_tritanium_plate",
-    "N": "#c:nuggets/tritanium"
+    "#": {
+      "item": "matteroverdrive:decorative_tritanium_plate"
+    },
+    "N": {
+      "tag": "c:nuggets/tritanium"
+    }
   },
   "result": {
     "id": "matteroverdrive:decorative_separator",

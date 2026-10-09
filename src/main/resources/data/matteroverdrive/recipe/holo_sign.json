@@ -7,10 +7,18 @@
     " T "
   ],
   "key": {
-    "G": "#c:glass_blocks",
-    "g": "minecraft:glowstone_dust",
-    "0": "matteroverdrive:isolinear_circuit_mk1",
-    "T": "#c:plates/tritanium"
+    "G": {
+      "tag": "c:glass_blocks"
+    },
+    "g": {
+      "item": "minecraft:glowstone_dust"
+    },
+    "0": {
+      "item": "matteroverdrive:isolinear_circuit_mk1"
+    },
+    "T": {
+      "tag": "c:plates/tritanium"
+    }
   },
   "result": {
     "id": "matteroverdrive:holo_sign",

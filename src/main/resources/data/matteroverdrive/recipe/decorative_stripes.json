@@ -7,9 +7,15 @@
     "#Y#"
   ],
   "key": {
-    "#": "matteroverdrive:decorative_tritanium_plate",
-    "B": "minecraft:black_dye",
-    "Y": "minecraft:yellow_dye"
+    "#": {
+      "item": "matteroverdrive:decorative_tritanium_plate"
+    },
+    "B": {
+      "item": "minecraft:black_dye"
+    },
+    "Y": {
+      "item": "minecraft:yellow_dye"
+    }
   },
   "result": {
     "id": "matteroverdrive:decorative_stripes",

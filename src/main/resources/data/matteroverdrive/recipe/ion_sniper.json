@@ -7,12 +7,24 @@
     " HB"
   ],
   "key": {
-    "I": "minecraft:iron_ingot",
-    "C": "matteroverdrive:isolinear_circuit_mk4",
-    "S": "matteroverdrive:weapon_receiver",
-    "P": "matteroverdrive:plasma_core",
-    "H": "matteroverdrive:weapon_handle",
-    "B": "matteroverdrive:battery"
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "C": {
+      "item": "matteroverdrive:isolinear_circuit_mk4"
+    },
+    "S": {
+      "item": "matteroverdrive:weapon_receiver"
+    },
+    "P": {
+      "item": "matteroverdrive:plasma_core"
+    },
+    "H": {
+      "item": "matteroverdrive:weapon_handle"
+    },
+    "B": {
+      "item": "matteroverdrive:battery"
+    }
   },
   "result": {
     "id": "matteroverdrive:ion_sniper",

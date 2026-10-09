@@ -7,10 +7,18 @@
     " IG"
   ],
   "key": {
-    "G": "minecraft:glass",
-    "I": "minecraft:iron_ingot",
-    "M": "matteroverdrive:s_magnet",
-    "C": "matteroverdrive:matter_container"
+    "G": {
+      "item": "minecraft:glass"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "M": {
+      "item": "matteroverdrive:s_magnet"
+    },
+    "C": {
+      "item": "matteroverdrive:matter_container"
+    }
   },
   "result": {
     "id": "matteroverdrive:plasma_core",

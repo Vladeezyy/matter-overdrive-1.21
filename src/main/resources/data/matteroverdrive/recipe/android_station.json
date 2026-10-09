@@ -7,15 +7,33 @@
     "GMR"
   ],
   "key": {
-    "T": "matteroverdrive:rogue_android_part_chest",
-    "H": "matteroverdrive:rogue_android_part_head",
-    "A": "matteroverdrive:rogue_android_part_arms",
-    "2": "matteroverdrive:isolinear_circuit_mk2",
-    "3": "matteroverdrive:isolinear_circuit_mk3",
-    "F": "matteroverdrive:forcefield_emitter",
-    "G": "minecraft:glowstone_dust",
-    "M": "matteroverdrive:machine_casing",
-    "R": "minecraft:redstone"
+    "T": {
+      "item": "matteroverdrive:rogue_android_part_chest"
+    },
+    "H": {
+      "item": "matteroverdrive:rogue_android_part_head"
+    },
+    "A": {
+      "item": "matteroverdrive:rogue_android_part_arms"
+    },
+    "2": {
+      "item": "matteroverdrive:isolinear_circuit_mk2"
+    },
+    "3": {
+      "item": "matteroverdrive:isolinear_circuit_mk3"
+    },
+    "F": {
+      "item": "matteroverdrive:forcefield_emitter"
+    },
+    "G": {
+      "item": "minecraft:glowstone_dust"
+    },
+    "M": {
+      "item": "matteroverdrive:machine_casing"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
   },
   "result": {
     "id": "matteroverdrive:android_station",

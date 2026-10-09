@@ -7,8 +7,12 @@
     " T "
   ],
   "key": {
-    "T": "#c:ingots/tritanium",
-    "Y": "minecraft:yellow_wool"
+    "T": {
+      "tag": "c:ingots/tritanium"
+    },
+    "Y": {
+      "item": "minecraft:yellow_wool"
+    }
   },
   "result": {
     "id": "matteroverdrive:tritanium_wrench",

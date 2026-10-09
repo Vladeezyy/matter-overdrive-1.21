@@ -7,11 +7,21 @@
     "CMC"
   ],
   "key": {
-    "H": "matteroverdrive:holo_sign",
-    "T": "#c:plates/tritanium",
-    "S": "matteroverdrive:spacetime_equalizer",
-    "C": "matteroverdrive:s_magnet",
-    "M": "matteroverdrive:machine_casing"
+    "H": {
+      "item": "matteroverdrive:holo_sign"
+    },
+    "T": {
+      "tag": "c:plates/tritanium"
+    },
+    "S": {
+      "item": "matteroverdrive:spacetime_equalizer"
+    },
+    "C": {
+      "item": "matteroverdrive:s_magnet"
+    },
+    "M": {
+      "item": "matteroverdrive:machine_casing"
+    }
   },
   "result": {
     "id": "matteroverdrive:gravitational_stabilizer",

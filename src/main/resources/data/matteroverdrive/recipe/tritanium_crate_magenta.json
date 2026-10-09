@@ -7,9 +7,15 @@
     " T "
   ],
   "key": {
-    "D": "minecraft:magenta_dye",
-    "T": "matteroverdrive:tritanium_plate",
-    "C": "minecraft:chest"
+    "D": {
+      "item": "minecraft:magenta_dye"
+    },
+    "T": {
+      "item": "matteroverdrive:tritanium_plate"
+    },
+    "C": {
+      "item": "minecraft:chest"
+    }
   },
   "result": {
     "id": "matteroverdrive:tritanium_crate_magenta",

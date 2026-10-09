@@ -7,9 +7,15 @@
     "#W#"
   ],
   "key": {
-    "#": "minecraft:clay",
-    "Q": "minecraft:quartz",
-    "W": "minecraft:white_dye"
+    "#": {
+      "item": "minecraft:clay"
+    },
+    "Q": {
+      "item": "minecraft:quartz"
+    },
+    "W": {
+      "item": "minecraft:white_dye"
+    }
   },
   "result": {
     "id": "matteroverdrive:decorative_floor_tile_white",

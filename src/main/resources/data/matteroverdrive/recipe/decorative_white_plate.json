@@ -7,8 +7,12 @@
     "#W#"
   ],
   "key": {
-    "#": "matteroverdrive:decorative_tritanium_plate",
-    "W": "#minecraft:wool"
+    "#": {
+      "item": "matteroverdrive:decorative_tritanium_plate"
+    },
+    "W": {
+      "tag": "minecraft:wool"
+    }
   },
   "result": {
     "id": "matteroverdrive:decorative_white_plate",

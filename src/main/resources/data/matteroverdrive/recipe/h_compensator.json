@@ -7,11 +7,21 @@
     "DED"
   ],
   "key": {
-    "M": "matteroverdrive:machine_casing",
-    "C": "matteroverdrive:isolinear_circuit_mk1",
-    "P": "matteroverdrive:isolinear_circuit_mk2",
-    "D": "#c:gems/dilithium",
-    "E": "minecraft:ender_eye"
+    "M": {
+      "item": "matteroverdrive:machine_casing"
+    },
+    "C": {
+      "item": "matteroverdrive:isolinear_circuit_mk1"
+    },
+    "P": {
+      "item": "matteroverdrive:isolinear_circuit_mk2"
+    },
+    "D": {
+      "tag": "c:gems/dilithium"
+    },
+    "E": {
+      "item": "minecraft:ender_eye"
+    }
   },
   "result": {
     "id": "matteroverdrive:h_compensator",

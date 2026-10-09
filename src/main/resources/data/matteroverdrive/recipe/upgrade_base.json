@@ -7,9 +7,15 @@
     "T"
   ],
   "key": {
-    "R": "minecraft:redstone",
-    "C": "matteroverdrive:isolinear_circuit_mk1",
-    "T": "#c:plates/tritanium"
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "C": {
+      "item": "matteroverdrive:isolinear_circuit_mk1"
+    },
+    "T": {
+      "tag": "c:plates/tritanium"
+    }
   },
   "result": {
     "id": "matteroverdrive:upgrade_base",

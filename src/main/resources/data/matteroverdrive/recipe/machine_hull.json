@@ -7,7 +7,9 @@
     " T "
   ],
   "key": {
-    "T": "#c:plates/tritanium"
+    "T": {
+      "tag": "c:plates/tritanium"
+    }
   },
   "result": {
     "id": "matteroverdrive:machine_hull",

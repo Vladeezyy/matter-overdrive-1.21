@@ -7,11 +7,21 @@
     "DED"
   ],
   "key": {
-    "M": "matteroverdrive:machine_casing",
-    "G": "minecraft:glass",
-    "P": "matteroverdrive:isolinear_circuit_mk2",
-    "D": "#c:gems/dilithium",
-    "E": "minecraft:ender_pearl"
+    "M": {
+      "item": "matteroverdrive:machine_casing"
+    },
+    "G": {
+      "item": "minecraft:glass"
+    },
+    "P": {
+      "item": "matteroverdrive:isolinear_circuit_mk2"
+    },
+    "D": {
+      "tag": "c:gems/dilithium"
+    },
+    "E": {
+      "item": "minecraft:ender_pearl"
+    }
   },
   "result": {
     "id": "matteroverdrive:integration_matrix",

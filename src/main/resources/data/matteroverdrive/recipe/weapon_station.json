@@ -6,12 +6,24 @@
     "CMB"
   ],
   "key": {
-    "G": "minecraft:glowstone_dust",
-    "F": "matteroverdrive:forcefield_emitter",
-    "R": "minecraft:redstone",
-    "C": "matteroverdrive:isolinear_circuit_mk3",
-    "M": "matteroverdrive:machine_casing",
-    "B": "matteroverdrive:battery"
+    "G": {
+      "item": "minecraft:glowstone_dust"
+    },
+    "F": {
+      "item": "matteroverdrive:forcefield_emitter"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "C": {
+      "item": "matteroverdrive:isolinear_circuit_mk3"
+    },
+    "M": {
+      "item": "matteroverdrive:machine_casing"
+    },
+    "B": {
+      "item": "matteroverdrive:battery"
+    }
   },
   "result": {
     "id": "matteroverdrive:weapon_station",

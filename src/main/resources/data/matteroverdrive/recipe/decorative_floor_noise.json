@@ -7,9 +7,15 @@
     "#G#"
   ],
   "key": {
-    "#": "minecraft:clay",
-    "Q": "minecraft:quartz",
-    "G": "minecraft:gravel"
+    "#": {
+      "item": "minecraft:clay"
+    },
+    "Q": {
+      "item": "minecraft:quartz"
+    },
+    "G": {
+      "item": "minecraft:gravel"
+    }
   },
   "result": {
     "id": "matteroverdrive:decorative_floor_noise",

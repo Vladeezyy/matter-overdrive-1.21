@@ -7,8 +7,12 @@
     "###"
   ],
   "key": {
-    "#": "matteroverdrive:decorative_tritanium_plate",
-    "C": "matteroverdrive:s_magnet"
+    "#": {
+      "item": "matteroverdrive:decorative_tritanium_plate"
+    },
+    "C": {
+      "item": "matteroverdrive:s_magnet"
+    }
   },
   "result": {
     "id": "matteroverdrive:decorative_coils",

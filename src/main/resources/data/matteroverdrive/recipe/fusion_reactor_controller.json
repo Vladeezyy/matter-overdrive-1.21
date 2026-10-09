@@ -7,12 +7,24 @@
     "CTC"
   ],
   "key": {
-    "C": "matteroverdrive:fusion_reactor_coil",
-    "H": "matteroverdrive:holo_sign",
-    "2": "matteroverdrive:isolinear_circuit_mk2",
-    "3": "matteroverdrive:isolinear_circuit_mk3",
-    "M": "matteroverdrive:machine_casing",
-    "T": "#c:plates/tritanium"
+    "C": {
+      "item": "matteroverdrive:fusion_reactor_coil"
+    },
+    "H": {
+      "item": "matteroverdrive:holo_sign"
+    },
+    "2": {
+      "item": "matteroverdrive:isolinear_circuit_mk2"
+    },
+    "3": {
+      "item": "matteroverdrive:isolinear_circuit_mk3"
+    },
+    "M": {
+      "item": "matteroverdrive:machine_casing"
+    },
+    "T": {
+      "tag": "c:plates/tritanium"
+    }
   },
   "result": {
     "id": "matteroverdrive:fusion_reactor_controller",

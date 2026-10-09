@@ -184,6 +184,9 @@ public final class MatterRegistry {
 
     /** 1.21.1: the recipe's non-empty ingredients (shaped recipes list their blank cells as empty ingredients). */
     private static List<Ingredient> ingredients(Recipe<?> recipe) {
+        if (recipe instanceof net.minecraft.world.item.crafting.SmithingTransformRecipe smithing) {
+            return java.util.stream.Stream.of(smithing.template, smithing.base, smithing.addition).filter(i -> !i.isEmpty()).toList();
+        }
         return recipe.getIngredients().stream().filter(i -> !i.isEmpty()).toList();
     }
 
@@ -260,6 +263,8 @@ public final class MatterRegistry {
             Integer value = values.get(alternative.getItem());
             if (value == null || value <= 0) continue;
             ItemStack remainder = alternative.getItem().getCraftingRemainingItem(alternative);
+            // wait for the returned container's value (1.21.1 lists the cake before the bucket)
+            if (!remainder.isEmpty() && !values.containsKey(remainder.getItem())) continue;
             int net = value - (remainder.isEmpty() ? 0 : values.getOrDefault(remainder.getItem(), 0) * remainder.getCount());
             if (net > 0 && (best == 0 || net < best)) best = net;
         }

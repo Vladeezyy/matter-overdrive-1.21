@@ -7,10 +7,18 @@
     "IRI"
   ],
   "key": {
-    "I": "minecraft:iron_ingot",
-    "D": "matteroverdrive:isolinear_circuit_mk3",
-    "R": "minecraft:redstone",
-    "G": "minecraft:gold_ingot"
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "D": {
+      "item": "matteroverdrive:isolinear_circuit_mk3"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "G": {
+      "item": "minecraft:gold_ingot"
+    }
   },
   "result": {
     "id": "matteroverdrive:matter_scanner",

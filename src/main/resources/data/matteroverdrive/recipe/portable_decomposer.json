@@ -7,10 +7,18 @@
     " T "
   ],
   "key": {
-    "T": "matteroverdrive:tritanium_plate",
-    "I": "matteroverdrive:integration_matrix",
-    "M": "matteroverdrive:me_conversion_matrix",
-    "P": "minecraft:sticky_piston"
+    "T": {
+      "item": "matteroverdrive:tritanium_plate"
+    },
+    "I": {
+      "item": "matteroverdrive:integration_matrix"
+    },
+    "M": {
+      "item": "matteroverdrive:me_conversion_matrix"
+    },
+    "P": {
+      "item": "minecraft:sticky_piston"
+    }
   },
   "result": {
     "id": "matteroverdrive:portable_decomposer",

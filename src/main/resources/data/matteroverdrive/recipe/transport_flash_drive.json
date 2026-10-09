@@ -7,10 +7,18 @@
     " I "
   ],
   "key": {
-    "I": "minecraft:iron_ingot",
-    "E": "minecraft:ender_pearl",
-    "C": "matteroverdrive:isolinear_circuit_mk1",
-    "R": "minecraft:redstone"
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "E": {
+      "item": "minecraft:ender_pearl"
+    },
+    "C": {
+      "item": "matteroverdrive:isolinear_circuit_mk1"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
   },
   "result": {
     "id": "matteroverdrive:transport_flash_drive",

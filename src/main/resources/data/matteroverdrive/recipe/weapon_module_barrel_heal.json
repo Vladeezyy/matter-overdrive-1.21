@@ -7,10 +7,18 @@
     "ETE"
   ],
   "key": {
-    "S": "minecraft:sugar",
-    "A": "minecraft:golden_apple",
-    "E": "minecraft:emerald",
-    "T": "#c:plates/tritanium"
+    "S": {
+      "item": "minecraft:sugar"
+    },
+    "A": {
+      "item": "minecraft:golden_apple"
+    },
+    "E": {
+      "item": "minecraft:emerald"
+    },
+    "T": {
+      "tag": "c:plates/tritanium"
+    }
   },
   "result": {
     "id": "matteroverdrive:weapon_module_barrel_heal",

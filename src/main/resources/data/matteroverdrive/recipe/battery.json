@@ -7,10 +7,18 @@
     "TDT"
   ],
   "key": {
-    "R": "minecraft:redstone",
-    "T": "#c:ingots/tritanium",
-    "G": "minecraft:gold_ingot",
-    "D": "#c:gems/dilithium"
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "T": {
+      "tag": "c:ingots/tritanium"
+    },
+    "G": {
+      "item": "minecraft:gold_ingot"
+    },
+    "D": {
+      "tag": "c:gems/dilithium"
+    }
   },
   "result": {
     "id": "matteroverdrive:battery",

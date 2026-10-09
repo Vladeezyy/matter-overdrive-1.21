@@ -7,12 +7,24 @@
     "GMR"
   ],
   "key": {
-    "S": "matteroverdrive:security_protocol",
-    "C": "matteroverdrive:isolinear_circuit_mk3",
-    "F": "matteroverdrive:forcefield_emitter",
-    "G": "minecraft:glowstone_dust",
-    "M": "matteroverdrive:machine_casing",
-    "R": "minecraft:redstone"
+    "S": {
+      "item": "matteroverdrive:security_protocol"
+    },
+    "C": {
+      "item": "matteroverdrive:isolinear_circuit_mk3"
+    },
+    "F": {
+      "item": "matteroverdrive:forcefield_emitter"
+    },
+    "G": {
+      "item": "minecraft:glowstone_dust"
+    },
+    "M": {
+      "item": "matteroverdrive:machine_casing"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
   },
   "result": {
     "id": "matteroverdrive:star_map",

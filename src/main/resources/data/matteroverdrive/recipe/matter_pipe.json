@@ -7,9 +7,15 @@
     " G "
   ],
   "key": {
-    "G": "minecraft:glass",
-    "I": "minecraft:iron_ingot",
-    "M": "matteroverdrive:s_magnet"
+    "G": {
+      "item": "minecraft:glass"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "M": {
+      "item": "matteroverdrive:s_magnet"
+    }
   },
   "result": {
     "id": "matteroverdrive:matter_pipe",

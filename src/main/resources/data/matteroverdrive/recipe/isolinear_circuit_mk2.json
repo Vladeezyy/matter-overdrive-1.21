@@ -1,7 +1,11 @@
 {
   "type": "matteroverdrive:inscriber",
-  "main": "matteroverdrive:isolinear_circuit_mk1",
-  "secondary": "minecraft:gold_ingot",
+  "main": {
+    "item": "matteroverdrive:isolinear_circuit_mk1"
+  },
+  "secondary": {
+    "item": "minecraft:gold_ingot"
+  },
   "result": {
     "id": "matteroverdrive:isolinear_circuit_mk2"
   },

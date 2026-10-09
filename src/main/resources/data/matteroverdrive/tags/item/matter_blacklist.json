@@ -18,8 +18,14 @@
     "minecraft:knowledge_book",
     "minecraft:reinforced_deepslate",
     "minecraft:petrified_oak_slab",
-    "minecraft:test_block",
-    "minecraft:test_instance_block",
+    {
+      "id": "minecraft:test_block",
+      "required": false
+    },
+    {
+      "id": "minecraft:test_instance_block",
+      "required": false
+    },
     "minecraft:player_head",
     "minecraft:budding_amethyst",
     "minecraft:enchanted_book",

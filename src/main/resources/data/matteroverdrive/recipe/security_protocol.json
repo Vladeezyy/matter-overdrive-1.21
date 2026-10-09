@@ -6,8 +6,12 @@
     "CP"
   ],
   "key": {
-    "P": "minecraft:paper",
-    "C": "matteroverdrive:isolinear_circuit_mk1"
+    "P": {
+      "item": "minecraft:paper"
+    },
+    "C": {
+      "item": "matteroverdrive:isolinear_circuit_mk1"
+    }
   },
   "result": {
     "id": "matteroverdrive:security_protocol",

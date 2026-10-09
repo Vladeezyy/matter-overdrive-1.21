@@ -7,8 +7,12 @@
     "###"
   ],
   "key": {
-    "#": "matteroverdrive:decorative_tritanium_plate",
-    "D": "minecraft:lime_dye"
+    "#": {
+      "item": "matteroverdrive:decorative_tritanium_plate"
+    },
+    "D": {
+      "item": "minecraft:lime_dye"
+    }
   },
   "result": {
     "id": "matteroverdrive:decorative_tritanium_plate_lime",

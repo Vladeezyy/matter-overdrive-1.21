@@ -1,6 +1,11 @@
 {
-  "parent": "minecraft:item/handheld",
-  "textures": {
-    "layer0": "matteroverdrive:item/matter_scanner"
-  }
+  "parent": "matteroverdrive:item/matter_scanner_offline",
+  "overrides": [
+    {
+      "predicate": {
+        "matteroverdrive:linked": 1
+      },
+      "model": "matteroverdrive:item/matter_scanner_case"
+    }
+  ]
 }

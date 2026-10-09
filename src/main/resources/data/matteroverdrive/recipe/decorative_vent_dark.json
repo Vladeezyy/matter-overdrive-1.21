@@ -7,8 +7,12 @@
     "###"
   ],
   "key": {
-    "#": "matteroverdrive:decorative_vent_bright",
-    "B": "minecraft:black_dye"
+    "#": {
+      "item": "matteroverdrive:decorative_vent_bright"
+    },
+    "B": {
+      "item": "minecraft:black_dye"
+    }
   },
   "result": {
     "id": "matteroverdrive:decorative_vent_dark",

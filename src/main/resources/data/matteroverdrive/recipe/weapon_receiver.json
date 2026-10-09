@@ -6,9 +6,15 @@
     "IIT"
   ],
   "key": {
-    "I": "minecraft:iron_ingot",
-    "R": "minecraft:redstone",
-    "T": "#c:ingots/tritanium"
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "T": {
+      "tag": "c:ingots/tritanium"
+    }
   },
   "result": {
     "id": "matteroverdrive:weapon_receiver",

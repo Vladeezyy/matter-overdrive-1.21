@@ -7,9 +7,15 @@
     "TGT"
   ],
   "key": {
-    "T": "#c:plates/tritanium",
-    "G": "minecraft:gold_ingot",
-    "C": "matteroverdrive:isolinear_circuit_mk1"
+    "T": {
+      "tag": "c:plates/tritanium"
+    },
+    "G": {
+      "item": "minecraft:gold_ingot"
+    },
+    "C": {
+      "item": "matteroverdrive:isolinear_circuit_mk1"
+    }
   },
   "result": {
     "id": "matteroverdrive:fusion_reactor_io",

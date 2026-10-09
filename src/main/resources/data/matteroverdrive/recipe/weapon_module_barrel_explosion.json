@@ -7,10 +7,18 @@
     "DTD"
   ],
   "key": {
-    "B": "minecraft:tnt",
-    "R": "minecraft:blaze_rod",
-    "D": "minecraft:diamond",
-    "T": "#c:plates/tritanium"
+    "B": {
+      "item": "minecraft:tnt"
+    },
+    "R": {
+      "item": "minecraft:blaze_rod"
+    },
+    "D": {
+      "item": "minecraft:diamond"
+    },
+    "T": {
+      "tag": "c:plates/tritanium"
+    }
   },
   "result": {
     "id": "matteroverdrive:weapon_module_barrel_explosion",

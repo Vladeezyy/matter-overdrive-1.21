@@ -7,9 +7,15 @@
     "#G#"
   ],
   "key": {
-    "#": "minecraft:clay",
-    "Q": "minecraft:quartz",
-    "G": "minecraft:green_dye"
+    "#": {
+      "item": "minecraft:clay"
+    },
+    "Q": {
+      "item": "minecraft:quartz"
+    },
+    "G": {
+      "item": "minecraft:green_dye"
+    }
   },
   "result": {
     "id": "matteroverdrive:decorative_floor_tiles_green",

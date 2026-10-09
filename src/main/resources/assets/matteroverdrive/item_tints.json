@@ -1,0 +1,179 @@
+{
+  "matteroverdrive:android_pill_blue": [
+    -1,
+    -16670742
+  ],
+  "matteroverdrive:android_pill_red": [
+    -1,
+    -3145728
+  ],
+  "matteroverdrive:android_pill_yellow": [
+    -1,
+    -7168
+  ],
+  "matteroverdrive:battery": [
+    -1,
+    -4201242
+  ],
+  "matteroverdrive:creative_battery": [
+    -1,
+    -1683436
+  ],
+  "matteroverdrive:decorative_tritanium_plate_black": [
+    -14869215
+  ],
+  "matteroverdrive:decorative_tritanium_plate_blue": [
+    -12827478
+  ],
+  "matteroverdrive:decorative_tritanium_plate_brown": [
+    -8170446
+  ],
+  "matteroverdrive:decorative_tritanium_plate_cyan": [
+    -15295332
+  ],
+  "matteroverdrive:decorative_tritanium_plate_gray": [
+    -12103854
+  ],
+  "matteroverdrive:decorative_tritanium_plate_green": [
+    -10585066
+  ],
+  "matteroverdrive:decorative_tritanium_plate_light_blue": [
+    -12930086
+  ],
+  "matteroverdrive:decorative_tritanium_plate_light_gray": [
+    -6447721
+  ],
+  "matteroverdrive:decorative_tritanium_plate_lime": [
+    -8337633
+  ],
+  "matteroverdrive:decorative_tritanium_plate_magenta": [
+    -3715395
+  ],
+  "matteroverdrive:decorative_tritanium_plate_orange": [
+    -425955
+  ],
+  "matteroverdrive:decorative_tritanium_plate_pink": [
+    -816214
+  ],
+  "matteroverdrive:decorative_tritanium_plate_purple": [
+    -7785800
+  ],
+  "matteroverdrive:decorative_tritanium_plate_red": [
+    -5231066
+  ],
+  "matteroverdrive:decorative_tritanium_plate_white": [
+    -393218
+  ],
+  "matteroverdrive:decorative_tritanium_plate_yellow": [
+    -75715
+  ],
+  "matteroverdrive:energy_pack": [
+    -1,
+    -1683436
+  ],
+  "matteroverdrive:hc_battery": [
+    -1,
+    -79100
+  ],
+  "matteroverdrive:matter_container_full": [
+    -1,
+    -4201242,
+    -79100
+  ],
+  "matteroverdrive:network_flash_drive": [
+    -1,
+    -79100
+  ],
+  "matteroverdrive:transport_flash_drive": [
+    -1,
+    -15151360
+  ],
+  "matteroverdrive:tritanium_crate_black": [
+    -14869215
+  ],
+  "matteroverdrive:tritanium_crate_blue": [
+    -12827478
+  ],
+  "matteroverdrive:tritanium_crate_brown": [
+    -8170446
+  ],
+  "matteroverdrive:tritanium_crate_cyan": [
+    -15295332
+  ],
+  "matteroverdrive:tritanium_crate_gray": [
+    -12103854
+  ],
+  "matteroverdrive:tritanium_crate_green": [
+    -10585066
+  ],
+  "matteroverdrive:tritanium_crate_light_blue": [
+    -12930086
+  ],
+  "matteroverdrive:tritanium_crate_light_gray": [
+    -6447721
+  ],
+  "matteroverdrive:tritanium_crate_lime": [
+    -8337633
+  ],
+  "matteroverdrive:tritanium_crate_magenta": [
+    -3715395
+  ],
+  "matteroverdrive:tritanium_crate_orange": [
+    -425955
+  ],
+  "matteroverdrive:tritanium_crate_pink": [
+    -816214
+  ],
+  "matteroverdrive:tritanium_crate_purple": [
+    -7785800
+  ],
+  "matteroverdrive:tritanium_crate_red": [
+    -5231066
+  ],
+  "matteroverdrive:tritanium_crate_white": [
+    -393218
+  ],
+  "matteroverdrive:tritanium_crate_yellow": [
+    -75715
+  ],
+  "matteroverdrive:weapon_module_color_black": [
+    -1,
+    -14803426
+  ],
+  "matteroverdrive:weapon_module_color_blue": [
+    -1,
+    -16750849
+  ],
+  "matteroverdrive:weapon_module_color_brown": [
+    -1,
+    -10079437
+  ],
+  "matteroverdrive:weapon_module_color_gold": [
+    -1,
+    -2838729
+  ],
+  "matteroverdrive:weapon_module_color_green": [
+    -1,
+    -16737997
+  ],
+  "matteroverdrive:weapon_module_color_grey": [
+    -1,
+    -8355712
+  ],
+  "matteroverdrive:weapon_module_color_lime_green": [
+    -1,
+    -10027162
+  ],
+  "matteroverdrive:weapon_module_color_pink": [
+    -1,
+    -26113
+  ],
+  "matteroverdrive:weapon_module_color_red": [
+    -1,
+    -3407872
+  ],
+  "matteroverdrive:weapon_module_color_sky_blue": [
+    -1,
+    -6697729
+  ]
+}

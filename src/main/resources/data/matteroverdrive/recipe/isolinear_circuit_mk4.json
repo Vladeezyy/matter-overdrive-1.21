@@ -1,7 +1,11 @@
 {
   "type": "matteroverdrive:inscriber",
-  "main": "matteroverdrive:isolinear_circuit_mk3",
-  "secondary": "minecraft:emerald",
+  "main": {
+    "item": "matteroverdrive:isolinear_circuit_mk3"
+  },
+  "secondary": {
+    "item": "minecraft:emerald"
+  },
   "result": {
     "id": "matteroverdrive:isolinear_circuit_mk4"
   },

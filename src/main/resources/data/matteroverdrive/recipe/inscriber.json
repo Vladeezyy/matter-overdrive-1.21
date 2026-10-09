@@ -7,12 +7,24 @@
     "RMR"
   ],
   "key": {
-    "I": "minecraft:iron_ingot",
-    "D": "#c:gems/dilithium",
-    "T": "#c:plates/tritanium",
-    "P": "minecraft:piston",
-    "R": "minecraft:redstone",
-    "M": "matteroverdrive:machine_casing"
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "D": {
+      "tag": "c:gems/dilithium"
+    },
+    "T": {
+      "tag": "c:plates/tritanium"
+    },
+    "P": {
+      "item": "minecraft:piston"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "M": {
+      "item": "matteroverdrive:machine_casing"
+    }
   },
   "result": {
     "id": "matteroverdrive:inscriber",

@@ -7,10 +7,18 @@
     " C "
   ],
   "key": {
-    "E": "minecraft:ender_pearl",
-    "R": "minecraft:redstone",
-    "M": "matteroverdrive:machine_casing",
-    "C": "matteroverdrive:isolinear_circuit_mk2"
+    "E": {
+      "item": "minecraft:ender_pearl"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "M": {
+      "item": "matteroverdrive:machine_casing"
+    },
+    "C": {
+      "item": "matteroverdrive:isolinear_circuit_mk2"
+    }
   },
   "result": {
     "id": "matteroverdrive:pattern_drive",

@@ -7,11 +7,21 @@
     "KMK"
   ],
   "key": {
-    "C": "minecraft:coal",
-    "G": "minecraft:glass",
-    "Q": "minecraft:quartz",
-    "K": "matteroverdrive:isolinear_circuit_mk2",
-    "M": "matteroverdrive:machine_casing"
+    "C": {
+      "item": "minecraft:coal"
+    },
+    "G": {
+      "item": "minecraft:glass"
+    },
+    "Q": {
+      "item": "minecraft:quartz"
+    },
+    "K": {
+      "item": "matteroverdrive:isolinear_circuit_mk2"
+    },
+    "M": {
+      "item": "matteroverdrive:machine_casing"
+    }
   },
   "result": {
     "id": "matteroverdrive:solar_panel",

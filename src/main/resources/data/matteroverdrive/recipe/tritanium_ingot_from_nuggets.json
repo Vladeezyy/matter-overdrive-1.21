@@ -7,7 +7,9 @@
     "###"
   ],
   "key": {
-    "#": "#c:nuggets/tritanium"
+    "#": {
+      "tag": "c:nuggets/tritanium"
+    }
   },
   "result": {
     "id": "matteroverdrive:tritanium_ingot",

@@ -7,13 +7,27 @@
     "2M1"
   ],
   "key": {
-    "B": "minecraft:black_wool",
-    "3": "matteroverdrive:isolinear_circuit_mk3",
-    "T": "#c:ingots/tritanium",
-    "C": "minecraft:chest",
-    "2": "matteroverdrive:isolinear_circuit_mk2",
-    "M": "matteroverdrive:machine_casing",
-    "1": "matteroverdrive:isolinear_circuit_mk1"
+    "B": {
+      "item": "minecraft:black_wool"
+    },
+    "3": {
+      "item": "matteroverdrive:isolinear_circuit_mk3"
+    },
+    "T": {
+      "tag": "c:ingots/tritanium"
+    },
+    "C": {
+      "item": "minecraft:chest"
+    },
+    "2": {
+      "item": "matteroverdrive:isolinear_circuit_mk2"
+    },
+    "M": {
+      "item": "matteroverdrive:machine_casing"
+    },
+    "1": {
+      "item": "matteroverdrive:isolinear_circuit_mk1"
+    }
   },
   "result": {
     "id": "matteroverdrive:pattern_storage",

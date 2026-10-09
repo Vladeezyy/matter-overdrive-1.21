@@ -7,13 +7,27 @@
     "WHB"
   ],
   "key": {
-    "I": "minecraft:iron_ingot",
-    "S": "matteroverdrive:weapon_receiver",
-    "P": "matteroverdrive:plasma_core",
-    "C": "matteroverdrive:isolinear_circuit_mk3",
-    "W": "#minecraft:wool",
-    "H": "matteroverdrive:weapon_handle",
-    "B": "matteroverdrive:battery"
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "S": {
+      "item": "matteroverdrive:weapon_receiver"
+    },
+    "P": {
+      "item": "matteroverdrive:plasma_core"
+    },
+    "C": {
+      "item": "matteroverdrive:isolinear_circuit_mk3"
+    },
+    "W": {
+      "tag": "minecraft:wool"
+    },
+    "H": {
+      "item": "matteroverdrive:weapon_handle"
+    },
+    "B": {
+      "item": "matteroverdrive:battery"
+    }
   },
   "result": {
     "id": "matteroverdrive:phaser_rifle",

@@ -6,6 +6,9 @@
 
 # The license for you mod. This is mandatory metadata and allows for easier comprehension of your redistributive properties.
 # Review your options at https://choosealicense.com/. All rights reserved is the default copyright stance, and is thus the default here.
+# FML 4 (Minecraft 1.21.1) still needs the loader lines
+modLoader="javafml" #mandatory
+loaderVersion="[4,)" #mandatory
 license="${mod_license}"
 
 # A URL to refer people to when problems occur with this mod
@@ -42,7 +45,7 @@ authors="Simeon Radivoev (original); port contributors"
 # The description text for the mod (multi line!) (#mandatory)
 description='''
 A mod that dwells within matter and energy.
-Unofficial port of Matter Overdrive (Simeon Radivoev, GPL-3.0) to Minecraft 1.21.10 / NeoForge.
+Unofficial port of Matter Overdrive (Simeon Radivoev, GPL-3.0) to Minecraft ${minecraft_version} / NeoForge.
 '''
 
 # The [[mixins]] block allows you to declare your mixin config to FML so that it gets loaded.

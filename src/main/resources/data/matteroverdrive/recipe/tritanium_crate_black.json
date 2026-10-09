@@ -7,9 +7,15 @@
     " T "
   ],
   "key": {
-    "D": "minecraft:black_dye",
-    "T": "matteroverdrive:tritanium_plate",
-    "C": "minecraft:chest"
+    "D": {
+      "item": "minecraft:black_dye"
+    },
+    "T": {
+      "item": "matteroverdrive:tritanium_plate"
+    },
+    "C": {
+      "item": "minecraft:chest"
+    }
   },
   "result": {
     "id": "matteroverdrive:tritanium_crate_black",

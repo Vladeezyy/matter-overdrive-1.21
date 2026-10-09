@@ -7,12 +7,24 @@
     "BMB"
   ],
   "key": {
-    "F": "matteroverdrive:forcefield_emitter",
-    "E": "minecraft:ender_eye",
-    "D": "#c:gems/dilithium",
-    "R": "minecraft:repeater",
-    "B": "matteroverdrive:hc_battery",
-    "M": "matteroverdrive:machine_casing"
+    "F": {
+      "item": "matteroverdrive:forcefield_emitter"
+    },
+    "E": {
+      "item": "minecraft:ender_eye"
+    },
+    "D": {
+      "tag": "c:gems/dilithium"
+    },
+    "R": {
+      "item": "minecraft:repeater"
+    },
+    "B": {
+      "item": "matteroverdrive:hc_battery"
+    },
+    "M": {
+      "item": "matteroverdrive:machine_casing"
+    }
   },
   "result": {
     "id": "matteroverdrive:charging_station",

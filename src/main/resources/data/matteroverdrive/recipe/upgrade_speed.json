@@ -7,10 +7,18 @@
     " E "
   ],
   "key": {
-    "R": "minecraft:redstone",
-    "G": "minecraft:glowstone_dust",
-    "U": "matteroverdrive:upgrade_base",
-    "E": "minecraft:emerald"
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "G": {
+      "item": "minecraft:glowstone_dust"
+    },
+    "U": {
+      "item": "matteroverdrive:upgrade_base"
+    },
+    "E": {
+      "item": "minecraft:emerald"
+    }
   },
   "result": {
     "id": "matteroverdrive:upgrade_speed",

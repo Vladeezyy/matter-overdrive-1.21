@@ -1,7 +1,9 @@
 {
   "type": "minecraft:blasting",
   "category": "misc",
-  "ingredient": "#c:dusts/tritanium",
+  "ingredient": {
+    "tag": "c:dusts/tritanium"
+  },
   "result": {
     "id": "matteroverdrive:tritanium_ingot"
   },

@@ -6,8 +6,12 @@
     " T "
   ],
   "key": {
-    "T": "#c:ingots/tritanium",
-    "M": "matteroverdrive:s_magnet"
+    "T": {
+      "tag": "c:ingots/tritanium"
+    },
+    "M": {
+      "item": "matteroverdrive:s_magnet"
+    }
   },
   "result": {
     "id": "matteroverdrive:matter_container",

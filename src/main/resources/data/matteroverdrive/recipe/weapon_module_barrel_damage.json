@@ -7,10 +7,18 @@
     " T "
   ],
   "key": {
-    "G": "minecraft:glass",
-    "R": "minecraft:redstone",
-    "D": "#c:gems/dilithium",
-    "T": "#c:plates/tritanium"
+    "G": {
+      "item": "minecraft:glass"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "D": {
+      "tag": "c:gems/dilithium"
+    },
+    "T": {
+      "tag": "c:plates/tritanium"
+    }
   },
   "result": {
     "id": "matteroverdrive:weapon_module_barrel_damage",

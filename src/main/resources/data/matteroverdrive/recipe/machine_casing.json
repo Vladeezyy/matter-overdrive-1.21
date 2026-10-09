@@ -7,10 +7,18 @@
     "GRG"
   ],
   "key": {
-    "T": "#c:plates/tritanium",
-    "I": "#c:ingots/tritanium",
-    "G": "minecraft:gold_ingot",
-    "R": "minecraft:redstone"
+    "T": {
+      "tag": "c:plates/tritanium"
+    },
+    "I": {
+      "tag": "c:ingots/tritanium"
+    },
+    "G": {
+      "item": "minecraft:gold_ingot"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
   },
   "result": {
     "id": "matteroverdrive:machine_casing",

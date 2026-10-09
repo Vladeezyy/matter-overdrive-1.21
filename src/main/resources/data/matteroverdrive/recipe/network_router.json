@@ -7,12 +7,24 @@
     " M "
   ],
   "key": {
-    "I": "minecraft:iron_ingot",
-    "G": "minecraft:glass",
-    "D": "matteroverdrive:isolinear_circuit_mk2",
-    "F": "matteroverdrive:network_flash_drive",
-    "C": "matteroverdrive:isolinear_circuit_mk1",
-    "M": "matteroverdrive:machine_casing"
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "G": {
+      "item": "minecraft:glass"
+    },
+    "D": {
+      "item": "matteroverdrive:isolinear_circuit_mk2"
+    },
+    "F": {
+      "item": "matteroverdrive:network_flash_drive"
+    },
+    "C": {
+      "item": "matteroverdrive:isolinear_circuit_mk1"
+    },
+    "M": {
+      "item": "matteroverdrive:machine_casing"
+    }
   },
   "result": {
     "id": "matteroverdrive:network_router",

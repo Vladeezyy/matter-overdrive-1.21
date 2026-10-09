@@ -7,12 +7,24 @@
     "WCW"
   ],
   "key": {
-    "I": "minecraft:iron_ingot",
-    "G": "minecraft:glass",
-    "P": "matteroverdrive:plasma_core",
-    "H": "matteroverdrive:weapon_handle",
-    "W": "#minecraft:wool",
-    "C": "matteroverdrive:isolinear_circuit_mk3"
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "G": {
+      "item": "minecraft:glass"
+    },
+    "P": {
+      "item": "matteroverdrive:plasma_core"
+    },
+    "H": {
+      "item": "matteroverdrive:weapon_handle"
+    },
+    "W": {
+      "tag": "minecraft:wool"
+    },
+    "C": {
+      "item": "matteroverdrive:isolinear_circuit_mk3"
+    }
   },
   "result": {
     "id": "matteroverdrive:phaser",

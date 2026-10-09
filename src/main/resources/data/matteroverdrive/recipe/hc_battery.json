@@ -7,9 +7,15 @@
     " P "
   ],
   "key": {
-    "P": "#c:plates/tritanium",
-    "D": "#c:gems/dilithium",
-    "B": "matteroverdrive:battery"
+    "P": {
+      "tag": "c:plates/tritanium"
+    },
+    "D": {
+      "tag": "c:gems/dilithium"
+    },
+    "B": {
+      "item": "matteroverdrive:battery"
+    }
   },
   "result": {
     "id": "matteroverdrive:hc_battery",

@@ -6,7 +6,9 @@
     "##"
   ],
   "key": {
-    "#": "#c:plates/tritanium"
+    "#": {
+      "tag": "c:plates/tritanium"
+    }
   },
   "result": {
     "id": "matteroverdrive:decorative_tritanium_plate",

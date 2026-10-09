@@ -7,10 +7,18 @@
     " G "
   ],
   "key": {
-    "D": "minecraft:diamond",
-    "R": "minecraft:redstone",
-    "U": "matteroverdrive:upgrade_base",
-    "G": "minecraft:gold_ingot"
+    "D": {
+      "item": "minecraft:diamond"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "U": {
+      "item": "matteroverdrive:upgrade_base"
+    },
+    "G": {
+      "item": "minecraft:gold_ingot"
+    }
   },
   "result": {
     "id": "matteroverdrive:upgrade_failsafe",

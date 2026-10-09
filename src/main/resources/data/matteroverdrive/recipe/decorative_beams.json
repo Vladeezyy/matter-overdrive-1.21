@@ -7,8 +7,12 @@
     "#"
   ],
   "key": {
-    "#": "#c:plates/tritanium",
-    "T": "#c:ingots/tritanium"
+    "#": {
+      "tag": "c:plates/tritanium"
+    },
+    "T": {
+      "tag": "c:ingots/tritanium"
+    }
   },
   "result": {
     "id": "matteroverdrive:decorative_beams",

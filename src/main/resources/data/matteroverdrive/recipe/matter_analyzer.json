@@ -7,12 +7,24 @@
     "ONO"
   ],
   "key": {
-    "C": "matteroverdrive:isolinear_circuit_mk3",
-    "P": "matteroverdrive:pattern_drive",
-    "M": "matteroverdrive:me_conversion_matrix",
-    "F": "matteroverdrive:network_flash_drive",
-    "O": "minecraft:iron_block",
-    "N": "matteroverdrive:integration_matrix"
+    "C": {
+      "item": "matteroverdrive:isolinear_circuit_mk3"
+    },
+    "P": {
+      "item": "matteroverdrive:pattern_drive"
+    },
+    "M": {
+      "item": "matteroverdrive:me_conversion_matrix"
+    },
+    "F": {
+      "item": "matteroverdrive:network_flash_drive"
+    },
+    "O": {
+      "item": "minecraft:iron_block"
+    },
+    "N": {
+      "item": "matteroverdrive:integration_matrix"
+    }
   },
   "result": {
     "id": "matteroverdrive:matter_analyzer",

@@ -7,9 +7,15 @@
     " M "
   ],
   "key": {
-    "M": "matteroverdrive:s_magnet",
-    "E": "minecraft:ender_pearl",
-    "H": "matteroverdrive:h_compensator"
+    "M": {
+      "item": "matteroverdrive:s_magnet"
+    },
+    "E": {
+      "item": "minecraft:ender_pearl"
+    },
+    "H": {
+      "item": "matteroverdrive:h_compensator"
+    }
   },
   "result": {
     "id": "matteroverdrive:spacetime_equalizer",

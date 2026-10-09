@@ -7,10 +7,18 @@
     "III"
   ],
   "key": {
-    "I": "minecraft:iron_ingot",
-    "C": "matteroverdrive:isolinear_circuit_mk2",
-    "G": "minecraft:lime_stained_glass_pane",
-    "F": "matteroverdrive:forcefield_emitter"
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "C": {
+      "item": "matteroverdrive:isolinear_circuit_mk2"
+    },
+    "G": {
+      "item": "minecraft:lime_stained_glass_pane"
+    },
+    "F": {
+      "item": "matteroverdrive:forcefield_emitter"
+    }
   },
   "result": {
     "id": "matteroverdrive:sniper_scope",

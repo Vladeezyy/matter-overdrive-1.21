@@ -7,13 +7,27 @@
     "NBH"
   ],
   "key": {
-    "T": "matteroverdrive:tritanium_plate",
-    "G": "minecraft:glowstone",
-    "C": "matteroverdrive:isolinear_circuit_mk2",
-    "M": "matteroverdrive:me_conversion_matrix",
-    "N": "matteroverdrive:integration_matrix",
-    "B": "matteroverdrive:hc_battery",
-    "H": "matteroverdrive:h_compensator"
+    "T": {
+      "item": "matteroverdrive:tritanium_plate"
+    },
+    "G": {
+      "item": "minecraft:glowstone"
+    },
+    "C": {
+      "item": "matteroverdrive:isolinear_circuit_mk2"
+    },
+    "M": {
+      "item": "matteroverdrive:me_conversion_matrix"
+    },
+    "N": {
+      "item": "matteroverdrive:integration_matrix"
+    },
+    "B": {
+      "item": "matteroverdrive:hc_battery"
+    },
+    "H": {
+      "item": "matteroverdrive:h_compensator"
+    }
   },
   "result": {
     "id": "matteroverdrive:transporter",

@@ -7,12 +7,24 @@
     "SPB"
   ],
   "key": {
-    "S": "matteroverdrive:weapon_receiver",
-    "P": "matteroverdrive:plasma_core",
-    "I": "minecraft:iron_ingot",
-    "C": "matteroverdrive:isolinear_circuit_mk3",
-    "H": "matteroverdrive:weapon_handle",
-    "B": "matteroverdrive:battery"
+    "S": {
+      "item": "matteroverdrive:weapon_receiver"
+    },
+    "P": {
+      "item": "matteroverdrive:plasma_core"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "C": {
+      "item": "matteroverdrive:isolinear_circuit_mk3"
+    },
+    "H": {
+      "item": "matteroverdrive:weapon_handle"
+    },
+    "B": {
+      "item": "matteroverdrive:battery"
+    }
   },
   "result": {
     "id": "matteroverdrive:plasma_shotgun",

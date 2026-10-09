@@ -7,8 +7,12 @@
     "###"
   ],
   "key": {
-    "#": "minecraft:clay",
-    "Q": "minecraft:quartz"
+    "#": {
+      "item": "minecraft:clay"
+    },
+    "Q": {
+      "item": "minecraft:quartz"
+    }
   },
   "result": {
     "id": "matteroverdrive:decorative_floor_tiles",

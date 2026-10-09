@@ -7,8 +7,12 @@
     " G "
   ],
   "key": {
-    "G": "minecraft:glass",
-    "T": "#c:plates/tritanium"
+    "G": {
+      "item": "minecraft:glass"
+    },
+    "T": {
+      "tag": "c:plates/tritanium"
+    }
   },
   "result": {
     "id": "matteroverdrive:force_glass",

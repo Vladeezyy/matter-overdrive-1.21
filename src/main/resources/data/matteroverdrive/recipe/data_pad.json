@@ -2,8 +2,12 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    "minecraft:book",
-    "matteroverdrive:isolinear_circuit_mk1"
+    {
+      "item": "minecraft:book"
+    },
+    {
+      "item": "matteroverdrive:isolinear_circuit_mk1"
+    }
   ],
   "result": {
     "id": "matteroverdrive:data_pad",

@@ -7,12 +7,24 @@
     "NTM"
   ],
   "key": {
-    "T": "#c:plates/tritanium",
-    "1": "matteroverdrive:isolinear_circuit_mk1",
-    "2": "matteroverdrive:isolinear_circuit_mk2",
-    "P": "minecraft:piston",
-    "N": "matteroverdrive:integration_matrix",
-    "M": "matteroverdrive:me_conversion_matrix"
+    "T": {
+      "tag": "c:plates/tritanium"
+    },
+    "1": {
+      "item": "matteroverdrive:isolinear_circuit_mk1"
+    },
+    "2": {
+      "item": "matteroverdrive:isolinear_circuit_mk2"
+    },
+    "P": {
+      "item": "minecraft:piston"
+    },
+    "N": {
+      "item": "matteroverdrive:integration_matrix"
+    },
+    "M": {
+      "item": "matteroverdrive:me_conversion_matrix"
+    }
   },
   "result": {
     "id": "matteroverdrive:matter_recycler",

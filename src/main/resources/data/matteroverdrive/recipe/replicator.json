@@ -7,14 +7,30 @@
     "NTM"
   ],
   "key": {
-    "P": "matteroverdrive:pattern_drive",
-    "C": "matteroverdrive:isolinear_circuit_mk3",
-    "F": "matteroverdrive:network_flash_drive",
-    "I": "minecraft:iron_ingot",
-    "H": "matteroverdrive:h_compensator",
-    "N": "matteroverdrive:integration_matrix",
-    "T": "#c:plates/tritanium",
-    "M": "matteroverdrive:me_conversion_matrix"
+    "P": {
+      "item": "matteroverdrive:pattern_drive"
+    },
+    "C": {
+      "item": "matteroverdrive:isolinear_circuit_mk3"
+    },
+    "F": {
+      "item": "matteroverdrive:network_flash_drive"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "H": {
+      "item": "matteroverdrive:h_compensator"
+    },
+    "N": {
+      "item": "matteroverdrive:integration_matrix"
+    },
+    "T": {
+      "tag": "c:plates/tritanium"
+    },
+    "M": {
+      "item": "matteroverdrive:me_conversion_matrix"
+    }
   },
   "result": {
     "id": "matteroverdrive:replicator",

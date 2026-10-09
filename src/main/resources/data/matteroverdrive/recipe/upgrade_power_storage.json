@@ -6,9 +6,15 @@
     " B "
   ],
   "key": {
-    "R": "minecraft:redstone",
-    "U": "matteroverdrive:upgrade_base",
-    "B": "matteroverdrive:hc_battery"
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "U": {
+      "item": "matteroverdrive:upgrade_base"
+    },
+    "B": {
+      "item": "matteroverdrive:hc_battery"
+    }
   },
   "result": {
     "id": "matteroverdrive:upgrade_power_storage",

@@ -7,10 +7,18 @@
     " C "
   ],
   "key": {
-    "B": "matteroverdrive:battery",
-    "R": "minecraft:redstone",
-    "U": "matteroverdrive:upgrade_base",
-    "C": "minecraft:quartz"
+    "B": {
+      "item": "matteroverdrive:battery"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "U": {
+      "item": "matteroverdrive:upgrade_base"
+    },
+    "C": {
+      "item": "minecraft:quartz"
+    }
   },
   "result": {
     "id": "matteroverdrive:upgrade_power",

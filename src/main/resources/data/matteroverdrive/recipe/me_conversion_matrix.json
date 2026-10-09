@@ -7,10 +7,18 @@
     "EIE"
   ],
   "key": {
-    "E": "minecraft:ender_pearl",
-    "I": "minecraft:iron_ingot",
-    "C": "matteroverdrive:isolinear_circuit_mk2",
-    "D": "#c:gems/dilithium"
+    "E": {
+      "item": "minecraft:ender_pearl"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "C": {
+      "item": "matteroverdrive:isolinear_circuit_mk2"
+    },
+    "D": {
+      "tag": "c:gems/dilithium"
+    }
   },
   "result": {
     "id": "matteroverdrive:me_conversion_matrix",

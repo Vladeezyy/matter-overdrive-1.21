@@ -7,11 +7,21 @@
     "P1P"
   ],
   "key": {
-    "C": "matteroverdrive:s_magnet",
-    "G": "minecraft:glass",
-    "D": "#c:gems/dilithium",
-    "P": "#c:plates/tritanium",
-    "1": "matteroverdrive:isolinear_circuit_mk2"
+    "C": {
+      "item": "matteroverdrive:s_magnet"
+    },
+    "G": {
+      "item": "minecraft:glass"
+    },
+    "D": {
+      "tag": "c:gems/dilithium"
+    },
+    "P": {
+      "tag": "c:plates/tritanium"
+    },
+    "1": {
+      "item": "matteroverdrive:isolinear_circuit_mk2"
+    }
   },
   "result": {
     "id": "matteroverdrive:forcefield_emitter",

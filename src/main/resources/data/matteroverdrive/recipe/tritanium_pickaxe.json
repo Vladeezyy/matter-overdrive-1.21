@@ -7,8 +7,12 @@
     " # "
   ],
   "key": {
-    "X": "#c:ingots/tritanium",
-    "#": "minecraft:stick"
+    "X": {
+      "tag": "c:ingots/tritanium"
+    },
+    "#": {
+      "item": "minecraft:stick"
+    }
   },
   "result": {
     "id": "matteroverdrive:tritanium_pickaxe",

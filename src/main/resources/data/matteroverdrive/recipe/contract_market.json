@@ -7,10 +7,18 @@
     " M "
   ],
   "key": {
-    "T": "matteroverdrive:tritanium_ingot",
-    "G": "minecraft:gold_ingot",
-    "E": "minecraft:emerald",
-    "M": "matteroverdrive:machine_casing"
+    "T": {
+      "item": "matteroverdrive:tritanium_ingot"
+    },
+    "G": {
+      "item": "minecraft:gold_ingot"
+    },
+    "E": {
+      "item": "minecraft:emerald"
+    },
+    "M": {
+      "item": "matteroverdrive:machine_casing"
+    }
   },
   "result": {
     "id": "matteroverdrive:contract_market",

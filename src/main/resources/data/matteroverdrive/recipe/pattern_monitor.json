@@ -7,10 +7,18 @@
     " F "
   ],
   "key": {
-    "H": "matteroverdrive:holo_sign",
-    "1": "matteroverdrive:isolinear_circuit_mk2",
-    "N": "matteroverdrive:network_switch",
-    "F": "matteroverdrive:network_flash_drive"
+    "H": {
+      "item": "matteroverdrive:holo_sign"
+    },
+    "1": {
+      "item": "matteroverdrive:isolinear_circuit_mk2"
+    },
+    "N": {
+      "item": "matteroverdrive:network_switch"
+    },
+    "F": {
+      "item": "matteroverdrive:network_flash_drive"
+    }
   },
   "result": {
     "id": "matteroverdrive:pattern_monitor",

@@ -7,9 +7,15 @@
     "I I"
   ],
   "key": {
-    "T": "#c:ingots/tritanium",
-    "W": "minecraft:black_wool",
-    "I": "minecraft:iron_ingot"
+    "T": {
+      "tag": "c:ingots/tritanium"
+    },
+    "W": {
+      "item": "minecraft:black_wool"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    }
   },
   "result": {
     "id": "matteroverdrive:weapon_handle",

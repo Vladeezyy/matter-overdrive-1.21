@@ -2,7 +2,9 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    "#c:ingots/tritanium"
+    {
+      "tag": "c:ingots/tritanium"
+    }
   ],
   "result": {
     "id": "matteroverdrive:tritanium_nugget",

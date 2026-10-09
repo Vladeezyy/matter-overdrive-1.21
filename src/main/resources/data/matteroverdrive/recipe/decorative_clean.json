@@ -6,7 +6,9 @@
     "TT"
   ],
   "key": {
-    "T": "#c:ingots/tritanium"
+    "T": {
+      "tag": "c:ingots/tritanium"
+    }
   },
   "result": {
     "id": "matteroverdrive:decorative_clean",

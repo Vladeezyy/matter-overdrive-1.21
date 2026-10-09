@@ -7,8 +7,12 @@
     "###"
   ],
   "key": {
-    "#": "matteroverdrive:decorative_tritanium_plate",
-    "C": "minecraft:coal"
+    "#": {
+      "item": "matteroverdrive:decorative_tritanium_plate"
+    },
+    "C": {
+      "item": "minecraft:coal"
+    }
   },
   "result": {
     "id": "matteroverdrive:decorative_carbon_fiber_plate",

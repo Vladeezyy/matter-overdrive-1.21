@@ -1,7 +1,9 @@
 {
   "type": "minecraft:smelting",
   "category": "misc",
-  "ingredient": "#c:ores/tritanium",
+  "ingredient": {
+    "tag": "c:ores/tritanium"
+  },
   "result": {
     "id": "matteroverdrive:tritanium_ingot"
   },

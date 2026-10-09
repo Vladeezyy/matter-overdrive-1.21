@@ -2,7 +2,9 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    "#c:storage_blocks/tritanium"
+    {
+      "tag": "c:storage_blocks/tritanium"
+    }
   ],
   "result": {
     "id": "matteroverdrive:tritanium_ingot",

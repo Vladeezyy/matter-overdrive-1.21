@@ -7,13 +7,27 @@
     " BH"
   ],
   "key": {
-    "I": "minecraft:iron_ingot",
-    "F": "matteroverdrive:forcefield_emitter",
-    "C": "matteroverdrive:isolinear_circuit_mk3",
-    "S": "matteroverdrive:weapon_receiver",
-    "P": "matteroverdrive:plasma_core",
-    "B": "matteroverdrive:battery",
-    "H": "matteroverdrive:weapon_handle"
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "F": {
+      "item": "matteroverdrive:forcefield_emitter"
+    },
+    "C": {
+      "item": "matteroverdrive:isolinear_circuit_mk3"
+    },
+    "S": {
+      "item": "matteroverdrive:weapon_receiver"
+    },
+    "P": {
+      "item": "matteroverdrive:plasma_core"
+    },
+    "B": {
+      "item": "matteroverdrive:battery"
+    },
+    "H": {
+      "item": "matteroverdrive:weapon_handle"
+    }
   },
   "result": {
     "id": "matteroverdrive:omni_tool",

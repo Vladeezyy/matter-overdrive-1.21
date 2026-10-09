@@ -51,6 +51,7 @@ final class AndroidGameTests {
         new io.netty.channel.embedded.EmbeddedChannel(connection);
         helper.getLevel().getServer().getPlayerList().placeNewPlayer(connection, player, cookie);
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+        player.spawnInvulnerableTime = 0;   // players are invulnerable for 3 s after joining
         net.minecraft.world.level.GameType.SURVIVAL.updatePlayerAbilities(player.getAbilities());   // abilities came from the creative default
         var pos = helper.absolutePos(new BlockPos(6, 1, 1)).getBottomCenter();
         player.moveTo(pos.x, pos.y, pos.z, 0, 0);
