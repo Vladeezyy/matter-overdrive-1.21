@@ -620,6 +620,11 @@
 - 96 GameTests pass; the DevScene matches the 1.21.10 screenshots (flat world: bolts fly off instead of hitting the
   bedrock room). Scene worlds: `run/saves/mo_scene_<mc>` (a `.mc_version` file inside), the current one at `mo_scene`.
 
+## 2026-10-09 — flaky GameTests fixed (every version branch)
+- The star map tests retry the homeworld claim (1.7.10 claimPlanet tries one random quadrant; quadrants with 1-3 stars
+  fill up when every test player claims), mad_scientist_trades expects the 7 sure trades (it asked for 8, ~8% flaky),
+  monitor_request_replicates counts a rare replication failure's matter.
+
 ## 1.21.10 / NeoForge 21.10.64 API notes (learned the hard way)
 **Workflow**
 - Resources: never hand-edit `src/main/resources/{assets,data}` — regenerate:
