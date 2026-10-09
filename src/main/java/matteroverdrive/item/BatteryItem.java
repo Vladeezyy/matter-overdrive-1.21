@@ -10,7 +10,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import matteroverdrive.compat.InfiniteEnergyHandler;
 import net.neoforged.neoforge.energy.ComponentEnergyStorage;
@@ -74,7 +73,8 @@ public class BatteryItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+        Consumer<Component> tooltip = tooltipLines::add;
         tooltip.accept(Component.translatable("tooltip.matteroverdrive.energy_stored",
                 creative ? Component.literal("∞") : MOText.energy(getEnergy(stack)), MOText.energy(capacity)).withStyle(ChatFormatting.YELLOW));
         tooltip.accept(Component.translatable("tooltip.matteroverdrive.energy_io", maxInsert, maxExtract).withStyle(ChatFormatting.GRAY));

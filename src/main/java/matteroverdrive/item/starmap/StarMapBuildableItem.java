@@ -15,7 +15,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 
 /** 1.7.10 ItemBuildableAbstract (+ ItemBuildingAbstract / ItemShipAbstract): stacks of 1, build start and owner on the stack. */
@@ -63,7 +62,8 @@ public abstract class StarMapBuildableItem extends Item implements Buildable {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+        Consumer<Component> tooltip = tooltipLines::add;
         String key = getDescriptionId() + ".details";
         if (!net.minecraft.locale.Language.getInstance().has(key)) return;
         for (String line : details().split("/n")) tooltip.accept(Component.literal(line).withStyle(ChatFormatting.GRAY));

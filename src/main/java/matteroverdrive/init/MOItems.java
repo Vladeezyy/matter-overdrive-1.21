@@ -68,10 +68,10 @@ public final class MOItems {
     public static final DeferredItem<Item> ISOLINEAR_CIRCUIT_MK4 = simple("isolinear_circuit_mk4");
 
     // Tools: tritanium is iron-tier with 3122 durability; damage/speed follow the vanilla iron tools.
-    public static final DeferredItem<Item> TRITANIUM_SWORD = item("tritanium_sword", Item::new,
-            p -> p.sword(MOMaterials.TRITANIUM_TOOL, 3f, -2.4f));
-    public static final DeferredItem<Item> TRITANIUM_PICKAXE = item("tritanium_pickaxe", Item::new,
-            p -> p.pickaxe(MOMaterials.TRITANIUM_TOOL, 1f, -2.8f));
+    public static final DeferredItem<net.minecraft.world.item.SwordItem> TRITANIUM_SWORD = item("tritanium_sword",
+            p -> new net.minecraft.world.item.SwordItem(MOMaterials.TRITANIUM_TOOL, 3f, -2.4f, p), p -> p);
+    public static final DeferredItem<net.minecraft.world.item.PickaxeItem> TRITANIUM_PICKAXE = item("tritanium_pickaxe",
+            p -> new net.minecraft.world.item.PickaxeItem(MOMaterials.TRITANIUM_TOOL, 1f, -2.8f, p), p -> p);
     public static final DeferredItem<AxeItem> TRITANIUM_AXE = item("tritanium_axe",
             p -> new AxeItem(MOMaterials.TRITANIUM_TOOL, 6f, -3.1f, p), p -> p);
     public static final DeferredItem<HoeItem> TRITANIUM_HOE = item("tritanium_hoe",
@@ -270,7 +270,7 @@ public final class MOItems {
     }
 
     private static DeferredItem<Item> armor(String name, ArmorType type) {
-        return item(name, Item::new, p -> p.humanoidArmor(MOMaterials.TRITANIUM_ARMOR, type));
+        return item(name, p -> new net.minecraft.world.item.ArmorItem(MOMaterials.TRITANIUM_ARMOR, type, p), p -> p);
     }
 
     private static DeferredItem<BlockItem> block(String name, net.neoforged.neoforge.registries.DeferredBlock<?> block) {

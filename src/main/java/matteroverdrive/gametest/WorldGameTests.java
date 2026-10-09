@@ -23,7 +23,7 @@ final class WorldGameTests {
     }
 
     private static void check(GameTestHelper helper, boolean ok, String message) {
-        helper.assertTrue(ok, Component.literal(message));
+        helper.assertTrue(ok, message);
     }
 
     /** Failed animals breed failed young, and only with their own kind. */
@@ -62,7 +62,7 @@ final class WorldGameTests {
     private static void tritaniumCrate(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, matteroverdrive.init.MOBlocks.crate(DyeColor.ORANGE).get());
-        var crate = (matteroverdrive.block.entity.TritaniumCrateBlockEntity) helper.getBlockEntity(pos, matteroverdrive.block.entity.TritaniumCrateBlockEntity.class);
+        var crate = (matteroverdrive.block.entity.TritaniumCrateBlockEntity) helper.<matteroverdrive.block.entity.TritaniumCrateBlockEntity>getBlockEntity(pos);
         check(helper, crate.getContainerSize() == 54, "size " + crate.getContainerSize());
         crate.setItem(53, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DIAMOND, 7));
         BlockPos abs = helper.absolutePos(pos);
@@ -133,7 +133,7 @@ final class WorldGameTests {
     private static void transporter(GameTestHelper helper) {
         BlockPos pos = new BlockPos(1, 1, 1);
         helper.setBlock(pos, matteroverdrive.init.MOBlocks.TRANSPORTER.get());
-        var t = helper.getBlockEntity(pos, matteroverdrive.block.entity.TransporterBlockEntity.class);
+        var t = helper.<matteroverdrive.block.entity.TransporterBlockEntity>getBlockEntity(pos);
         t.getEnergy().set(100000);
         BlockPos abs = helper.absolutePos(pos);
         var drive = new net.minecraft.world.item.ItemStack(matteroverdrive.init.MOItems.TRANSPORT_FLASH_DRIVE.get());
@@ -152,7 +152,7 @@ final class WorldGameTests {
     private static void androidSpawner(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, matteroverdrive.init.MOBlocks.ANDROID_SPAWNER.get());
-        var spawner = helper.getBlockEntity(pos, matteroverdrive.block.entity.AndroidSpawnerBlockEntity.class);
+        var spawner = helper.<matteroverdrive.block.entity.AndroidSpawnerBlockEntity>getBlockEntity(pos);
         var scoreboard = helper.getLevel().getScoreboard();
         String teamName = "mo_spawner_test";
         if (scoreboard.getPlayerTeam(teamName) != null) scoreboard.removePlayerTeam(scoreboard.getPlayerTeam(teamName));

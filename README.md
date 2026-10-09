@@ -1,11 +1,11 @@
-# Matter Overdrive for Minecraft 1.21.5 (NeoForge)
+# Matter Overdrive for Minecraft 1.21.4 (NeoForge)
 
 ![Matter Overdrive](docs/modrinth/banner.png)
 
 An unofficial port of [Matter Overdrive](https://github.com/simeonradivoev/MatterOverdrive) by Simeon Radivoev
-from Minecraft 1.7.10 to **Minecraft 1.21.5** on **NeoForge 21.5**.
+from Minecraft 1.7.10 to **Minecraft 1.21.4** on **NeoForge 21.4**.
 
-This is the `1.21.5` branch. Every supported Minecraft version has its own branch with the same game code: `main`
+This is the `1.21.4` branch. Every supported Minecraft version has its own branch with the same game code: `main`
 (1.21.10), `1.21.8`, `1.21.5`, `1.21.4`, `1.21.3` and `1.21.1`. The APIs that differ are bridged in
 `matteroverdrive.compat`, and `tools/backport.py` converts the generated resources for the branch's version.
 

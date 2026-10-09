@@ -50,20 +50,20 @@ public class Star extends SpaceBody {
 
     public void readNBT(CompoundTag tag, HolderLookup.Provider registries) {
         readBody(tag);
-        x = tag.getFloatOr("X", 0);
-        y = tag.getFloatOr("Y", 0);
-        z = tag.getFloatOr("Z", 0);
-        size = tag.getFloatOr("Size", 0);
-        mass = tag.getFloatOr("Mass", 0);
-        type = tag.getByteOr("Type", (byte) 0);
-        temperature = tag.getIntOr("Temperature", 0);
-        color = tag.getIntOr("Color", 0);
-        seed = tag.getIntOr("Seed", 0);
-        generated = tag.getBooleanOr("Generated", false);
-        ListTag list = tag.getListOrEmpty("Planets");
+        x = tag.getFloat("X");
+        y = tag.getFloat("Y");
+        z = tag.getFloat("Z");
+        size = tag.getFloat("Size");
+        mass = tag.getFloat("Mass");
+        type = tag.getByte("Type");
+        temperature = tag.getInt("Temperature");
+        color = tag.getInt("Color");
+        seed = tag.getInt("Seed");
+        generated = tag.getBoolean("Generated");
+        ListTag list = tag.getList("Planets", net.minecraft.nbt.Tag.TAG_COMPOUND);
         for (int i = 0; i < list.size(); i++) {
             Planet planet = new Planet();
-            planet.readNBT(list.getCompoundOrEmpty(i), registries);
+            planet.readNBT(list.getCompound(i), registries);
             addPlanet(planet);
         }
     }

@@ -12,7 +12,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
@@ -109,7 +108,8 @@ public class PortableDecomposerItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+        Consumer<Component> tooltip = tooltipLines::add;
         tooltip.accept(Component.translatable("item.matteroverdrive.portable_decomposer.details").withStyle(ChatFormatting.GRAY));
         tooltip.accept(Component.translatable("tooltip.matteroverdrive.energy_stored", MOText.energy(getEnergy(stack)), MOText.energy(CAPACITY))
                 .withStyle(ChatFormatting.YELLOW));

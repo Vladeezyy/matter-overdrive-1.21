@@ -34,13 +34,8 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 @EventBusSubscriber(modid = MatterOverdrive.MODID, value = Dist.CLIENT)
 public class MatterOverdriveClient {
     @SubscribeEvent
-    static void standaloneModels(net.neoforged.neoforge.client.event.ModelEvent.RegisterStandalone event) {
+    static void standaloneModels(net.neoforged.neoforge.client.event.ModelEvent.RegisterAdditional event) {
         MachineRenderers.registerModels(event);
-    }
-
-    @SubscribeEvent
-    static void pipelines(net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent event) {
-        matteroverdrive.client.starmap.HoloRenderTypes.register(event);
     }
 
     /** 1.7.10 GalaxyClient.onClientTick: the client's galaxy runs its travel events too. */
@@ -127,6 +122,7 @@ public class MatterOverdriveClient {
     @SubscribeEvent
     static void registerSelectProperties(net.neoforged.neoforge.client.event.RegisterSelectItemModelPropertyEvent event) {
         event.register(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "barrel"), BarrelProperty.TYPE);
+        event.register(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "security_type"), SecurityTypeProperty.TYPE);
     }
 
     @SubscribeEvent

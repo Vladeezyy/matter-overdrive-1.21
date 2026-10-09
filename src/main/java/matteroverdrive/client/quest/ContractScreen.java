@@ -12,7 +12,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import matteroverdrive.compat.MouseButtonEvent;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
@@ -128,7 +127,7 @@ public class ContractScreen extends Screen {
         boolean doubleClick = false;
         QuestStack stack = quest();
         if (stack != null && canAccept(stack) && in(event.x(), event.y(), left + 14, top + HEIGHT - 28, 68, 12)) {
-            int slot = hand == InteractionHand.OFF_HAND ? 40 : minecraft.player.getInventory().getSelectedSlot();
+            int slot = hand == InteractionHand.OFF_HAND ? 40 : minecraft.player.getInventory().selected;
             PacketDistributor.sendToServer(new QuestPayloads.QuestAction(QuestPayloads.Action.ADD, slot));
             onClose();
             return true;

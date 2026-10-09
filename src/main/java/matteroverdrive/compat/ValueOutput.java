@@ -10,7 +10,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 
 /**
- * Stand-in for the 1.21.6+ {@code net.minecraft.world.level.storage.ValueOutput}: the subset of its API the
+ * 1.21.1 stand-in for the 1.21.6+ {@code net.minecraft.world.level.storage.ValueOutput}: the subset of its API the
  * mod uses, written into a CompoundTag.
  */
 public final class ValueOutput {

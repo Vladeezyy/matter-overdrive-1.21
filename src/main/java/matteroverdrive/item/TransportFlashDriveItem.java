@@ -8,7 +8,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,7 +34,8 @@ public class TransportFlashDriveItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+        Consumer<Component> tooltip = tooltipLines::add;
         tooltip.accept(Component.translatable("item.matteroverdrive.transport_flash_drive.details").withStyle(ChatFormatting.GRAY));
         BlockPos target = getTarget(stack);
         if (target != null) {

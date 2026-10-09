@@ -54,8 +54,8 @@ public class ImageStructurePiece extends StructurePiece {
 
     public ImageStructurePiece(CompoundTag tag) {
         super(MOStructures.IMAGE_PIECE.get(), tag);
-        this.building = Building.valueOf(tag.getStringOr("Building", "ANDROID_HOUSE"));
-        this.seed = tag.getLongOr("Seed", 0);
+        this.building = Building.valueOf(tag.contains("Building") ? tag.getString("Building") : "ANDROID_HOUSE");
+        this.seed = tag.getLong("Seed");
     }
 
     private static BoundingBox box(Building building, BlockPos origin) {
@@ -151,7 +151,7 @@ public class ImageStructurePiece extends StructurePiece {
     private static <T extends Mob> void spawn(WorldGenLevel level, EntityType<T> type, double x, double y, double z, Consumer<T> setup) {
         T mob = type.create(level.getLevel(), EntitySpawnReason.STRUCTURE);
         if (mob == null) return;
-        mob.snapTo(x, y, z, level.getRandom().nextFloat() * 360, 0);
+        mob.moveTo(x, y, z, level.getRandom().nextFloat() * 360, 0);
         mob.finalizeSpawn(level, level.getCurrentDifficultyAt(mob.blockPosition()), EntitySpawnReason.STRUCTURE, null);
         setup.accept(mob);
         mob.setPersistenceRequired();

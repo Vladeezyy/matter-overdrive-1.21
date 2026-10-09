@@ -75,27 +75,27 @@ public class Planet extends SpaceBody {
         buildings.clear();
         fleet.clear();
         for (int i = 0; i < SLOT_COUNT; i++) {
-            inventory[i] = tag.getCompound("Slot" + i).map(t -> loadStack(registries, t)).orElse(ItemStack.EMPTY);
+            inventory[i] = matteroverdrive.compat.Nbt.compound(tag, "Slot" + i).map(t -> loadStack(registries, t)).orElse(ItemStack.EMPTY);
         }
-        buildingSpaces = tag.getIntOr("BuildingSpaces", 0);
+        buildingSpaces = tag.getInt("BuildingSpaces");
         for (int i = 0; i < getBuildingSpaces(); i++) {
-            tag.getCompound("Building" + i).map(t -> loadStack(registries, t)).filter(s -> !s.isEmpty()).ifPresent(buildings::add);
+            matteroverdrive.compat.Nbt.compound(tag, "Building" + i).map(t -> loadStack(registries, t)).filter(s -> !s.isEmpty()).ifPresent(buildings::add);
         }
-        fleetSpaces = tag.getIntOr("FleetSpaces", 0);
+        fleetSpaces = tag.getInt("FleetSpaces");
         for (int i = 0; i < getFleetSpaces(); i++) {
-            tag.getCompound("Ship" + i).map(t -> loadStack(registries, t)).filter(s -> !s.isEmpty()).ifPresent(fleet::add);
+            matteroverdrive.compat.Nbt.compound(tag, "Ship" + i).map(t -> loadStack(registries, t)).filter(s -> !s.isEmpty()).ifPresent(fleet::add);
         }
         ownerUUID = null;
-        tag.getString("OwnerUUID").ifPresent(s -> {
+        matteroverdrive.compat.Nbt.string(tag, "OwnerUUID").ifPresent(s -> {
             try {
                 ownerUUID = UUID.fromString(s);
             } catch (IllegalArgumentException ignored) {}
         });
-        homeworld = tag.getBooleanOr("Homeworld", false);
-        size = tag.getFloatOr("Size", 0);
-        type = tag.getByteOr("Type", (byte) 0);
-        orbit = tag.getFloatOr("Orbit", 0);
-        seed = tag.getIntOr("Seed", 0);
+        homeworld = tag.getBoolean("Homeworld");
+        size = tag.getFloat("Size");
+        type = tag.getByte("Type");
+        orbit = tag.getFloat("Orbit");
+        seed = tag.getInt("Seed");
     }
 
     // --- update ---------------------------------------------------------------------------------

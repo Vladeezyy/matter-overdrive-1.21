@@ -3,7 +3,6 @@ package matteroverdrive.client.screen;
 import matteroverdrive.menu.ContractMarketMenu;
 import matteroverdrive.menu.MachineMenu;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;

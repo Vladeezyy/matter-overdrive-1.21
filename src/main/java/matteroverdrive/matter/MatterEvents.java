@@ -73,7 +73,7 @@ public final class MatterEvents {
         if (!matteroverdrive.item.PortableDecomposerItem.addToList(output, event.getRight())) return;
         event.setOutput(output);
         event.setMaterialCost(1);
-        event.setXpCost(3);
+        event.setCost(3);
     }
 
     /** Recipes and data maps were (re)loaded on the server: recalculate on next use. */

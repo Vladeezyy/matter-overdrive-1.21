@@ -33,11 +33,11 @@ public class ScanBlockLogic extends AbstractLogic {
     }
 
     public int getBlockScan(QuestStack stack) {
-        return tag(stack).getShortOr("BlockScan", (short) 0);
+        return tag(stack).getShort("BlockScan");
     }
 
     public int getMaxBlockScan(QuestStack stack) {
-        return tag(stack).getShortOr("MaxBlockScan", (short) 0);
+        return tag(stack).getShort("MaxBlockScan");
     }
 
     private String replace(QuestStack stack, String text) {

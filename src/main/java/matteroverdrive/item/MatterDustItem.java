@@ -8,7 +8,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
 
 /**
  * 1.7.10 MatterDust. A failed decomposition or replication leaves matter dust carrying the item's matter; the
@@ -37,7 +36,8 @@ public class MatterDustItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+        Consumer<Component> tooltip = tooltipLines::add;
         int matter = getMatter(stack);
         if (matter > 0) {
             tooltip.accept(Component.translatable("tooltip.matteroverdrive.matter", matter).withStyle(ChatFormatting.BLUE));

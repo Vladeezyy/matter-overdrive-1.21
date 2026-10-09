@@ -14,7 +14,6 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
@@ -110,7 +109,7 @@ public final class AndroidHud {
             y += 20;
             float ammo = EnergyWeaponItem.getEnergy(held) / (float) EnergyWeaponItem.getCapacity(held);
             int packs = 0;
-            for (ItemStack stack : player.getInventory().getNonEquipmentItems()) {
+            for (ItemStack stack : player.getInventory().items) {
                 if (stack.getItem() instanceof EnergyPackItem) packs += stack.getCount();
             }
             wx += iconWithInfo(g, font, "ammo", Math.round(ammo * 100) + "% | " + packs, lerp(HOLO_RED, BASE, ammo), wx, y, 0, 18);

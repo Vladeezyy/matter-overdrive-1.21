@@ -76,9 +76,11 @@ public class TritaniumCrateBlock extends BaseEntityBlock {
         }
     }
 
+    /** The contents go into the dropped item (container component), not onto the ground. */
     @Override
-    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
-        Containers.updateNeighboursAfterDestroy(state, level, pos);
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        if (!state.is(newState.getBlock())) level.updateNeighbourForOutputSignal(pos, this);
+        super.onRemove(state, level, pos, newState, movedByPiston);
     }
 
     @Override

@@ -587,6 +587,24 @@
   oceans) and sinks into the floor to stay submerged, no "generate buildings" config (use a datapack), not rotated
   (1.7.10 never rotated them either).
 
+## 2026-10-09 — Minecraft 1.21.4 (NeoForge 21.4.158), branch `1.21.4`
+- Made from 1.21.5; 1.21.4 lacks the 1.21.5 changes, bridged like on 1.21.1: CompoundTag Or / Optional getters
+  (`compat.Nbt`, compat ValueInput over plain getters), BlockEntity.preRemoveSideEffects (CompatBlockEntity, called
+  from MachineBlock.onRemove; the crate updates comparators in its onRemove), tooltips as a list (TooltipDisplay
+  doesn't exist), the old MobEffects names, Entity.moveTo, Inventory.selected / items, SwordItem / PickaxeItem /
+  ArmorItem with materials, inventoryTick(stack, level, entity, slot, selected), render pipelines (HoloRenderTypes
+  from state shards with CoreShaders), standalone models (ModelEvent.RegisterAdditional + getStandaloneModel(id),
+  BakedModel), ItemModelResolver.updateForTopItem's leftHand flag, animal variants (the failed pig / cow / chicken
+  renderers swap getTextureLocation; 1.7.10 64x32 textures), GameTests from a @GameTestGenerator with @BeforeBatch.
+- 1.21.4 has client item definitions but no `minecraft:component` select property: `client/SecurityTypeProperty`
+  (`matteroverdrive:security_type`), and backport.py rewrites the security protocol's definition to it. Spawn eggs:
+  the vanilla template with the 1.7.10 egg colours as constant tints.
+- Test fixes (all branches): the star map tests retry the homeworld claim (1.7.10 claimPlanet tries one random
+  quadrant; quadrants with 1-3 stars fill up when every test player claims), mad_scientist_trades expects the 7 sure
+  trades (it asked for 8, ~8% flaky), monitor_request_replicates counts a rare replication failure's matter. Before
+  1.21.5 the game test server keeps run/world (and its galaxy) between runs: build.gradle deletes it first.
+- 95 GameTests pass (the generator form, like 1.21.1; 25 runs in a row); the DevScene matches the 1.21.10 screenshots.
+
 ## 2026-10-09 — Minecraft 1.21.5 (NeoForge 21.5.98), branch `1.21.5`
 - Made from 1.21.8; 1.21.5 lacks the 1.21.6 changes: ValueInput / ValueOutput (compat, delegating to the 1.21.5
   CompoundTag Or-getters; CompatBlockEntity bridges the CompoundTag saves; entities bridge add/readAdditionalSaveData;

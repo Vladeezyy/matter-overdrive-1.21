@@ -30,7 +30,7 @@ final class SecurityGameTests {
     }
 
     private static void check(GameTestHelper helper, boolean ok, String message) {
-        helper.assertTrue(ok, Component.literal(message));
+        helper.assertTrue(ok, message);
     }
 
     private static void sneakUse(ServerPlayer player, ItemStack stack) {
@@ -67,7 +67,7 @@ final class SecurityGameTests {
 
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, MOBlocks.CONTRACT_MARKET.get());
-        var machine = helper.getBlockEntity(pos, ContractMarketBlockEntity.class);
+        var machine = helper.<ContractMarketBlockEntity>getBlockEntity(pos);
         check(helper, machine.isUseableByPlayer(other) && machine.canRemove(other), "unclaimed machines are everyone's");
         check(helper, useOn(helper, owner, protocol, pos) && protocol.getCount() == 2 && owner.getUUID().equals(machine.getOwner()), "claim");
         check(helper, !useOn(helper, owner, protocol, pos) && protocol.getCount() == 2, "claimed twice");
@@ -114,7 +114,7 @@ final class SecurityGameTests {
         QuestEvents.manageQuestCompletion(player);
         check(helper, PlayerQuests.get(player).hasCompletedQuest(contract), "crash landing not completed " + active.getData());
         ItemStack relay = ItemStack.EMPTY;
-        for (ItemStack s : player.getInventory()) {
+        for (ItemStack s : matteroverdrive.compat.ContainerItems.of(player.getInventory())) {
             if (s.is(MODecorative.COILS.get().asItem())) relay = s;
         }
         check(helper, !relay.isEmpty() && "Communication Relay".equals(relay.getHoverName().getString()), "relay " + relay);

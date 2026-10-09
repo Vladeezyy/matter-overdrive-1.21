@@ -9,7 +9,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
 
 /** 1.7.10 ItemUpgrade: one damage value per upgrade there, one item per upgrade here. */
 public class UpgradeItem extends Item {
@@ -25,7 +24,8 @@ public class UpgradeItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+        Consumer<Component> tooltip = tooltipLines::add;
         upgrades.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach(e -> tooltip.accept(describe(e.getKey(), e.getValue())));
     }
 

@@ -3,7 +3,6 @@ package matteroverdrive.client.screen;
 import matteroverdrive.block.entity.ReplicatorBlockEntity;
 import matteroverdrive.menu.ReplicatorMenu;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;

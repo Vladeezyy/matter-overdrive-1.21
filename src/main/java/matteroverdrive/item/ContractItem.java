@@ -17,7 +17,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 
 /**
@@ -65,7 +64,8 @@ public class ContractItem extends Item {
 
     /** 1.7.10 addDetails: the objectives. */
     @Override
-    public void appendHoverText(ItemStack contract, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack contract, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+        Consumer<Component> tooltip = tooltipLines::add;
         QuestStack stack = getQuest(contract);
         Player player = clientPlayer.get();
         if (stack == null || player == null) return;

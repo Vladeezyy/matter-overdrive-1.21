@@ -24,7 +24,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.PacketDistributor;
-import net.minecraft.client.renderer.RenderPipelines;
 
 /**
  * 1.7.10 GuiAndroidStation: the biotic stat tree (a 4x4 grid of holo buttons with arrows from their roots), the

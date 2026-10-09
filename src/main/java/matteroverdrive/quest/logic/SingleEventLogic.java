@@ -13,7 +13,7 @@ public class SingleEventLogic extends AbstractLogic {
     }
 
     public boolean hasEventFired(QuestStack stack) {
-        return tag(stack).getBooleanOr("e", false);
+        return tag(stack).getBoolean("e");
     }
 
     @Override

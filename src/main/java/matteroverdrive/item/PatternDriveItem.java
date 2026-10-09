@@ -13,7 +13,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.CustomModelData;
-import net.minecraft.world.item.component.TooltipDisplay;
 
 /**
  * 1.7.10 PatternDrive: stores up to {@code capacity} item patterns (2 for the pattern drive). The icon shows
@@ -69,7 +68,8 @@ public class PatternDriveItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+        Consumer<Component> tooltip = tooltipLines::add;
         for (ItemPattern p : getPatterns(stack)) {
             tooltip.accept(Component.empty().append(p.toStack().getHoverName()).append(" " + p.progress() + "%")
                     .withStyle(p.isComplete() ? ChatFormatting.GREEN : ChatFormatting.YELLOW));

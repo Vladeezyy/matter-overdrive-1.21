@@ -134,7 +134,7 @@ public class AndroidSpawnerBlockEntity extends MachineBlockEntity {
         double x = pos.getX() + Mth.clamp(server.random.nextGaussian(), 0, 1) * spawnRange;
         double z = pos.getZ() + Mth.clamp(server.random.nextGaussian(), 0, 1) * spawnRange;
         int topY = Math.min(server.getHeight(Heightmap.Types.MOTION_BLOCKING, Mth.floor(x), Mth.floor(z)), pos.getY() + 3);
-        android.snapTo(x, topY, z, server.random.nextFloat() * 360, 0);
+        android.moveTo(x, topY, z, server.random.nextFloat() * 360, 0);
         // 1.7.10 getCanSpawnHere(true, true, true): not peaceful, no block collision, no liquid
         if (server.getDifficulty() == Difficulty.PEACEFUL || !server.noCollision(android) || server.containsAnyLiquid(android.getBoundingBox())) {
             return;

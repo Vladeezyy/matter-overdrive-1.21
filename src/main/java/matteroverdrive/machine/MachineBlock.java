@@ -71,6 +71,16 @@ public abstract class MachineBlock extends BaseEntityBlock {
         return type.get().create(pos, state);
     }
 
+    /** Before 1.21.5: the preRemoveSideEffects hook (drops the contents, etc.). */
+    @Override
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        if (!state.is(newState.getBlock()) && !matteroverdrive.compat.CompatBlockEntity.skipRemoveSideEffects
+                && level.getBlockEntity(pos) instanceof matteroverdrive.compat.CompatBlockEntity be) {
+            be.preRemoveSideEffects(pos, state);
+        }
+        super.onRemove(state, level, pos, newState, movedByPiston);
+    }
+
     @Override
     public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
         return createTickerHelper(blockEntityType, type.get(), level.isClientSide() ? MachineBlockEntity::clientTick : MachineBlockEntity::serverTick);

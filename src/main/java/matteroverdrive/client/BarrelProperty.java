@@ -27,9 +27,4 @@ public record BarrelProperty() implements SelectItemModelProperty<String> {
     public SelectItemModelProperty.Type<BarrelProperty, String> type() {
         return TYPE;
     }
-
-    @Override
-    public Codec<String> valueCodec() {
-        return Codec.STRING;
-    }
 }

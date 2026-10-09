@@ -7,8 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.ModelBlockRenderer;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.util.FormattedCharSequence;
 
 /**
@@ -45,8 +44,9 @@ public final class SubmitNodeCollector {
         Minecraft.getInstance().font.drawInBatch(text, x, y, color, shadow, pose.last().pose(), buffers, mode, backgroundColor, light);
     }
 
-    public void submitBlockModel(PoseStack pose, RenderType type, BlockStateModel model, float r, float g, float b, int light, int overlay,
+    public void submitBlockModel(PoseStack pose, RenderType type, BakedModel model, float r, float g, float b, int light, int overlay,
                                  int outlineColor) {
-        ModelBlockRenderer.renderModel(pose.last(), buffers.getBuffer(type), model, r, g, b, light, overlay);
+        Minecraft.getInstance().getBlockRenderer().getModelRenderer().renderModel(pose.last(), buffers.getBuffer(type), null, model,
+                r, g, b, light, overlay);
     }
 }

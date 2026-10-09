@@ -18,7 +18,7 @@ public class RomulanAleItem extends Item {
     @Override
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
         if (!level.isClientSide() && !(entity instanceof Player player && Android.isAndroid(player))) {
-            entity.addEffect(new MobEffectInstance(MobEffects.NAUSEA, 160, 8));
+            entity.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 160, 8));
         }
         return super.finishUsingItem(stack, level, entity);
     }

@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
 import matteroverdrive.compat.render.SubmitNodeCollector;
 import net.minecraft.resources.ResourceLocation;
@@ -49,7 +48,7 @@ public interface HoloSink {
             public void item(PoseStack pose, net.minecraft.world.item.ItemStack stack, float x, float y) {
                 var mc = net.minecraft.client.Minecraft.getInstance();
                 var state = new net.minecraft.client.renderer.item.ItemStackRenderState();
-                mc.getItemModelResolver().updateForTopItem(state, stack, net.minecraft.world.item.ItemDisplayContext.GUI, mc.level, null, 0);
+                mc.getItemModelResolver().updateForTopItem(state, stack, net.minecraft.world.item.ItemDisplayContext.GUI, false, mc.level, null, 0);
                 if (state.isEmpty()) return;
                 pose.pushPose();
                 pose.translate(x + 8, y + 8, 0);

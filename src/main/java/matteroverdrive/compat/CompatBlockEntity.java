@@ -2,12 +2,16 @@ package matteroverdrive.compat;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
-/** Bridge to the 1.21.6+ block entity saves through {@link ValueOutput} / {@link ValueInput}. */
+/**
+ * Bridge to the 1.21.10 block entity hooks: saves through {@link ValueOutput}/{@link ValueInput}, implicit
+ * components through {@link DataComponentGetter}, and {@link #preRemoveSideEffects} (called by the block's onRemove).
+ */
 public abstract class CompatBlockEntity extends BlockEntity {
     protected CompatBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -18,6 +22,14 @@ public abstract class CompatBlockEntity extends BlockEntity {
     protected void loadAdditional(ValueInput input) {}
 
     public void removeComponentsFromTag(ValueOutput output) {}
+
+    protected void applyImplicitComponents(DataComponentGetter components) {}
+
+    /** Set around a setBlock that 1.21.10 would do with UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS (the dev scene). */
+    public static boolean skipRemoveSideEffects;
+
+    /** 1.21.10 BlockEntity.preRemoveSideEffects: the block is being removed (not just its state changed). */
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {}
 
     @Override
     protected final void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
@@ -35,5 +47,17 @@ public abstract class CompatBlockEntity extends BlockEntity {
     public final void removeComponentsFromTag(CompoundTag tag) {
         super.removeComponentsFromTag(tag);
         removeComponentsFromTag(ValueOutput.of(tag, net.minecraft.core.RegistryAccess.EMPTY));
+    }
+
+    @Override
+    protected final void applyImplicitComponents(BlockEntity.DataComponentInput input) {
+        super.applyImplicitComponents(input);
+        applyImplicitComponents(new DataComponentGetter() {
+            @Override
+            @SuppressWarnings("unchecked")
+            public <T> T get(DataComponentType<? extends T> type) {
+                return input.get((DataComponentType<T>) type);
+            }
+        });
     }
 }

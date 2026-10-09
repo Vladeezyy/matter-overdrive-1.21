@@ -94,7 +94,7 @@ public class MatterOverdrive {
         event.put(MOEntities.FAILED_PIG.get(), net.minecraft.world.entity.animal.Pig.createAttributes().build());
         event.put(MOEntities.FAILED_COW.get(), net.minecraft.world.entity.animal.Cow.createAttributes().build());
         event.put(MOEntities.FAILED_CHICKEN.get(), net.minecraft.world.entity.animal.Chicken.createAttributes().build());
-        event.put(MOEntities.FAILED_SHEEP.get(), net.minecraft.world.entity.animal.sheep.Sheep.createAttributes().build());
+        event.put(MOEntities.FAILED_SHEEP.get(), net.minecraft.world.entity.animal.Sheep.createAttributes().build());
     }
 
     private static void registerSpawnPlacements(net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent event) {

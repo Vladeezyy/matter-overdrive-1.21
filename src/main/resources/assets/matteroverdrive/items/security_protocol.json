@@ -1,8 +1,7 @@
 {
   "model": {
     "type": "minecraft:select",
-    "property": "minecraft:component",
-    "component": "matteroverdrive:security_type",
+    "property": "matteroverdrive:security_type",
     "cases": [
       {
         "when": 0,

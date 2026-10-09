@@ -69,10 +69,6 @@ public class TritaniumCrateBlockEntity extends RandomizableContainerBlockEntity 
         }
     }
 
-    /** The contents go into the dropped item (container component), not onto the ground. */
-    @Override
-    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
-    }
 
     @Override
     public int getContainerSize() {

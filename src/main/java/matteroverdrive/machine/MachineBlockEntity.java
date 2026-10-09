@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import matteroverdrive.init.MODataComponents;
 import matteroverdrive.item.UpgradeItem;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.component.DataComponentGetter;
+import matteroverdrive.compat.DataComponentGetter;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Containers;
@@ -290,7 +290,7 @@ public abstract class MachineBlockEntity extends matteroverdrive.compat.CompatBl
     /** Unclaimed, or the owner, a creative player or someone carrying the owner's [Access] protocol. */
     public boolean isUseableByPlayer(net.minecraft.world.entity.player.Player player) {
         if (owner == null || owner.equals(player.getUUID()) || player.getAbilities().instabuild) return true;
-        for (ItemStack stack : player.getInventory()) {
+        for (ItemStack stack : matteroverdrive.compat.ContainerItems.of(player.getInventory())) {
             if (matteroverdrive.item.SecurityProtocolItem.is(stack, matteroverdrive.item.SecurityProtocolItem.ACCESS, owner)) return true;
         }
         return false;

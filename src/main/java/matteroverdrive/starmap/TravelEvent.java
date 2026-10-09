@@ -36,11 +36,11 @@ public class TravelEvent {
 
     public static TravelEvent fromNBT(CompoundTag tag, HolderLookup.Provider registries) {
         TravelEvent event = new TravelEvent();
-        event.from = GalacticPosition.fromNBT(tag.getCompoundOrEmpty("From"));
-        event.to = GalacticPosition.fromNBT(tag.getCompoundOrEmpty("To"));
-        event.ship = tag.getCompound("Ship").map(t -> Planet.loadStack(registries, t)).orElse(ItemStack.EMPTY);
-        event.timeLength = tag.getIntOr("TimeLength", 0);
-        event.timeStart = tag.getLongOr("TimeStart", 0);
+        event.from = GalacticPosition.fromNBT(tag.getCompound("From"));
+        event.to = GalacticPosition.fromNBT(tag.getCompound("To"));
+        event.ship = matteroverdrive.compat.Nbt.compound(tag, "Ship").map(t -> Planet.loadStack(registries, t)).orElse(ItemStack.EMPTY);
+        event.timeLength = tag.getInt("TimeLength");
+        event.timeStart = tag.getLong("TimeStart");
         return event;
     }
 

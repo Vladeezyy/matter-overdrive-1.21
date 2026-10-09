@@ -29,7 +29,7 @@ final class AndroidGameTests {
     }
 
     private static void check(GameTestHelper helper, boolean ok, String message) {
-        helper.assertTrue(ok, Component.literal(message));
+        helper.assertTrue(ok, message);
     }
 
     /** GameTestHelper.makeMockServerPlayerInLevel, but in survival (the vanilla mock is hard-wired to creative). */
@@ -38,17 +38,23 @@ final class AndroidGameTests {
                 new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "test-android"), false);
         ServerPlayer player = new ServerPlayer(helper.getLevel().getServer(), helper.getLevel(), cookie.gameProfile(), cookie.clientInformation()) {
             @Override
-            public net.minecraft.world.level.GameType gameMode() {
-                return net.minecraft.world.level.GameType.SURVIVAL;
+            public boolean isCreative() {
+                return false;
+            }
+
+            @Override
+            public boolean isSpectator() {
+                return false;
             }
         };
         var connection = new net.minecraft.network.Connection(net.minecraft.network.protocol.PacketFlow.SERVERBOUND);
         new io.netty.channel.embedded.EmbeddedChannel(connection);
         helper.getLevel().getServer().getPlayerList().placeNewPlayer(connection, player, cookie);
         player.setClientLoaded(true);      // players are invulnerable until their client reports it has loaded
+        player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
         net.minecraft.world.level.GameType.SURVIVAL.updatePlayerAbilities(player.getAbilities());   // abilities came from the creative default
         var pos = helper.absolutePos(new BlockPos(6, 1, 1)).getBottomCenter();
-        player.snapTo(pos.x, pos.y, pos.z, 0, 0);
+        player.moveTo(pos.x, pos.y, pos.z, 0, 0);
         return player;
     }
 
@@ -58,7 +64,7 @@ final class AndroidGameTests {
         Android.startTransformation(player);
         check(helper, Android.get(player).getTurning() == Android.TRANSFORM_TIME, "turning " + Android.get(player).getTurning());
         Android.tick(player);
-        check(helper, player.hasEffect(net.minecraft.world.effect.MobEffects.NAUSEA), "no sickness while turning");
+        check(helper, player.hasEffect(net.minecraft.world.effect.MobEffects.CONFUSION), "no sickness while turning");
         Android.setTurning(player, 1);
         Android.tick(player);
         check(helper, Android.isAndroid(player), "not an android after turning");
@@ -77,7 +83,7 @@ final class AndroidGameTests {
         Android.tick(player);
         check(helper, player.getFoodData().getFoodLevel() == 20, "food " + player.getFoodData().getFoodLevel());
         check(helper, Android.getEnergy(player) == before - 2 * Android.ENERGY_FOOD_MULTIPLY, "energy after food " + Android.getEnergy(player));
-        player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.SPEED, 200));
+        player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.MOVEMENT_SPEED, 200));
         Android.tick(player);
         check(helper, player.getActiveEffects().isEmpty(), "androids keep potion effects");
         helper.succeed();
@@ -133,7 +139,7 @@ final class AndroidGameTests {
     private static void stationParts(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, matteroverdrive.init.MOBlocks.ANDROID_STATION.get());
-        var station = helper.getBlockEntity(pos, matteroverdrive.block.entity.AndroidStationBlockEntity.class);
+        var station = helper.<matteroverdrive.block.entity.AndroidStationBlockEntity>getBlockEntity(pos);
         ServerPlayer player = player(helper);
         Android.setAndroid(player, true);
         var menu = new matteroverdrive.menu.AndroidStationMenu(1, player.getInventory(), station, new net.minecraft.world.inventory.SimpleContainerData(11));
@@ -275,7 +281,7 @@ final class AndroidGameTests {
         var state = helper.getBlockState(pos);
         state.getBlock().setPlacedBy(helper.getLevel(), helper.absolutePos(pos), state, null, ItemStack.EMPTY);
         check(helper, helper.getBlockState(pos.above(2)).is(matteroverdrive.init.MOBlocks.CHARGING_STATION.get()), "no top part");
-        var station = helper.getBlockEntity(pos, matteroverdrive.block.entity.ChargingStationBlockEntity.class);
+        var station = helper.<matteroverdrive.block.entity.ChargingStationBlockEntity>getBlockEntity(pos);
         for (int i = 0; i < 100; i++) station.getEnergyHandler(null).receiveEnergy(512, false);
         ServerPlayer player = player(helper);
         Android.setAndroid(player, true);

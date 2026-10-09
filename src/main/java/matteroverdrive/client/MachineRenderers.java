@@ -17,8 +17,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.Sheets;
 import matteroverdrive.compat.render.SubmitNodeCollector;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import matteroverdrive.compat.render.BlockEntityRenderState;
 import net.minecraft.client.renderer.item.ItemModelResolver;
@@ -33,8 +33,6 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.event.ModelEvent;
-import net.neoforged.neoforge.client.model.standalone.StandaloneModelBaker;
-import net.neoforged.neoforge.client.model.standalone.StandaloneModelKey;
 
 /**
  * The 1.7.10 machine tile entity renderers: pattern storage drives (TileEntityRendererPatterStorage), the replicator's
@@ -42,25 +40,22 @@ import net.neoforged.neoforge.client.model.standalone.StandaloneModelKey;
  * and the monitors' holo screens (TileEntityRendererMonitor / PatternMonitor / ContractMarket).
  */
 public final class MachineRenderers {
-    public static final StandaloneModelKey<BlockStateModel> STORAGE_DRIVE = key("pattern_storage_drive");
-    public static final StandaloneModelKey<BlockStateModel> INSCRIBER_RAIL = key("inscriber_rail");
-    public static final StandaloneModelKey<BlockStateModel> INSCRIBER_HEAD = key("inscriber_head");
+    public static final ResourceLocation STORAGE_DRIVE = id("block/pattern_storage_drive");
+    public static final ResourceLocation INSCRIBER_RAIL = id("block/inscriber_rail");
+    public static final ResourceLocation INSCRIBER_HEAD = id("block/inscriber_head");
 
-    private static StandaloneModelKey<BlockStateModel> key(String name) {
-        return new StandaloneModelKey<>(id("block/" + name));
-    }
-
-    public static void registerModels(ModelEvent.RegisterStandalone event) {
-        event.register(STORAGE_DRIVE, StandaloneModelBaker.blockStateModel());
-        event.register(INSCRIBER_RAIL, StandaloneModelBaker.blockStateModel());
-        event.register(INSCRIBER_HEAD, StandaloneModelBaker.blockStateModel());
+    /** 1.21.4: extra (standalone) block models are registered and looked up by their model id. */
+    public static void registerModels(ModelEvent.RegisterAdditional event) {
+        event.register(STORAGE_DRIVE);
+        event.register(INSCRIBER_RAIL);
+        event.register(INSCRIBER_HEAD);
     }
 
     private static ResourceLocation id(String path) {
         return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, path);
     }
 
-    private static BlockStateModel model(StandaloneModelKey<BlockStateModel> key) {
+    private static BakedModel model(ResourceLocation key) {
         return Minecraft.getInstance().getModelManager().getStandaloneModel(key);
     }
 
@@ -122,7 +117,7 @@ public final class MachineRenderers {
             return facingYaw(facing);
         }
 
-        protected void part(PoseStack pose, SubmitNodeCollector collector, State state, StandaloneModelKey<BlockStateModel> key) {
+        protected void part(PoseStack pose, SubmitNodeCollector collector, State state, ResourceLocation key) {
             pose.pushPose();
             pose.translate(-0.5, 0, -0.5);   // the OBJ models are shifted to the block corner
             collector.submitBlockModel(pose, Sheets.cutoutBlockSheet(), model(key), 1, 1, 1, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
@@ -179,7 +174,7 @@ public final class MachineRenderers {
         public void extractRenderState(ReplicatorBlockEntity replicator, State state, float partialTick, Vec3 camera,
                                        @Nullable Object crumbling) {
             super.extractRenderState(replicator, state, partialTick, camera, crumbling);
-            items.updateForTopItem(state.item, replicator.getInventory().getStack(ReplicatorBlockEntity.OUTPUT), ItemDisplayContext.GROUND,
+            items.updateForTopItem(state.item, replicator.getInventory().getStack(ReplicatorBlockEntity.OUTPUT), ItemDisplayContext.GROUND, false,
                     replicator.getLevel(), null, (int) state.seed);
             // the machine is a full opaque block, so its own light is 0: light the item from in front of the opening
             state.lightCoords = net.minecraft.client.renderer.LevelRenderer.getLightColor(replicator.getLevel(),
@@ -218,7 +213,7 @@ public final class MachineRenderers {
             super.extractRenderState(inscriber, state, partialTick, camera, crumbling);
             ItemStack stack = inscriber.getInventory().getStack(InscriberBlockEntity.MAIN);
             if (stack.isEmpty()) stack = inscriber.getInventory().getStack(InscriberBlockEntity.OUTPUT);
-            items.updateForTopItem(state.item, stack, ItemDisplayContext.GROUND, inscriber.getLevel(), null, (int) state.seed);
+            items.updateForTopItem(state.item, stack, ItemDisplayContext.GROUND, false, inscriber.getLevel(), null, (int) state.seed);
         }
 
         private static float target(long seed, long step, int axis) {

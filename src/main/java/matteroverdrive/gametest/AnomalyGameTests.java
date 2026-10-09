@@ -34,7 +34,7 @@ final class AnomalyGameTests {
 
     private static GravitationalAnomalyBlockEntity anomaly(GameTestHelper helper, long mass) {
         helper.setBlock(CORE, MOBlocks.GRAVITATIONAL_ANOMALY.get());
-        GravitationalAnomalyBlockEntity a = helper.getBlockEntity(CORE, GravitationalAnomalyBlockEntity.class);
+        GravitationalAnomalyBlockEntity a = helper.<GravitationalAnomalyBlockEntity>getBlockEntity(CORE);
         a.setMass(mass);
         return a;
     }
@@ -54,8 +54,8 @@ final class AnomalyGameTests {
         ItemEntity item = helper.spawnItem(Items.IRON_INGOT, new BlockPos(6, 4, 8).getCenter());
         item.setDeltaMovement(0, 0, 0);
         helper.runAfterDelay(60, () -> {
-            helper.assertTrue(item.isRemoved(), Component.literal("ingot still there, " + item.position()));
-            helper.assertTrue(a.getMass() == 6000 + 32, Component.literal("mass " + a.getMass() + ", expected 6032"));
+            helper.assertTrue(item.isRemoved(), "ingot still there, " + item.position());
+            helper.assertTrue(a.getMass() == 6000 + 32, "mass " + a.getMass() + ", expected 6032");
             helper.succeed();
         });
     }
@@ -67,7 +67,7 @@ final class AnomalyGameTests {
         // mass 100000: ~0.26 blocks/tick^2 at this distance, so check before the pig flies through the core
         helper.runAfterDelay(5, () -> {
             double now = pig.isRemoved() ? 0 : pig.distanceToSqr(helper.absolutePos(CORE).getCenter());
-            helper.assertTrue(now < start, Component.literal("pig not pulled: " + start + " -> " + now));
+            helper.assertTrue(now < start, "pig not pulled: " + start + " -> " + now);
             helper.succeed();
         });
     }
@@ -79,7 +79,7 @@ final class AnomalyGameTests {
         var start = pig.position();
         helper.runAfterDelay(20, () -> {
             double moved = Math.abs(pig.position().z - start.z) + Math.abs(pig.position().x - start.x);
-            helper.assertTrue(moved < 0.05, Component.literal("pig with equalizer moved " + moved));
+            helper.assertTrue(moved < 0.05, "pig with equalizer moved " + moved);
             helper.succeed();
         });
     }
@@ -109,15 +109,15 @@ final class AnomalyGameTests {
                 Registries.CONFIGURED_FEATURE, ResourceLocation.fromNamespaceAndPath("matteroverdrive", "gravitational_anomaly"))).value();
         BlockPos pos = helper.absolutePos(CORE);
         helper.assertTrue(feature.place(level, level.getChunkSource().getGenerator(), level.getRandom(), pos),
-                Component.literal("feature refused to place"));
+                "feature refused to place");
         helper.assertTrue(level.getBlockEntity(pos) instanceof GravitationalAnomalyBlockEntity a
                         && a.getMass() >= GravitationalAnomalyFeature.MIN_MASS && a.getMass() < GravitationalAnomalyFeature.MAX_MASS,
-                Component.literal("no anomaly with a valid mass at " + pos));
+                "no anomaly with a valid mass at " + pos);
         helper.succeed();
     }
 
     private static void near(GameTestHelper helper, double actual, double expected, String what) {
-        helper.assertTrue(Math.abs(actual - expected) < 1e-6, Component.literal(what + ": " + actual + " != " + expected));
+        helper.assertTrue(Math.abs(actual - expected) < 1e-6, what + ": " + actual + " != " + expected);
     }
 
     private AnomalyGameTests() {}

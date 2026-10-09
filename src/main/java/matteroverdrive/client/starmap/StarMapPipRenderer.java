@@ -69,6 +69,6 @@ public final class StarMapPipRenderer {
     }
 
     private static void clearDepth(Minecraft mc) {
-        RenderSystem.getDevice().createCommandEncoder().clearDepthTexture(mc.getMainRenderTarget().getDepthTexture(), 1.0);
+        RenderSystem.clear(org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT);
     }
 }

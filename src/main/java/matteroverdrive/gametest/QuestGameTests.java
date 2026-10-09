@@ -33,7 +33,7 @@ final class QuestGameTests {
     }
 
     private static void check(GameTestHelper helper, boolean ok, String message) {
-        helper.assertTrue(ok, Component.literal(message));
+        helper.assertTrue(ok, message);
     }
 
     private static MadScientist scientist(GameTestHelper helper, boolean junkie) {
@@ -53,7 +53,7 @@ final class QuestGameTests {
     private static void trades(GameTestHelper helper) {
         MadScientist npc = scientist(helper, false);
         var offers = npc.getOffers();
-        check(helper, offers.size() >= 8, "offers " + offers.size());
+        check(helper, offers.size() >= 7, "offers " + offers.size());   // 7 sure trades, the android parts and H compensator are chances
         check(helper, offers.stream().anyMatch(o -> o.getResult().is(MOItems.ANDROID_PILL_BLUE.get()) && o.getCostA().is(Items.EMERALD)),
                 "no blue pill for emeralds");
         check(helper, offers.stream().anyMatch(o -> o.getCostA().is(MOItems.DILITHIUM_CRYSTAL.get()) && o.getResult().is(Items.EMERALD)),

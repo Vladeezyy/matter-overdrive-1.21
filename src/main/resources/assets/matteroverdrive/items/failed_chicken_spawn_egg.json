@@ -1,6 +1,16 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "matteroverdrive:item/failed_chicken_spawn_egg"
+    "model": "minecraft:item/template_spawn_egg",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -6184543
+      },
+      {
+        "type": "minecraft:constant",
+        "value": -13382605
+      }
+    ]
   }
 }

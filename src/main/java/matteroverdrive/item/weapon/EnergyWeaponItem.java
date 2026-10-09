@@ -30,7 +30,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.ItemContainerContents;
-import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.energy.ComponentEnergyStorage;
@@ -241,7 +240,8 @@ public abstract class EnergyWeaponItem extends Item {
 
     /** 1.7.10 manageCooling: heat drops by 4 * easeOutQuart(heat / max) per tick; overheat ends below 2. */
     @Override
-    public void inventoryTick(ItemStack stack, ServerLevel level, Entity entity, EquipmentSlot slot) {
+    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean selected) {
+        if (!(level instanceof ServerLevel)) return;
         float heat = getHeat(stack);
         if (heat > 0) {
             float t = Math.min(1, heat / getMaxHeat(stack));
@@ -359,7 +359,8 @@ public abstract class EnergyWeaponItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack weapon, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack weapon, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+        Consumer<Component> tooltip = tooltipLines::add;
         tooltip.accept(Component.translatable("tooltip.matteroverdrive.energy_stored", MOText.energy(getEnergy(weapon)),
                 MOText.energy(getCapacity(weapon))).withStyle(ChatFormatting.YELLOW));
         tooltip.accept(Component.translatable("tooltip.matteroverdrive.weapon.power_use", MOText.energy(getEnergyUse(weapon) * 20L))

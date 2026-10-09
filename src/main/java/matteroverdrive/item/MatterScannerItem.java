@@ -20,7 +20,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -179,7 +178,8 @@ public class MatterScannerItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack scanner, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack scanner, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+        Consumer<Component> tooltip = tooltipLines::add;
         GlobalPos link = getLink(scanner);
         if (link != null) {
             tooltip.accept(Component.translatable("tooltip.matteroverdrive.scanner.online", link.pos().toShortString()).withStyle(ChatFormatting.GREEN));

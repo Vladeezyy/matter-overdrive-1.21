@@ -20,7 +20,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseFireBlock;
@@ -159,8 +158,8 @@ public class PhaserItem extends EnergyWeaponItem {
             }
             int stun = getStunTime(phaser);
             if (stun > 0) {
-                target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, stun, 100));
-                target.addEffect(new MobEffectInstance(MobEffects.MINING_FATIGUE, stun, 100));
+                target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, stun, 100));
+                target.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, stun, 100));
                 // 1.7.10 also gave jump boost -10 (no jumping); 1.21 effect levels can't be negative, slowness 100 pins them anyway
             }
             if (hasStat(WeaponStat.FIRE_DAMAGE, phaser) && isKillMode(phaser)) {
@@ -183,13 +182,14 @@ public class PhaserItem extends EnergyWeaponItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack weapon, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack weapon, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+        Consumer<Component> tooltip = tooltipLines::add;
         int level = getLevel(weapon);
         tooltip.accept(Component.translatable(isKillMode(weapon) ? "tooltip.matteroverdrive.phaser.kill" : "tooltip.matteroverdrive.phaser.stun",
                 level + 1, MAX_LEVEL).withStyle(isKillMode(weapon) ? ChatFormatting.RED : ChatFormatting.BLUE));
         if (!isKillMode(weapon)) {
             tooltip.accept(Component.translatable("tooltip.matteroverdrive.phaser.stun_time", getStunTime(weapon) / 20f).withStyle(ChatFormatting.BLUE));
         }
-        super.appendHoverText(weapon, context, display, tooltip, flag);
+        super.appendHoverText(weapon, context, tooltipLines, flag);
     }
 }

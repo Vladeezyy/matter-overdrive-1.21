@@ -9,7 +9,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
 
 /**
  * 1.7.10 RougeAndroidParts: a rogue android's head, arm, leg or torso. Installed in the matching android slot it adds
@@ -123,7 +122,8 @@ public class BionicPartItem extends Item {
 
     /** 1.7.10 BionicPart.addDetails: "+n" for additions, "+10%" for operation 1, "50%" (amount + 1) for operation 2. */
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+        Consumer<Component> tooltip = tooltipLines::add;
         if (slot < 4) tooltip.accept(Component.translatable("item." + MatterOverdrive.MODID + ".rogue_android_part.melee").withStyle(ChatFormatting.GOLD));
         for (Mod mod : modifiers(stack)) {
             String value = switch (mod.operation()) {

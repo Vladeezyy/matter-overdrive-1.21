@@ -7,41 +7,30 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.PigRenderer;
 import net.minecraft.client.renderer.entity.SheepRenderer;
 import net.minecraft.client.renderer.entity.state.ChickenRenderState;
-import net.minecraft.client.renderer.entity.state.CowRenderState;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.client.renderer.entity.state.PigRenderState;
 import net.minecraft.client.renderer.entity.state.SheepRenderState;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.animal.Chicken;
-import net.minecraft.world.entity.animal.ChickenVariant;
-import net.minecraft.world.entity.animal.Cow;
-import net.minecraft.world.entity.animal.CowVariant;
-import net.minecraft.world.entity.animal.Pig;
-import net.minecraft.world.entity.animal.PigVariant;
-import net.minecraft.world.entity.variant.ModelAndTexture;
-import net.minecraft.world.entity.variant.SpawnPrioritySelectors;
 
 /**
- * 1.7.10 EntityRendererFailed*: the vanilla renderers with the failed texture. Pig, cow and chicken have biome variants
- * now, so the render state gets a fixed variant with the normal model and the failed texture (the 1.7.10 pig and cow
- * textures are padded to the 64x64 layout of today's models by the resource generator).
+ * 1.7.10 EntityRendererFailed*: the vanilla renderers with the failed texture (1.21.4: no animal variants yet, the
+ * texture is swapped directly; the 1.7.10 pig and cow textures keep their 64x32 layout).
  */
 public final class FailedAnimalRenderers {
-    private static final PigVariant PIG = new PigVariant(new ModelAndTexture<>(PigVariant.ModelType.NORMAL, tex("failed_pig")), SpawnPrioritySelectors.EMPTY);
-    private static final CowVariant COW = new CowVariant(new ModelAndTexture<>(CowVariant.ModelType.NORMAL, tex("failed_cow")), SpawnPrioritySelectors.EMPTY);
-    private static final ChickenVariant CHICKEN = new ChickenVariant(new ModelAndTexture<>(ChickenVariant.ModelType.NORMAL, tex("failed_chicken")),
-            SpawnPrioritySelectors.EMPTY);
-    private static final ResourceLocation SHEEP = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/entity/failed_sheep.png");
+    private static final ResourceLocation PIG = tex("failed_pig");
+    private static final ResourceLocation COW = tex("failed_cow");
+    private static final ResourceLocation CHICKEN = tex("failed_chicken");
+    private static final ResourceLocation SHEEP = tex("failed_sheep");
 
     private static ResourceLocation tex(String name) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "entity/" + name);
+        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/entity/" + name + ".png");
     }
 
     public static PigRenderer pig(EntityRendererProvider.Context context) {
         return new PigRenderer(context) {
             @Override
-            public void extractRenderState(Pig pig, PigRenderState state, float partialTick) {
-                super.extractRenderState(pig, state, partialTick);
-                state.variant = PIG;
+            public ResourceLocation getTextureLocation(PigRenderState state) {
+                return PIG;
             }
         };
     }
@@ -49,9 +38,8 @@ public final class FailedAnimalRenderers {
     public static CowRenderer cow(EntityRendererProvider.Context context) {
         return new CowRenderer(context) {
             @Override
-            public void extractRenderState(Cow cow, CowRenderState state, float partialTick) {
-                super.extractRenderState(cow, state, partialTick);
-                state.variant = COW;
+            public ResourceLocation getTextureLocation(LivingEntityRenderState state) {
+                return COW;
             }
         };
     }
@@ -59,9 +47,8 @@ public final class FailedAnimalRenderers {
     public static ChickenRenderer chicken(EntityRendererProvider.Context context) {
         return new ChickenRenderer(context) {
             @Override
-            public void extractRenderState(Chicken chicken, ChickenRenderState state, float partialTick) {
-                super.extractRenderState(chicken, state, partialTick);
-                state.variant = CHICKEN;
+            public ResourceLocation getTextureLocation(ChickenRenderState state) {
+                return CHICKEN;
             }
         };
     }

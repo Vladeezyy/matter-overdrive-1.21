@@ -31,10 +31,10 @@ public interface StateBlockEntityRenderer<T extends BlockEntity, S extends Block
     }
 
     @Override
-    default void render(T blockEntity, float partialTick, PoseStack pose, MultiBufferSource buffers, int light, int overlay, Vec3 cameraPos) {
+    default void render(T blockEntity, float partialTick, PoseStack pose, MultiBufferSource buffers, int light, int overlay) {
         S state = createRenderState();
         state.lightCoords = light;
-        extractRenderState(blockEntity, state, partialTick, cameraPos, null);
+        extractRenderState(blockEntity, state, partialTick, CameraRenderState.current().pos, null);
         submit(state, pose, new SubmitNodeCollector(buffers), CameraRenderState.current());
     }
 }

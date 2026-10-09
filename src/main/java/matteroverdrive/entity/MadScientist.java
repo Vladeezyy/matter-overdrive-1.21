@@ -226,7 +226,7 @@ public class MadScientist extends AbstractVillager implements DialogNpc {
             discard();
             var mutant = MOEntities.MUTANT_SCIENTIST.get().create(server, EntitySpawnReason.CONVERSION);
             if (mutant != null) {
-                mutant.snapTo(getX(), getY(), getZ(), getYRot(), getXRot());
+                mutant.moveTo(getX(), getY(), getZ(), getYRot(), getXRot());
                 mutant.finalizeSpawn(server, server.getCurrentDifficultyAt(blockPosition()), EntitySpawnReason.CONVERSION, null);
                 server.addFreshEntity(mutant);
                 mutant.spawnAnim();

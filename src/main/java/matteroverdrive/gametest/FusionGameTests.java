@@ -31,7 +31,7 @@ final class FusionGameTests {
     private static void build(GameTestHelper helper, boolean anomaly, boolean hullForOneCoil, Check check) {
         helper.setBlock(CONTROLLER, MOBlocks.FUSION_REACTOR_CONTROLLER.get().defaultBlockState()
                 .setValue(MachineBlock.FACING, helper.getTestRotation().rotate(Direction.NORTH)));
-        FusionReactorControllerBlockEntity reactor = helper.getBlockEntity(CONTROLLER, FusionReactorControllerBlockEntity.class);
+        FusionReactorControllerBlockEntity reactor = helper.<FusionReactorControllerBlockEntity>getBlockEntity(CONTROLLER);
         boolean replaced = false;
         for (int i = 0; i < FusionReactorControllerBlockEntity.POSITION_COUNT; i++) {
             BlockPos abs = reactor.getPosition(i);
@@ -59,27 +59,27 @@ final class FusionGameTests {
 
     private static void generates(GameTestHelper helper, FusionReactorControllerBlockEntity reactor) {
         helper.runAfterDelay(90, () -> {
-            helper.assertTrue(reactor.isValidStructure(), Component.literal("structure invalid: " + reactor.getStatus()));
+            helper.assertTrue(reactor.isValidStructure(), "structure invalid: " + reactor.getStatus());
             helper.assertTrue(reactor.getEnergyPerTick() == Math.round(2048 * Math.log(2)),
-                    Component.literal("energy per tick " + reactor.getEnergyPerTick()));
-            helper.assertTrue(reactor.getEnergy().getEnergy() > 0, Component.literal("no energy generated"));
+                    "energy per tick " + reactor.getEnergyPerTick());
+            helper.assertTrue(reactor.getEnergy().getEnergy() > 0, "no energy generated");
             helper.succeed();
         });
     }
 
     private static void needsCoils(GameTestHelper helper, FusionReactorControllerBlockEntity reactor) {
         helper.runAfterDelay(60, () -> {
-            helper.assertFalse(reactor.isValidStructure(), Component.literal("valid without all coils"));
-            helper.assertTrue(reactor.getStatus().contains("COILS"), Component.literal("status " + reactor.getStatus()));
-            helper.assertTrue(reactor.getEnergy().getEnergy() == 0, Component.literal("generated anyway"));
+            helper.assertFalse(reactor.isValidStructure(), "valid without all coils");
+            helper.assertTrue(reactor.getStatus().contains("COILS"), "status " + reactor.getStatus());
+            helper.assertTrue(reactor.getEnergy().getEnergy() == 0, "generated anyway");
             helper.succeed();
         });
     }
 
     private static void needsAnomaly(GameTestHelper helper, FusionReactorControllerBlockEntity reactor) {
         helper.runAfterDelay(60, () -> {
-            helper.assertFalse(reactor.isValidStructure(), Component.literal("valid without an anomaly"));
-            helper.assertTrue(reactor.getStatus().contains("ANOMALY"), Component.literal("status " + reactor.getStatus()));
+            helper.assertFalse(reactor.isValidStructure(), "valid without an anomaly");
+            helper.assertTrue(reactor.getStatus().contains("ANOMALY"), "status " + reactor.getStatus());
             helper.succeed();
         });
     }
@@ -91,7 +91,7 @@ final class FusionGameTests {
         helper.getLevel().setBlockAndUpdate(outside, MOBlocks.INSCRIBER.get().defaultBlockState());
         helper.runAfterDelay(120, () -> {
             var inscriber = (InscriberBlockEntity) helper.getLevel().getBlockEntity(outside);
-            helper.assertTrue(inscriber.getEnergy().getEnergy() > 0, Component.literal("nothing came out of the IO port"));
+            helper.assertTrue(inscriber.getEnergy().getEnergy() > 0, "nothing came out of the IO port");
             helper.succeed();
         });
     }

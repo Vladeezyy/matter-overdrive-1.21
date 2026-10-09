@@ -10,10 +10,12 @@ its version.json gives the Minecraft version and data version. Steps:
   matter data map and become optional tag entries;
 - before 1.21.4: client item definitions (assets/*/items/*.json) become item models with overrides; their constant
   layer tints go to assets/matteroverdrive/item_tints.json (read by client/BarrelProperty.java);
+- 1.21.4: the component select property of the security protocol becomes matteroverdrive:security_type;
 - before 1.21.2: recipe ingredients are objects ({"item": ...} / {"tag": ...}); no equipment assets;
 - 1.21.2 - 1.21.3: equipment assets live in models/equipment;
-- before 1.21.5: spawn eggs use the vanilla two-colour template; the failed pig / cow textures keep the 1.7.10 64x32
-  layout (the 1.21.5+ models are 64x64).
+- before 1.21.5: spawn eggs use the vanilla two-colour template with the 1.7.10 egg colours (1.21.4: constant tints
+  of the client item definition; before 1.21.4 DeferredSpawnEggItem gives them); the failed pig / cow textures keep
+  the 1.7.10 64x32 layout (the 1.21.5+ models are 64x64).
 """
 import gzip
 import io
@@ -27,6 +29,12 @@ from pathlib import Path
 MOD = "matteroverdrive"
 # select property matteroverdrive:barrel -> (WeaponBarrelItem.Type ordinal + 1) / 10
 BARREL = {"damage": 0.1, "fire": 0.2, "explosion": 0.3, "heal": 0.4}
+# 1.7.10 spawn egg colours (background, spots)
+EGGS = {
+    "rogue_android": (0x0FFFFF, 0), "ranged_rogue_android": (0x0FFFFF, 0), "mad_scientist": (0xFFFFFF, 0),
+    "mutant_scientist": (0xFFFFFF, 0x00FF00), "failed_pig": (15771042, 0x33CC33), "failed_cow": (4470310, 0x33CC33),
+    "failed_chicken": (10592673, 0x33CC33), "failed_sheep": (15198183, 0x33CC33),
+}
 
 ref = Path(sys.argv[1])
 res = Path(sys.argv[2])
@@ -105,6 +113,16 @@ if MC < (1, 21, 4):
     shutil.rmtree(A / "items")
     write(A / "item_tints.json", tints)
 
+# --- 1.21.4: no minecraft:component select property (client/SecurityTypeProperty.java) -------------------------
+if MC == (1, 21, 4):
+    for f in sorted((A / "items").glob("*.json")):
+        d = read(f)
+        m = d["model"]
+        if m["type"] == "minecraft:select" and m["property"] == "minecraft:component":
+            assert m.pop("component") == f"{MOD}:security_type", f
+            m["property"] = f"{MOD}:security_type"
+            write(f, d)
+
 # --- equipment assets ------------------------------------------------------------------------------------------
 if MC < (1, 21, 2):
     shutil.rmtree(A / "equipment", ignore_errors=True)
@@ -119,6 +137,10 @@ if MC < (1, 21, 5):
     for f in (A / "models/item").glob("*_spawn_egg.json"):
         write(f, {"parent": "minecraft:item/template_spawn_egg"})
         (A / "textures/item" / f"{f.stem}.png").unlink(missing_ok=True)
+        if MC >= (1, 21, 4):
+            colours = EGGS[f.stem[:-len("_spawn_egg")]]
+            write(A / "items" / f.name, {"model": {"type": "minecraft:model", "model": "minecraft:item/template_spawn_egg", "tints": [
+                {"type": "minecraft:constant", "value": (c | 0xFF000000) - (1 << 32)} for c in colours]}})
     for n in ("pig", "cow"):
         shutil.copyfile(ref / "textures/entities" / f"failed_{n}.png", A / "textures/entity" / f"failed_{n}.png")
 

@@ -27,11 +27,11 @@ public class MineLogic extends AbstractLogic {
     }
 
     public int getMineCount(QuestStack stack) {
-        return tag(stack).getIntOr("MineCount", 0);
+        return tag(stack).getInt("MineCount");
     }
 
     public int getMaxMineCount(QuestStack stack) {
-        return tag(stack).getIntOr("MaxMineCount", 0);
+        return tag(stack).getInt("MaxMineCount");
     }
 
     private String replace(QuestStack stack, String text) {

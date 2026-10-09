@@ -319,8 +319,8 @@ public final class Android {
         var damage = level.damageSources().source(TRANSFORMATION_DAMAGE);
         data.turning--;
         if (data.turning > 0) {
-            player.addEffect(new MobEffectInstance(MobEffects.NAUSEA, TRANSFORM_TIME));
-            player.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, TRANSFORM_TIME, 1));
+            player.addEffect(new MobEffectInstance(MobEffects.CONFUSION, TRANSFORM_TIME));
+            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, TRANSFORM_TIME, 1));
             player.addEffect(new MobEffectInstance(MobEffects.HUNGER, TRANSFORM_TIME));
             player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, TRANSFORM_TIME));
             if (data.turning % 40 == 0) {

@@ -13,7 +13,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 
 /**
@@ -44,7 +43,8 @@ public class NetworkFlashDriveItem extends Item {
 
     /** 1.7.10: "[x,y,z] Block name" per connection. */
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+        Consumer<Component> tooltip = tooltipLines::add;
         var level = context.level();
         for (BlockPos pos : getConnections(stack)) {
             Component name = level != null && level.isLoaded(pos) && !level.getBlockState(pos).isAir() ? level.getBlockState(pos).getBlock().getName()

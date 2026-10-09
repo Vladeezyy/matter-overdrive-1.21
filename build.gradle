@@ -186,6 +186,13 @@ publishing {
     }
 }
 
+// Before 1.21.5 the game test server reuses run/world: the galaxy there keeps every test player's homeworld, and
+// small quadrants run out of free stars. Each run starts from a fresh world.
+def gameTestWorld = file('run/world')
+tasks.matching { it.name == 'runGameTestServer' }.configureEach {
+    doFirst { gameTestWorld.deleteDir() }
+}
+
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
     options.compilerArgs += ['-Xmaxerrs', '100000']

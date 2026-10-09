@@ -10,7 +10,7 @@ import matteroverdrive.machine.UpgradeType;
 import matteroverdrive.menu.TransporterMenu;
 import matteroverdrive.transport.TransportLocation;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.component.DataComponentGetter;
+import matteroverdrive.compat.DataComponentGetter;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;

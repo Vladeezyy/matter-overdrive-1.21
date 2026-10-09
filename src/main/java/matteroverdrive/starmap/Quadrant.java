@@ -39,14 +39,14 @@ public class Quadrant extends SpaceBody {
 
     public void readNBT(CompoundTag tag, HolderLookup.Provider registries) {
         readBody(tag);
-        x = tag.getFloatOr("X", 0);
-        y = tag.getFloatOr("Y", 0);
-        z = tag.getFloatOr("Z", 0);
-        size = tag.getFloatOr("Size", 0);
-        ListTag list = tag.getListOrEmpty("Stars");
+        x = tag.getFloat("X");
+        y = tag.getFloat("Y");
+        z = tag.getFloat("Z");
+        size = tag.getFloat("Size");
+        ListTag list = tag.getList("Stars", net.minecraft.nbt.Tag.TAG_COMPOUND);
         for (int i = 0; i < list.size(); i++) {
             Star star = new Star();
-            star.readNBT(list.getCompoundOrEmpty(i), registries);
+            star.readNBT(list.getCompound(i), registries);
             addStar(star);
         }
     }

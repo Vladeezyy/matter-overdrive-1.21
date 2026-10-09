@@ -41,7 +41,7 @@ public class WeaponStationRenderer implements matteroverdrive.compat.render.Stat
     public void extractRenderState(WeaponStationBlockEntity station, State state, float partialTick, Vec3 camera,
                                    @Nullable Object crumbling) {
         matteroverdrive.compat.render.StateBlockEntityRenderer.super.extractRenderState(station, state, partialTick, camera, crumbling);
-        itemModelResolver.updateForTopItem(state.item, station.getWeapon(), ItemDisplayContext.GROUND, station.getLevel(), null,
+        itemModelResolver.updateForTopItem(state.item, station.getWeapon(), ItemDisplayContext.GROUND, false, station.getLevel(), null,
                 (int) station.getBlockPos().asLong());
         // 1.7.10 hoverStart = worldTime * 0.05 + noise: the item entity renderer turned it by age + hoverStart
         state.time = station.getLevel() == null ? 0 : station.getLevel().getGameTime() + partialTick;
