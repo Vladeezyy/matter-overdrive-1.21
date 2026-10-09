@@ -433,6 +433,7 @@
   "gui.matteroverdrive.generating": "+%s FE/t",
   "tooltip.matteroverdrive.energy_stored": "Energy: %s / %s",
   "tooltip.matteroverdrive.matter": "Matter: %s kM",
+  "tooltip.matteroverdrive.matter_estimated": "Matter: ~%s kM",
   "tooltip.matteroverdrive.matter_stored": "Matter: %s / %s kM",
   "item.matteroverdrive.matter_dust.details": "Put in a recycler to refine",
   "item.matteroverdrive.pattern_drive.details": "Stores 2 Item Patterns",

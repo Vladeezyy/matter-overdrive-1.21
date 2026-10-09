@@ -560,6 +560,16 @@
   in first person (its camera-facing ribbon is edge-on from behind). The mod now has a logo for the mods list
   (`matteroverdrive_logo.png`, next release). Modrinth API: token in `~/.gradle/gradle.properties` (`modrinthToken`);
   the client/server environment is set per version via v3 (`environment: client_and_server`).
+- **Matter for every item** (beyond 1.7.10, user request). After the 1.7.10 derivation (crafting passes + smelting,
+  unchanged), `MatterRegistry` keeps deriving until nothing changes: every recipe type, other mods' machines included
+  (ingredients from `Recipe.placementInfo()`, result from `Recipe.display()`), copper weathering / waxing and log
+  stripping (NeoForge OXIDIZABLES / WAXABLES / STRIPPABLES data maps), concrete from its powder, infested blocks from their
+  host. `MODERN_MATTER` in gen_resources gives the raw materials 1.7.10 never had a value on its scale (ancient debris 512,
+  shulker shell 64, tuff 1, ...). Anything still unvalued gets an estimate (block hardness or 8, x4 per rarity step, x4
+  unstackable, x2 for stacks of 16; shown as "~N kM", synced in `MatterValuesPayload`), except the
+  `matteroverdrive:matter_blacklist` item tag (command blocks, spawners, barrier, dragon egg...), unbreakable blocks and
+  spawn eggs. Bedrock keeps its 1.7.10 base value (1024). Vanilla: 468 base, 672 crafting / smelting, 170 other, 239
+  estimated. First derivation found wins, like 1.7.10 (e.g. stonecutter copper is cheaper than crafted). 96 GameTests.
 - Cloud (Linux) notes: regenerating resources rewrites the .ogg and ffmpeg-made .png bytes (different ffmpeg/oggenc
   builds) - `git checkout` them. Screenshots: `Xvfb :99` + `DISPLAY=:99 ./gradlew runScene` (software GL is slow; give
   menus extra ticks), world created by `runServer` with a flat creative server.properties, then moved to run/saves;
@@ -581,7 +591,7 @@
 **Workflow**
 - Resources: never hand-edit `src/main/resources/{assets,data}` — regenerate:
   `rm -rf src/main/resources/{assets,data} && python3 -I tools/gen_resources.py ~/mo-reference/mo-1.7.10/src/main/resources/assets/mo src/main/resources`
-- Tests: `./gradlew runGameTestServer` (95 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
+- Tests: `./gradlew runGameTestServer` (96 tests, registry-based: `Registries.TEST_FUNCTION`, `RegisterGameTestsEvent`,
   `FunctionGameTestInstance`, custom 12³ structure `matteroverdrive:gametest_area`, time-of-day via `TestEnvironmentDefinition.TimeOfDay`,
   `makeMockServerPlayerInLevel`). Visual: `./gradlew runScene` → `run/screenshots/scene_*.png` (DevScene, world `run/saves/mo_scene`;
   pristine copy = "Новый мир (2)"; needs `pauseOnLostFocus=false`; selected hotbar slot is client-side; place blocks with

@@ -1633,7 +1633,34 @@ MATTER_ITEMS = {
     "iron_horse_armor": 32 * 5, "golden_horse_armor": 42 * 5, "diamond_horse_armor": 256 * 5, "experience_bottle": 32,
     "chicken": 2, "cooked_chicken": 3, "rotten_flesh": 1, "name_tag": 32, "glass_bottle": 3,
 }
+# Raw materials newer than 1.7.10 (on its scale: stone 1, iron 32, gold 42, diamond 256, obsidian 16); everything made
+# from them is derived from recipes, the rest gets an estimate (MatterRegistry).
+MODERN_MATTER = {
+    "ancient_debris": 512, "amethyst_shard": 8, "amethyst_cluster": 16, "large_amethyst_bud": 12, "medium_amethyst_bud": 8,
+    "small_amethyst_bud": 4, "basalt": 1, "blackstone": 1, "calcite": 1, "tuff": 1, "dripstone_block": 2, "pointed_dripstone": 1,
+    "mud": 1, "moss_block": 1, "pale_moss_block": 1, "pale_hanging_moss": 1, "sculk": 1, "sculk_vein": 1, "sculk_catalyst": 32,
+    "sculk_sensor": 16, "sculk_shrieker": 32, "crimson_nylium": 1, "warped_nylium": 1, "soul_soil": 4, "rooted_dirt": 1,
+    "mangrove_roots": 1, "muddy_mangrove_roots": 2, "prismarine_shard": 4, "prismarine_crystals": 4, "nautilus_shell": 64,
+    "heart_of_the_sea": 512, "echo_shard": 64, "shulker_shell": 64, "chorus_fruit": 2, "chorus_flower": 4, "chorus_plant": 1,
+    "honeycomb": 4, "honey_bottle": 6, "resin_clump": 2, "breeze_rod": 8, "armadillo_scute": 8, "turtle_scute": 8,
+    "rabbit": 2, "mutton": 2, "rabbit_hide": 1, "rabbit_foot": 8, "phantom_membrane": 8, "dragon_breath": 16, "kelp": 1,
+    "bamboo": 1, "sweet_berries": 1, "glow_berries": 1, "glow_ink_sac": 4, "snowball": 1, "sea_pickle": 2, "shroomlight": 4,
+    "mushroom_stem": 1, "crimson_fungus": 1, "warped_fungus": 1, "crimson_roots": 1, "warped_roots": 1, "nether_sprouts": 1,
+    "twisting_vines": 1, "weeping_vines": 1, "turtle_egg": 16, "sniffer_egg": 64, "frogspawn": 4, "ochre_froglight": 8,
+    "verdant_froglight": 8, "pearlescent_froglight": 8, "spore_blossom": 4, "big_dripleaf": 1, "small_dripleaf": 1,
+    "hanging_roots": 1, "glow_lichen": 1, "pink_petals": 1, "wildflowers": 1, "bush": 1, "short_dry_grass": 1,
+    "tall_dry_grass": 1, "tall_grass": 1, "large_fern": 1, "seagrass": 1, "firefly_bush": 2, "cactus_flower": 1,
+    "pitcher_pod": 2, "torchflower_seeds": 1, "beetroot": 1, "beetroot_seeds": 1, "poisonous_potato": 1,
+    "crying_obsidian": 32, "gilded_blackstone": 8, "goat_horn": 64, "trident": 1024, "elytra": 2048,
+    "totem_of_undying": 512, "enchanted_golden_apple": 2048, "wet_sponge": 8, "suspicious_sand": 1, "suspicious_gravel": 2,
+    "farmland": 1, "dirt_path": 1, "netherite_upgrade_smithing_template": 512,
+    **{f"{c}_coral": 2 for c in ["tube", "brain", "bubble", "fire", "horn"]},
+    **{f"{c}_coral_fan": 2 for c in ["tube", "brain", "bubble", "fire", "horn"]},
+    **{f"{c}_coral_block": 4 for c in ["tube", "brain", "bubble", "fire", "horn"]},
+    **{f"dead_{c}_coral{t}": 1 for c in ["tube", "brain", "bubble", "fire", "horn"] for t in ["", "_fan", "_block"]},
+}
 w(D / "data_maps/item/matter.json", {"values": {**MATTER_TAGS, **{f"minecraft:{k}": v for k, v in MATTER_ITEMS.items()},
+    **{f"minecraft:{k}": v for k, v in MODERN_MATTER.items()},
     # 1.7.10 MatterOverdriveMatter: blue and yellow android pills can be replicated, the red one can't
     mid("android_pill_blue"): 64, mid("android_pill_yellow"): 32,
     mid("emergency_ration"): 3, mid("earl_gray_tea"): 2, mid("romulan_ale"): 2}})
@@ -1809,6 +1836,14 @@ for n in ["android_station", "decomposer", "fusion_reactor_controller", "gravita
             copy["include"] = MACHINE_ITEM_DATA + [c for c in copy["include"] if c not in MACHINE_ITEM_DATA]
     w(p, table)
 
+# Items that never get an estimated matter value (creative / technical blocks); modpacks can add more.
+w(TAGS / f"{MOD}/tags/item/matter_blacklist.json", {"values": [f"minecraft:{n}" for n in [
+    "bedrock", "barrier", "command_block", "chain_command_block", "repeating_command_block", "command_block_minecart",
+    "structure_block", "structure_void", "jigsaw", "spawner", "trial_spawner", "vault", "end_portal_frame", "light",
+    "debug_stick", "knowledge_book", "reinforced_deepslate", "petrified_oak_slab", "test_block", "test_instance_block",
+    "player_head", "budding_amethyst", "enchanted_book", "written_book", "filled_map", "bundle", "ominous_trial_key",
+    "trial_key", "heavy_core", "dragon_egg"]]})
+
 # --- lang ------------------------------------------------------------------------------------
 def parse_lang(p):
     d = {}
@@ -1830,6 +1865,7 @@ GUI_KEYS = {
     "gui.matteroverdrive.generating": {"en_us": "+%s FE/t", "ru_ru": "+%s FE/т"},
     "tooltip.matteroverdrive.energy_stored": {"en_us": "Energy: %s / %s", "ru_ru": "Энергия: %s / %s"},
     "tooltip.matteroverdrive.matter": {"en_us": "Matter: %s kM", "ru_ru": "Материя: %s kM"},
+    "tooltip.matteroverdrive.matter_estimated": {"en_us": "Matter: ~%s kM", "ru_ru": "Материя: ~%s kM"},
     "tooltip.matteroverdrive.matter_stored": {"en_us": "Matter: %s / %s kM", "ru_ru": "Материя: %s / %s kM"},
     "item.matteroverdrive.matter_dust.details": "item.matter_dust.details",
     "item.matteroverdrive.pattern_drive.details": "item.pattern_drive.details",

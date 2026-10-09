@@ -433,6 +433,7 @@
   "gui.matteroverdrive.generating": "+%s FE/т",
   "tooltip.matteroverdrive.energy_stored": "Энергия: %s / %s",
   "tooltip.matteroverdrive.matter": "Материя: %s kM",
+  "tooltip.matteroverdrive.matter_estimated": "Материя: ~%s kM",
   "tooltip.matteroverdrive.matter_stored": "Материя: %s / %s kM",
   "item.matteroverdrive.matter_dust.details": "Положить в утилизатор, чтобы очистить",
   "item.matteroverdrive.pattern_drive.details": "Хранит 2 шаблона предмета",

@@ -22,6 +22,7 @@ import net.minecraft.world.item.Items;
 final class MatterGameTests {
     static void addAll() {
         MOGameTests.add("matter_values", 20, false, MatterGameTests::matterValues);
+        MOGameTests.add("matter_values_modern", 20, false, MatterGameTests::matterValuesModern);
         MOGameTests.add("decomposer_makes_matter", 400, false, MatterGameTests::decomposerMakesMatter);
         MOGameTests.add("decomposer_rejects_no_matter", 20, false, MatterGameTests::decomposerRejects);
         MOGameTests.add("recycler_refines_dust", 200, false, MatterGameTests::recyclerRefines);
@@ -51,6 +52,35 @@ final class MatterGameTests {
         expect(helper, server, Items.COOKED_BEEF, 2);
         // no base value and no recipe
         expect(helper, server, Items.DRAGON_EGG, 0);
+        helper.succeed();
+    }
+
+    /** Beyond 1.7.10: other recipe types, block conversions, modern base values, estimates and the blacklist. */
+    private static void matterValuesModern(GameTestHelper helper) {
+        var server = helper.getLevel().getServer();
+        var estimated = MatterRegistry.estimated(server);
+        // weathering + waxing (block conversions, then the waxing recipe)
+        int copper = MatterRegistry.get(server, Items.CHISELED_COPPER);
+        helper.assertTrue(copper > 0 && MatterRegistry.get(server, Items.WAXED_OXIDIZED_CHISELED_COPPER) > 0
+                && !estimated.contains(Items.WAXED_OXIDIZED_CHISELED_COPPER), Component.literal("waxed oxidized chiseled copper"));
+        // (the stonecutter makes cut copper 4 per block, cheaper than the crafting table: either derivation may win)
+        helper.assertTrue(MatterRegistry.get(server, Items.OXIDIZED_CHISELED_COPPER) > 0 && !estimated.contains(Items.OXIDIZED_CHISELED_COPPER),
+                Component.literal("oxidized chiseled copper"));
+        // smithing: netherite from ancient debris; stonecutting: polished tuff; concrete from its powder; infested stone
+        helper.assertTrue(MatterRegistry.get(server, Items.NETHERITE_INGOT) > 4 * 512 && !estimated.contains(Items.NETHERITE_SWORD)
+                && MatterRegistry.get(server, Items.NETHERITE_SWORD) > MatterRegistry.get(server, Items.DIAMOND_SWORD),
+                Component.literal("netherite " + MatterRegistry.get(server, Items.NETHERITE_INGOT)));
+        helper.assertTrue(MatterRegistry.get(server, Items.POLISHED_TUFF) > 0 && !estimated.contains(Items.POLISHED_TUFF), Component.literal("polished tuff"));
+        expect(helper, server, Items.WHITE_CONCRETE, MatterRegistry.get(server, Items.WHITE_CONCRETE_POWDER));
+        expect(helper, server, Items.INFESTED_STONE, MatterRegistry.get(server, Items.STONE));
+        expect(helper, server, Items.STRIPPED_OAK_LOG, 16);
+        // never estimated: the blacklist tag, unbreakable blocks, spawn eggs (1.7.10 itself gave bedrock 1024)
+        for (var item : new net.minecraft.world.item.Item[] {Items.BARRIER, Items.COMMAND_BLOCK, Items.SPAWNER, Items.DRAGON_EGG, Items.PIG_SPAWN_EGG}) {
+            expect(helper, server, item, 0);
+        }
+        // an item no recipe or base value covers gets a "~" estimate
+        helper.assertTrue(estimated.contains(Items.SKULL_POTTERY_SHERD) && MatterRegistry.get(server, Items.SKULL_POTTERY_SHERD) > 0,
+                Component.literal("pottery sherd estimate"));
         helper.succeed();
     }
 

@@ -1615,7 +1615,15 @@ public final class DevScene {
             p.onUpdateAbilities();
         }));
         at(3764, mc -> mc.options.hideGui = false);
-        at(3768, mc -> mc.stop());
+        // matter of modern items: derived (waxed oxidized copper from weathering + the waxing recipe) and estimated ("~")
+        at(3770, mc -> mc.setScreen(new TooltipScreen(new ItemStack(Items.WAXED_OXIDIZED_CHISELED_COPPER))));
+        at(3778, mc -> shot(mc, "matter_tooltip_copper"));
+        at(3779, mc -> mc.setScreen(new TooltipScreen(new ItemStack(Items.NETHERITE_SWORD))));
+        at(3787, mc -> shot(mc, "matter_tooltip_netherite"));
+        at(3788, mc -> mc.setScreen(new TooltipScreen(new ItemStack(Items.SKULL_POTTERY_SHERD))));
+        at(3796, mc -> shot(mc, "matter_tooltip_estimated"));
+        at(3797, mc -> mc.setScreen(null));
+        at(3800, mc -> mc.stop());
     }
 
     /** Shows one item's tooltip in the middle of the screen. */

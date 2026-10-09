@@ -16,7 +16,9 @@ public final class MatterTooltip {
     static void onTooltip(ItemTooltipEvent event) {
         int matter = MatterRegistry.getClient(event.getItemStack().getItem());
         if (matter > 0) {
-            event.getToolTip().add(Component.translatable("tooltip.matteroverdrive.matter", matter).withStyle(ChatFormatting.BLUE));
+            // estimated values (items the 1.7.10 rules can't price) are marked with "~"
+            String key = MatterRegistry.isEstimatedClient(event.getItemStack().getItem()) ? "tooltip.matteroverdrive.matter_estimated" : "tooltip.matteroverdrive.matter";
+            event.getToolTip().add(Component.translatable(key, matter).withStyle(ChatFormatting.BLUE));
         }
     }
 

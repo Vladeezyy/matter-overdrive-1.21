@@ -86,7 +86,8 @@ public final class MatterEvents {
 
     @SubscribeEvent
     static void onDatapackSync(OnDatapackSyncEvent event) {
-        var payload = new MatterValuesPayload(MatterRegistry.values(event.getPlayerList().getServer()));
+        var server = event.getPlayerList().getServer();
+        var payload = new MatterValuesPayload(MatterRegistry.values(server), MatterRegistry.estimated(server));
         // only clients that have this mod's channel (not vanilla clients or game-test mock players)
         event.getRelevantPlayers().filter(player -> player.connection.hasChannel(MatterValuesPayload.TYPE))
                 .forEach(player -> PacketDistributor.sendToPlayer(player, payload));
