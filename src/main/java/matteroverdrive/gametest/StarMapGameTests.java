@@ -27,6 +27,15 @@ final class StarMapGameTests {
         helper.assertTrue(ok, Component.literal(message));
     }
 
+    /**
+     * The test player's homeworld. 1.7.10 claimPlanet tries one random quadrant, and the small ones (1-3 stars) are
+     * soon full with every test player claiming, so the test retries like a player logging in again would.
+     */
+    private static Planet claim(ServerPlayer player) {
+        for (int i = 0; i < 100 && GalaxyServer.getHomeworld(player) == null; i++) GalaxyServer.tryAndClaimPlanet(player);
+        return GalaxyServer.getHomeworld(player);
+    }
+
     /** 1.7.10 defaults: 2048-2303 stars in 27 quadrants, 1-3 planets each; the same seed gives the same galaxy; NBT round trip. */
     private static void generation(GameTestHelper helper) {
         Galaxy galaxy = GalaxyServer.createGalaxy(12345L);
@@ -58,8 +67,7 @@ final class StarMapGameTests {
     /** The menu's 4 slots are the selected planet's construction slots; on someone else's planet nothing goes in or out. */
     private static void menu(GameTestHelper helper) {
         ServerPlayer player = AndroidGameTests.player(helper);
-        GalaxyServer.tryAndClaimPlanet(player);
-        Planet home = GalaxyServer.getHomeworld(player);
+        Planet home = claim(player);
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, MOBlocks.STAR_MAP.get());
         var starMap = helper.getBlockEntity(pos, StarMapBlockEntity.class);
@@ -96,8 +104,7 @@ final class StarMapGameTests {
     /** Construction slots: buildings need a base, ships a factory; finished ones join the planet, owned by its owner. */
     private static void building(GameTestHelper helper) {
         ServerPlayer player = AndroidGameTests.player(helper);
-        GalaxyServer.tryAndClaimPlanet(player);
-        Planet home = GalaxyServer.getHomeworld(player);
+        Planet home = claim(player);
         var level = helper.getLevel();
         check(helper, home.hasBuildingType(matteroverdrive.starmap.BuildingType.BASE) && home.getFleet().size() == 1
                 && home.getFleet().get(0).is(matteroverdrive.init.MOItems.SCOUT_SHIP.get()), "homeworld base + scout " + home.getFleet());
@@ -133,8 +140,7 @@ final class StarMapGameTests {
     /** A scout flies to another planet and arrives; a colonizer claims a free planet with a base. */
     private static void travel(GameTestHelper helper) {
         ServerPlayer player = AndroidGameTests.player(helper);
-        GalaxyServer.tryAndClaimPlanet(player);
-        Planet home = GalaxyServer.getHomeworld(player);
+        Planet home = claim(player);
         var level = helper.getLevel();
         Galaxy galaxy = GalaxyServer.getGalaxy();
         Planet target = null;
@@ -172,8 +178,7 @@ final class StarMapGameTests {
     private static void homeworld(GameTestHelper helper) {
         check(helper, GalaxyServer.getGalaxy() != null, "no server galaxy");
         ServerPlayer player = AndroidGameTests.player(helper);
-        GalaxyServer.tryAndClaimPlanet(player);
-        Planet home = GalaxyServer.getHomeworld(player);
+        Planet home = claim(player);
         check(helper, home != null && home.isHomeworld(player) && home.getBuildingSpaces() == 10 && home.getFleetSpaces() == 10, "homeworld " + home);
         check(helper, !GalaxyServer.tryAndClaimPlanet(player) && GalaxyServer.getHomeworld(player) == home, "claimed twice");
         for (Planet planet : home.getStar().getPlanets()) {
