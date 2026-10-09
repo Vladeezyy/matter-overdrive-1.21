@@ -1,9 +1,13 @@
-# Matter Overdrive for Minecraft 1.21.10 (NeoForge)
+# Matter Overdrive for Minecraft 1.21.8 (NeoForge)
 
 ![Matter Overdrive](docs/modrinth/banner.png)
 
 An unofficial port of [Matter Overdrive](https://github.com/simeonradivoev/MatterOverdrive) by Simeon Radivoev
-from Minecraft 1.7.10 to **Minecraft 1.21.10** on **NeoForge 21.10**.
+from Minecraft 1.7.10 to **Minecraft 1.21.8** on **NeoForge 21.8**.
+
+This is the `1.21.8` branch. Every supported Minecraft version has its own branch with the same game code: `main`
+(1.21.10), `1.21.8`, `1.21.5`, `1.21.4`, `1.21.3` and `1.21.1`. The APIs that differ are bridged in
+`matteroverdrive.compat`, and `tools/backport.py` converts the generated resources for the branch's version.
 
 The port is a rewrite against modern APIs that keeps the original's behaviour, numbers, textures, sounds and
 translations (English and Russian). The 1.7.10 source (0.4.2) is the specification.
@@ -37,8 +41,8 @@ Requires JDK 21.
 ./gradlew runScene           # scripted scene: screenshots of the machines and features to run/screenshots/
 ```
 `runScene` needs a world named `mo_scene` in `run/saves/` (any copy of a dev world).
-Resources for simple content are generated from the original 1.7.10 assets by `tools/gen_resources.py`
-(see MODLOG.md for the command).
+Resources for simple content are generated from the original 1.7.10 assets by `tools/gen_resources.py`, then
+converted for the branch's Minecraft version by `tools/backport.py` (see MODLOG.md for the commands).
 
 ## License and credits
 GPL-3.0-or-later, the same license as the original — see [LICENSE.md](LICENSE.md).

@@ -539,7 +539,7 @@ public final class DevScene {
                 p.openMenu(t, buf -> buf.writeBlockPos(pad));
             }
         }));
-        at(1486, mc -> shot(mc, "transporter_gui"));
+        at(1484, mc -> shot(mc, "transporter_gui"));   // before 1.21.9 the screen closes right after the 1485 step
         at(1485, mc -> server(mc, p -> {
             p.closeContainer();
             BlockPos base = origin.above(14);

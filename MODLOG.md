@@ -587,6 +587,24 @@
   oceans) and sinks into the floor to stay submerged, no "generate buildings" config (use a datapack), not rotated
   (1.7.10 never rotated them either).
 
+## 2026-10-09 — Minecraft 1.21.8 (NeoForge 21.8.54), branch `1.21.8`
+- Version branches (user): one per Minecraft version with a stable NeoForge — `main` 1.21.10, `1.21.8`, `1.21.5`,
+  `1.21.4`, `1.21.3`, `1.21.1` (NeoForge for 1.21.2 / 1.21.6 / 1.21.7 only ever had betas). Each one is made from the
+  next newer branch, so the differences stay small. Jars are named `matteroverdrive-<mod_version>+<mc>.jar`.
+- 1.21.8 lacks the 1.21.9 changes: the NeoForge transfer API (ported like 1.21.1: ItemStackHandler / EnergyStorage /
+  IFluidHandler, whose ValueIO serialization exists in 21.8), block entity render states and SubmitNodeCollector
+  (`compat.render`: SubmitNodeCollector over a MultiBufferSource, StateBlockEntityRenderer, StateEntityRenderer bridging
+  submit() to render(state, pose, buffers, light); entity render states, ItemStackRenderState, BlockStateModel are
+  native), MouseButtonEvent / KeyEvent (compat), KeyMapping.Category, FontDescription, ContainerUser, SingleQuadParticle
+  layers, the feature render dispatcher (the star map PIP draws into its own buffer source), getRespawnData,
+  ArmorModelSet. NeoForge 21.10's DeferredRegister.Blocks/Items with a property operator: blocks get
+  `MOBlocks.props(op)`, items apply the operator inside the factory (tool / armour properties look up registries,
+  so they can't be built in static init).
+- Resources: `tools/backport.py` (the generic successor of backport_1_21_1.py, same file on every branch, steps by the
+  target's version.json) only rewrites the NBT data version and filters newer vanilla ids for 1.21.8.
+- 96 GameTests pass; the DevScene matches the 1.21.10 screenshots (flat world: bolts fly off instead of hitting the
+  bedrock room). Scene worlds: `run/saves/mo_scene_<mc>` (a `.mc_version` file inside), the current one at `mo_scene`.
+
 ## 1.21.10 / NeoForge 21.10.64 API notes (learned the hard way)
 **Workflow**
 - Resources: never hand-edit `src/main/resources/{assets,data}` — regenerate:
