@@ -188,7 +188,7 @@ public final class DevScene {
         // phase 6: become an android, buy a few stats, fit parts, android station GUI
         at(510, mc -> server(mc, p -> {
             BlockPos station = origin.offset(0, 0, -2);
-            p.serverLevel().setBlock(station, MOBlocks.ANDROID_STATION.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH),
+            setQuiet(p.serverLevel(), station, MOBlocks.ANDROID_STATION.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH),
                     Block.UPDATE_ALL);
             matteroverdrive.android.Android.setAndroid(p, true);
             p.setExperienceLevels(200);
@@ -438,7 +438,7 @@ public final class DevScene {
             p.getAbilities().flying = false;
             p.onUpdateAbilities();
             for (BlockPos pos : BlockPos.betweenClosed(base.offset(-4, 0, -9), base.offset(4, 1, -4))) {
-                p.serverLevel().setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+                setQuiet(p.serverLevel(), pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
             }
             for (BlockPos pos : BlockPos.betweenClosed(base.offset(-2, -1, -7), base.offset(2, -1, -5))) {
                 p.serverLevel().setBlockAndUpdate(pos, matteroverdrive.init.MODecorative.TRITANIUM_PLATE.get().defaultBlockState());
@@ -516,7 +516,7 @@ public final class DevScene {
             BlockPos pad = base.offset(0, -1, -4);
             // a clean floor (the plasma pool and the microwaves go)
             for (BlockPos pos : BlockPos.betweenClosed(base.offset(-7, -2, -10), base.offset(7, 3, 1))) {
-                p.serverLevel().setBlock(pos, pos.getY() < base.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
+                setQuiet(p.serverLevel(), pos, pos.getY() < base.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
                         Block.UPDATE_CLIENTS);
             }
             p.serverLevel().setBlockAndUpdate(pad, MOBlocks.TRANSPORTER.get().defaultBlockState());
@@ -539,7 +539,7 @@ public final class DevScene {
                 p.openMenu(t, buf -> buf.writeBlockPos(pad));
             }
         }));
-        at(1486, mc -> shot(mc, "transporter_gui"));
+        at(1484, mc -> shot(mc, "transporter_gui"));   // 1.21.1 closes the screen right after the 1485 step
         at(1485, mc -> server(mc, p -> {
             p.closeContainer();
             BlockPos base = origin.above(14);
@@ -552,7 +552,7 @@ public final class DevScene {
         at(1544, mc -> server(mc, p -> {
             BlockPos base = origin.above(30);
             for (BlockPos pos : BlockPos.betweenClosed(base.offset(-8, -1, -14), base.offset(8, 5, 2))) {
-                p.serverLevel().setBlock(pos, pos.getY() < base.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
+                setQuiet(p.serverLevel(), pos, pos.getY() < base.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
                         Block.UPDATE_CLIENTS);
             }
             p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.Mob.class, new AABB(base).inflate(20)).forEach(e -> e.discard());
@@ -590,7 +590,7 @@ public final class DevScene {
         at(1636, mc -> server(mc, p -> {
             BlockPos base = origin.above(30);
             for (BlockPos pos : BlockPos.betweenClosed(base.offset(-8, -1, -14), base.offset(8, 5, 2))) {
-                p.serverLevel().setBlock(pos, pos.getY() < base.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
+                setQuiet(p.serverLevel(), pos, pos.getY() < base.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
                         Block.UPDATE_CLIENTS);
             }
             p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.Mob.class, new AABB(base).inflate(20)).forEach(e -> e.discard());
@@ -771,7 +771,7 @@ public final class DevScene {
         at(2302, mc -> server(mc, p -> {
             BlockPos base = origin.above(30);
             for (BlockPos pos : BlockPos.betweenClosed(base.offset(-8, -1, -14), base.offset(8, 5, 2))) {
-                p.serverLevel().setBlock(pos, pos.getY() < base.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
+                setQuiet(p.serverLevel(), pos, pos.getY() < base.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
                         Block.UPDATE_CLIENTS);
             }
             p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.Mob.class, new AABB(base).inflate(20)).forEach(e -> e.discard());
@@ -921,7 +921,7 @@ public final class DevScene {
         at(2520, mc -> server(mc, p -> {
             BlockPos base = origin.above(30);
             for (BlockPos pos : BlockPos.betweenClosed(base.offset(-8, -1, -14), base.offset(8, 8, 8))) {
-                p.serverLevel().setBlock(pos, pos.getY() < base.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
+                setQuiet(p.serverLevel(), pos, pos.getY() < base.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
                         Block.UPDATE_CLIENTS);
             }
             BlockPos map = base.offset(0, 0, -4);
@@ -1155,7 +1155,7 @@ public final class DevScene {
         at(3102, mc -> server(mc, p -> {
             BlockPos pos = origin.above(30).offset(0, 0, -4);
             for (BlockPos b : BlockPos.betweenClosed(pos.offset(-3, -1, -3), pos.offset(3, 3, 3))) {
-                p.serverLevel().setBlock(b, b.getY() < pos.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
+                setQuiet(p.serverLevel(), b, b.getY() < pos.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
                         Block.UPDATE_CLIENTS);
             }
             p.serverLevel().setBlockAndUpdate(pos, MOBlocks.PATTERN_STORAGE.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
@@ -1226,7 +1226,7 @@ public final class DevScene {
         at(3202, mc -> server(mc, p -> {
             BlockPos base = origin.above(30);
             for (BlockPos b : BlockPos.betweenClosed(base.offset(-6, -1, -12), base.offset(6, 4, 6))) {
-                p.serverLevel().setBlock(b, b.getY() < base.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
+                setQuiet(p.serverLevel(), b, b.getY() < base.getY() ? Blocks.SMOOTH_STONE.defaultBlockState() : Blocks.AIR.defaultBlockState(),
                         Block.UPDATE_CLIENTS);
             }
             p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, new AABB(base).inflate(10)).forEach(e -> e.discard());
@@ -1341,8 +1341,8 @@ public final class DevScene {
         at(3325, mc -> server(mc, p -> {
             BlockPos base = origin.above(30);
             p.removeEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION);
-            p.serverLevel().setBlock(base.offset(0, 1, -9), Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
-            p.serverLevel().setBlock(base.offset(0, 1, -3), Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+            setQuiet(p.serverLevel(), base.offset(0, 1, -9), Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+            setQuiet(p.serverLevel(), base.offset(0, 1, -3), Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
         }));
         // leftovers: plasma shotgun - the full spread (thin bolts) and a charged shot (one big bolt): in flight and their
         // hits on the wall (sparks, puff)
@@ -1695,7 +1695,7 @@ public final class DevScene {
         // Clear the previous run's scene without machine side effects (they would drop their contents),
         // then remove any items already lying around.
         for (BlockPos p : BlockPos.betweenClosed(base.offset(-3, 0, -8), base.offset(3, 4, 0))) {
-            level.setBlock(p, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+            setQuiet(level, p, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
         }
         level.getEntitiesOfClass(ItemEntity.class, new AABB(base).inflate(8)).forEach(e -> e.discard());
         inscriberPos = base.offset(-1, 0, -3);
@@ -1789,7 +1789,7 @@ public final class DevScene {
             level.setBlock(p, Blocks.SMOOTH_STONE.defaultBlockState(), Block.UPDATE_CLIENTS);
         }
         for (BlockPos p : BlockPos.betweenClosed(controller.offset(-6, 0, -11), controller.offset(6, 4, 1))) {
-            level.setBlock(p, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+            setQuiet(level, p, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
         }
         reactorPos = controller;
         level.setBlockAndUpdate(controller, MOBlocks.FUSION_REACTOR_CONTROLLER.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
@@ -1844,7 +1844,7 @@ public final class DevScene {
             var state = dy >= 0 ? Blocks.AIR.defaultBlockState()
                     : dy == -1 ? (edge ? matteroverdrive.init.MODecorative.TRITANIUM_PLATE_STRIPE.get() : matteroverdrive.init.MODecorative.FLOOR_TILES.get()).defaultBlockState()
                     : Blocks.STONE.defaultBlockState();
-            level.setBlock(b, state, Block.UPDATE_CLIENTS);
+            setQuiet(level, b, state, Block.UPDATE_CLIENTS);
         }
         level.getEntitiesOfClass(net.minecraft.world.entity.Entity.class, new AABB(c).inflate(14),
                 e -> !(e instanceof net.minecraft.world.entity.player.Player)).forEach(net.minecraft.world.entity.Entity::discard);
@@ -1888,4 +1888,14 @@ public final class DevScene {
     }
 
     private DevScene() {}
+
+    /** 1.21.10 placed these with UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS: replaced machines don't drop their contents. */
+    private static void setQuiet(net.minecraft.world.level.Level level, BlockPos pos, net.minecraft.world.level.block.state.BlockState state, int flags) {
+        matteroverdrive.compat.CompatBlockEntity.skipRemoveSideEffects = true;
+        try {
+            level.setBlock(pos, state, flags);
+        } finally {
+            matteroverdrive.compat.CompatBlockEntity.skipRemoveSideEffects = false;
+        }
+    }
 }

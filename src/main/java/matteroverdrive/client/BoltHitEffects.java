@@ -86,8 +86,10 @@ public final class BoltHitEffects {
         }
 
         private static TextureAtlasSprite sprite(int index) {
-            return Minecraft.getInstance().getTextureAtlas(net.minecraft.client.renderer.texture.TextureAtlas.LOCATION_PARTICLES)
-                    .apply(ResourceLocation.withDefaultNamespace("generic_" + index));
+            // 1.21.1: the particle atlas belongs to the particle engine, not the model manager
+            var atlas = (net.minecraft.client.renderer.texture.TextureAtlas) Minecraft.getInstance().getTextureManager()
+                    .getTexture(net.minecraft.client.renderer.texture.TextureAtlas.LOCATION_PARTICLES);
+            return atlas.getSprite(ResourceLocation.withDefaultNamespace("generic_" + index));
         }
 
         @Override

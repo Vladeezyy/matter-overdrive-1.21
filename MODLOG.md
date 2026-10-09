@@ -587,6 +587,57 @@
   oceans) and sinks into the floor to stay submerged, no "generate buildings" config (use a datapack), not rotated
   (1.7.10 never rotated them either).
 
+## 2026-10-09 — Minecraft 1.21.1 (NeoForge 21.1.256), branch `1.21.1`
+- User: support NeoForge on 1.21.1..1.21.10, 1.21.1 first (most modpacks). One jar can't span them, so each MC range is a
+  branch of this repo (like the original's `1.7.10` / `1.19` branches): `main` = 1.21.10, `1.21.1` = 1.21.1.
+- **Java**: `matteroverdrive.compat` re-creates the 1.21.10 APIs the code is written against, so the game logic is the
+  same file on both branches and fixes cherry-pick cleanly: `ValueInput` / `ValueOutput` (over CompoundTag),
+  `CompatBlockEntity` (bridges saveAdditional / loadAdditional / removeComponentsFromTag / applyImplicitComponents and
+  `preRemoveSideEffects`, called from `MachineBlock.onRemove`), `ValueIOSerializable` (attachments), `DataComponentGetter`,
+  `ARGB`, `Nbt` (Optional getters), `ContainerItems`, `EnergyHandlerUtil`, `InfiniteEnergyHandler`, `Gui` (blit with an
+  ARGB tint, deferred tooltips), `MouseButtonEvent` / `KeyEvent`, and `compat.render` (SubmitNodeCollector over a
+  MultiBufferSource, Block/EntityRenderState, `StateBlockEntityRenderer` / `StateEntityRenderer` that extract a state and
+  submit it every frame, ItemStackRenderState / ItemModelResolver over the ItemRenderer).
+- Rewritten for 1.21.1 instead: transfer (MachineInventory = ItemStackHandler, MachineEnergy = EnergyStorage, MatterTank =
+  IFluidHandler, item energy = ComponentEnergyStorage, matter container = IFluidHandlerItem that swaps empty/full; capability
+  names `EnergyStorage` / `ItemHandler` / `FluidHandler`), registration (block / item properties, BlockEntityType.Builder,
+  EntityType.Builder, tool Tier + ArmorMaterial registry, DeferredSpawnEggItem with the 1.7.10 egg colours, drinks as
+  `DrinkItem`), Item.use -> InteractionResultHolder, tooltips (List), recipes (getIngredients / getResultItem,
+  canCraftInDimensions, SimpleCraftingRecipeSerializer), mob renderers and models (entity-typed HumanoidModel /
+  VillagerModel / HierarchicalModel), tritanium armour (getGenericArmorModel + ArmorItem.getArmorTexture), holo render
+  types from state shards, the star map screen hologram drawn straight into the GUI with its own projection (no
+  picture-in-picture), particles (TextureSheetParticle), item model properties (`client/BarrelProperty`: barrel,
+  security_type, linked + `item_tints.json` colours), GameTests (`@GameTestGenerator` over the same Spec list, time of day
+  via `@BeforeBatch`). Access transformer: Sheep.getOffspringColor, ServerPlayer.spawnInvulnerableTime (GameTest players),
+  SmithingTransformRecipe template / base / addition (matter derivation).
+- **Resources**: `tools/gen_resources.py` stays shared; `tools/backport_1_21_1.py` runs after it (client item
+  definitions -> item model overrides + item_tints.json, string ingredients -> objects, spawn eggs on the vanilla
+  template, 64x32 failed pig / cow textures, structure NBT DataVersion 3955, newer vanilla items out of the matter map /
+  optional in tags, equipment assets dropped):
+  `rm -rf src/main/resources/{assets,data} && python3 -I tools/gen_resources.py <mo> src/main/resources && python3 -I tools/backport_1_21_1.py <mo> src/main/resources build/moddev/artifacts/neoforge-21.1.256-client-extra-aka-minecraft-resources.jar`
+- mods.toml needs `modLoader` / `loaderVersion="[4,)"` on FML 4 (kept on main too, harmless).
+- Vanilla 1.21.1 bug: `GuiGraphics.blitNineSlicedSprite` draws the right edge as wide as the left border, so sprites
+  with different left / right borders (machine background, star map, holo list entries) got a stray column right of
+  the GUI. `compat.Gui.blitSprite` draws those nine-slices itself, in one buffer (the machine background's 1 px centre
+  was ~14k draw calls with the vanilla tiling).
+- 1.21.1 has no UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS: DevScene sets `CompatBlockEntity.skipRemoveSideEffects` around the
+  same setBlock calls (MachineBlock.onRemove skips preRemoveSideEffects), so cleared machines drop nothing.
+- The particle atlas belongs to the particle engine in 1.21.1: sprites come from
+  `TextureManager.getTexture(TextureAtlas.LOCATION_PARTICLES)`, not `Minecraft.getTextureAtlas` (crashed).
+- Fixed on the way (also wrong on main, latent): matter derivation now waits for a returned container's value (1.21.1
+  lists the cake recipe before the bucket, so the cake kept its milk buckets' full value).
+- Deviations from the 1.21.10 build: the holo sign editor text isn't holo blue (MultiLineEditBox has no colour);
+  item fluid handlers only fill / drain single containers (a stack of 8 empty containers is filled one by one by pipes,
+  as with vanilla buckets); spawn eggs look like vanilla 1.21.1 eggs in the 1.7.10 colours.
+- Oldest NeoForge: 21.1.197 (first with attachment sync; found by reading the class lists of the universal jars),
+  `neo_version_range=[21.1.197,)` in gradle.properties; the code compiles and all GameTests pass on 21.1.197 too.
+  Stripped logs come from vanilla `AxeItem.STRIPPABLES` (AT) there: NeoForge's STRIPPABLES data map is newer, so
+  modded strippable logs get an estimate on 1.21.1.
+- DevScene: the transporter screen shot moved to tick 1484 (1.21.1 closes the screen right after the 1485 step).
+- 95 GameTests pass on 1.21.1. Scene world for 1.21.1: `run/saves/mo_scene` (flat creative, made by runServer); the
+  1.21.10 one is `run/saves/mo_scene_1.21.10` (swap the folders when switching branches), old screenshots in
+  `run/screenshots_1.21.10`.
+
 ## 1.21.10 / NeoForge 21.10.64 API notes (learned the hard way)
 **Workflow**
 - Resources: never hand-edit `src/main/resources/{assets,data}` — regenerate:
@@ -641,6 +692,11 @@
 - Sounds must be mono ogg: ffmpeg → mono wav → `oggenc` (vorbis-tools); ffmpeg's built-in vorbis is stereo-only.
 
 ## Next
+- **1.21.1 branch ✅ (2026-10-09)**: everything ported, 95 GameTests, the DevScene matches the 1.21.10 screenshots
+  (see the 1.21.1 section above). Not released yet: needs a version name (e.g. 1.0.0+1.21.1 / mc1.21.1 in the jar name,
+  both branches build `matteroverdrive-1.0.0.jar`), a GitHub release and a Modrinth version for 1.21.1.
+  Next ranges if the user wants them: 1.21.2-1.21.4 and 1.21.5-1.21.8 as more branches, the same way (compat package +
+  a resources backport step).
 - Phase 7 ✅, all leftovers ✅ (only gui button_expand left out). Released v1.0.0 (GitHub release + Modrinth version).
 - **Next task (user, 2026-10-09): make the mod run on NeoForge for every Minecraft 1.21.1 .. 1.21.10.** Not started.
   Notes for whoever picks it up:

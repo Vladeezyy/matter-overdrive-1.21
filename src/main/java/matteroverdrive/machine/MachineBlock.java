@@ -74,7 +74,8 @@ public abstract class MachineBlock extends BaseEntityBlock {
     /** 1.21.1: the 1.21.10 preRemoveSideEffects hook (drops the contents, etc.). */
     @Override
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
-        if (!state.is(newState.getBlock()) && level.getBlockEntity(pos) instanceof matteroverdrive.compat.CompatBlockEntity be) {
+        if (!state.is(newState.getBlock()) && !matteroverdrive.compat.CompatBlockEntity.skipRemoveSideEffects
+                && level.getBlockEntity(pos) instanceof matteroverdrive.compat.CompatBlockEntity be) {
             be.preRemoveSideEffects(pos, state);
         }
         super.onRemove(state, level, pos, newState, movedByPiston);

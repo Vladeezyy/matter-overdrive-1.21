@@ -25,6 +25,9 @@ public abstract class CompatBlockEntity extends BlockEntity {
 
     protected void applyImplicitComponents(DataComponentGetter components) {}
 
+    /** Set around a setBlock that 1.21.10 would do with UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS (the dev scene). */
+    public static boolean skipRemoveSideEffects;
+
     /** 1.21.10 BlockEntity.preRemoveSideEffects: the block is being removed (not just its state changed). */
     public void preRemoveSideEffects(BlockPos pos, BlockState state) {}
 
