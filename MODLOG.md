@@ -647,16 +647,13 @@
 
 ## Next
 - Phase 7 ✅, all leftovers ✅ (only gui button_expand left out). Released v1.0.0 (GitHub release + Modrinth version).
-- **Next task (user, 2026-10-09): make the mod run on NeoForge for every Minecraft 1.21.1 .. 1.21.10.** Not started.
-  Notes for whoever picks it up:
-  - One jar can't span them (version boundaries below are from memory: verify against the NeoForge changelogs): 1.21.2 (item/recipe/render rewrites, `Recipe.placementInfo/display`, equipment assets),
-    1.21.4 (client item definitions `assets/*/items`), 1.21.5 (tools as plain items, `ValueInput/ValueOutput` saves
-    landed in 1.21.6), 1.21.9-10 (render states / `SubmitNodeCollector`, `ResourceLocation` vs ids, the transfer API
-    `EnergyHandler`/`ResourceHandler` replacing IEnergyStorage/IItemHandler) all break source compatibility. Plan on
-    separate builds per range (e.g. 1.21.1, 1.21.3-4, 1.21.5-8, 1.21.9-10) from one repo: a multi-version Gradle
-    setup (Stonecutter-style preprocessing, or branches) with version-specific shims for the APIs listed in
-    "## 1.21.10 / NeoForge 21.10.64 API notes" above; the resources generator needs per-version output too.
-  - Ask the user which versions matter most (1.21.1 has by far the most modpacks) before building the matrix.
+- **Multi-version ✅ (2026-10-09)**: one branch per Minecraft version with a stable NeoForge, each made from the next
+  newer one and carrying the same game code: `main` 1.21.10 (21.10.64), `1.21.8` (21.8.54), `1.21.5` (21.5.98),
+  `1.21.4` (21.4.158), `1.21.3` (21.3.97), `1.21.1` (21.1.256, runs on 21.1.197+). 1.21.2 / 1.21.6 / 1.21.7 only had
+  beta NeoForge. API differences are bridged in `matteroverdrive.compat`; `tools/backport.py` converts the generated
+  resources (1.21.1 still uses its older `tools/backport_1_21_1.py`). Each branch's MODLOG has its own section; jars
+  are `matteroverdrive-1.0.0+<mc>.jar`. All tests and DevScenes checked per branch. Not released yet.
+  - A fix in game code goes to every branch (apply on `main`, then carry it down; the files mostly match).
 - Suggested, not done: estimate modded raw materials from common `c:` tags (c:ingots 32, c:raw_materials 32,
   c:ores 64, c:gems 64, c:dusts 16, c:nuggets 4, c:storage_blocks 9 x ingot) in `MatterRegistry.estimate` — the user
   hasn't answered yet.
