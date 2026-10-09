@@ -135,5 +135,19 @@
     "dig_effect": false,
     "weapon_module_barrel_damage": false,
     "weapon_module_barrel_fire": false
-  }
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "matteroverdrive:barrel": 0.1
+      },
+      "model": "matteroverdrive:item/omni_tool_damage"
+    },
+    {
+      "predicate": {
+        "matteroverdrive:barrel": 0.2
+      },
+      "model": "matteroverdrive:item/omni_tool_fire"
+    }
+  ]
 }

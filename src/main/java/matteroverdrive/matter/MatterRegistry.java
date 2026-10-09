@@ -265,7 +265,7 @@ public final class MatterRegistry {
     /** The cheapest valued alternative of an ingredient, minus what crafting gives back (water bucket -> bucket). */
     private static int cheapest(Ingredient ingredient, Map<Item, Integer> values) {
         int best = 0;
-        for (Holder<Item> holder : ingredient.items().toList()) {
+        for (Holder<Item> holder : ingredient.items()) {
             Integer value = values.get(holder.value());
             if (value == null || value <= 0) continue;
             ItemStack remainder = holder.value().getCraftingRemainder(holder.value().getDefaultInstance());

@@ -8,8 +8,8 @@ import matteroverdrive.compat.render.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import matteroverdrive.compat.render.BlockEntityRenderState;
-import net.minecraft.client.renderer.item.ItemModelResolver;
-import net.minecraft.client.renderer.item.ItemStackRenderState;
+import matteroverdrive.compat.render.ItemModelResolver;
+import matteroverdrive.compat.render.ItemStackRenderState;
 import matteroverdrive.compat.render.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -24,7 +24,7 @@ public class WeaponStationRenderer implements matteroverdrive.compat.render.Stat
     private final ItemModelResolver itemModelResolver;
 
     public WeaponStationRenderer(BlockEntityRendererProvider.Context context) {
-        this.itemModelResolver = context.getItemModelResolver();
+        this.itemModelResolver = ItemModelResolver.INSTANCE;
     }
 
     public static class State extends BlockEntityRenderState {

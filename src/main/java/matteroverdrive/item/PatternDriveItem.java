@@ -64,7 +64,7 @@ public class PatternDriveItem extends Item {
     public void setPatterns(ItemStack drive, List<ItemPattern> patterns) {
         drive.set(MODataComponents.PATTERNS.get(), List.copyOf(patterns));
         float state = patterns.isEmpty() ? 0 : patterns.size() < capacity ? 1 : 2;
-        drive.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(state), List.of(), List.of(), List.of()));
+        drive.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData((int) state));
     }
 
     @Override

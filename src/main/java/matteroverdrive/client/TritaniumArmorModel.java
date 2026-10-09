@@ -13,7 +13,7 @@ import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
-import net.minecraft.client.resources.model.EquipmentClientInfo;
+import net.minecraft.world.item.equipment.EquipmentModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
@@ -86,27 +86,23 @@ public final class TritaniumArmorModel {
     /** Client extensions of the four tritanium armor pieces. */
     public static final IClientItemExtensions EXTENSIONS = new IClientItemExtensions() {
         @Override
-        public Model getGenericArmorModel(ItemStack stack, EquipmentClientInfo.LayerType layerType, Model original) {
+        public Model getGenericArmorModel(ItemStack stack, EquipmentModel.LayerType layerType, Model original) {
             // the poses come from the render state in setupAnim; don't copy the vanilla model's visibility
             return forSlot(slot(stack));
         }
-
-        @Override
-        public ResourceLocation getArmorTexture(ItemStack stack, EquipmentClientInfo.LayerType type, EquipmentClientInfo.Layer layer, ResourceLocation _default) {
-            return slot(stack) == EquipmentSlot.FEET ? LAYER_2 : LAYER_1;
-        }
+        // the textures: ArmorItem.getArmorTexture in MOItems (before 1.21.4 the hook is on the item)
     };
 
     @net.neoforged.bus.api.SubscribeEvent
     static void hideSkinOverlay(net.neoforged.neoforge.client.event.RenderPlayerEvent.Pre event) {
         var state = event.getRenderState();
-        if (isTritanium(state.headEquipment)) state.showHat = false;
-        if (isTritanium(state.chestEquipment)) {
+        if (isTritanium(state.headItem)) state.showHat = false;
+        if (isTritanium(state.chestItem)) {
             state.showJacket = false;
             state.showLeftSleeve = false;
             state.showRightSleeve = false;
         }
-        if (isTritanium(state.legsEquipment) || isTritanium(state.feetEquipment)) {
+        if (isTritanium(state.legsItem) || isTritanium(state.feetItem)) {
             state.showLeftPants = false;
             state.showRightPants = false;
         }

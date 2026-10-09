@@ -116,7 +116,7 @@ public class MatterScannerScreen extends Screen {
             g.fill(ix, ty, ix + Math.round(barW * selected.progress() / (float) ItemPattern.MAX_PROGRESS), ty + 4,
                     selected.isComplete() ? 0xFF6BE36B : 0xFFE3C46B);
         } else {
-            g.drawWordWrap(font, Component.translatable("gui.matteroverdrive.scanner.nothing_selected"), ix, iy, INFO_W, COLOR_TEXT, false);
+            g.drawWordWrap(font, Component.translatable("gui.matteroverdrive.scanner.nothing_selected"), ix, iy, INFO_W, COLOR_TEXT);
         }
         if (hovered != null) {
             matteroverdrive.compat.Gui.setTooltipForNextFrame(g, font, Component.translatable("gui.matteroverdrive.pattern", hovered.toStack().getHoverName(), hovered.progress()),

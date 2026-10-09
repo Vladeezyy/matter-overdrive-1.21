@@ -587,6 +587,20 @@
   oceans) and sinks into the floor to stay submerged, no "generate buildings" config (use a datapack), not rotated
   (1.7.10 never rotated them either).
 
+## 2026-10-09 — Minecraft 1.21.3 (NeoForge 21.3.97), branch `1.21.3`
+- Made from 1.21.4; 1.21.3 lacks the 1.21.4 changes: client item definitions (backport.py makes model overrides and
+  item_tints.json; `client/BarrelProperty` registers the item properties barrel / security_type / linked and the
+  tints, as on 1.21.1), ItemModelResolver / ItemStackRenderState (compat.render stand-ins over the ItemRenderer),
+  DeferredRegister.Entities (MOEntities.register with a ResourceKey), EquipmentAsset (the armor material takes the
+  equipment model id; models/equipment), EquipmentClientInfo (EquipmentModel; the boots' layer-2 texture comes from
+  ArmorItem.getArmorTexture), HoldingEntityRenderState, ModelEvent.RegisterAdditional with ModelResourceLocation,
+  CustomModelData(int), the humanoid arm pose from the model (the rogue android's aimed bow is a render state flag),
+  setClientLoaded (AT: spawnInvulnerableTime), DyeColor.getMixedColor (AT: Sheep.getOffspringColor),
+  Ingredient.items() as a list, drawWordWrap without the shadow flag. NeoForge 21.3 has no DeferredSpawnEggItem:
+  vanilla SpawnEggItem with the 1.7.10 egg colours.
+- 95 GameTests pass; the DevScene matches the 1.21.10 screenshots (the new scene world's galaxy put the homeworld in a
+  3-star quadrant, so the quadrant page is nearly empty — 1.7.10 claimPlanet does that too).
+
 ## 2026-10-09 — Minecraft 1.21.4 (NeoForge 21.4.158), branch `1.21.4`
 - Made from 1.21.5; 1.21.4 lacks the 1.21.5 changes, bridged like on 1.21.1: CompoundTag Or / Optional getters
   (`compat.Nbt`, compat ValueInput over plain getters), BlockEntity.preRemoveSideEffects (CompatBlockEntity, called

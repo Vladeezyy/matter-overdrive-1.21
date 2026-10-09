@@ -4,7 +4,6 @@ import java.util.Map;
 
 import matteroverdrive.MatterOverdrive;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BlockTags;
@@ -13,8 +12,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ToolMaterial;
 import net.minecraft.world.item.equipment.ArmorMaterial;
 import net.minecraft.world.item.equipment.ArmorType;
-import net.minecraft.world.item.equipment.EquipmentAsset;
-import net.minecraft.world.item.equipment.EquipmentAssets;
 
 public final class MOMaterials {
     public static final TagKey<Item> TRITANIUM_REPAIR = TagKey.create(Registries.ITEM, id("tritanium_tool_materials"));
@@ -23,7 +20,8 @@ public final class MOMaterials {
     public static final ToolMaterial TRITANIUM_TOOL = new ToolMaterial(
             BlockTags.INCORRECT_FOR_IRON_TOOL, 3122, 6f, 2f, 14, TRITANIUM_REPAIR);
 
-    public static final ResourceKey<EquipmentAsset> TRITANIUM_ASSET = ResourceKey.create(EquipmentAssets.ROOT_ID, id("tritanium"));
+    /** 1.21.2 - 1.21.3: the equipment model id (models/equipment/tritanium.json). */
+    public static final ResourceLocation TRITANIUM_ASSET = id("tritanium");
 
     /** 1.7.10: addArmorMaterial("tritanium", 66, {4, 9, 7, 4}, 20) — helmet, chest, legs, boots. */
     public static final ArmorMaterial TRITANIUM_ARMOR = new ArmorMaterial(

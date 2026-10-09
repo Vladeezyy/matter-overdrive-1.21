@@ -1,0 +1,23 @@
+{
+  "parent": "matteroverdrive:item/security_protocol_empty",
+  "overrides": [
+    {
+      "predicate": {
+        "matteroverdrive:security_type": 0.1
+      },
+      "model": "matteroverdrive:item/security_protocol_claim"
+    },
+    {
+      "predicate": {
+        "matteroverdrive:security_type": 0.2
+      },
+      "model": "matteroverdrive:item/security_protocol_access"
+    },
+    {
+      "predicate": {
+        "matteroverdrive:security_type": 0.3
+      },
+      "model": "matteroverdrive:item/security_protocol_remove"
+    }
+  ]
+}

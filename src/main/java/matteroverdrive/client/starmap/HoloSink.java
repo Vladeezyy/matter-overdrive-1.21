@@ -47,8 +47,8 @@ public interface HoloSink {
             @Override
             public void item(PoseStack pose, net.minecraft.world.item.ItemStack stack, float x, float y) {
                 var mc = net.minecraft.client.Minecraft.getInstance();
-                var state = new net.minecraft.client.renderer.item.ItemStackRenderState();
-                mc.getItemModelResolver().updateForTopItem(state, stack, net.minecraft.world.item.ItemDisplayContext.GUI, false, mc.level, null, 0);
+                var state = new matteroverdrive.compat.render.ItemStackRenderState();
+                matteroverdrive.compat.render.ItemModelResolver.INSTANCE.updateForTopItem(state, stack, net.minecraft.world.item.ItemDisplayContext.GUI, false, mc.level, null, 0);
                 if (state.isEmpty()) return;
                 pose.pushPose();
                 pose.translate(x + 8, y + 8, 0);

@@ -41,6 +41,19 @@ public class RogueAndroidRenderer<T extends RogueAndroid> extends HumanoidMobRen
     public static class State extends HumanoidRenderState {
         int visorColor;
         boolean legendary;
+        boolean aimedBow;
+    }
+
+    /** Before 1.21.4 the model picks the arm pose from the render state. */
+    private static class Model extends HumanoidModel<State> {
+        Model(net.minecraft.client.model.geom.ModelPart root) {
+            super(root);
+        }
+
+        @Override
+        protected HumanoidModel.ArmPose getArmPose(State state, HumanoidArm arm) {
+            return state.aimedBow && state.mainArm == arm ? HumanoidModel.ArmPose.BOW_AND_ARROW : HumanoidModel.ArmPose.EMPTY;
+        }
     }
 
     private static ModelLayerLocation layer(String name) {
@@ -80,7 +93,7 @@ public class RogueAndroidRenderer<T extends RogueAndroid> extends HumanoidMobRen
     }
 
     private RogueAndroidRenderer(EntityRendererProvider.Context context, ModelLayerLocation layer, boolean ranged) {
-        super(context, new HumanoidModel<>(context.bakeLayer(layer)), 0.5f);
+        super(context, new Model(context.bakeLayer(layer)), 0.5f);
         this.ranged = ranged;
         addLayer(new HumanoidArmorLayer<>(this, new HumanoidModel<>(context.bakeLayer(ModelLayers.ZOMBIE_INNER_ARMOR)),
                 new HumanoidModel<>(context.bakeLayer(ModelLayers.ZOMBIE_OUTER_ARMOR)), context.getEquipmentRenderer()));
@@ -97,18 +110,13 @@ public class RogueAndroidRenderer<T extends RogueAndroid> extends HumanoidMobRen
         super.extractRenderState(android, state, partialTick);
         state.visorColor = android.getVisorColor();
         state.legendary = android.isLegendary();
+        // 1.7.10 setRenderPassModel: aimedBow for the ranged android
+        state.aimedBow = ranged && !android.getMainHandItem().isEmpty();
     }
 
     @Override
     public ResourceLocation getTextureLocation(State state) {
         return ranged ? RANGED_TEXTURE : MELEE_TEXTURE;
-    }
-
-    /** 1.7.10 setRenderPassModel: aimedBow for the ranged android. */
-    @Override
-    protected HumanoidModel.ArmPose getArmPose(T android, HumanoidArm arm) {
-        return ranged && android.getMainArm() == arm && !android.getMainHandItem().isEmpty()
-                ? HumanoidModel.ArmPose.BOW_AND_ARROW : HumanoidModel.ArmPose.EMPTY;
     }
 
     @Override

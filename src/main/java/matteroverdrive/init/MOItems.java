@@ -221,21 +221,21 @@ public final class MOItems {
     public static final List<DeferredItem<BlockItem>> TRITANIUM_CRATES = MOBlocks.TRITANIUM_CRATES.stream()
             .map(b -> block(b.getId().getPath(), b)).toList();
     public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> ROGUE_ANDROID_SPAWN_EGG = item("rogue_android_spawn_egg",
-            p -> new net.minecraft.world.item.SpawnEggItem(MOEntities.ROGUE_ANDROID.get(), p), p -> p);
+            p -> new net.minecraft.world.item.SpawnEggItem(MOEntities.ROGUE_ANDROID.get(), 0x0FFFFF, 0, p), p -> p);
     public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> RANGED_ROGUE_ANDROID_SPAWN_EGG = item("ranged_rogue_android_spawn_egg",
-            p -> new net.minecraft.world.item.SpawnEggItem(MOEntities.RANGED_ROGUE_ANDROID.get(), p), p -> p);
+            p -> new net.minecraft.world.item.SpawnEggItem(MOEntities.RANGED_ROGUE_ANDROID.get(), 0x0FFFFF, 0, p), p -> p);
     public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> MAD_SCIENTIST_SPAWN_EGG = item("mad_scientist_spawn_egg",
-            p -> new net.minecraft.world.item.SpawnEggItem(MOEntities.MAD_SCIENTIST.get(), p), p -> p);
+            p -> new net.minecraft.world.item.SpawnEggItem(MOEntities.MAD_SCIENTIST.get(), 0xFFFFFF, 0, p), p -> p);
     public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> MUTANT_SCIENTIST_SPAWN_EGG = item("mutant_scientist_spawn_egg",
-            p -> new net.minecraft.world.item.SpawnEggItem(MOEntities.MUTANT_SCIENTIST.get(), p), p -> p);
+            p -> new net.minecraft.world.item.SpawnEggItem(MOEntities.MUTANT_SCIENTIST.get(), 0xFFFFFF, 0x00FF00, p), p -> p);
     public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> FAILED_PIG_SPAWN_EGG = item("failed_pig_spawn_egg",
-            p -> new net.minecraft.world.item.SpawnEggItem(MOEntities.FAILED_PIG.get(), p), p -> p);
+            p -> new net.minecraft.world.item.SpawnEggItem(MOEntities.FAILED_PIG.get(), 15771042, 0x33CC33, p), p -> p);
     public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> FAILED_COW_SPAWN_EGG = item("failed_cow_spawn_egg",
-            p -> new net.minecraft.world.item.SpawnEggItem(MOEntities.FAILED_COW.get(), p), p -> p);
+            p -> new net.minecraft.world.item.SpawnEggItem(MOEntities.FAILED_COW.get(), 4470310, 0x33CC33, p), p -> p);
     public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> FAILED_CHICKEN_SPAWN_EGG = item("failed_chicken_spawn_egg",
-            p -> new net.minecraft.world.item.SpawnEggItem(MOEntities.FAILED_CHICKEN.get(), p), p -> p);
+            p -> new net.minecraft.world.item.SpawnEggItem(MOEntities.FAILED_CHICKEN.get(), 10592673, 0x33CC33, p), p -> p);
     public static final DeferredItem<net.minecraft.world.item.SpawnEggItem> FAILED_SHEEP_SPAWN_EGG = item("failed_sheep_spawn_egg",
-            p -> new net.minecraft.world.item.SpawnEggItem(MOEntities.FAILED_SHEEP.get(), p), p -> p);
+            p -> new net.minecraft.world.item.SpawnEggItem(MOEntities.FAILED_SHEEP.get(), 15198183, 0x33CC33, p), p -> p);
 
     public static final DeferredItem<AndroidPillItem> ANDROID_PILL_YELLOW = item("android_pill_yellow", p -> new AndroidPillItem(AndroidPillItem.Type.YELLOW, p), p -> p);
 
@@ -270,7 +270,15 @@ public final class MOItems {
     }
 
     private static DeferredItem<Item> armor(String name, ArmorType type) {
-        return item(name, p -> new net.minecraft.world.item.ArmorItem(MOMaterials.TRITANIUM_ARMOR, type, p), p -> p);
+        return item(name, p -> new net.minecraft.world.item.ArmorItem(MOMaterials.TRITANIUM_ARMOR, type, p) {
+            /** 1.7.10: the boots use layer 2 (before 1.21.4 the texture hook is on the item). */
+            @Override
+            public net.minecraft.resources.ResourceLocation getArmorTexture(net.minecraft.world.item.ItemStack stack, net.minecraft.world.item.equipment.EquipmentModel.LayerType layerType,
+                    net.minecraft.world.item.equipment.EquipmentModel.Layer layer, net.minecraft.resources.ResourceLocation _default) {
+                return net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, type == ArmorType.BOOTS
+                        ? "textures/entity/equipment/humanoid_leggings/tritanium.png" : "textures/entity/equipment/humanoid/tritanium.png");
+            }
+        }, p -> p);
     }
 
     private static DeferredItem<BlockItem> block(String name, net.neoforged.neoforge.registries.DeferredBlock<?> block) {

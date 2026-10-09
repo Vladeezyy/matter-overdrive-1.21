@@ -89,7 +89,7 @@ public class MatterScannerItem extends Item {
 
     private static ItemStack blockItem(Level level, BlockPos pos) {
         BlockState state = level.getBlockState(pos);
-        return state.isAir() ? ItemStack.EMPTY : state.getCloneItemStack(level, pos, false);
+        return state.isAir() ? ItemStack.EMPTY : state.getBlock().getCloneItemStack(level, pos, state);
     }
 
     @Override

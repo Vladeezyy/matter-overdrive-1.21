@@ -7,7 +7,6 @@ import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.entity.layers.CrossedArmsItemLayer;
-import net.minecraft.client.renderer.entity.state.HoldingEntityRenderState;
 import net.minecraft.client.renderer.entity.state.VillagerRenderState;
 import net.minecraft.resources.ResourceLocation;
 
@@ -17,7 +16,7 @@ public class MadScientistRenderer extends MobRenderer<MadScientist, VillagerRend
 
     public MadScientistRenderer(EntityRendererProvider.Context context) {
         super(context, new VillagerModel(context.bakeLayer(ModelLayers.VILLAGER)), 0.5f);
-        addLayer(new CrossedArmsItemLayer<>(this));
+        addLayer(new CrossedArmsItemLayer<>(this, context.getItemRenderer()));
     }
 
     @Override
@@ -33,7 +32,6 @@ public class MadScientistRenderer extends MobRenderer<MadScientist, VillagerRend
     @Override
     public void extractRenderState(MadScientist entity, VillagerRenderState state, float partialTick) {
         super.extractRenderState(entity, state, partialTick);
-        HoldingEntityRenderState.extractHoldingEntityRenderState(entity, state, itemModelResolver);
         state.isUnhappy = entity.getUnhappyCounter() > 0;
     }
 }

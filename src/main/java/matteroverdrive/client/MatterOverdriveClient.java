@@ -120,12 +120,6 @@ public class MatterOverdriveClient {
     }
 
     @SubscribeEvent
-    static void registerSelectProperties(net.neoforged.neoforge.client.event.RegisterSelectItemModelPropertyEvent event) {
-        event.register(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "barrel"), BarrelProperty.TYPE);
-        event.register(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "security_type"), SecurityTypeProperty.TYPE);
-    }
-
-    @SubscribeEvent
     static void registerRenderers(net.neoforged.neoforge.client.event.EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(matteroverdrive.init.MOEntities.PLASMA_BOLT.get(), PlasmaBoltRenderer::new);
         event.registerBlockEntityRenderer(matteroverdrive.init.MOBlockEntities.WEAPON_STATION.get(), WeaponStationRenderer::new);

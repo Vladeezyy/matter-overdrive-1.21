@@ -38,7 +38,7 @@ public class FailedSheep extends Sheep {
     public @Nullable Sheep getBreedOffspring(ServerLevel level, AgeableMob mate) {
         FailedSheep lamb = MOEntities.FAILED_SHEEP.get().create(level, EntitySpawnReason.BREEDING);
         if (lamb != null && mate instanceof Sheep other) {
-            lamb.setColor(DyeColor.getMixedColor(level, getColor(), other.getColor()));
+            lamb.setColor(getOffspringColor(level, this, other));   // AT before 1.21.4
         }
         return lamb;
     }

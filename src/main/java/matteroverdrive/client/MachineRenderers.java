@@ -19,10 +19,11 @@ import net.minecraft.client.renderer.Sheets;
 import matteroverdrive.compat.render.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import matteroverdrive.compat.render.BlockEntityRenderState;
-import net.minecraft.client.renderer.item.ItemModelResolver;
-import net.minecraft.client.renderer.item.ItemStackRenderState;
+import matteroverdrive.compat.render.ItemModelResolver;
+import matteroverdrive.compat.render.ItemStackRenderState;
 import matteroverdrive.compat.render.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
@@ -40,11 +41,11 @@ import net.neoforged.neoforge.client.event.ModelEvent;
  * and the monitors' holo screens (TileEntityRendererMonitor / PatternMonitor / ContractMarket).
  */
 public final class MachineRenderers {
-    public static final ResourceLocation STORAGE_DRIVE = id("block/pattern_storage_drive");
-    public static final ResourceLocation INSCRIBER_RAIL = id("block/inscriber_rail");
-    public static final ResourceLocation INSCRIBER_HEAD = id("block/inscriber_head");
+    public static final ModelResourceLocation STORAGE_DRIVE = ModelResourceLocation.standalone(id("block/pattern_storage_drive"));
+    public static final ModelResourceLocation INSCRIBER_RAIL = ModelResourceLocation.standalone(id("block/inscriber_rail"));
+    public static final ModelResourceLocation INSCRIBER_HEAD = ModelResourceLocation.standalone(id("block/inscriber_head"));
 
-    /** 1.21.4: extra (standalone) block models are registered and looked up by their model id. */
+    /** Before 1.21.4: extra (standalone) block models are registered and looked up by their model location. */
     public static void registerModels(ModelEvent.RegisterAdditional event) {
         event.register(STORAGE_DRIVE);
         event.register(INSCRIBER_RAIL);
@@ -55,8 +56,8 @@ public final class MachineRenderers {
         return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, path);
     }
 
-    private static BakedModel model(ResourceLocation key) {
-        return Minecraft.getInstance().getModelManager().getStandaloneModel(key);
+    private static BakedModel model(ModelResourceLocation key) {
+        return Minecraft.getInstance().getModelManager().getModel(key);
     }
 
     /** The block model's facing rotation (blockstate y: north 0, east 90, south 180, west 270) about the block centre. */
@@ -88,7 +89,7 @@ public final class MachineRenderers {
         protected final ItemModelResolver items;
 
         Base(BlockEntityRendererProvider.Context context) {
-            this.items = context.getItemModelResolver();
+            this.items = ItemModelResolver.INSTANCE;
         }
 
         @Override
@@ -117,7 +118,7 @@ public final class MachineRenderers {
             return facingYaw(facing);
         }
 
-        protected void part(PoseStack pose, SubmitNodeCollector collector, State state, ResourceLocation key) {
+        protected void part(PoseStack pose, SubmitNodeCollector collector, State state, ModelResourceLocation key) {
             pose.pushPose();
             pose.translate(-0.5, 0, -0.5);   // the OBJ models are shifted to the block corner
             collector.submitBlockModel(pose, Sheets.cutoutBlockSheet(), model(key), 1, 1, 1, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
