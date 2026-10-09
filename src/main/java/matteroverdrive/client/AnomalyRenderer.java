@@ -69,8 +69,8 @@ public class AnomalyRenderer implements matteroverdrive.compat.render.StateBlock
         float half = r;     // a unit plane scaled by 2 x horizon
         // the core is a black disc, the glow a half-transparent white ring; both alpha blended (1.7.10 GL_SRC_ALPHA,
         // GL_ONE_MINUS_SRC_ALPHA) and unlit (lighting disabled)
-        collector.submitCustomGeometry(pose, RenderType.entityTranslucentEmissive(CORE), (p, vc) -> plane(vc, p, half));
-        collector.submitCustomGeometry(pose, RenderType.entityTranslucentEmissive(GLOW), (p, vc) -> plane(vc, p, half));
+        collector.submitCustomGeometry(pose, matteroverdrive.compat.render.RenderTypes.entityTranslucentEmissive(CORE), (p, vc) -> plane(vc, p, half));
+        collector.submitCustomGeometry(pose, matteroverdrive.compat.render.RenderTypes.entityTranslucentEmissive(GLOW), (p, vc) -> plane(vc, p, half));
         pose.popPose();
     }
 

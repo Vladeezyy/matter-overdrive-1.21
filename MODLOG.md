@@ -587,6 +587,21 @@
   oceans) and sinks into the floor to stay submerged, no "generate buildings" config (use a datapack), not rotated
   (1.7.10 never rotated them either).
 
+## 2026-10-09 — Minecraft 1.21.5 (NeoForge 21.5.98), branch `1.21.5`
+- Made from 1.21.8; 1.21.5 lacks the 1.21.6 changes: ValueInput / ValueOutput (compat, delegating to the 1.21.5
+  CompoundTag Or-getters; CompatBlockEntity bridges the CompoundTag saves; entities bridge add/readAdditionalSaveData;
+  ValueIOSerializable over INBTSerializable), the deferred GUI (compat.Gui: blit / blitSprite with
+  RenderType::guiTextured, tooltips through Screen.setTooltipForNextRenderPass, PoseStack instead of Matrix3x2f),
+  picture-in-picture (the star map screen hologram is drawn with its own projection, as on 1.21.1),
+  ClientPacketDistributor, ServerPlayer.level() as ServerLevel, MultiLineEditBox.builder (no holo blue text there),
+  NeoForge's STRIPPABLES data map (vanilla AxeItem.STRIPPABLES via AT).
+- NeoForge 21.5 has no attachment sync: `compat.AttachmentSync` sends the android / quest attachments in its own payload
+  (login, respawn, dimension change, start tracking, and `AttachmentSync.sync` where 1.21.6+ calls syncData) through
+  the same handler interface.
+- 1.21.5 bug: `entity_translucent_emissive` has no lightmap state but its pipeline samples Sampler2 ("Missing sampler
+  Sampler2" crash when drawn on its own): `compat.render.RenderTypes.entityTranslucentEmissive` adds the lightmap.
+- 96 GameTests pass; the DevScene matches the 1.21.10 screenshots.
+
 ## 2026-10-09 — Minecraft 1.21.8 (NeoForge 21.8.54), branch `1.21.8`
 - Version branches (user): one per Minecraft version with a stable NeoForge — `main` 1.21.10, `1.21.8`, `1.21.5`,
   `1.21.4`, `1.21.3`, `1.21.1` (NeoForge for 1.21.2 / 1.21.6 / 1.21.7 only ever had betas). Each one is made from the

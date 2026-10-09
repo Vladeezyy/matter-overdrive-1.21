@@ -128,7 +128,7 @@ public class RogueAndroidRenderer<T extends RogueAndroid> extends HumanoidMobRen
         @Override
         public void render(PoseStack pose, net.minecraft.client.renderer.MultiBufferSource buffers, int light, State state, float yRot, float xRot) {
             visor.setupAnim(state);
-            visor.renderToBuffer(pose, buffers.getBuffer(RenderType.entityTranslucentEmissive(RANGED_TEXTURE)), 0xF000F0,
+            visor.renderToBuffer(pose, buffers.getBuffer(matteroverdrive.compat.render.RenderTypes.entityTranslucentEmissive(RANGED_TEXTURE)), 0xF000F0,
                     OverlayTexture.NO_OVERLAY, ARGB.color(255, state.visorColor));
         }
     }
