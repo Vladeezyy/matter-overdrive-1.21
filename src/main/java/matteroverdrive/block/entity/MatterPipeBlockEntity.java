@@ -13,8 +13,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
+import matteroverdrive.compat.ValueInput;
+import matteroverdrive.compat.ValueOutput;
 import net.neoforged.neoforge.capabilities.Capabilities;
 
 /**
@@ -22,7 +22,7 @@ import net.neoforged.neoforge.capabilities.Capabilities;
  * that accept matter), then evens out with neighbouring pipes that hold less, so matter flows from sources to
  * consumers instead of sloshing back and forth.
  */
-public class MatterPipeBlockEntity extends BlockEntity {
+public class MatterPipeBlockEntity extends matteroverdrive.compat.CompatBlockEntity {
     private final MatterTank tank;
     private final int interval;
 

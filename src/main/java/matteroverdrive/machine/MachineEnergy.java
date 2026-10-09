@@ -2,8 +2,8 @@ package matteroverdrive.machine;
 
 import java.util.function.ToDoubleFunction;
 
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
+import matteroverdrive.compat.ValueInput;
+import matteroverdrive.compat.ValueOutput;
 import net.neoforged.neoforge.energy.EnergyStorage;
 
 /**

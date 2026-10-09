@@ -23,7 +23,7 @@ import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
  */
 public final class HoloRenderTypes {
     private static RenderPipeline.Builder base(String name) {
-        return RenderPipeline.builder(RenderPipelines.MATRICES_PROJECTION_SNIPPET).withLocation(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID,
+        return RenderPipeline.builder(RenderPipelines.MATRICES_SNIPPET).withLocation(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID,
                 "pipeline/" + name)).withBlend(BlendFunction.ADDITIVE).withCull(false).withDepthWrite(false);
     }
 
@@ -54,7 +54,7 @@ public final class HoloRenderTypes {
 
     public static RenderType screen(ResourceLocation texture) {
         return SCREEN_TYPES.computeIfAbsent(texture, t -> RenderType.create("mo_holo_screen", 1536, false, true, SCREEN,
-                RenderType.CompositeState.builder().setTextureState(new RenderStateShard.TextureStateShard(t, false)).createCompositeState(false)));
+                RenderType.CompositeState.builder().setTextureState(new RenderStateShard.TextureStateShard(t, net.minecraft.util.TriState.FALSE, false)).createCompositeState(false)));
     }
 
     public static void register(RegisterRenderPipelinesEvent event) {
@@ -79,14 +79,14 @@ public final class HoloRenderTypes {
 
     public static RenderType textured(ResourceLocation texture) {
         return TEXTURED_TYPES.computeIfAbsent(texture, t -> RenderType.create("mo_holo_textured", 1536, false, true, TEXTURED,
-                RenderType.CompositeState.builder().setTextureState(new RenderStateShard.TextureStateShard(t, false)).createCompositeState(false)));
+                RenderType.CompositeState.builder().setTextureState(new RenderStateShard.TextureStateShard(t, net.minecraft.util.TriState.FALSE, false)).createCompositeState(false)));
     }
 
     private static final Map<ResourceLocation, RenderType> CULLED_TYPES = new HashMap<>();
 
     public static RenderType texturedCulled(ResourceLocation texture) {
         return CULLED_TYPES.computeIfAbsent(texture, t -> RenderType.create("mo_holo_textured_cull", 1536, false, true, TEXTURED_CULL,
-                RenderType.CompositeState.builder().setTextureState(new RenderStateShard.TextureStateShard(t, false)).createCompositeState(false)));
+                RenderType.CompositeState.builder().setTextureState(new RenderStateShard.TextureStateShard(t, net.minecraft.util.TriState.FALSE, false)).createCompositeState(false)));
     }
 
     private HoloRenderTypes() {}

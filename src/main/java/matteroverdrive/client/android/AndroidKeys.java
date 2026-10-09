@@ -27,7 +27,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
  * 1.7.10 KeyHandler: X uses the selected android ability (and toggles others), Tab holds the ability wheel. Teleport
@@ -58,7 +58,7 @@ public final class AndroidKeys {
         }
         AndroidData data = Android.get(player);
         while (ABILITY_USE.consumeClick()) {
-            ClientPacketDistributor.sendToServer(new AndroidPayloads.Action());
+            PacketDistributor.sendToServer(new AndroidPayloads.Action());
         }
         // 1.7.10 BioticStatTeleport.manageActivate
         BioticStat teleport = BioticStats.TELEPORT;
@@ -68,7 +68,7 @@ public final class AndroidKeys {
         } else if (teleportHeld) {
             teleportHeld = false;
             Vec3 target = teleportTarget(player);
-            if (target != null) ClientPacketDistributor.sendToServer(new AndroidPayloads.Teleport(target.x, target.y, target.z));
+            if (target != null) PacketDistributor.sendToServer(new AndroidPayloads.Teleport(target.x, target.y, target.z));
         }
         while (ABILITY_SWITCH.consumeClick()) {
             if (mc.screen == null && AbilityWheelScreen.hasStats(player)) mc.setScreen(new AbilityWheelScreen());

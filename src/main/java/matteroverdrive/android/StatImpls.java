@@ -427,13 +427,13 @@ final class StatImpls {
                 dir = dir.normalize();
                 target.push(dir.x * power * multiply, power * 0.2f, dir.z * power * multiply);
                 target.hurtMarked = true;
-                target.hurtServer(player.level(), source, power * 3);
+                target.hurtServer(player.serverLevel(), source, power * 3);
             }
             data.setEffect(LAST_USE, player.level().getGameTime() + DELAY);
             Android.sync(player);
             player.level().playSound(null, player.blockPosition(), MOSounds.SHOCKWAVE.get(), SoundSource.PLAYERS, 1,
                     0.9f + player.getRandom().nextFloat() * 0.1f);
-            player.level().sendParticles(ParticleTypes.EXPLOSION, player.getX(), player.getY() + 0.5, player.getZ(), 20, 0.6, 0.6, 0.6, 0.02);
+            player.serverLevel().sendParticles(ParticleTypes.EXPLOSION, player.getX(), player.getY() + 0.5, player.getZ(), 20, 0.6, 0.6, 0.6, 0.02);
         }
     }
 

@@ -35,8 +35,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
+import matteroverdrive.compat.ValueInput;
+import matteroverdrive.compat.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -194,8 +194,9 @@ public abstract class RogueAndroid extends Monster {
     }
 
     @Override
-    protected void addAdditionalSaveData(ValueOutput output) {
-        super.addAdditionalSaveData(output);
+    public void addAdditionalSaveData(net.minecraft.nbt.CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
+        ValueOutput output = ValueOutput.of(tag, registryAccess());
         output.putInt("android_level", getAndroidLevel());
         output.putBoolean("legendary", isLegendary());
         if (entityData.get(VISOR_COLOR) >= 0) output.putInt("visor_color", entityData.get(VISOR_COLOR));
@@ -204,8 +205,9 @@ public abstract class RogueAndroid extends Monster {
     }
 
     @Override
-    protected void readAdditionalSaveData(ValueInput input) {
-        super.readAdditionalSaveData(input);
+    public void readAdditionalSaveData(net.minecraft.nbt.CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+        ValueInput input = ValueInput.of(tag, registryAccess());
         entityData.set(LEVEL, input.getIntOr("android_level", 0));
         entityData.set(LEGENDARY, input.getBooleanOr("legendary", false));
         entityData.set(VISOR_COLOR, input.getIntOr("visor_color", -1));

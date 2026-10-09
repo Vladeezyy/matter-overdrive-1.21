@@ -26,7 +26,7 @@ public class ReplicatorScreen extends MachineScreen<ReplicatorMenu> {
         drawMatter(g, x + MATTER_X, y + BAR_Y);
         drawEnergy(g, x + ENERGY_X, y + BAR_Y);
         drawArrow(g, x + 32, y + 55, menu.getProgress());
-        g.blit(RenderPipelines.GUI_TEXTURED, SLOT_MAIN, x + PATTERN_X, y + PATTERN_Y, 0, 0, 37, 22, 37, 22);
+        matteroverdrive.compat.Gui.blit(g, SLOT_MAIN, x + PATTERN_X, y + PATTERN_Y, 0, 0, 37, 22, 37, 22);
         menu.getMachine().clientTask().ifPresent(task -> {
             ItemStack stack = task.pattern().toStack().copyWithCount(task.count());
             g.renderItem(stack, x + PATTERN_X + 3, y + PATTERN_Y + 3);
@@ -39,7 +39,7 @@ public class ReplicatorScreen extends MachineScreen<ReplicatorMenu> {
         matterTooltip(g, mx, my, MATTER_X, BAR_Y, mouseX, mouseY);
         energyTooltip(g, mx, my, ENERGY_X, BAR_Y, mouseX, mouseY);
         if (in(mx, my, PATTERN_X, PATTERN_Y, 37, 22)) {
-            menu.getMachine().clientTask().ifPresent(task -> g.setTooltipForNextFrame(font, Component.translatable(
+            menu.getMachine().clientTask().ifPresent(task -> matteroverdrive.compat.Gui.setTooltipForNextFrame(g, font, Component.translatable(
                     "gui.matteroverdrive.replicating", task.pattern().toStack().getHoverName(), task.count(), task.pattern().progress()),
                     mouseX, mouseY));
         }

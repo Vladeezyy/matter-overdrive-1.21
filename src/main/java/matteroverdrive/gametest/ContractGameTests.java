@@ -42,8 +42,7 @@ final class ContractGameTests {
         var market = helper.getBlockEntity(pos, ContractMarketBlockEntity.class);
         int wait = market.getTimeUntilNextQuest();
         check(helper, wait > ContractMarketBlockEntity.QUEST_GENERATE_DELAY_MIN - 40, "first delay " + wait);
-        market.loadWithComponents(net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING,
-                helper.getLevel().registryAccess(), new net.minecraft.nbt.CompoundTag()));
+        market.loadWithComponents(new net.minecraft.nbt.CompoundTag(), helper.getLevel().registryAccess());
         helper.runAfterDelay(2, () -> {
             ItemStack contract = market.getContract(0);
             check(helper, contract.is(MOItems.CONTRACT.get()) && ContractItem.getQuest(contract) != null, "no contract: " + contract);

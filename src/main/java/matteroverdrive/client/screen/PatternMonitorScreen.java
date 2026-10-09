@@ -20,7 +20,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
-import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
  * 1.7.10 GuiPatternMonitor: a searchable grid of every pattern on the network (48, 40, 160x110). Left click adds
@@ -53,7 +53,7 @@ public class PatternMonitorScreen extends MachineScreen<PatternMonitorMenu> {
         search.setTextColor(0xFFBFE4E6);
         addRenderableWidget(search);
         // ask the server for the network's patterns (also how Refresh works)
-        ClientPacketDistributor.sendToServer(new PatternRequestPayload(menu.containerId, List.of()));
+        PacketDistributor.sendToServer(new PatternRequestPayload(menu.containerId, List.of()));
     }
 
     private List<ItemPattern> visible() {
@@ -68,12 +68,12 @@ public class PatternMonitorScreen extends MachineScreen<PatternMonitorMenu> {
     @Override
     protected void renderHome(GuiGraphics g, int x, int y, int mx, int my) {
         search.visible = true;
-        g.blit(RenderPipelines.GUI_TEXTURED, SEARCH_FIELD, x + SEARCH_X, y + SEARCH_Y, 0, 0, 166, 14, 166, 14);
+        matteroverdrive.compat.Gui.blit(g, SEARCH_FIELD, x + SEARCH_X, y + SEARCH_Y, 0, 0, 166, 14, 166, 14);
         List<ItemPattern> patterns = visible();
         int first = scroll * COLS;
         for (int i = 0; i < COLS * ROWS; i++) {
             int cx = x + GRID_X + (i % COLS) * CELL, cy = y + GRID_Y + (i / COLS) * CELL;
-            g.blit(RenderPipelines.GUI_TEXTURED, SLOT, cx, cy, 0, 0, 22, 22, 22, 22);
+            matteroverdrive.compat.Gui.blit(g, SLOT, cx, cy, 0, 0, 22, 22, 22, 22);
             if (first + i >= patterns.size()) continue;
             ItemPattern p = patterns.get(first + i);
             g.renderItem(p.toStack(), cx + 3, cy + 3);
@@ -88,8 +88,8 @@ public class PatternMonitorScreen extends MachineScreen<PatternMonitorMenu> {
         }
         boolean overRefresh = in(mx, my, REFRESH_X, REFRESH_Y, BUTTON, BUTTON);
         boolean overRequest = in(mx, my, REQUEST_X, REQUEST_Y, BUTTON, BUTTON);
-        g.blit(RenderPipelines.GUI_TEXTURED, REFRESH, x + REFRESH_X, y + REFRESH_Y, overRefresh ? 22 : 0, 0, 22, 22, 44, 22);
-        g.blit(RenderPipelines.GUI_TEXTURED, REQUEST, x + REQUEST_X, y + REQUEST_Y, overRequest ? 22 : 0, 0, 22, 22, 44, 22);
+        matteroverdrive.compat.Gui.blit(g, REFRESH, x + REFRESH_X, y + REFRESH_Y, overRefresh ? 22 : 0, 0, 22, 22, 44, 22);
+        matteroverdrive.compat.Gui.blit(g, REQUEST, x + REQUEST_X, y + REQUEST_Y, overRequest ? 22 : 0, 0, 22, 22, 44, 22);
         int queued = menu.getClientQueue().stream().mapToInt(Task::count).sum();
         g.drawString(font, Component.translatable("gui.matteroverdrive.queue", menu.getClientQueue().size(), queued),
                 x + GRID_X, y + GRID_Y + ROWS * CELL + 2, COLOR_TEXT, false);
@@ -105,12 +105,12 @@ public class PatternMonitorScreen extends MachineScreen<PatternMonitorMenu> {
     protected void homeTooltips(GuiGraphics g, int mx, int my, int mouseX, int mouseY) {
         ItemPattern p = patternAt(mx, my);
         if (p != null) {
-            g.setTooltipForNextFrame(font, Component.translatable("gui.matteroverdrive.pattern",
+            matteroverdrive.compat.Gui.setTooltipForNextFrame(g, font, Component.translatable("gui.matteroverdrive.pattern",
                     p.toStack().getHoverName(), p.progress()), mouseX, mouseY);
         } else if (in(mx, my, REFRESH_X, REFRESH_Y, BUTTON, BUTTON)) {
-            g.setTooltipForNextFrame(font, Component.translatable("gui.matteroverdrive.refresh"), mouseX, mouseY);
+            matteroverdrive.compat.Gui.setTooltipForNextFrame(g, font, Component.translatable("gui.matteroverdrive.refresh"), mouseX, mouseY);
         } else if (in(mx, my, REQUEST_X, REQUEST_Y, BUTTON, BUTTON)) {
-            g.setTooltipForNextFrame(font, Component.translatable("gui.matteroverdrive.request"), mouseX, mouseY);
+            matteroverdrive.compat.Gui.setTooltipForNextFrame(g, font, Component.translatable("gui.matteroverdrive.request"), mouseX, mouseY);
         }
     }
 
@@ -141,11 +141,11 @@ public class PatternMonitorScreen extends MachineScreen<PatternMonitorMenu> {
                     if (amount > 0) requests.add(new Task(pattern, amount));
                 }
                 order.clear();
-                ClientPacketDistributor.sendToServer(new PatternRequestPayload(menu.containerId, requests));
+                PacketDistributor.sendToServer(new PatternRequestPayload(menu.containerId, requests));
                 return true;
             }
             if (in(mx, my, REFRESH_X, REFRESH_Y, BUTTON, BUTTON)) {
-                ClientPacketDistributor.sendToServer(new PatternRequestPayload(menu.containerId, List.of()));
+                PacketDistributor.sendToServer(new PatternRequestPayload(menu.containerId, List.of()));
                 return true;
             }
         }

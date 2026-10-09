@@ -20,8 +20,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
+import matteroverdrive.compat.ValueInput;
+import matteroverdrive.compat.ValueOutput;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import matteroverdrive.compat.EnergyHandlerUtil;
@@ -30,7 +30,7 @@ import matteroverdrive.compat.EnergyHandlerUtil;
  * Base of every powered Matter Overdrive machine (1.7.10 MOTileEntityMachine + MOTileEntityMachineEnergy):
  * inventory with upgrade slots and an optional battery slot, FE storage, redstone mode, active state.
  */
-public abstract class MachineBlockEntity extends BlockEntity implements MenuProvider {
+public abstract class MachineBlockEntity extends matteroverdrive.compat.CompatBlockEntity implements MenuProvider {
     /** 1.7.10 basicUpgradeHandler: no multiplier below 0.05, speed not below 0.1. */
     private static final double MIN_MULTIPLIER = 0.05;
     private static final double MIN_SPEED = 0.1;

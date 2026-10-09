@@ -141,7 +141,7 @@ public class StarMapRenderer implements matteroverdrive.compat.render.StateBlock
         pose.translate(0.5, 0.5, 0.5);
         pose.translate(0, renderer.height(), 0);
         // 1.7.10 drawHoloGuiInfo: the side facing the player, snapped to 90 degrees
-        Vec3 viewer = cam.position();
+        Vec3 viewer = cam.getPosition();
         double dx = viewer.x - state.blockCenter.x, dz = viewer.z - state.blockCenter.z;
         double angle = Math.atan2(dz, dx);
         if (angle < 0) angle += Math.PI * 2;

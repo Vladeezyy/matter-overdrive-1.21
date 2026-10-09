@@ -20,6 +20,16 @@ public interface StateBlockEntityRenderer<T extends BlockEntity, S extends Block
 
     void submit(S state, PoseStack pose, SubmitNodeCollector collector, CameraRenderState camera);
 
+    /** 1.21.9+ shouldRenderOffScreen() has no block entity argument. */
+    default boolean shouldRenderOffScreen() {
+        return false;
+    }
+
+    @Override
+    default boolean shouldRenderOffScreen(T blockEntity) {
+        return shouldRenderOffScreen();
+    }
+
     @Override
     default void render(T blockEntity, float partialTick, PoseStack pose, MultiBufferSource buffers, int light, int overlay, Vec3 cameraPos) {
         S state = createRenderState();

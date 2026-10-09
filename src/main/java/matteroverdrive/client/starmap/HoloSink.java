@@ -73,7 +73,7 @@ public interface HoloSink {
 
             @Override
             public void icon(PoseStack pose, ResourceLocation texture, float x, float y, float w, float h, int rgb) {
-                g.blit(RenderPipelines.GUI_TEXTURED, texture, Math.round(x), Math.round(y), 0, 0, Math.round(w), Math.round(h),
+                matteroverdrive.compat.Gui.blit(g, texture, Math.round(x), Math.round(y), 0, 0, Math.round(w), Math.round(h),
                         Math.round(w), Math.round(h), 0xFF000000 | rgb);
             }
 

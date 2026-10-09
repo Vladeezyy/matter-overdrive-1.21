@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import matteroverdrive.network.GuideRecipePayload;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 /** Crafting grids for the guide's recipe elements: the client has no recipes in 1.21, so the server sends them. */
 public final class GuideRecipes {
@@ -19,7 +19,7 @@ public final class GuideRecipes {
     private static final Set<Item> ASKED = new HashSet<>();
 
     static void request(Item item) {
-        if (ASKED.add(item)) ClientPacketDistributor.sendToServer(new GuideRecipePayload.Request(item));
+        if (ASKED.add(item)) PacketDistributor.sendToServer(new GuideRecipePayload.Request(item));
     }
 
     static @Nullable List<List<ItemStack>> get(Item item) {

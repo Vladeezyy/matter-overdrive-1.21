@@ -45,11 +45,11 @@ public class WeaponStationScreen extends MachineScreen<WeaponStationMenu> {
     protected void renderHome(GuiGraphics g, int x, int y, int mx, int my) {
         ItemStack weapon = menu.getWeapon();
         if (!weapon.isEmpty()) {
-            g.pose().pushMatrix();
-            g.pose().translate(x + PREVIEW_X, y + PREVIEW_Y);
-            g.pose().scale(PREVIEW_SIZE / 16f, PREVIEW_SIZE / 16f);
+            g.pose().pushPose();
+            g.pose().translate(x + PREVIEW_X, y + PREVIEW_Y, 0);
+            g.pose().scale(PREVIEW_SIZE / 16f, PREVIEW_SIZE / 16f, 1);
             g.renderItem(weapon, 0, 0);
-            g.pose().popMatrix();
+            g.pose().popPose();
             int[][] points = modulePoints().get(weapon.getItem());
             for (int i = 0; points != null && i < points.length; i++) {
                 if (points[i] == null || !menu.supportsSlot(i)) continue;
@@ -63,7 +63,7 @@ public class WeaponStationScreen extends MachineScreen<WeaponStationMenu> {
             if (!menu.supportsSlot(module.moduleSlot)) {
                 g.fill(sx, sy, sx + 16, sy + 16, GREY);
             } else if (!slot.hasItem()) {
-                g.blit(RenderPipelines.GUI_TEXTURED, HOLO[module.moduleSlot], sx, sy, 0, 0, 16, 16, 16, 16, HOLO_COLOR);
+                matteroverdrive.compat.Gui.blit(g, HOLO[module.moduleSlot], sx, sy, 0, 0, 16, 16, 16, 16, HOLO_COLOR);
             }
         }
     }
@@ -83,7 +83,7 @@ public class WeaponStationScreen extends MachineScreen<WeaponStationMenu> {
         for (Slot slot : menu.slots) {
             if (slot instanceof WeaponStationMenu.ModuleSlot module && slot.isActive() && !slot.hasItem()
                     && in(mx, my, slot.x, slot.y, 16, 16)) {
-                g.setTooltipForNextFrame(font, Component.translatable("gui." + MatterOverdrive.MODID + ".module." + MODULE_NAMES[module.moduleSlot]),
+                matteroverdrive.compat.Gui.setTooltipForNextFrame(g, font, Component.translatable("gui." + MatterOverdrive.MODID + ".module." + MODULE_NAMES[module.moduleSlot]),
                         mouseX, mouseY);
             }
         }

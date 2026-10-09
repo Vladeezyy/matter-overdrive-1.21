@@ -25,7 +25,6 @@ import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import matteroverdrive.compat.render.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.ModelDebugName;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -34,7 +33,7 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.event.ModelEvent;
-import net.neoforged.neoforge.client.model.standalone.SimpleUnbakedStandaloneModel;
+import net.neoforged.neoforge.client.model.standalone.StandaloneModelBaker;
 import net.neoforged.neoforge.client.model.standalone.StandaloneModelKey;
 
 /**
@@ -48,18 +47,13 @@ public final class MachineRenderers {
     public static final StandaloneModelKey<BlockStateModel> INSCRIBER_HEAD = key("inscriber_head");
 
     private static StandaloneModelKey<BlockStateModel> key(String name) {
-        return new StandaloneModelKey<>(new ModelDebugName() {
-            @Override
-            public String debugName() {
-                return MatterOverdrive.MODID + ":" + name;
-            }
-        });
+        return new StandaloneModelKey<>(id("block/" + name));
     }
 
     public static void registerModels(ModelEvent.RegisterStandalone event) {
-        event.register(STORAGE_DRIVE, SimpleUnbakedStandaloneModel.blockStateModel(id("block/pattern_storage_drive")));
-        event.register(INSCRIBER_RAIL, SimpleUnbakedStandaloneModel.blockStateModel(id("block/inscriber_rail")));
-        event.register(INSCRIBER_HEAD, SimpleUnbakedStandaloneModel.blockStateModel(id("block/inscriber_head")));
+        event.register(STORAGE_DRIVE, StandaloneModelBaker.blockStateModel());
+        event.register(INSCRIBER_RAIL, StandaloneModelBaker.blockStateModel());
+        event.register(INSCRIBER_HEAD, StandaloneModelBaker.blockStateModel());
     }
 
     private static ResourceLocation id(String path) {

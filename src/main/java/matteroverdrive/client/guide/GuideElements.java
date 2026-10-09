@@ -277,11 +277,11 @@ public final class GuideElements {
         public void draw(Context ctx, int x, int y, int width) {
             int titleWidth = (int) (uniWidth(title) * size);
             int tx = textAlign == 1 ? (width - marginLeft - marginRight) / 2 - titleWidth / 2 : textAlign == 2 ? width - marginLeft - marginRight - titleWidth : 0;
-            ctx.g.pose().pushMatrix();
-            ctx.g.pose().translate(x + tx + marginLeft, y + marginTop);
-            ctx.g.pose().scale(size, size);
+            ctx.g.pose().pushPose();
+            ctx.g.pose().translate(x + tx + marginLeft, y + marginTop, 0);
+            ctx.g.pose().scale(size, size, 1);
             ctx.g.drawString(font(), uni(title), 0, 0, color, false);
-            ctx.g.pose().popMatrix();
+            ctx.g.pose().popPose();
         }
     }
 
@@ -306,7 +306,7 @@ public final class GuideElements {
             float scale = (float) maxWidth / Math.max(imageWidth, maxWidth);
             int w = (int) (imageWidth * scale), h = (int) (imageHeight * scale);
             int ix = textAlign == 1 ? width / 2 - w / 2 : 0;
-            ctx.g.blit(RenderPipelines.GUI_TEXTURED, location, x + ix + marginLeft, y + marginTop, 0, 0, w, h, w, h, color);
+            matteroverdrive.compat.Gui.blit(ctx.g, location, x + ix + marginLeft, y + marginTop, 0, 0, w, h, w, h, color);
         }
     }
 
@@ -351,7 +351,7 @@ public final class GuideElements {
         public void draw(Context ctx, int x, int y, int width) {
             int rx = textAlign == 1 ? x + marginLeft + this.width / 2 - 110 / 2 : x + marginLeft;
             int ry = y + marginTop;
-            ctx.g.blit(RenderPipelines.GUI_TEXTURED, BACKGROUND, rx + 8, ry + 8, 0, 0, 96, 96, 48, 48, 48, 48, COLOR_MATTER);
+            matteroverdrive.compat.Gui.blit(ctx.g, BACKGROUND, rx + 8, ry + 8, 0, 0, 96, 96, 48, 48, 48, 48, COLOR_MATTER);
             List<List<ItemStack>> grid = output == null ? null : GuideRecipes.get(output.getItem());
             if (grid == null) return;
             long time = Minecraft.getInstance().level == null ? 0 : Minecraft.getInstance().level.getGameTime();
@@ -434,12 +434,12 @@ public final class GuideElements {
             if (maxDepth >= 0) g.drawString(font(), uni(maxDepth + "-"), x + 8, y + 8 + (int) (46 * maxPercent), COLOR_HOLO_GREEN, false);
             if (minDepth > 0) g.drawString(font(), uni(minDepth + "-"), x + 8, y + 8 + (int) (46 * minPercent), COLOR_HOLO_GREEN, false);
             int tx = x + marginLeft + 20, ty = y + marginTop + 8;
-            g.blit(RenderPipelines.GUI_TEXTURED, TERRAIN, tx, ty, 0, 0, 73, 53, 144, 105, 144, 105);
+            matteroverdrive.compat.Gui.blit(g, TERRAIN, tx, ty, 0, 0, 73, 53, 144, 105, 144, 105);
             // 1.7.10 used a stencil: the stripes only between the depths
             g.enableScissor(x + marginLeft + 24, ty + (int) (53 * maxPercent), x + marginLeft + 24 + 69, ty + (int) (53 * minPercent));
-            g.blit(RenderPipelines.GUI_TEXTURED, STRIPES, x + marginLeft + 24, ty, 0, 0, 69, 53, 137, 105, 137, 105);
+            matteroverdrive.compat.Gui.blit(g, STRIPES, x + marginLeft + 24, ty, 0, 0, 69, 53, 137, 105, 137, 105);
             g.disableScissor();
-            g.blit(RenderPipelines.GUI_TEXTURED, LENS, x + marginLeft + 69, y + marginTop + 16, 0, 0, 84, 41, 168, 82, 168, 82);
+            matteroverdrive.compat.Gui.blit(g, LENS, x + marginLeft + 69, y + marginTop + 16, 0, 0, 84, 41, 168, 82, 168, 82);
             drawStack(ctx, stack, x + marginLeft + 123, y + marginTop + 21, 1.5f);
         }
     }
@@ -459,7 +459,7 @@ public final class GuideElements {
 
         @Override
         public void draw(Context ctx, int x, int y, int width) {
-            ctx.g.blit(RenderPipelines.GUI_TEXTURED, BACKGROUND, x + marginLeft, y + marginTop, 0, 0, 115, 36, 230, 71, 230, 71);
+            matteroverdrive.compat.Gui.blit(ctx.g, BACKGROUND, x + marginLeft, y + marginTop, 0, 0, 115, 36, 230, 71, 230, 71);
             drawStack(ctx, from, x + marginLeft + 5, y + marginTop + 5, 1.5f);
             drawStack(ctx, to, x + marginLeft + 86, y + marginTop + 5, 1.5f);
         }

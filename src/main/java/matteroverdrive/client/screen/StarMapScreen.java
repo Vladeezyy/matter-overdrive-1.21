@@ -35,7 +35,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
  * 1.7.10 GuiStarMap: a full-screen holo screen over the star map's hologram. Pages (tabs on the right): galaxy (the
@@ -140,7 +140,7 @@ public class StarMapScreen extends AbstractContainerScreen<StarMapMenu> {
     private void send(int zoom, GalacticPosition position, GalacticPosition destination) {
         starMap.setGalacticPosition(position);
         starMap.setDestination(destination);
-        ClientPacketDistributor.sendToServer(new StarMapPayloads.Command(starMap.getBlockPos(), zoom, position, destination));
+        PacketDistributor.sendToServer(new StarMapPayloads.Command(starMap.getBlockPos(), zoom, position, destination));
     }
 
     @Override
@@ -241,7 +241,7 @@ public class StarMapScreen extends AbstractContainerScreen<StarMapMenu> {
 
     private void view(Entry entry) {
         if (entry.ship() != null) {
-            ClientPacketDistributor.sendToServer(new StarMapPayloads.Attack(starMap.getGalaxyPosition(), starMap.getDestination(), entry.shipId()));
+            PacketDistributor.sendToServer(new StarMapPayloads.Attack(starMap.getGalaxyPosition(), starMap.getDestination(), entry.shipId()));
             return;
         }
         setPage(entry.body() instanceof Quadrant ? 1 : entry.body() instanceof Star ? 2 : 3);
@@ -309,24 +309,23 @@ public class StarMapScreen extends AbstractContainerScreen<StarMapMenu> {
     public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
         // 1.7.10 drawWorldBackground: black, then the hologram in perspective
         g.fill(0, 0, width, height, 0xFF000000);
-        g.submitPictureInPictureRenderState(new StarMapPipRenderer.State(starMap, partialTick, 0, 0, width, height));
-        // the hologram texture is blitted at the end of its layer: everything else goes above it
-        g.nextStratum();
+        g.flush();
+        StarMapPipRenderer.render(starMap, partialTick, width, height);
         renderBg(g, partialTick, mouseX, mouseY);
     }
 
     @Override
     protected void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY) {
-        g.blitSprite(RenderPipelines.GUI_TEXTURED, sprite("star_map"), 0, 0, width, height);
+        matteroverdrive.compat.Gui.blitSprite(g, sprite("star_map"), 0, 0, width, height);
         // the bottom info panel of the selected body (1.7.10 renderGUIInfo at xSize / 1.9, ySize - 16, opacity 0.8)
         Galaxy galaxy = galaxy();
         if (galaxy != null) {
-            g.pose().pushMatrix();
-            g.pose().translate((float) (width / 1.9), height - 16);
+            g.pose().pushPose();
+            g.pose().translate((float) (width / 1.9), height - 16, 0);
             var ctx = new StarMapRenderer.Ctx(StarMapRenderer.stateOf(starMap, partialTick, minecraft.player), new com.mojang.blaze3d.vertex.PoseStack(),
                     HoloSink.of(g, font), font, 0, 0, new org.joml.Quaternionf(), minecraft.player, galaxy);
             StarMapRenderer.renderGuiInfo(ctx, 0.8f);
-            g.pose().popMatrix();
+            g.pose().popPose();
         }
         renderPageTabs(g, mouseX, mouseY);
         renderList(g, mouseX, mouseY);
@@ -337,10 +336,10 @@ public class StarMapScreen extends AbstractContainerScreen<StarMapMenu> {
             boolean planetSlot = i < StarMapMenu.SLOTS, hotbar = i >= StarMapMenu.SLOTS + 27;
             int color = planetSlot || hotbar ? Galaxy.COLOR_HOLO >> 1 & 0x7F7F7F : div(Galaxy.COLOR_HOLO, 3);
             int size = planetSlot ? 22 : 18, off = planetSlot ? 3 : 1;
-            g.blitSprite(RenderPipelines.GUI_TEXTURED, sprite("slot_holo_with_bg"), slot.x - off, slot.y - off, size, size, 0xFF000000 | color);
+            matteroverdrive.compat.Gui.blitSprite(g, sprite("slot_holo_with_bg"), slot.x - off, slot.y - off, size, size, 0xFF000000 | color);
             if (planetSlot && !slot.hasItem()) {
                 String icon = i < StarMapMenu.SLOTS / 2 ? "factory" : "icon_shuttle";
-                g.blit(RenderPipelines.GUI_TEXTURED, holo(icon), slot.x, slot.y, 0, 0, 16, 16, 16, 16, 0xFF000000 | color);
+                matteroverdrive.compat.Gui.blit(g, holo(icon), slot.x, slot.y, 0, 0, 16, 16, 16, 16, 0xFF000000 | color);
             }
         }
         if (page == 3) {
@@ -377,7 +376,7 @@ public class StarMapScreen extends AbstractContainerScreen<StarMapMenu> {
 
     private void renderPageTabs(GuiGraphics g, int mouseX, int mouseY) {
         int x = width - 42;
-        g.blitSprite(RenderPipelines.GUI_TEXTURED, sprite("right_side_bar_panel_bg_holo"), x, 16, 42, 5 * 26 + 8);
+        matteroverdrive.compat.Gui.blitSprite(g, sprite("right_side_bar_panel_bg_holo"), x, 16, 42, 5 * 26 + 8);
         for (int i = 0; i < 5; i++) {
             if (!pageVisible(i)) continue;
             int bx = x + 9, by = 20 + i * 26;
@@ -385,8 +384,8 @@ public class StarMapScreen extends AbstractContainerScreen<StarMapMenu> {
             float m = i == page ? 1 : over ? 0.8f : 0.4f;
             int color = 0xFF000000 | mul(COLOR_MATTER, m);
             int s = iconSize(PAGE_ICONS[i]);
-            g.blit(RenderPipelines.GUI_TEXTURED, holo(PAGE_ICONS[i]), bx + 12 - s / 2, by + 12 - s / 2, 0, 0, s, s, s, s, color);
-            if (over) g.setTooltipForNextFrame(font, Component.translatable("gui.matteroverdrive.page." + PAGE_NAMES[i]), mouseX, mouseY);
+            matteroverdrive.compat.Gui.blit(g, holo(PAGE_ICONS[i]), bx + 12 - s / 2, by + 12 - s / 2, 0, 0, s, s, s, s, color);
+            if (over) matteroverdrive.compat.Gui.setTooltipForNextFrame(g, font, Component.translatable("gui.matteroverdrive.page." + PAGE_NAMES[i]), mouseX, mouseY);
         }
     }
 
@@ -417,29 +416,29 @@ public class StarMapScreen extends AbstractContainerScreen<StarMapMenu> {
         String bg = entry.body() instanceof Planet p && entry.ship() == null && starMap.getGalaxyPosition().is(p) ? "holo_list_entry_middle_down"
                 : "holo_list_entry";
         int bgColor = 0xFF000000 | mul(color, m);
-        g.blitSprite(RenderPipelines.GUI_TEXTURED, sprite(bg), x, y, ENTRY_W - 64, ENTRY_H, bgColor);
+        matteroverdrive.compat.Gui.blitSprite(g, sprite(bg), x, y, ENTRY_W - 64, ENTRY_H, bgColor);
         int iconsX = 0;
         if (selected) {
             if (canView(entry) || entry.ship() != null) {
-                g.blitSprite(RenderPipelines.GUI_TEXTURED, sprite("holo_list_entry_middle_normal"), x + ENTRY_W - 64, y, 32, ENTRY_H, bgColor);
+                matteroverdrive.compat.Gui.blitSprite(g, sprite("holo_list_entry_middle_normal"), x + ENTRY_W - 64, y, 32, ENTRY_H, bgColor);
             }
             if (canTravelTo(entry)) {
-                g.blitSprite(RenderPipelines.GUI_TEXTURED, sprite("holo_list_entry_flipped"), x + ENTRY_W - 32, y, 32, ENTRY_H, bgColor);
+                matteroverdrive.compat.Gui.blitSprite(g, sprite("holo_list_entry_flipped"), x + ENTRY_W - 32, y, 32, ENTRY_H, bgColor);
             }
             drawName(g, entry, x, y, color, 1);
             int rel = mouseX - x;
             boolean overEntry = mouseY >= y && mouseY < y + ENTRY_H;
             if (canTravelTo(entry)) {
                 float im = overEntry && rel > ENTRY_W - 32 && rel < ENTRY_W ? 1 : 0.5f;
-                g.blit(RenderPipelines.GUI_TEXTURED, holo("travel_icon"), x + ENTRY_W - 32 + 6, y + 5, 0, 0, 18, 18, 18, 18, 0xFF000000 | mul(color, im));
-                if (im == 1) g.setTooltipForNextFrame(font, Component.literal("Travel To"), mouseX, mouseY);
+                matteroverdrive.compat.Gui.blit(g, holo("travel_icon"), x + ENTRY_W - 32 + 6, y + 5, 0, 0, 18, 18, 18, 18, 0xFF000000 | mul(color, im));
+                if (im == 1) matteroverdrive.compat.Gui.setTooltipForNextFrame(g, font, Component.literal("Travel To"), mouseX, mouseY);
                 iconsX += 32;
             }
             if (canView(entry) || entry.ship() != null) {
                 float im = overEntry && rel > ENTRY_W - 64 && rel < ENTRY_W - 32 ? 1 : 0.5f;
                 String icon = entry.ship() != null ? "icon_attack" : "icon_search";
-                g.blit(RenderPipelines.GUI_TEXTURED, holo(icon), x + ENTRY_W - 64 + 8, y + 8, 0, 0, 16, 16, 16, 16, 0xFF000000 | mul(color, im));
-                if (im == 1 && entry.ship() == null) g.setTooltipForNextFrame(font, Component.literal("Enter"), mouseX, mouseY);
+                matteroverdrive.compat.Gui.blit(g, holo(icon), x + ENTRY_W - 64 + 8, y + 8, 0, 0, 16, 16, 16, 16, 0xFF000000 | mul(color, im));
+                if (im == 1 && entry.ship() == null) matteroverdrive.compat.Gui.setTooltipForNextFrame(g, font, Component.literal("Enter"), mouseX, mouseY);
                 iconsX += 32;
             }
             drawIcons(g, entry, x + 128 + iconsX, y, color, 0.8f, Galaxy.COLOR_HOLO, 1);
@@ -452,9 +451,9 @@ public class StarMapScreen extends AbstractContainerScreen<StarMapMenu> {
     private void drawIcons(GuiGraphics g, Entry entry, int x, int y, int color, float m, int countColor, float countM) {
         for (var icon : icons(entry).entrySet()) {
             if (icon.getValue() == 0) continue;
-            g.blitSprite(RenderPipelines.GUI_TEXTURED, sprite("holo_list_entry_circle"), x, y, 32, 32, 0xFF000000 | mul(color, m));
+            matteroverdrive.compat.Gui.blitSprite(g, sprite("holo_list_entry_circle"), x, y, 32, 32, 0xFF000000 | mul(color, m));
             int s = iconSize(icon.getKey());
-            g.blit(RenderPipelines.GUI_TEXTURED, holo(icon.getKey()), x + 16 - s / 2, y + 16 - s / 2, 0, 0, s, s, s, s, 0xFF000000 | mul(color, m));
+            matteroverdrive.compat.Gui.blit(g, holo(icon.getKey()), x + 16 - s / 2, y + 16 - s / 2, 0, 0, s, s, s, s, 0xFF000000 | mul(color, m));
             if (icon.getValue() > 0) g.drawString(font, String.valueOf(icon.getValue()), x + 16 + 3, y + 16 + 3, 0xFF000000 | mul(countColor, countM), false);
             x += 32;
         }

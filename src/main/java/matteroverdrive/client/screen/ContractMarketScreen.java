@@ -19,7 +19,7 @@ public class ContractMarketScreen extends MachineScreen<ContractMarketMenu> {
     @Override
     protected boolean drawSlotBackground(Slot slot) {
         if (slot instanceof MachineMenu<?>.PageSlot) {
-            graphicsForSlots.blit(RenderPipelines.GUI_TEXTURED, tex("slot_small"), leftPos + slot.x - 1, topPos + slot.y - 1, 0, 0, 18, 18, 18, 18);
+            matteroverdrive.compat.Gui.blit(graphicsForSlots, tex("slot_small"), leftPos + slot.x - 1, topPos + slot.y - 1, 0, 0, 18, 18, 18, 18);
             return false;
         }
         return true;

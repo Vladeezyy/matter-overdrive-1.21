@@ -7,11 +7,11 @@ import com.mojang.serialization.Codec;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
-import net.neoforged.neoforge.attachment.AttachmentSyncHandler;
+import matteroverdrive.compat.ValueInput;
+import matteroverdrive.compat.ValueOutput;
+import matteroverdrive.compat.AttachmentSyncHandler;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
-import net.neoforged.neoforge.common.util.ValueIOSerializable;
+import matteroverdrive.compat.ValueIOSerializable;
 import org.jetbrains.annotations.Nullable;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
@@ -118,7 +118,7 @@ public class AndroidData implements ValueIOSerializable {
         output.putInt("turning", turning);
         output.putString("active_stat", activeStat);
         output.store("effects", EFFECTS_CODEC, effects);
-        inventory.serialize(output.child("inventory"));
+        output.tag().put("inventory", inventory.serializeNBT(output.lookup()));
     }
 
     @Override
@@ -131,7 +131,7 @@ public class AndroidData implements ValueIOSerializable {
         activeStat = input.getStringOr("active_stat", "");
         effects.clear();
         input.read("effects", EFFECTS_CODEC).ifPresent(effects::putAll);
-        input.child("inventory").ifPresent(inventory::deserialize);
+        input.child("inventory").ifPresent(c -> inventory.deserializeNBT(c.lookup(), c.tag()));
     }
 
     /** Sends the whole state (it is small); the client keeps its own glitch countdown running between syncs. */
@@ -139,7 +139,7 @@ public class AndroidData implements ValueIOSerializable {
         /** Real clients only (GameTest mock players have no channels). */
         @Override
         public boolean sendToPlayer(IAttachmentHolder holder, net.minecraft.server.level.ServerPlayer to) {
-            return to.connection.hasChannel(net.neoforged.neoforge.network.payload.SyncAttachmentsPayload.TYPE);
+            return matteroverdrive.compat.AttachmentSync.canReceive(to);
         }
 
         @Override

@@ -18,7 +18,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
  * 1.7.10 GuiAndroidHud radial menu: while the switch key is held the unlocked wheel abilities sit on a ring; pointing
@@ -94,7 +94,7 @@ public class AbilityWheelScreen extends Screen {
 
     private void choose() {
         if (selected >= 0 && selected < stats.size()) {
-            ClientPacketDistributor.sendToServer(new AndroidPayloads.SelectStat(stats.get(selected).id()));
+            PacketDistributor.sendToServer(new AndroidPayloads.SelectStat(stats.get(selected).id()));
             Android.get(minecraft.player).setActiveStat(stats.get(selected).id());
         }
         onClose();

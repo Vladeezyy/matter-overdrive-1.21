@@ -10,11 +10,11 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
+import matteroverdrive.compat.ValueInput;
+import matteroverdrive.compat.ValueOutput;
 
 /** 1.7.10 TileEntityHoloSign: just the text (lines separated by \n). */
-public class HoloSignBlockEntity extends BlockEntity {
+public class HoloSignBlockEntity extends matteroverdrive.compat.CompatBlockEntity {
     public static final int MAX_LENGTH = 512;
     private String text = "";
 

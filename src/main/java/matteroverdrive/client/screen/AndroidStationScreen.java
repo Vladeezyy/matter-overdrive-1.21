@@ -23,7 +23,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.minecraft.client.renderer.RenderPipelines;
 
 /**
@@ -101,7 +101,7 @@ public class AndroidStationScreen extends MachineScreen<AndroidStationMenu> {
             int sx = x + slot.x - 2, sy = y + slot.y - 2;
             scaled(g, SLOT_HOLO, sx, sy, 20, 18, ARGB.color(78 * 2, MATTER));
             if (!slot.hasItem()) {
-                g.blit(RenderPipelines.GUI_TEXTURED, PART_ICONS[part.part], sx + 2, sy + 2, 0, 0, 16, 16, 16, 16, ARGB.color(160, MATTER));
+                matteroverdrive.compat.Gui.blit(g, PART_ICONS[part.part], sx + 2, sy + 2, 0, 0, 16, 16, 16, 16, ARGB.color(160, MATTER));
             }
         }
         // the player, turning with the mouse (1.7.10 turned it with world time)
@@ -113,17 +113,17 @@ public class AndroidStationScreen extends MachineScreen<AndroidStationMenu> {
 
     /** A square texture of src px drawn at size px. */
     private static void scaled(GuiGraphics g, ResourceLocation tex, int x, int y, int size, int src, int color) {
-        g.blit(RenderPipelines.GUI_TEXTURED, tex, x, y, 0, 0, size, size, src, src, src, src, color);
+        matteroverdrive.compat.Gui.blit(g, tex, x, y, 0, 0, size, size, src, src, src, src, color);
     }
 
     /** 1.7.10 up_arrow holo icon, turned towards the stat's root. */
     private static void arrow(GuiGraphics g, int cx, int cy, int dx, int dy, int color) {
-        g.pose().pushMatrix();
-        g.pose().translate(cx, cy);
+        g.pose().pushPose();
+        g.pose().translate(cx, cy, 0);
         float angle = dx == 1 ? 90 : dx == -1 ? -90 : dy == 1 ? 180 : 0;
-        g.pose().rotate((float) Math.toRadians(angle));
-        g.blit(RenderPipelines.GUI_TEXTURED, UP_ARROW, -4, -4, 0, 0, 7, 7, 7, 7, color);
-        g.pose().popMatrix();
+        g.pose().mulPose(com.mojang.math.Axis.ZP.rotation((float) Math.toRadians(angle)));
+        matteroverdrive.compat.Gui.blit(g, UP_ARROW, -4, -4, 0, 0, 7, 7, 7, 7, color);
+        g.pose().popPose();
     }
 
     @Override
@@ -131,13 +131,13 @@ public class AndroidStationScreen extends MachineScreen<AndroidStationMenu> {
         AndroidData data = Android.get(player());
         for (Cell cell : CELLS) {
             if (in(mx, my, cell.px(), cell.py(), 22, 22)) {
-                g.setComponentTooltipForNextFrame(font, tooltip(cell.stat, data, data.getUnlockedLevel(cell.stat)), mouseX, mouseY);
+                matteroverdrive.compat.Gui.setComponentTooltipForNextFrame(g, font, tooltip(cell.stat, data, data.getUnlockedLevel(cell.stat)), mouseX, mouseY);
                 return;
             }
         }
         for (Slot slot : menu.slots) {
             if (slot instanceof AndroidStationMenu.PartSlot part && slot.isActive() && !slot.hasItem() && in(mx, my, slot.x, slot.y, 16, 16)) {
-                g.setTooltipForNextFrame(font, Component.translatable("gui." + MatterOverdrive.MODID + ".biopart." + PART_NAMES[part.part]), mouseX, mouseY);
+                matteroverdrive.compat.Gui.setTooltipForNextFrame(g, font, Component.translatable("gui." + MatterOverdrive.MODID + ".biopart." + PART_NAMES[part.part]), mouseX, mouseY);
             }
         }
     }
@@ -190,7 +190,7 @@ public class AndroidStationScreen extends MachineScreen<AndroidStationMenu> {
             int level = data.getUnlockedLevel(cell.stat);
             if (level < cell.stat.maxLevel() && cell.stat.canBeUnlocked(player(), data, level + 1)) {
                 minecraft.getSoundManager().play(SimpleSoundInstance.forUI(MOSounds.BIOTIC_STAT_UNLOCK.get(), 1));
-                ClientPacketDistributor.sendToServer(new UnlockStatPayload(cell.stat.id(), level + 1));
+                PacketDistributor.sendToServer(new UnlockStatPayload(cell.stat.id(), level + 1));
             }
             return true;
         }

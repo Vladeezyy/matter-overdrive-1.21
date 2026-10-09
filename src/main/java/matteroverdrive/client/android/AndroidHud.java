@@ -45,7 +45,7 @@ public final class AndroidHud {
 
     /** Draws a whole texture of srcW x srcH scaled to w x h. */
     static void icon(GuiGraphics g, ResourceLocation tex, int x, int y, int w, int h, int srcW, int srcH, int color) {
-        g.blit(RenderPipelines.GUI_TEXTURED, tex, x, y, 0, 0, w, h, srcW, srcH, srcW, srcH, color);
+        matteroverdrive.compat.Gui.blit(g, tex, x, y, 0, 0, w, h, srcW, srcH, srcW, srcH, color);
     }
 
     private static ResourceLocation elem(String name) {
@@ -95,7 +95,7 @@ public final class AndroidHud {
 
     private static void renderStats(GuiGraphics g, Font font, Player player, AndroidData data) {
         int x = 12, y = 12;
-        g.blit(RenderPipelines.GUI_TEXTURED, elem("android_bg_element"), x, y, 0, 0, 174, 11, 174, 11, BASE);
+        matteroverdrive.compat.Gui.blit(g, elem("android_bg_element"), x, y, 0, 0, 174, 11, 174, 11, BASE);
         y += 10;
         x += 5;
         double health = player.getHealth() / player.getAttributeBaseValue(Attributes.MAX_HEALTH);
@@ -154,7 +154,7 @@ public final class AndroidHud {
             int color = ARGB.color(255, stat.isEnabled(player, data, level) ? BASE : HOLO_RED);
             if (stat.isActive(player, data, level)) {
                 // first frame of the 4-frame active background
-                g.blit(RenderPipelines.GUI_TEXTURED, elem("android_feature_icon_bg_active"), pos[0], pos[1], 0, 0, 22, 22, 22, 22, 22, 88, color);
+                matteroverdrive.compat.Gui.blit(g, elem("android_feature_icon_bg_active"), pos[0], pos[1], 0, 0, 22, 22, 22, 22, 22, 88, color);
             } else {
                 icon(g, elem("android_feature_icon_bg"), pos[0], pos[1], 22, 22, 22, 22, color);
             }
@@ -165,7 +165,7 @@ public final class AndroidHud {
                 g.drawString(font, text, pos[0] + 22 - font.width(text), pos[1] + 22 - font.lineHeight - 1, ARGB.color(255, HOLO), false);
             }
         }
-        g.blit(RenderPipelines.GUI_TEXTURED, elem("android_bg_element"), right - 174, 12, 0, 0, 174, 11, 174, 11, BASE);
+        matteroverdrive.compat.Gui.blit(g, elem("android_bg_element"), right - 174, 12, 0, 0, 174, 11, 174, 11, BASE);
     }
 
     /** 1.7.10 AndroidHudBionicStats: six per row, filled from the right edge below the bar. */
@@ -204,7 +204,7 @@ public final class AndroidHud {
 
     private static void renderGlitch(GuiGraphics g) {
         int u = (int) (RANDOM.nextGaussian() * 64), v = (int) (RANDOM.nextGaussian() * 64);
-        g.blit(RenderPipelines.GUI_TEXTURED, gui("glitch"), 0, 0, Math.abs(u), Math.abs(v), g.guiWidth(), g.guiHeight(), 1280 - 128, 720 - 128,
+        matteroverdrive.compat.Gui.blit(g, gui("glitch"), 0, 0, Math.abs(u), Math.abs(v), g.guiWidth(), g.guiHeight(), 1280 - 128, 720 - 128,
                 1280, 720, ARGB.color(160, 0xFFFFFF));
     }
 
@@ -215,11 +215,11 @@ public final class AndroidHud {
         if (time % 40 > 0 && time % 40 < 3) renderGlitch(g);
         String text = typedText(time);
         g.drawString(font, text, cx - font.width(text) / 2, cy - 28, ARGB.color(255, HOLO), false);
-        g.pose().pushMatrix();
-        g.pose().translate(cx, cy);
-        g.pose().rotate((float) Math.toRadians(-(player.level().getGameTime() * 10 % 360)));
+        g.pose().pushPose();
+        g.pose().translate(cx, cy, 0);
+        g.pose().mulPose(com.mojang.math.Axis.ZP.rotation((float) Math.toRadians(-(player.level().getGameTime() * 10 % 360))));
         icon(g, elem("spinner"), -16, -16, 32, 32, 64, 64, 0xFFFFFFFF);
-        g.pose().popMatrix();
+        g.pose().popPose();
         String percent = Math.round(time * 100f / Android.TRANSFORM_TIME) + "%";
         g.drawString(font, percent, cx - font.width(percent) / 2, cy - 3, ARGB.color(255, HOLO), false);
     }

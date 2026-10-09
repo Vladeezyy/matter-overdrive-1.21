@@ -27,7 +27,7 @@ import net.minecraft.util.ARGB;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
  * 1.7.10 GuiDataPad (300 wide; 240 high here, 1.7.10's 260 doesn't fit a 240-high scaled screen): the guide entries
@@ -119,7 +119,7 @@ public class DataPadScreen extends Screen {
 
     private void setState(DataPadItem.State next) {
         state = next;
-        ClientPacketDistributor.sendToServer(new QuestPayloads.DataPadState(hand == InteractionHand.OFF_HAND, next));
+        PacketDistributor.sendToServer(new QuestPayloads.DataPadState(hand == InteractionHand.OFF_HAND, next));
     }
 
     private static boolean in(double mx, double my, int x, int y, int w, int h) {
@@ -142,9 +142,9 @@ public class DataPadScreen extends Screen {
             return;
         }
         int mx = mouseX - left, my = mouseY - top;
-        g.blitSprite(RenderPipelines.GUI_TEXTURED, BACKGROUND, left, top, WIDTH, HEIGHT);
+        matteroverdrive.compat.Gui.blitSprite(g, BACKGROUND, left, top, WIDTH, HEIGHT);
         boolean overClose = in(mx, my, WIDTH - 32, 20, 9, 9);
-        g.blit(RenderPipelines.GUI_TEXTURED, CLOSE, left + WIDTH - 32, top + 20, overClose ? 9 : 0, 0, 9, 9, 18, 9);
+        matteroverdrive.compat.Gui.blit(g, CLOSE, left + WIDTH - 32, top + 20, overClose ? 9 : 0, 0, 9, 9, 18, 9);
         search.visible = state.page() == DataPadItem.State.PAGE_ENTRIES;
         links.clear();
         switch (state.page()) {
@@ -241,7 +241,7 @@ public class DataPadScreen extends Screen {
         if (state.ordering() > 1) {
             for (var group : groups.entrySet()) {
                 int[] b = group.getValue();
-                g.blitSprite(RenderPipelines.GUI_TEXTURED, GROUP_BG, px + b[0], py + b[1], b[2] - b[0], b[3] - b[1], 0xFFBFE4E6);
+                matteroverdrive.compat.Gui.blitSprite(g, GROUP_BG, px + b[0], py + b[1], b[2] - b[0], b[3] - b[1], 0xFFBFE4E6);
                 Component name = GuideElement.uni(net.minecraft.client.resources.language.I18n.get("guide.matteroverdrive.group." + group.getKey()));
                 g.drawString(font, name, px + (b[0] + b[2]) / 2 - font.width(name) / 2, py + b[1] - 4, 0xFFBFE4E6, false);
             }
@@ -250,7 +250,7 @@ public class DataPadScreen extends Screen {
         GuideEntry hoveredEntry = null;
         for (Placed p : placed) {
             int ex = px + p.x(), ey = py + p.y();
-            g.blit(RenderPipelines.GUI_TEXTURED, ENTRY_BG, ex, ey, 0, 0, 22, 22, 22, 22);
+            matteroverdrive.compat.Gui.blit(g, ENTRY_BG, ex, ey, 0, 0, 22, 22, 22, 22);
             List<ItemStack> icons = p.entry().icons();
             if (!icons.isEmpty()) g.renderItem(icons.get((int) (time / 20 % icons.size())), ex + 3, ey + 3);
             if (state.ordering() == 0) {
@@ -263,15 +263,15 @@ public class DataPadScreen extends Screen {
         }
         g.disableScissor();
         // search icon and the ordering toggle (1.7.10 ElementStatesHoloIcons)
-        g.blit(RenderPipelines.GUI_TEXTURED, holo("page_icon_search"), px + 28, py + 3, 0, 0, 10, 10, 16, 16, 16, 16, 0xFFBFE4E6);
+        matteroverdrive.compat.Gui.blit(g, holo("page_icon_search"), px + 28, py + 3, 0, 0, 10, 10, 16, 16, 16, 16, 0xFFBFE4E6);
         int ordering = Math.clamp(state.ordering(), 0, 2);
-        g.blit(RenderPipelines.GUI_TEXTURED, holo(ORDER_ICONS[ordering]), px + PAGE_W - 38, py + 2, 0, 0, 16, 16, 16, 16, 16, 16, 0xFFBFE4E6);
-        if (hoveredEntry != null) g.setTooltipForNextFrame(font, Component.literal(hoveredEntry.getDisplayName()), mouseX, mouseY);
+        matteroverdrive.compat.Gui.blit(g, holo(ORDER_ICONS[ordering]), px + PAGE_W - 38, py + 2, 0, 0, 16, 16, 16, 16, 16, 16, 0xFFBFE4E6);
+        if (hoveredEntry != null) matteroverdrive.compat.Gui.setTooltipForNextFrame(g, font, Component.literal(hoveredEntry.getDisplayName()), mouseX, mouseY);
     }
 
     private void circuit(GuiGraphics g, int x, int y, float u, float v, float uw, float vh) {
         int size = 1600;
-        g.blit(RenderPipelines.GUI_TEXTURED, CIRCUIT, x, y, u * size, v * size, PAGE_W, PAGE_H, (int) (uw * size), (int) (vh * size),
+        matteroverdrive.compat.Gui.blit(g, CIRCUIT, x, y, u * size, v * size, PAGE_W, PAGE_H, (int) (uw * size), (int) (vh * size),
                 size, size, ARGB.color(26, 0xFFFFFF));
     }
 
@@ -314,7 +314,7 @@ public class DataPadScreen extends Screen {
             ctx.mouseY = mouseY;
             pages.get(page).draw(ctx, px, py, PAGE_W);
             links.addAll(ctx.links);
-            if (ctx.hovered != null) g.setTooltipForNextFrame(font, ctx.hovered, mouseX, mouseY);
+            if (ctx.hovered != null) matteroverdrive.compat.Gui.setTooltipForNextFrame(g, font, ctx.hovered, mouseX, mouseY);
         } else {
             Component none = GuideElement.uni("No Info...");
             g.drawString(font, none, px + PAGE_W / 2 - font.width(none) / 2, py + PAGE_H / 2, HOLO_RED, false);
@@ -328,7 +328,7 @@ public class DataPadScreen extends Screen {
 
     private void arrow(GuiGraphics g, ResourceLocation tex, int x, int y, int w, int h, int mx, int my) {
         boolean over = in(mx + left, my + top, x, y, w, h);
-        g.blit(RenderPipelines.GUI_TEXTURED, tex, x, y, over ? w : 0, 0, w, h, w * 2, h);
+        matteroverdrive.compat.Gui.blit(g, tex, x, y, over ? w : 0, 0, w, h, w * 2, h);
     }
 
     /** 1.7.10 undo: back through the link history, else to the entries. */
@@ -344,11 +344,11 @@ public class DataPadScreen extends Screen {
     private void button(GuiGraphics g, int mx, int my, int[] b, String icon, int iconSize, boolean enabled, int color, int mouseX, int mouseY,
                         String tooltip) {
         boolean over = enabled && in(mx, my, b[0], b[1], b[2], b[3]);
-        g.blitSprite(RenderPipelines.GUI_TEXTURED, !enabled ? BUTTON_DARK : over ? BUTTON_OVER : BUTTON, left + b[0], top + b[1], b[2], b[3]);
+        matteroverdrive.compat.Gui.blitSprite(g, !enabled ? BUTTON_DARK : over ? BUTTON_OVER : BUTTON, left + b[0], top + b[1], b[2], b[3]);
         int size = Math.min(iconSize, b[2] - 4);
-        g.blit(RenderPipelines.GUI_TEXTURED, holo(icon), left + b[0] + (b[2] - size) / 2, top + b[1] + (b[3] - size) / 2, 0, 0, size, size,
+        matteroverdrive.compat.Gui.blit(g, holo(icon), left + b[0] + (b[2] - size) / 2, top + b[1] + (b[3] - size) / 2, 0, 0, size, size,
                 iconSize, iconSize, iconSize, iconSize, enabled ? color : HOLO_DIM);
-        if (in(mx, my, b[0], b[1], b[2], b[3])) g.setTooltipForNextFrame(font, Component.translatable(tooltip), mouseX, mouseY);
+        if (in(mx, my, b[0], b[1], b[2], b[3])) matteroverdrive.compat.Gui.setTooltipForNextFrame(g, font, Component.translatable(tooltip), mouseX, mouseY);
     }
 
     private void renderQuests(GuiGraphics g, int mx, int my, int mouseX, int mouseY) {
@@ -370,7 +370,7 @@ public class DataPadScreen extends Screen {
             g.drawString(font, none, left + LIST_X + LIST_W / 2 - font.width(none) / 2, top + LIST_Y, HOLO_DIM, false);
         }
         // the band between list and info (1.7.10 android_bg_element at 20% holo)
-        g.blit(RenderPipelines.GUI_TEXTURED, BAND, left + 60, top + 102, 0, 0, 174, 11, 174, 11, ARGB.color(51, 0xA9E2FB));
+        matteroverdrive.compat.Gui.blit(g, BAND, left + 60, top + 102, 0, 0, 174, 11, 174, 11, ARGB.color(51, 0xA9E2FB));
         if (selected == null || selected.getQuest() == null) return;
         // info, objectives, rewards
         Quest quest = selected.getQuest();
@@ -403,7 +403,7 @@ public class DataPadScreen extends Screen {
             g.renderItem(rewards.get(i), rx, ry);
             g.renderItemDecorations(font, rewards.get(i), rx, ry);
             if (mouseX >= rx && mouseX < rx + 16 && mouseY >= ry && mouseY < ry + 16 && mouseY >= top + INFO_Y && mouseY < top + INFO_Y + INFO_H) {
-                g.setTooltipForNextFrame(font, rewards.get(i), mouseX, mouseY);
+                matteroverdrive.compat.Gui.setTooltipForNextFrame(g, font, rewards.get(i), mouseX, mouseY);
             }
         }
         g.disableScissor();
@@ -484,11 +484,11 @@ public class DataPadScreen extends Screen {
         }
         QuestStack selected = selected();
         if (in(mx, my, COMPLETE_BT[0], COMPLETE_BT[1], COMPLETE_BT[2], COMPLETE_BT[3]) && canComplete(selected)) {
-            ClientPacketDistributor.sendToServer(new QuestPayloads.QuestAction(QuestPayloads.Action.COMPLETE, quests.indexOf(selected)));
+            PacketDistributor.sendToServer(new QuestPayloads.QuestAction(QuestPayloads.Action.COMPLETE, quests.indexOf(selected)));
             return true;
         }
         if (in(mx, my, ABANDON_BT[0], ABANDON_BT[1], ABANDON_BT[2], ABANDON_BT[3]) && selected != null) {
-            ClientPacketDistributor.sendToServer(new QuestPayloads.QuestAction(QuestPayloads.Action.ABANDON, quests.indexOf(selected)));
+            PacketDistributor.sendToServer(new QuestPayloads.QuestAction(QuestPayloads.Action.ABANDON, quests.indexOf(selected)));
             setState(state.withQuest(0, 0));
             return true;
         }

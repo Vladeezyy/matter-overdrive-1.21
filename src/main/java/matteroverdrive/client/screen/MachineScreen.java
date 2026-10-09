@@ -88,14 +88,14 @@ public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractCo
     @Override
     protected void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY) {
         int x = leftPos, y = topPos;
-        g.blitSprite(RenderPipelines.GUI_TEXTURED, BACKGROUND, x, y, imageWidth, imageHeight);
+        matteroverdrive.compat.Gui.blitSprite(g, BACKGROUND, x, y, imageWidth, imageHeight);
 
         for (Slot slot : menu.slots) {
             if (!slot.isActive() || !drawSlotBackground(slot)) continue;
             if (slot instanceof MachineMenu<?>.PageSlot) {
-                g.blit(RenderPipelines.GUI_TEXTURED, SLOT_BIG, x + slot.x - 3, y + slot.y - 3, 0, 0, 22, 22, 22, 22);
+                matteroverdrive.compat.Gui.blit(g, SLOT_BIG, x + slot.x - 3, y + slot.y - 3, 0, 0, 22, 22, 22, 22);
             } else {
-                g.blit(RenderPipelines.GUI_TEXTURED, SLOT_SMALL, x + slot.x - 1, y + slot.y - 1, 0, 0, 18, 18, 18, 18);
+                matteroverdrive.compat.Gui.blit(g, SLOT_SMALL, x + slot.x - 1, y + slot.y - 1, 0, 0, 18, 18, 18, 18);
             }
         }
 
@@ -105,19 +105,19 @@ public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractCo
             MachineMenu.Page page = pages.get(i);
             int bx = x + pagesX(), by = y + PAGES_Y + i * 26;
             boolean selected = menu.page == page;
-            g.blit(RenderPipelines.GUI_TEXTURED, PAGE_BUTTON, bx, by, selected ? 24 : 0, 0, 24, 24, 48, 24);
+            matteroverdrive.compat.Gui.blit(g, PAGE_BUTTON, bx, by, selected ? 24 : 0, 0, 24, 24, 48, 24);
             int icon = page.ordinal();
             int size = PAGE_ICON_SIZES[icon];
-            g.blit(RenderPipelines.GUI_TEXTURED, PAGE_ICONS[icon], bx + (24 - size) / 2, by + (24 - size) / 2, 0, 0, size, size, size, size,
+            matteroverdrive.compat.Gui.blit(g, PAGE_ICONS[icon], bx + (24 - size) / 2, by + (24 - size) / 2, 0, 0, size, size, size, size,
                     selected ? COLOR_TEXT : 0xFF8B9EA0);
         }
 
         // indicator (1.7.10 ElementIndicator: 21x5 frames, 0 idle / 1 active)
-        g.blit(RenderPipelines.GUI_TEXTURED, INDICATOR, x + 6, y + imageHeight - 18, 0, menu.isActive() ? 5 : 0, 21, 5, 21, 15);
+        matteroverdrive.compat.Gui.blit(g, INDICATOR, x + 6, y + imageHeight - 18, 0, menu.isActive() ? 5 : 0, 21, 5, 21, 15);
 
         // close button
         boolean overClose = in(mouseX - x, mouseY - y, closeX(), CLOSE_Y, 9, 9);
-        g.blit(RenderPipelines.GUI_TEXTURED, CLOSE, x + closeX(), y + CLOSE_Y, overClose ? 9 : 0, 0, 9, 9, 18, 9);
+        matteroverdrive.compat.Gui.blit(g, CLOSE, x + closeX(), y + CLOSE_Y, overClose ? 9 : 0, 0, 9, 9, 18, 9);
 
         switch (menu.page) {
             case HOME -> renderHome(g, x, y, mouseX - x, mouseY - y);
@@ -146,7 +146,7 @@ public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractCo
         List<MachineMenu.Page> pages = pages();
         for (int i = 0; i < pages.size(); i++) {
             if (in(mx, my, pagesX(), PAGES_Y + i * 26, 24, 24)) {
-                g.setTooltipForNextFrame(font, Component.translatable("gui.matteroverdrive.page." + pages.get(i).name().toLowerCase(java.util.Locale.ROOT)), mouseX, mouseY);
+                matteroverdrive.compat.Gui.setTooltipForNextFrame(g, font, Component.translatable("gui.matteroverdrive.page." + pages.get(i).name().toLowerCase(java.util.Locale.ROOT)), mouseX, mouseY);
             }
         }
         if (menu.page == MachineMenu.Page.HOME) {
@@ -187,44 +187,44 @@ public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractCo
 
     /** 1.7.10 MOElementEnergy: 16x42 bar from energy.png (left half empty, right half full). */
     protected void drawEnergy(GuiGraphics g, int x, int y) {
-        g.blit(RenderPipelines.GUI_TEXTURED, ENERGY, x, y, 0, 0, 16, 42, 32, 64);
+        matteroverdrive.compat.Gui.blit(g, ENERGY, x, y, 0, 0, 16, 42, 32, 64);
         int capacity = menu.getCapacity();
         int h = capacity > 0 ? (int) ((long) menu.getEnergy() * 42 / capacity) : 0;
         if (h > 0) {
-            g.blit(RenderPipelines.GUI_TEXTURED, ENERGY, x, y + 42 - h, 16, 42 - h, 16, h, 32, 64);
+            matteroverdrive.compat.Gui.blit(g, ENERGY, x, y + 42 - h, 16, 42 - h, 16, h, 32, 64);
         }
     }
 
     protected void energyTooltip(GuiGraphics g, int mx, int my, int barX, int barY, int mouseX, int mouseY) {
         if (in(mx, my, barX, barY, 16, 42)) {
-            g.setTooltipForNextFrame(font, Component.translatable("tooltip.matteroverdrive.energy_stored",
+            matteroverdrive.compat.Gui.setTooltipForNextFrame(g, font, Component.translatable("tooltip.matteroverdrive.energy_stored",
                     MOText.energy(menu.getEnergy()), MOText.energy(menu.getCapacity())), mouseX, mouseY);
         }
     }
 
     /** 1.7.10 ElementMatterStored: same 16x42 layout as the energy bar, from matter.png. */
     protected void drawMatter(GuiGraphics g, int x, int y) {
-        g.blit(RenderPipelines.GUI_TEXTURED, MATTER, x, y, 0, 0, 16, 42, 32, 64);
+        matteroverdrive.compat.Gui.blit(g, MATTER, x, y, 0, 0, 16, 42, 32, 64);
         int capacity = menu.getMatterCapacity();
         int h = capacity > 0 ? (int) ((long) menu.getMatter() * 42 / capacity) : 0;
         if (h > 0) {
-            g.blit(RenderPipelines.GUI_TEXTURED, MATTER, x, y + 42 - h, 16, 42 - h, 16, h, 32, 64);
+            matteroverdrive.compat.Gui.blit(g, MATTER, x, y + 42 - h, 16, 42 - h, 16, h, 32, 64);
         }
     }
 
     protected void matterTooltip(GuiGraphics g, int mx, int my, int barX, int barY, int mouseX, int mouseY) {
         if (in(mx, my, barX, barY, 16, 42)) {
-            g.setTooltipForNextFrame(font, Component.translatable("tooltip.matteroverdrive.matter_stored",
+            matteroverdrive.compat.Gui.setTooltipForNextFrame(g, font, Component.translatable("tooltip.matteroverdrive.matter_stored",
                     menu.getMatter(), menu.getMatterCapacity()), mouseX, mouseY);
         }
     }
 
     /** 1.7.10 ElementDualScaled with Progress_Arrow_Right: 24x16, empty frame then full frame. */
     protected void drawArrow(GuiGraphics g, int x, int y, float progress) {
-        g.blit(RenderPipelines.GUI_TEXTURED, ARROW, x, y, 0, 0, 24, 16, 48, 16);
+        matteroverdrive.compat.Gui.blit(g, ARROW, x, y, 0, 0, 24, 16, 48, 16);
         int w = Math.round(progress * 24);
         if (w > 0) {
-            g.blit(RenderPipelines.GUI_TEXTURED, ARROW, x, y, 24, 0, w, 16, 48, 16);
+            matteroverdrive.compat.Gui.blit(g, ARROW, x, y, 24, 0, w, 16, 48, 16);
         }
     }
 

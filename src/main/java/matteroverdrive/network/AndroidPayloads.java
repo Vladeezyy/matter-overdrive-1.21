@@ -64,7 +64,7 @@ public final class AndroidPayloads {
     /** Sends a shield hit to the player and everyone near enough to see the shield. */
     public static void sendShieldHit(ServerPlayer player, Vec3 offset) {
         ShieldHit hit = new ShieldHit(player.getId(), (float) offset.x, (float) offset.y, (float) offset.z);
-        for (ServerPlayer to : player.level().players()) {
+        for (ServerPlayer to : player.serverLevel().players()) {
             if (to.distanceToSqr(player) < 128 * 128 && to.connection.hasChannel(ShieldHit.TYPE)) {
                 net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(to, hit);
             }

@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-import net.minecraft.world.level.storage.ValueInput;
+import matteroverdrive.compat.ValueInput;
+import matteroverdrive.compat.ValueOutput;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
@@ -70,12 +71,23 @@ public class MachineInventory extends ItemStackHandler {
         onChanged.run();
     }
 
-    /** ItemStackHandler.deserialize without its resize: the slots come from the machine. */
-    @Override
+    private record SlotStack(int slot, ItemStack stack) {
+        static final com.mojang.serialization.Codec<SlotStack> CODEC = com.mojang.serialization.codecs.RecordCodecBuilder.create(i -> i.group(
+                com.mojang.serialization.Codec.INT.fieldOf("Slot").forGetter(SlotStack::slot),
+                ItemStack.CODEC.fieldOf("Item").forGetter(SlotStack::stack)).apply(i, SlotStack::new));
+    }
+
+    public void serialize(ValueOutput output) {
+        var items = output.list("Items", SlotStack.CODEC);
+        for (int i = 0; i < stacks.size(); i++) {
+            if (!stacks.get(i).isEmpty()) items.add(new SlotStack(i, stacks.get(i)));
+        }
+    }
+
     public void deserialize(ValueInput input) {
         java.util.Collections.fill(stacks, ItemStack.EMPTY);
-        input.listOrEmpty("Items", net.minecraft.world.ItemStackWithSlot.CODEC).forEach(slot -> {
-            if (slot.isValidInContainer(stacks.size())) stacks.set(slot.slot(), slot.stack());
+        input.listOrEmpty("Items", SlotStack.CODEC).forEach(slot -> {
+            if (slot.slot() >= 0 && slot.slot() < stacks.size()) stacks.set(slot.slot(), slot.stack());
         });
         onLoad();
     }

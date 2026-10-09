@@ -37,8 +37,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
+import matteroverdrive.compat.ValueInput;
+import matteroverdrive.compat.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -50,7 +50,7 @@ import net.minecraft.world.phys.Vec3;
  * up to 6 weak blocks every 6 ticks, and collapses into an explosion when it swallows a nether star.
  * Gravitational stabilizers suppress it while their beam hits it.
  */
-public class GravitationalAnomalyBlockEntity extends BlockEntity {
+public class GravitationalAnomalyBlockEntity extends matteroverdrive.compat.CompatBlockEntity {
     public static final ResourceKey<DamageType> BLACK_HOLE = ResourceKey.create(Registries.DAMAGE_TYPE,
             ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "black_hole"));
     public static final int BLOCK_DESTROY_DELAY = 6;

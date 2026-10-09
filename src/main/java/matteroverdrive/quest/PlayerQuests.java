@@ -13,11 +13,11 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
-import net.neoforged.neoforge.attachment.AttachmentSyncHandler;
+import matteroverdrive.compat.ValueInput;
+import matteroverdrive.compat.ValueOutput;
+import matteroverdrive.compat.AttachmentSyncHandler;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
-import net.neoforged.neoforge.common.util.ValueIOSerializable;
+import matteroverdrive.compat.ValueIOSerializable;
 
 /**
  * 1.7.10 PlayerQuestData (in MOExtendedProperties): the active and the completed quests of a player. A player
@@ -35,7 +35,7 @@ public class PlayerQuests implements ValueIOSerializable {
     }
 
     public static void sync(Player player) {
-        if (!player.level().isClientSide()) player.syncData(MOAttachments.QUESTS);
+        if (!player.level().isClientSide()) matteroverdrive.compat.AttachmentSync.sync(player, MOAttachments.QUESTS);
     }
 
     public List<QuestStack> getActiveQuests() {
@@ -91,7 +91,7 @@ public class PlayerQuests implements ValueIOSerializable {
     public static final AttachmentSyncHandler<PlayerQuests> SYNC = new AttachmentSyncHandler<>() {
         @Override
         public boolean sendToPlayer(IAttachmentHolder holder, net.minecraft.server.level.ServerPlayer to) {
-            return holder == to && to.connection.hasChannel(net.neoforged.neoforge.network.payload.SyncAttachmentsPayload.TYPE);
+            return holder == to && matteroverdrive.compat.AttachmentSync.canReceive(to);
         }
 
         @Override

@@ -64,7 +64,7 @@ public final class Android {
     /** Pushes a change to the player and everyone tracking them. */
     public static void sync(Player player) {
         get(player).dirty = false;
-        if (!player.level().isClientSide()) player.syncData(MOAttachments.ANDROID);
+        if (!player.level().isClientSide()) matteroverdrive.compat.AttachmentSync.sync(player, MOAttachments.ANDROID);
     }
 
     // --- energy -------------------------------------------------------------------------------------
@@ -315,7 +315,7 @@ public final class Android {
     /** 1.7.10 manageTurning: sickness while turning, a hit every 2 s, then android - and (by default) death. */
     private static void manageTurning(ServerPlayer player, AndroidData data) {
         if (data.turning <= 0) return;
-        ServerLevel level = player.level();
+        ServerLevel level = player.serverLevel();
         var damage = level.damageSources().source(TRANSFORMATION_DAMAGE);
         data.turning--;
         if (data.turning > 0) {

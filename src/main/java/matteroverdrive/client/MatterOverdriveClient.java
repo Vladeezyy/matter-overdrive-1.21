@@ -39,11 +39,6 @@ public class MatterOverdriveClient {
     }
 
     @SubscribeEvent
-    static void pictureInPicture(net.neoforged.neoforge.client.event.RegisterPictureInPictureRenderersEvent event) {
-        event.register(matteroverdrive.client.starmap.StarMapPipRenderer.State.class, matteroverdrive.client.starmap.StarMapPipRenderer::new);
-    }
-
-    @SubscribeEvent
     static void pipelines(net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent event) {
         matteroverdrive.client.starmap.HoloRenderTypes.register(event);
     }
@@ -104,7 +99,7 @@ public class MatterOverdriveClient {
             var mc = net.minecraft.client.Minecraft.getInstance();
             if (player == mc.player) {
                 mc.getSoundManager().play(net.minecraft.client.resources.sounds.SimpleSoundInstance.forMusic(
-                        matteroverdrive.init.MOSounds.TRANSFORMATION_MUSIC.get(), 1));
+                        matteroverdrive.init.MOSounds.TRANSFORMATION_MUSIC.get()));
             }
         };
     }

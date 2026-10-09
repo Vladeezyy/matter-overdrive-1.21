@@ -205,8 +205,9 @@ public final class MatterRegistry {
             if (next != null) values.putIfAbsent(next.nextOxidationStage().asItem(), value);
             var waxed = holder.getData(NeoForgeDataMaps.WAXABLES);
             if (waxed != null) values.putIfAbsent(waxed.waxed().asItem(), value);
-            var stripped = holder.getData(NeoForgeDataMaps.STRIPPABLES);
-            if (stripped != null) values.putIfAbsent(stripped.strippedBlock().asItem(), value);
+            // the vanilla table: NeoForge's STRIPPABLES data map came with 21.6
+            var stripped = net.minecraft.world.item.AxeItem.STRIPPABLES.get(block);
+            if (stripped != null) values.putIfAbsent(stripped.asItem(), value);
             // concrete powder hardens in water (its target is private: the "_concrete" sibling by name)
             if (block instanceof net.minecraft.world.level.block.ConcretePowderBlock) {
                 var id = BuiltInRegistries.BLOCK.getKey(block);
