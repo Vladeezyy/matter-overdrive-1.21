@@ -641,18 +641,33 @@
 - Sounds must be mono ogg: ffmpeg → mono wav → `oggenc` (vorbis-tools); ffmpeg's built-in vorbis is stereo-only.
 
 ## Next
-- Phase 7 ✅. Leftovers done: legendary bonuses, network destination filters, machine renderers, machine sounds,
-  machine item tooltip, android shield bubble + teleport marker, tritanium armor model, stabilizer beam, bolt hits,
-  shotgun charge.
-- Leftovers: all done (only gui button_expand is left out, see above).
+- Phase 7 ✅, all leftovers ✅ (only gui button_expand left out). Released v1.0.0 (GitHub release + Modrinth version).
+- **Next task (user, 2026-10-09): make the mod run on NeoForge for every Minecraft 1.21.1 .. 1.21.10.** Not started.
+  Notes for whoever picks it up:
+  - One jar can't span them (version boundaries below are from memory: verify against the NeoForge changelogs): 1.21.2 (item/recipe/render rewrites, `Recipe.placementInfo/display`, equipment assets),
+    1.21.4 (client item definitions `assets/*/items`), 1.21.5 (tools as plain items, `ValueInput/ValueOutput` saves
+    landed in 1.21.6), 1.21.9-10 (render states / `SubmitNodeCollector`, `ResourceLocation` vs ids, the transfer API
+    `EnergyHandler`/`ResourceHandler` replacing IEnergyStorage/IItemHandler) all break source compatibility. Plan on
+    separate builds per range (e.g. 1.21.1, 1.21.3-4, 1.21.5-8, 1.21.9-10) from one repo: a multi-version Gradle
+    setup (Stonecutter-style preprocessing, or branches) with version-specific shims for the APIs listed in
+    "## 1.21.10 / NeoForge 21.10.64 API notes" above; the resources generator needs per-version output too.
+  - Ask the user which versions matter most (1.21.1 has by far the most modpacks) before building the matrix.
+- Suggested, not done: estimate modded raw materials from common `c:` tags (c:ingots 32, c:raw_materials 32,
+  c:ores 64, c:gems 64, c:dusts 16, c:nuggets 4, c:storage_blocks 9 x ingot) in `MatterRegistry.estimate` — the user
+  hasn't answered yet.
+- Not released yet (on `main` after v1.0.0): the matter-for-every-item change and the mods-list logo → would be 1.0.1.
+  Auto-publishing to Modrinth (Minotaur / GitHub Action with the `MODRINTH_TOKEN` secret) isn't set up.
 
-## Handover (2026-10-08, cloud -> local)
-- Branch `main-uvidhk`, everything committed and pushed. Last commit: "Leftovers: stabilizer beam, bolt hits ...". 95 GameTests
-  pass (`./gradlew runGameTestServer`).
-- DevScene now builds the scene at the world spawn on the flat surface (`level.getMinY() + 4`), not at the player's
-  saved position. A local mo_scene world that isn't a default superflat may put the floor elsewhere: adjust `build()`
-  if so. The latest scene steps are 3020-3164 (machine renderers); `-PsceneFrom=3000` reproduces them. Steps compress
-  when the client lags (several ticks per frame), so give teleports about 20 ticks before a shot.
-- Screenshots for the machine renderers were taken in the cloud (Xvfb). On Windows/macOS just run `./gradlew runScene`.
+## Handover (2026-10-09)
+- Work on `main` (public repo github.com/Vladeezyy/matter-overdrive-1.21; `main-uvidhk` is an old pointer). Everything
+  committed and pushed; 96 GameTests pass. History was rewritten to remove AI attribution: commits go out as Vladeezyy
+  with plain messages, no Co-Authored-By / session trailers (user request). Backup bundle in ~/mo-reference/backups/.
+- Modrinth project `matter-overdrive-1.21-unofficial-port` (id ahhDxumU) is in review ("processing"); description,
+  gallery and changelog sources in `docs/modrinth/`. API token: `~/.gradle/gradle.properties` (`modrinthToken`, never
+  print it); the client/server environment is set per version via the v3 API (`environment: client_and_server`).
+- `CLAUDE.md` is local only (gitignored). The dev client's language is ru_ru (`run/options.txt`); switch to en_us for
+  public screenshots and back.
+- DevScene: base scene at spawn underground (`level.getMinY() + 4`), Modrinth gallery steps from 3440
+  (`-PsceneFrom=3440`, platforms 1000 blocks from spawn), matter tooltips at 3770.
 - Regenerating resources on another machine changes .ogg/.png bytes: `git checkout` those, and commit only the
   json/obj changes.
