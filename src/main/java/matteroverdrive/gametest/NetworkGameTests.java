@@ -137,7 +137,8 @@ final class NetworkGameTests {
         helper.runAfterDelay(350, () -> {
             ItemStack out = r.getInventory().getStack(ReplicatorBlockEntity.OUTPUT);
             helper.assertTrue(out.is(Items.COBBLESTONE) && out.getCount() == 3, "replicated " + out);
-            helper.assertTrue(r.getMatterTank().getMatter() == 7, "matter left " + r.getMatterTank().getMatter());
+            int failed = r.getInventory().getStack(ReplicatorBlockEntity.SECOND_OUTPUT).getCount();   // a rare failure costs matter too
+            helper.assertTrue(r.getMatterTank().getMatter() == 7 - failed, "matter left " + r.getMatterTank().getMatter() + ", failed " + failed);
             helper.assertTrue(r.isIdle() && monitor.getQueue().isEmpty(), "task not finished");
             helper.succeed();
         });

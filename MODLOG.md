@@ -638,6 +638,12 @@
   1.21.10 one is `run/saves/mo_scene_1.21.10` (swap the folders when switching branches), old screenshots in
   `run/screenshots_1.21.10`.
 
+## 2026-10-09 — flaky GameTests fixed (every version branch)
+- The star map tests retry the homeworld claim (1.7.10 claimPlanet tries one random quadrant; quadrants with 1-3 stars
+  fill up when every test player claims), mad_scientist_trades expects the 7 sure trades (it asked for 8, ~8% flaky),
+  monitor_request_replicates counts a rare replication failure's matter. Before 1.21.5 the game test server keeps
+  run/world (and its galaxy) between runs: build.gradle deletes it first.
+
 ## 1.21.10 / NeoForge 21.10.64 API notes (learned the hard way)
 **Workflow**
 - Resources: never hand-edit `src/main/resources/{assets,data}` — regenerate:
