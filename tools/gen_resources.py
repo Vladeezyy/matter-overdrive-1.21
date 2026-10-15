@@ -2108,3 +2108,11 @@ for src_name, dst_name in [("en_US", "en_us"), ("ru_RU", "ru_ru")]:
                 fallback.append(ours)
     w(A / "lang" / f"{dst_name}.json", lang)
     print(f"{dst_name}: {len(lang)} keys, not in original {src_name}: {fallback or 'none'}")
+
+# port translations (tools/lang): the required languages 1.7.10 lacked (uk_ua, de_de, es_es, pt_br) and the ru_ru
+# strings it left in English, merged over the generated files
+for extra in sorted((Path(__file__).resolve().parent / "lang").glob("*.json")):
+    target = A / "lang" / extra.name
+    lang = json.loads(target.read_text(encoding="utf-8")) if target.exists() else {}
+    lang.update(json.loads(extra.read_text(encoding="utf-8")))
+    w(target, lang)
