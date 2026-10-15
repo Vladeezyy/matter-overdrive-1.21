@@ -17,6 +17,9 @@
 ### Gotchas
 1. 1.21.4+ needs a client item definition in `assets/<mod>/items/<id>.json` in addition to `models/item/` — without it items render as missing.
 2. Some ru_RU strings are missing in the original (weapon_handle, weapon_receiver, plasma_core); translated in `EXTRA` in tools/gen_resources.py.
+3. Required languages (uk_ua, de_de, es_es, pt_br) and the ru_ru strings 1.7.10 left in English (quests, junkie dialog) are in
+   `tools/lang/<lang>.json`, merged over the generated files by tools/gen_resources.py. The quest tokens (`$craftAmount`,
+   `$block`, ...) stay as they are; the old ru_ru `%2$s` in weapons_of_war.objective.1 is `$craftAmount` now.
 
 ## 2026-10-08 — phase 1: base content ✅
 - Resources now come from `tools/gen_resources.py` (in repo): regenerate with
