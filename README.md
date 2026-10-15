@@ -10,7 +10,8 @@ This is the `1.21.1` branch; the Minecraft 1.21.10 build lives on `main`. Both b
 `tools/backport_1_21_1.py` converts the generated resources.
 
 The port is a rewrite against modern APIs that keeps the original's behaviour, numbers, textures, sounds and
-translations (English and Russian). The 1.7.10 source (0.4.2) is the specification.
+translations (English and Russian; the port adds Ukrainian, German, Spanish and Portuguese (Brazil), not by native
+speakers). The 1.7.10 source (0.4.2) is the specification.
 
 **Download:** [Modrinth](https://modrinth.com/mod/matter-overdrive-1.21-unofficial-port) ·
 [GitHub releases](https://github.com/Vladeezyy/matter-overdrive-1.21/releases)
