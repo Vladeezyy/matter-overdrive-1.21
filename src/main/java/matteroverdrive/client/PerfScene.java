@@ -66,6 +66,8 @@ public final class PerfScene {
     private static void initSteps() {
         if (MODE.equals("stress")) {
             stressSteps();
+        } else if (MODE.equals("types")) {
+            typeSteps();
         } else if (MODE.equals("hands")) {
             handSteps();
         }
@@ -83,6 +85,8 @@ public final class PerfScene {
             // the frame rate must not hit a limit, or both sides of a comparison read the same number
             mc.options.framerateLimit().set(260);
             mc.options.enableVsync().set(false);
+            // 1.21.2+ caps an idle game ("AFK" after a minute without input) at 30 FPS: nobody touches it during the run
+            mc.options.inactivityFpsLimit().set(net.minecraft.client.InactivityFpsLimit.MINIMIZED);
             mc.options.cloudStatus().set(net.minecraft.client.CloudStatus.OFF);
             mc.options.hideGui = true;
             server(mc, PerfScene::prepareField);
@@ -237,6 +241,86 @@ public final class PerfScene {
 
     private static void machine(ServerLevel level, BlockPos pos, Block block) {
         level.setBlockAndUpdate(pos, block.defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
+    }
+
+    // --- one machine type at a time --------------------------------------------------------------
+
+    private static final String[] TYPES = {"minecraft:furnace", "decomposer", "replicator", "inscriber", "pattern_storage", "pattern_monitor",
+            "matter_analyzer", "solar_panel", "matter_pipe", "network_pipe", "tritanium_crate_white", "star_map", "weapon_station",
+            "android_station", "transporter", "gravitational_stabilizer"};
+
+    /** {@code types}: the field filled with 576 blocks of one kind at a time, set up to work where they can. */
+    private static void typeSteps() {
+        int t = 40;
+        at(t, mc -> {
+            mc.options.framerateLimit().set(260);
+            mc.options.enableVsync().set(false);
+            // 1.21.2+ caps an idle game ("AFK" after a minute without input) at 30 FPS: nobody touches it during the run
+            mc.options.inactivityFpsLimit().set(net.minecraft.client.InactivityFpsLimit.MINIMIZED);
+            mc.options.cloudStatus().set(net.minecraft.client.CloudStatus.OFF);
+            mc.options.hideGui = true;
+            server(mc, PerfScene::prepareField);
+        });
+        t += 400;
+        // -Dmatteroverdrive.perf.types=a,b limits the run to those kinds (to profile one renderer)
+        String only = System.getProperty("matteroverdrive.perf.types", "");
+        for (String id : TYPES) {
+            if (!only.isEmpty() && !List.of(only.split(",")).contains(id)) continue;
+            var key = net.minecraft.resources.ResourceLocation.parse(id.contains(":") ? id : MatterOverdrive.MODID + ":" + id);
+            at(t, mc -> server(mc, p -> fillWith(p.level(), net.minecraft.core.registries.BuiltInRegistries.BLOCK.getValue(key))));
+            at(t += 100, mc -> startMeasure());
+            at(t += 200, mc -> stopMeasure("576 x " + id));
+            t += 1;
+        }
+        at(t + 5, mc -> {
+            MatterOverdrive.LOGGER.info("[perf] DONE");
+            mc.options.hideGui = false;
+            mc.stop();
+        });
+    }
+
+    private static void fillWith(ServerLevel level, Block block) {
+        clear(level);
+        for (BlockPos m : modules()) {
+            for (int x = 0; x < 6; x++) {
+                for (int z = 0; z < 2; z++) {
+                    BlockPos p = m.offset(x, 0, z);
+                    BlockState state = block.defaultBlockState();
+                    if (state.hasProperty(MachineBlock.FACING)) state = state.setValue(MachineBlock.FACING, Direction.SOUTH);
+                    level.setBlockAndUpdate(p, state);
+                    var be = level.getBlockEntity(p);
+                    if (be instanceof AbstractFurnaceBlockEntity furnace) {
+                        furnace.setItem(0, new ItemStack(Items.COBBLESTONE, 64));
+                        furnace.setItem(1, new ItemStack(Items.COAL, 64));
+                    } else if (be instanceof DecomposerBlockEntity d) {
+                        d.getEnergy().set(400000);
+                        d.getInventory().setStack(DecomposerBlockEntity.INPUT, new ItemStack(Items.COBBLESTONE, 64));
+                    } else if (be instanceof ReplicatorBlockEntity r) {
+                        r.getEnergy().set(500000);
+                        r.getMatterTank().setMatter(1000);
+                        r.getInventory().setStack(ReplicatorBlockEntity.SHIELDING, new ItemStack(MOItems.TRITANIUM_PLATE.get(), 5));
+                        r.setTask(new ReplicatorBlockEntity.Task(new matteroverdrive.matter.ItemPattern(Items.COBBLESTONE.builtInRegistryHolder(), 100), 64));
+                    } else if (be instanceof InscriberBlockEntity i) {
+                        i.getEnergy().set(300000);
+                        i.getInventory().setStack(InscriberBlockEntity.MAIN, new ItemStack(MOItems.ISOLINEAR_CIRCUIT_MK1.get(), 64));
+                        i.getInventory().setStack(InscriberBlockEntity.SECONDARY, new ItemStack(Items.GOLD_INGOT, 64));
+                    } else if (be instanceof PatternStorageBlockEntity storage) {
+                        storage.getEnergy().set(60000);
+                        for (int d = 0; d < 3; d++) {
+                            ItemStack drive = new ItemStack(MOItems.PATTERN_DRIVE.get());
+                            MOItems.PATTERN_DRIVE.get().addProgress(drive, Items.COBBLESTONE, 100);
+                            storage.getInventory().setStack(d, drive);
+                        }
+                    } else if (be instanceof AnalyzerBlockEntity a) {
+                        a.getEnergy().set(500000);
+                        a.getInventory().setStack(AnalyzerBlockEntity.INPUT, new ItemStack(Items.DIAMOND, 64));
+                        a.getInventory().setStack(AnalyzerBlockEntity.DATABASE, new ItemStack(MOItems.PATTERN_DRIVE.get()));
+                    } else if (be instanceof matteroverdrive.block.entity.MatterPipeBlockEntity pipe) {
+                        pipe.getTank().setMatter(16);
+                    }
+                }
+            }
+        }
     }
 
     // --- held items ------------------------------------------------------------------------------

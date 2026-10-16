@@ -5,7 +5,10 @@ cd "$(dirname "$0")/.."
 MODE=${1:-stress}; shift
 rm -f build-perf.log run/perf.jfr run/screenshots/hand_*.png
 perl -e 'alarm 900; exec @ARGV' ./gradlew runPerf -Pperf=$MODE --console=plain "$@" > build-perf.log 2>&1
-echo "exit $?"
+code=$?
+# after the time limit the game process outlives Gradle and keeps the world locked
+pkill -f 'build/moddev/perfRunProgramArgs' 2>/dev/null
+echo "exit $code"
 grep -E '\[perf\] (PERF|CHECK|DONE)' build-perf.log | sed -E 's/^.*\[perf\] //'
 echo "--- errors"
 grep -E '/(ERROR|FATAL)\]|Caused by|Exception' build-perf.log | sed -E 's/^\[[^]]*\] //' | cut -c1-250 | sort | uniq -c | sort -rn | head -20

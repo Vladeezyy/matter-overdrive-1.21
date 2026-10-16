@@ -73,6 +73,7 @@ neoForge {
             client()
             programArguments.addAll '--quickPlaySingleplayer', 'mo_scene'
             systemProperty 'matteroverdrive.perf', project.findProperty('perf') ?: 'stress'
+            systemProperty 'matteroverdrive.perf.types', project.findProperty('types') ?: ''
             if (project.hasProperty('jfr')) {
                 jvmArguments.add '-XX:StartFlightRecording=filename=perf.jfr,settings=profile'
             }
