@@ -42,6 +42,10 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
     private final int batterySlot;
     private final Set<UpgradeType> affectedBy;
     private RedstoneMode redstoneMode = RedstoneMode.LOW;
+    private final double[] multipliers = new double[UpgradeType.values().length];
+    private boolean multipliersValid;
+    /** Whether a neighbour powers this block; asked again only after a neighbour changes (see MachineBlock). */
+    private @Nullable Boolean powered;
     private boolean active;
     /** 1.7.10 MOTileEntityMachine.owner: set by a [Claim] security protocol. */
     private java.util.@Nullable UUID owner;
@@ -77,13 +81,16 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, MachineBlockEntity be) {
         be.chargeFromBattery();
-        boolean enabled = be.redstoneMode.allows(level.hasNeighborSignal(pos));
+        if (be.powered == null) be.powered = level.hasNeighborSignal(pos);
+        boolean enabled = be.redstoneMode.allows(be.powered);
         boolean nowActive = be.tickMachine(enabled);
         if (nowActive != be.active) {
             be.active = nowActive;
             be.setChanged();
-            if (state.hasProperty(MachineBlock.ACTIVE)) {
-                level.setBlock(pos, state.setValue(MachineBlock.ACTIVE, nowActive), Block.UPDATE_CLIENTS);
+            // the machine may have changed its own block state during the tick (the pattern storage's drives)
+            BlockState current = level.getBlockState(pos);
+            if (current.hasProperty(MachineBlock.ACTIVE)) {
+                level.setBlock(pos, current.setValue(MachineBlock.ACTIVE, nowActive), Block.UPDATE_CLIENTS);
             } else {
                 level.sendBlockUpdated(pos, state, state, Block.UPDATE_CLIENTS);
             }
@@ -108,6 +115,14 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
     /** 1.7.10 soundVolume. */
     public float getLoopVolume() {
         return 1;
+    }
+
+    /**
+     * True once every {@code period} ticks, at a tick that depends on the machine's position: periodic work (network
+     * scans, matter pushes) is spread over the period instead of every machine doing it on the same tick.
+     */
+    protected boolean every(int period) {
+        return (getLevel().getGameTime() + Math.floorMod(worldPosition.asLong(), (long) period)) % period == 0;
     }
 
     /** Runs one tick of the machine's work. Returns whether it is actively working. */
@@ -139,22 +154,36 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
 
     public double getUpgradeMultiplier(UpgradeType type) {
         if (!affectedBy.contains(type)) return 1;
-        double multiplier = 1;
-        for (int i = 0; i < inventory.size(); i++) {
-            if (inventory.spec(i).role() == MachineInventory.Role.UPGRADE
-                    && inventory.getStack(i).getItem() instanceof UpgradeItem upgrade) {
-                multiplier *= upgrade.getUpgrades().getOrDefault(type, 1d);
+        // asked several times per tick (speed, energy drain, capacity): worked out once per inventory change
+        if (!multipliersValid) {
+            java.util.Arrays.fill(multipliers, 1);
+            for (int i = 0; i < inventory.size(); i++) {
+                if (inventory.spec(i).role() == MachineInventory.Role.UPGRADE
+                        && inventory.getStack(i).getItem() instanceof UpgradeItem upgrade) {
+                    for (UpgradeType t : UpgradeType.values()) multipliers[t.ordinal()] *= upgrade.getUpgrades().getOrDefault(t, 1d);
+                }
             }
+            for (UpgradeType t : UpgradeType.values()) {
+                double m = multipliers[t.ordinal()];
+                if (t == UpgradeType.SPEED) m = Math.max(m, MIN_SPEED);
+                multipliers[t.ordinal()] = Math.max(m, MIN_MULTIPLIER);
+            }
+            multipliersValid = true;
         }
-        if (type == UpgradeType.SPEED) multiplier = Math.max(multiplier, MIN_SPEED);
-        return Math.max(multiplier, MIN_MULTIPLIER);
+        return multipliers[type.ordinal()];
     }
 
     public Set<UpgradeType> getAffectedBy() {
         return affectedBy;
     }
 
+    /** A neighbour changed (MachineBlock.neighborChanged): the redstone signal is read again on the next tick. */
+    public void neighbourChanged() {
+        powered = null;
+    }
+
     protected void onInventoryChanged() {
+        multipliersValid = false;
         energy.refresh();
         setChanged();
         // the renderers show what's inside (drives, the replicated item, the inscribed item)
@@ -318,6 +347,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         input.child("inventory").ifPresent(inventory::deserialize);
+        multipliersValid = false;
         energy.refresh();
         input.child("energy").ifPresent(energy::deserialize);
         if (matter != null) input.child("matter").ifPresent(matter::deserialize);

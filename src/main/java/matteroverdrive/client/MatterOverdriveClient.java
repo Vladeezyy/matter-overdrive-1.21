@@ -140,7 +140,6 @@ public class MatterOverdriveClient {
         event.registerBlockEntityRenderer(matteroverdrive.init.MOBlockEntities.WEAPON_STATION.get(), WeaponStationRenderer::new);
         event.registerBlockEntityRenderer(matteroverdrive.init.MOBlockEntities.GRAVITATIONAL_STABILIZER.get(), StabilizerRenderer::new);
         event.registerBlockEntityRenderer(matteroverdrive.init.MOBlockEntities.STAR_MAP.get(), matteroverdrive.client.starmap.StarMapRenderer::new);
-        event.registerBlockEntityRenderer(matteroverdrive.init.MOBlockEntities.PATTERN_STORAGE.get(), MachineRenderers.PatternStorage::new);
         event.registerBlockEntityRenderer(matteroverdrive.init.MOBlockEntities.REPLICATOR.get(), MachineRenderers.Replicator::new);
         event.registerBlockEntityRenderer(matteroverdrive.init.MOBlockEntities.INSCRIBER.get(), MachineRenderers.Inscriber::new);
         event.registerBlockEntityRenderer(matteroverdrive.init.MOBlockEntities.PATTERN_MONITOR.get(),

@@ -697,3 +697,14 @@
   (`-PsceneFrom=3440`, platforms 1000 blocks from spawn), matter tooltips at 3770.
 - Regenerating resources on another machine changes .ogg/.png bytes: `git checkout` those, and commit only the
   json/obj changes.
+
+## 2026-10-16 — performance pass and held machines (from main)
+- Same game code changes as main's "performance pass and held machines": neighbour capabilities cached per side
+  (`util/NeighbourCaps`, here with IEnergyStorage / IFluidHandler), allocation-free pipe transfers spread over ticks,
+  upgrade multipliers and the redstone signal read once per change, periodic machine work spread over ticks
+  (`MachineBlockEntity.every`), the anomaly's block scan skips air-only sections and blocks outside its sphere; idle
+  inscribers' rail and head and the pattern storage's drives baked into block models; the OBJ machines get block display
+  transforms (normal size in the hand, item frames, on the ground and in the GUI). Resources regenerated
+  (gen_resources.py + the branch's backport step).
+- The PerfScene / tools/perf.sh measuring tools stay on main (1.21.10 APIs); the numbers are in main's MODLOG.
+- 96 GameTests pass.

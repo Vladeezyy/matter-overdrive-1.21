@@ -5,5 +5,126 @@
   "textures": {
     "texture": "matteroverdrive:block/charging_station",
     "particle": "matteroverdrive:block/base"
+  },
+  "display": {
+    "gui": {
+      "rotation": [
+        30,
+        225,
+        0
+      ],
+      "translation": [
+        0.0,
+        -2.45,
+        -1.41
+      ],
+      "scale": [
+        0.2717,
+        0.2717,
+        0.2717
+      ]
+    },
+    "ground": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0.0,
+        1.87,
+        0.0
+      ],
+      "scale": [
+        0.1087,
+        0.1087,
+        0.1087
+      ]
+    },
+    "fixed": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0.0,
+        -2.26,
+        0.0
+      ],
+      "scale": [
+        0.2174,
+        0.2174,
+        0.2174
+      ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [
+        75,
+        45,
+        0
+      ],
+      "translation": [
+        0.0,
+        2.06,
+        -1.64
+      ],
+      "scale": [
+        0.163,
+        0.163,
+        0.163
+      ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [
+        75,
+        45,
+        0
+      ],
+      "translation": [
+        0.0,
+        2.06,
+        -1.64
+      ],
+      "scale": [
+        0.163,
+        0.163,
+        0.163
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        0,
+        45,
+        0
+      ],
+      "translation": [
+        0.0,
+        -1.81,
+        0.0
+      ],
+      "scale": [
+        0.1739,
+        0.1739,
+        0.1739
+      ]
+    },
+    "firstperson_lefthand": {
+      "rotation": [
+        0,
+        225,
+        0
+      ],
+      "translation": [
+        0.0,
+        -1.81,
+        0.0
+      ],
+      "scale": [
+        0.1739,
+        0.1739,
+        0.1739
+      ]
+    }
   }
 }
