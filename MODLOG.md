@@ -676,3 +676,30 @@
   (`-PsceneFrom=3440`, platforms 1000 blocks from spawn), matter tooltips at 3770.
 - Regenerating resources on another machine changes .ogg/.png bytes: `git checkout` those, and commit only the
   json/obj changes.
+
+## 2026-10-16 — performance pass and held machines (branch `perf`)
+- Tools: `tools/perf.sh stress|types|hands [-Pjfr] [-Ptypes=a,b]` runs `client/PerfScene` in `run/saves/mo_scene` on a
+  sky platform. `stress`: one field measured empty, with 576 burning vanilla furnaces and with 48 working modules (576
+  machines and pipes). `types`: 576 blocks of one kind at a time (plus a close screenshot). `hands`: first and third person
+  and inventory screenshots of the big items. FPS limit, vsync and the 1.21.2+ idle ("AFK") 30 FPS cap are switched off
+  during runs (that cap made every kind read 29.2 FPS at first). `-Pjfr` writes `run/perf.jfr`.
+- Results (MacBook Air, noisy: absolute FPS swings ~30 % between runs, so each kind is compared with the vanilla
+  furnaces of the same run). Stress, two alternating runs each: modules at 72 % of the furnaces' frame rate before,
+  86 % after; server tick +0.58 ms over the furnaces before, +0.24 ms after. Types: 576 pattern storages 62 % -> 104 % of
+  the furnaces' FPS, 576 idle inscribers 128 FPS -> as fast as furnaces, working inscribers ~unchanged (37 % -> 40 %).
+  One gravitational anomaly took 7.5 % of the server thread before, 0.8 % after (flight recording).
+- Server: neighbour capabilities cached per side (`util/NeighbourCaps`, NeoForge `BlockCapabilityCache`) for the solar
+  panel, decomposer and matter pipes; pipe transfers without allocations and spread over ticks by position; upgrade
+  multipliers worked out once per inventory change; the redstone signal read again only after a neighbour changes
+  (`MachineBlock.neighborChanged`); network scans, matter pushes and replicator radiation spread over ticks
+  (`MachineBlockEntity.every`); the anomaly's block scan skips air-only sections, unloaded chunks and blocks outside its
+  sphere before reading them.
+- Client: an idle inscriber's rail and head are baked into `inscriber_idle` (block state active=false), the renderer
+  draws them only while working; pattern storage drives are part of the block model (multipart, properties
+  `drive_0`..`drive_5`, set from the inventory; the drive renderer is gone). Looks the same (screenshots compared).
+- Held items: the OBJ machines (charging station, inscriber, replicator, pattern storage, tritanium crates) had no
+  display transforms and were drawn at full size in the hand, item frames, on the ground and flat in the GUI; they
+  get vanilla block transforms (`block_display` in gen_resources.py), the 2.3 block charging station shrunk to fit.
+- Not changed: working inscribers still draw rail and head every frame; the star map draws the whole galaxy every
+  frame (576 maps: 5 FPS; one or two in a base is the real case). Weapons look as before.
+- 96 GameTests pass. Not carried to the version branches yet.
