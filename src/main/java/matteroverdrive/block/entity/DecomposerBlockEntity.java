@@ -30,6 +30,9 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
  * matter dust instead. Every 32 ticks it pushes its matter into neighbouring tanks and pipes.
  */
 public class DecomposerBlockEntity extends MachineBlockEntity {
+    /** Neighbours that take matter, looked up once per side. */
+    private final matteroverdrive.util.NeighbourCaps<net.neoforged.neoforge.transfer.ResourceHandler<FluidResource>> matterTargets =
+            new matteroverdrive.util.NeighbourCaps<>(Capabilities.Fluid.BLOCK, this);
     public static final int INPUT = 0;
     public static final int OUTPUT = 1;
     public static final int MATTER_STORAGE = 1024;
@@ -61,7 +64,7 @@ public class DecomposerBlockEntity extends MachineBlockEntity {
 
     @Override
     protected boolean tickMachine(boolean redstoneAllows) {
-        if (getLevel().getGameTime() % MATTER_EXTRACT_SPEED == 0) {
+        if (every(MATTER_EXTRACT_SPEED)) {
             pushMatter();
         }
         int amount = inputMatter();
@@ -103,7 +106,7 @@ public class DecomposerBlockEntity extends MachineBlockEntity {
     private void pushMatter() {
         for (Direction dir : Direction.values()) {
             if (matter.getMatter() <= 0) return;
-            var target = getLevel().getCapability(Capabilities.Fluid.BLOCK, getBlockPos().relative(dir), dir.getOpposite());
+            var target = matterTargets.get(dir);
             if (target == null) continue;
             try (Transaction tx = Transaction.openRoot()) {
                 int moved = target.insert(FluidResource.of(matteroverdrive.init.MOFluids.MATTER_PLASMA.get()), matter.getMatter(), tx);

@@ -101,6 +101,30 @@ def block_display(low=0.0, high=1.0):
     return display
 
 
+def offset_obj_groups(src, dst, offsets):
+    """Copy an OBJ file, moving the vertices used by the faces of each named group by (dx, dy, dz): renderer-placed
+    parts (the inscriber's rail and head at rest, the storage's drives) baked into a block model at their places."""
+    lines = Path(src).read_text().splitlines()
+    owner = {}
+    group = None
+    for line in lines:
+        if line.startswith("g "):
+            group = line[2:].strip()
+        elif line.startswith("f ") and group in offsets:
+            for ref_ in line.split()[1:]:
+                owner[int(ref_.split("/")[0])] = group
+    out, index = [], 0
+    for line in lines:
+        if line.startswith("v "):
+            index += 1
+            if index in owner:
+                dx, dy, dz = offsets[owner[index]]
+                _, x, y, z = line.split()
+                line = f"v {float(x) + dx:.4f} {float(y) + dy:.4f} {float(z) + dz:.4f}"
+        out.append(line)
+    Path(dst).write_text("\n".join(out) + "\n")
+
+
 def cp(src, dst):
     if not src.exists():
         sys.exit(f"missing texture: {src}")
@@ -309,6 +333,15 @@ for part, others in [("rail", ["base", "head"]), ("head", ["base", "rail"])]:
         "flip_v": True, "textures": {"texture": f"{MOD}:block/inscriber", "particle": f"{MOD}:block/base"},
         "visibility": {o: False for o in others}})
 facing_blockstate("inscriber", f"{MOD}:block/inscriber", OBJ_FACING_Y)
+# An idle inscriber's rail and head stand still (MachineRenderers.Inscriber at rest: rail (0, 0.6, 0.02), head
+# (0, 0.84, -0.04)): baked into the block model, so only working inscribers draw them every frame.
+offset_obj_groups(A / "models/block/inscriber.obj", A / "models/block/inscriber_idle.obj",
+                  {"rail": (0, 0.6, 0.02), "head": (0, 0.84, -0.04)})
+w(A / "models/block/inscriber_idle.json", {"loader": "neoforge:obj", "model": f"{MOD}:models/block/inscriber_idle.obj",
+    "flip_v": True, "textures": {"texture": f"{MOD}:block/inscriber", "particle": f"{MOD}:block/base"}})
+w(A / "blockstates/inscriber.json", {"variants": {
+    f"active={a},facing={f}": ({"model": f"{MOD}:block/inscriber" if a == "true" else f"{MOD}:block/inscriber_idle"} | ({"y": y} if y else {}))
+    for f, y in OBJ_FACING_Y.items() for a in ("false", "true")}})
 # the item keeps the whole model (the block's rail and head move in the renderer)
 w(A / "models/block/inscriber_full.json", {"loader": "neoforge:obj", "model": f"{MOD}:models/block/inscriber.obj",
     "flip_v": True, "textures": {"texture": f"{MOD}:block/inscriber", "particle": f"{MOD}:block/base"},
@@ -552,6 +585,19 @@ w(A / "models/block/pattern_storage_drive.json", {"loader": "neoforge:obj", "mod
     "textures": {"pattern_storage": f"{MOD}:block/pattern_storage", "vent": f"{MOD}:block/vent", "particle": f"{MOD}:block/pattern_storage"},
     "visibility": {"Vents": False, "pattern_storage": False}})
 facing_blockstate("pattern_storage", f"{MOD}:block/pattern_storage", OBJ_FACING_Y)
+# The drives in the front are baked into the block model too (they never move): one model per slot, where
+# MachineRenderers.PatternStorage drew them (x +-0.3, y 0.6 - 0.2 * row, z -0.2), shown by the drive_<slot> properties.
+for i in range(6):
+    offset_obj_groups(A / "models/block/pattern_storage.obj", A / "models/block" / f"pattern_storage_drive_{i}.obj",
+                      {"drive": (-0.3 if i >= 3 else 0.3, 0.6 - 0.2 * (i % 3), -0.2)})
+    w(A / "models/block" / f"pattern_storage_drive_{i}.json", {"loader": "neoforge:obj",
+        "model": f"{MOD}:models/block/pattern_storage_drive_{i}.obj", "flip_v": True,
+        "textures": {"pattern_storage": f"{MOD}:block/pattern_storage", "vent": f"{MOD}:block/vent", "particle": f"{MOD}:block/pattern_storage"},
+        "visibility": {"Vents": False, "pattern_storage": False}})
+w(A / "blockstates/pattern_storage.json", {"multipart":
+    [{"when": {"facing": f}, "apply": {"model": f"{MOD}:block/pattern_storage"} | ({"y": y} if y else {})} for f, y in OBJ_FACING_Y.items()]
+    + [{"when": {"facing": f, f"drive_{i}": "true"}, "apply": {"model": f"{MOD}:block/pattern_storage_drive_{i}"} | ({"y": y} if y else {})}
+       for i in range(6) for f, y in OBJ_FACING_Y.items()]})
 # 1.7.10 RendererBlockReplicator: front + inside replicator, shell base, vents, back network port. The front's window
 # is transparent (pass 0 alpha test = cutout), so the output item drawn by the tile renderer shows through it.
 obj_model("replicator", {"Front": "replicator", "Inside": "replicator", "Shell": "base", "Vents": "vent", "Back": "network_port"},
