@@ -116,7 +116,7 @@ public class ReplicatorBlockEntity extends MachineBlockEntity {
         int drain = getEnergyDrainPerTick(m);
         if (energy.getEnergy() < drain) return false;
         energy.add(-drain);
-        if (getLevel().getGameTime() % RADIATION_DELAY == 0) irradiate();
+        if (every(RADIATION_DELAY)) irradiate();
         if (++replicateTime >= getSpeed(m)) {
             replicateTime = 0;
             replicate(product, m);
