@@ -70,6 +70,8 @@ public final class PerfScene {
             typeSteps();
         } else if (MODE.equals("hands")) {
             handSteps();
+        } else if (MODE.equals("look")) {
+            lookSteps();
         }
     }
 
@@ -330,6 +332,39 @@ public final class PerfScene {
                 }
             }
         }
+    }
+
+    // --- an old world as it was saved -------------------------------------------------------------
+
+    /**
+     * {@code look} ({@code -Pworld=<save>}): builds nothing, stands in front of DevScene's pattern storage (spawn base
+     * -1, 0, -7) and the inscriber (-1, 0, -3) and takes screenshots: a world saved by an older version must show the
+     * same machines (the storage's drives come from block state properties it did not have then).
+     */
+    private static void lookSteps() {
+        at(40, mc -> server(mc, p -> {
+            ServerLevel level = p.level();
+            BlockPos spawn = level.getRespawnData().pos();
+            BlockPos base = new BlockPos(spawn.getX(), level.getMinY() + 4, spawn.getZ());
+            p.setGameMode(GameType.SPECTATOR);
+            p.teleportTo(level, base.getX() - 0.5, base.getY() + 0.6, base.getZ() - 4.6, Set.of(), 180f, 10f, false);
+        }));
+        at(45, mc -> mc.options.hideGui = true);
+        // the first machine tick sets the drive properties; the client gets the block update
+        at(80, mc -> {
+            shot(mc, "look_storage");
+            mc.player.connection.sendCommand("data get block ~-1 ~-0.6 ~-2.4");
+        });
+        at(85, mc -> server(mc, p -> {
+            BlockPos spawn = p.level().getRespawnData().pos();
+            BlockPos storage = new BlockPos(spawn.getX() - 1, p.level().getMinY() + 4, spawn.getZ() - 7);
+            MatterOverdrive.LOGGER.info("[perf] CHECK storage state {}", p.level().getBlockState(storage));
+        }));
+        at(90, mc -> {
+            mc.options.hideGui = false;
+            MatterOverdrive.LOGGER.info("[perf] DONE");
+            mc.stop();
+        });
     }
 
     // --- held items ------------------------------------------------------------------------------

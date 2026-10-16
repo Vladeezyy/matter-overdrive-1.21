@@ -71,7 +71,7 @@ neoForge {
         // -Pjfr records a Java Flight Recording to run/perf.jfr (tools/perf.sh runs it and prints the results).
         perf {
             client()
-            programArguments.addAll '--quickPlaySingleplayer', 'mo_scene'
+            programArguments.addAll '--quickPlaySingleplayer', project.findProperty('world') ?: 'mo_scene'
             systemProperty 'matteroverdrive.perf', project.findProperty('perf') ?: 'stress'
             systemProperty 'matteroverdrive.perf.types', project.findProperty('types') ?: ''
             if (project.hasProperty('jfr')) {
