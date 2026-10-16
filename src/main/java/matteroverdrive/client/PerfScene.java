@@ -271,7 +271,12 @@ public final class PerfScene {
             String block = idle ? id.substring(0, id.length() - 5) : id;
             var key = net.minecraft.resources.ResourceLocation.parse(block.contains(":") ? block : MatterOverdrive.MODID + ":" + block);
             at(t, mc -> server(mc, p -> fillWith(p.level(), net.minecraft.core.registries.BuiltInRegistries.BLOCK.getValue(key), idle)));
-            at(t += 100, mc -> startMeasure());
+            String shotName = "types_" + id.replace("minecraft:", "vanilla_").replace("/", "_");
+            // a close look at a few of them (the same spot every run) before measuring
+            at(t + 60, mc -> server(mc, p -> p.teleportTo(p.level(), field.getX() - 20.5, field.getY() + 2.5, field.getZ() - 12.5, Set.of(), 200f, 25f, false)));
+            at(t + 80, mc -> shot(mc, shotName));
+            at(t + 82, mc -> server(mc, p -> p.teleportTo(p.level(), field.getX() + 0.5, field.getY() + 18, field.getZ() + 26.5, Set.of(), 180f, 35f, false)));
+            at(t += 140, mc -> startMeasure());
             at(t += 200, mc -> stopMeasure("576 x " + id));
             t += 1;
         }
