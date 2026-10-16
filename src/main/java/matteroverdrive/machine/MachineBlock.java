@@ -82,6 +82,12 @@ public abstract class MachineBlock extends BaseEntityBlock {
     }
 
     @Override
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
+        super.neighborChanged(state, level, pos, neighborBlock, neighborPos, movedByPiston);
+        if (level.getBlockEntity(pos) instanceof MachineBlockEntity machine) machine.neighbourChanged();
+    }
+
+    @Override
     public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
         return createTickerHelper(blockEntityType, type.get(), level.isClientSide() ? MachineBlockEntity::clientTick : MachineBlockEntity::serverTick);
     }

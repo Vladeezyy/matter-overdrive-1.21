@@ -263,14 +263,38 @@ public class GravitationalAnomalyBlockEntity extends matteroverdrive.compat.Comp
         double horizon = getEventHorizon();
         BlockPos center = getBlockPos();
         List<BlockPos> candidates = new ArrayList<>();
-        for (BlockPos p : BlockPos.betweenClosed(center.offset(-range, -range, -range), center.offset(range - 1, range - 1, range - 1))) {
-            if (p.equals(center)) continue;
-            BlockState state = level.getBlockState(p);
-            if (state.isAir()) continue;
-            double distance = Math.sqrt(p.distSqr(center));
-            float hardness = state.getBlock() instanceof LiquidBlock ? 1 : state.getDestroySpeed(level, p);
-            if (distance <= range && hardness >= 0 && (distance < horizon || hardness < getBreakStrength((float) distance, range))) {
-                candidates.add(p.immutable());
+        BlockPos min = center.offset(-range, -range, -range), max = center.offset(range - 1, range - 1, range - 1);
+        BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
+        // The same cube as before, walked one chunk section at a time: sections of only air (most of the space around an
+        // anomaly once it has eaten its surroundings) and unloaded chunks are skipped without reading a single block.
+        for (int sx = min.getX() >> 4; sx <= max.getX() >> 4; sx++) {
+            for (int sz = min.getZ() >> 4; sz <= max.getZ() >> 4; sz++) {
+                var chunk = level.getChunkSource().getChunkNow(sx, sz);
+                if (chunk == null) continue;
+                for (int sy = Math.max(min.getY(), level.getMinBuildHeight()) >> 4; sy <= Math.min(max.getY(), level.getMaxBuildHeight() - 1) >> 4; sy++) {
+                    var section = chunk.getSection(chunk.getSectionIndexFromSectionY(sy));
+                    if (section.hasOnlyAir()) continue;
+                    int x0 = Math.max(min.getX(), sx << 4), x1 = Math.min(max.getX(), (sx << 4) + 15);
+                    int y0 = Math.max(min.getY(), sy << 4), y1 = Math.min(max.getY(), (sy << 4) + 15);
+                    int z0 = Math.max(min.getZ(), sz << 4), z1 = Math.min(max.getZ(), (sz << 4) + 15);
+                    for (int x = x0; x <= x1; x++) {
+                        for (int y = y0; y <= y1; y++) {
+                            for (int z = z0; z <= z1; z++) {
+                                cursor.set(x, y, z);
+                                double distSq = cursor.distSqr(center);
+                                // outside the break sphere nothing breaks: test the distance before reading the block
+                                if (distSq > (double) range * range || distSq == 0) continue;
+                                BlockState state = section.getBlockState(x & 15, y & 15, z & 15);
+                                if (state.isAir()) continue;
+                                double distance = Math.sqrt(distSq);
+                                float hardness = state.getBlock() instanceof LiquidBlock ? 1 : state.getDestroySpeed(level, cursor);
+                                if (hardness >= 0 && (distance < horizon || hardness < getBreakStrength((float) distance, range))) {
+                                    candidates.add(cursor.immutable());
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
         candidates.sort(Comparator.comparingDouble(p -> p.distSqr(center)));
