@@ -245,7 +245,7 @@ public final class PerfScene {
 
     // --- one machine type at a time --------------------------------------------------------------
 
-    private static final String[] TYPES = {"minecraft:furnace", "decomposer", "replicator", "inscriber", "pattern_storage", "pattern_monitor",
+    private static final String[] TYPES = {"minecraft:furnace", "decomposer", "replicator", "inscriber", "inscriber/idle", "pattern_storage", "pattern_monitor",
             "matter_analyzer", "solar_panel", "matter_pipe", "network_pipe", "tritanium_crate_white", "star_map", "weapon_station",
             "android_station", "transporter", "gravitational_stabilizer"};
 
@@ -266,8 +266,11 @@ public final class PerfScene {
         String only = System.getProperty("matteroverdrive.perf.types", "");
         for (String id : TYPES) {
             if (!only.isEmpty() && !List.of(only.split(",")).contains(id)) continue;
-            var key = net.minecraft.resources.ResourceLocation.parse(id.contains(":") ? id : MatterOverdrive.MODID + ":" + id);
-            at(t, mc -> server(mc, p -> fillWith(p.level(), net.minecraft.core.registries.BuiltInRegistries.BLOCK.getValue(key))));
+            // "<block>/idle": the machines get no work (an idle inscriber shows its rail and head at rest)
+            boolean idle = id.endsWith("/idle");
+            String block = idle ? id.substring(0, id.length() - 5) : id;
+            var key = net.minecraft.resources.ResourceLocation.parse(block.contains(":") ? block : MatterOverdrive.MODID + ":" + block);
+            at(t, mc -> server(mc, p -> fillWith(p.level(), net.minecraft.core.registries.BuiltInRegistries.BLOCK.getValue(key), idle)));
             at(t += 100, mc -> startMeasure());
             at(t += 200, mc -> stopMeasure("576 x " + id));
             t += 1;
@@ -279,7 +282,7 @@ public final class PerfScene {
         });
     }
 
-    private static void fillWith(ServerLevel level, Block block) {
+    private static void fillWith(ServerLevel level, Block block, boolean idle) {
         clear(level);
         for (BlockPos m : modules()) {
             for (int x = 0; x < 6; x++) {
@@ -289,6 +292,7 @@ public final class PerfScene {
                     if (state.hasProperty(MachineBlock.FACING)) state = state.setValue(MachineBlock.FACING, Direction.SOUTH);
                     level.setBlockAndUpdate(p, state);
                     var be = level.getBlockEntity(p);
+                    if (idle) continue;
                     if (be instanceof AbstractFurnaceBlockEntity furnace) {
                         furnace.setItem(0, new ItemStack(Items.COBBLESTONE, 64));
                         furnace.setItem(1, new ItemStack(Items.COAL, 64));
