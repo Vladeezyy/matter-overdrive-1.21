@@ -8,7 +8,6 @@ import com.mojang.math.Axis;
 import matteroverdrive.MatterOverdrive;
 import matteroverdrive.block.entity.InscriberBlockEntity;
 import matteroverdrive.block.entity.PatternMonitorBlockEntity;
-import matteroverdrive.block.entity.PatternStorageBlockEntity;
 import matteroverdrive.block.entity.ReplicatorBlockEntity;
 import matteroverdrive.client.starmap.HoloRenderTypes;
 import matteroverdrive.machine.MachineBlock;
@@ -36,18 +35,16 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.event.ModelEvent;
 
 /**
- * The 1.7.10 machine tile entity renderers: pattern storage drives (TileEntityRendererPatterStorage), the replicator's
+ * The 1.7.10 machine tile entity renderers (the pattern storage's drives are baked into its block model): the replicator's
  * output item (TileEntityRendererReplicator), the inscriber's moving rail / head and its item (TileEntityRendererInscriber)
  * and the monitors' holo screens (TileEntityRendererMonitor / PatternMonitor / ContractMarket).
  */
 public final class MachineRenderers {
-    public static final ModelResourceLocation STORAGE_DRIVE = ModelResourceLocation.standalone(id("block/pattern_storage_drive"));
     public static final ModelResourceLocation INSCRIBER_RAIL = ModelResourceLocation.standalone(id("block/inscriber_rail"));
     public static final ModelResourceLocation INSCRIBER_HEAD = ModelResourceLocation.standalone(id("block/inscriber_head"));
 
     /** Before 1.21.4: extra (standalone) block models are registered and looked up by their model location. */
     public static void registerModels(ModelEvent.RegisterAdditional event) {
-        event.register(STORAGE_DRIVE);
         event.register(INSCRIBER_RAIL);
         event.register(INSCRIBER_HEAD);
     }
@@ -122,40 +119,6 @@ public final class MachineRenderers {
             pose.pushPose();
             pose.translate(-0.5, 0, -0.5);   // the OBJ models are shifted to the block corner
             collector.submitBlockModel(pose, Sheets.cutoutBlockSheet(), model(key), 1, 1, 1, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
-            pose.popPose();
-        }
-    }
-
-    /** 1.7.10: each drive slot with a drive shows a drive in the front, 3 rows in 2 columns. */
-    public static class PatternStorage extends Base<PatternStorageBlockEntity> {
-        public PatternStorage(BlockEntityRendererProvider.Context context) {
-            super(context);
-        }
-
-        @Override
-        protected float modelYaw(Direction facing) {
-            return objFacingYaw(facing);
-        }
-
-        @Override
-        public void extractRenderState(PatternStorageBlockEntity storage, State state, float partialTick, Vec3 camera,
-                                       @Nullable Object crumbling) {
-            super.extractRenderState(storage, state, partialTick, camera, crumbling);
-            state.drives = new boolean[PatternStorageBlockEntity.DRIVES];
-            for (int i = 0; i < state.drives.length; i++) state.drives[i] = !storage.getInventory().getStack(i).isEmpty();
-        }
-
-        @Override
-        public void submit(State state, PoseStack pose, SubmitNodeCollector collector, CameraRenderState camera) {
-            pose.pushPose();
-            facingFrame(pose, state, 0.5);
-            for (int i = 0; i < state.drives.length; i++) {
-                if (!state.drives[i]) continue;
-                pose.pushPose();
-                pose.translate(i >= 3 ? -0.3 : 0.3, 0.1 - 0.2 * (i % 3), -0.2);
-                part(pose, collector, state, STORAGE_DRIVE);
-                pose.popPose();
-            }
             pose.popPose();
         }
     }
@@ -235,14 +198,17 @@ public final class MachineRenderers {
             double headX = 0.15 * lerpX + 0.02, headY = 0.1 * lerpY;
             pose.pushPose();
             facingFrame(pose, state, 0);
-            pose.pushPose();
-            pose.translate(0, 0.6, headX);
-            part(pose, collector, state, INSCRIBER_RAIL);
-            pose.popPose();
-            pose.pushPose();
-            pose.translate(headY, 0.84, headX - 0.06);
-            part(pose, collector, state, INSCRIBER_HEAD);
-            pose.popPose();
+            // an idle inscriber's rail and head are in its block model (inscriber_idle) at these rest places
+            if (state.active) {
+                pose.pushPose();
+                pose.translate(0, 0.6, headX);
+                part(pose, collector, state, INSCRIBER_RAIL);
+                pose.popPose();
+                pose.pushPose();
+                pose.translate(headY, 0.84, headX - 0.06);
+                part(pose, collector, state, INSCRIBER_HEAD);
+                pose.popPose();
+            }
             if (!state.item.isEmpty()) {
                 pose.pushPose();
                 pose.translate(-0.23, 0.69, 0);

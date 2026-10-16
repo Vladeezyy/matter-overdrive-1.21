@@ -1,34 +1,273 @@
 {
-  "variants": {
-    "active=false,facing=south": {
-      "model": "matteroverdrive:block/pattern_storage"
+  "multipart": [
+    {
+      "when": {
+        "facing": "south"
+      },
+      "apply": {
+        "model": "matteroverdrive:block/pattern_storage"
+      }
     },
-    "active=true,facing=south": {
-      "model": "matteroverdrive:block/pattern_storage"
+    {
+      "when": {
+        "facing": "west"
+      },
+      "apply": {
+        "model": "matteroverdrive:block/pattern_storage",
+        "y": 90
+      }
     },
-    "active=false,facing=west": {
-      "model": "matteroverdrive:block/pattern_storage",
-      "y": 90
+    {
+      "when": {
+        "facing": "north"
+      },
+      "apply": {
+        "model": "matteroverdrive:block/pattern_storage",
+        "y": 180
+      }
     },
-    "active=true,facing=west": {
-      "model": "matteroverdrive:block/pattern_storage",
-      "y": 90
+    {
+      "when": {
+        "facing": "east"
+      },
+      "apply": {
+        "model": "matteroverdrive:block/pattern_storage",
+        "y": 270
+      }
     },
-    "active=false,facing=north": {
-      "model": "matteroverdrive:block/pattern_storage",
-      "y": 180
+    {
+      "when": {
+        "facing": "south",
+        "drive_0": "true"
+      },
+      "apply": {
+        "model": "matteroverdrive:block/pattern_storage_drive_0"
+      }
     },
-    "active=true,facing=north": {
-      "model": "matteroverdrive:block/pattern_storage",
-      "y": 180
+    {
+      "when": {
+        "facing": "west",
+        "drive_0": "true"
+      },
+      "apply": {
+        "model": "matteroverdrive:block/pattern_storage_drive_0",
+        "y": 90
+      }
     },
-    "active=false,facing=east": {
-      "model": "matteroverdrive:block/pattern_storage",
-      "y": 270
+    {
+      "when": {
+        "facing": "north",
+        "drive_0": "true"
+      },
+      "apply": {
+        "model": "matteroverdrive:block/pattern_storage_drive_0",
+        "y": 180
+      }
     },
-    "active=true,facing=east": {
-      "model": "matteroverdrive:block/pattern_storage",
-      "y": 270
+    {
+      "when": {
+        "facing": "east",
+        "drive_0": "true"
+      },
+      "apply": {
+        "model": "matteroverdrive:block/pattern_storage_drive_0",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "drive_1": "true"
+      },
+      "apply": {
+        "model": "matteroverdrive:block/pattern_storage_drive_1"
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "drive_1": "true"
+      },
+      "apply": {
+        "model": "matteroverdrive:block/pattern_storage_drive_1",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "drive_1": "true"
+      },
+      "apply": {
+        "model": "matteroverdrive:block/pattern_storage_drive_1",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "drive_1": "true"
+      },
+      "apply": {
+        "model": "matteroverdrive:block/pattern_storage_drive_1",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "drive_2": "true"
+      },
+      "apply": {
+        "model": "matteroverdrive:block/pattern_storage_drive_2"
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "drive_2": "true"
+      },
+      "apply": {
+        "model": "matteroverdrive:block/pattern_storage_drive_2",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "drive_2": "true"
+      },
+      "apply": {
+        "model": "matteroverdrive:block/pattern_storage_drive_2",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "drive_2": "true"
+      },
+      "apply": {
+        "model": "matteroverdrive:block/pattern_storage_drive_2",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "drive_3": "true"
+      },
+      "apply": {
+        "model": "matteroverdrive:block/pattern_storage_drive_3"
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "drive_3": "true"
+      },
+      "apply": {
+        "model": "matteroverdrive:block/pattern_storage_drive_3",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "drive_3": "true"
+      },
+      "apply": {
+        "model": "matteroverdrive:block/pattern_storage_drive_3",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "drive_3": "true"
+      },
+      "apply": {
+        "model": "matteroverdrive:block/pattern_storage_drive_3",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "drive_4": "true"
+      },
+      "apply": {
+        "model": "matteroverdrive:block/pattern_storage_drive_4"
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "drive_4": "true"
+      },
+      "apply": {
+        "model": "matteroverdrive:block/pattern_storage_drive_4",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "drive_4": "true"
+      },
+      "apply": {
+        "model": "matteroverdrive:block/pattern_storage_drive_4",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "drive_4": "true"
+      },
+      "apply": {
+        "model": "matteroverdrive:block/pattern_storage_drive_4",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "drive_5": "true"
+      },
+      "apply": {
+        "model": "matteroverdrive:block/pattern_storage_drive_5"
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "drive_5": "true"
+      },
+      "apply": {
+        "model": "matteroverdrive:block/pattern_storage_drive_5",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "drive_5": "true"
+      },
+      "apply": {
+        "model": "matteroverdrive:block/pattern_storage_drive_5",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "drive_5": "true"
+      },
+      "apply": {
+        "model": "matteroverdrive:block/pattern_storage_drive_5",
+        "y": 270
+      }
     }
-  }
+  ]
 }

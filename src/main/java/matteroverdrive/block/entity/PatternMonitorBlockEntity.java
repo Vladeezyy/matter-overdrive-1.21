@@ -75,14 +75,14 @@ public class PatternMonitorBlockEntity extends MachineBlockEntity {
     @Override
     protected boolean tickMachine(boolean redstoneAllows) {
         // the screen shows how many patterns the network has (1.7.10 getGuiPatterns().size())
-        if (getLevel().getGameTime() % 20 == 0) {
+        if (every(20)) {
             int count = networkPatterns().size();
             if (count != patternCount) {
                 patternCount = count;
                 getLevel().sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
             }
         }
-        if (queue.isEmpty() || getLevel().getGameTime() % DISPATCH_DELAY != 0) return !queue.isEmpty();
+        if (queue.isEmpty() || !every(DISPATCH_DELAY)) return !queue.isEmpty();
         for (ReplicatorBlockEntity replicator : MatterNetwork.of(getLevel(), getBlockPos(), getNetworkFilter()).replicators()) {
             if (replicator.isIdle()) {
                 replicator.setTask(queue.remove(0));
