@@ -703,3 +703,12 @@
 - Not changed: working inscribers still draw rail and head every frame; the star map draws the whole galaxy every
   frame (576 maps: 5 FPS; one or two in a base is the real case). Weapons look as before.
 - 96 GameTests pass. Not carried to the version branches yet.
+
+## 2026-10-17 — release 1.0.1
+- GitHub release v1.0.1 (Latest) with six jars: 1.0.1+1.21.10 (main), +1.21.8, +1.21.5, +1.21.4, +1.21.3, +1.21.1 (the
+  1.21.1 branch's build names its jar `matteroverdrive-1.0.1.jar` and its mods.toml version `1.0.1`; uploaded as
+  `matteroverdrive-1.0.1+1.21.1.jar`). Contents since 1.0.0: version branches, held machines, performance, matter values
+  for every item, translations.
+- Checked before the release: a world saved by 1.0.0 (`tools/perf.sh look -Pworld=<save>`) — its pattern storage gets
+  drive_0..2 on the first tick, nothing else changes.
+- Modrinth not updated (on request only).

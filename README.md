@@ -1,9 +1,9 @@
-# Matter Overdrive for Minecraft 1.21.10 (NeoForge)
+# Matter Overdrive for Minecraft 1.21.1 – 1.21.10 (NeoForge)
 
 ![Matter Overdrive](docs/modrinth/banner.png)
 
 An unofficial port of [Matter Overdrive](https://github.com/simeonradivoev/MatterOverdrive) by Simeon Radivoev
-from Minecraft 1.7.10 to **Minecraft 1.21.10** on **NeoForge 21.10**.
+from Minecraft 1.7.10 to **Minecraft 1.21.1 – 1.21.10** on **NeoForge**.
 
 The port is a rewrite against modern APIs that keeps the original's behaviour, numbers, textures, sounds and
 translations (English and Russian; the port adds Ukrainian, German, Spanish and Portuguese (Brazil), not by native
@@ -11,6 +11,18 @@ speakers). The 1.7.10 source (0.4.2) is the specification.
 
 **Download:** [Modrinth](https://modrinth.com/mod/matter-overdrive-1.21-unofficial-port) ·
 [GitHub releases](https://github.com/Vladeezyy/matter-overdrive-1.21/releases)
+
+| Version | Minecraft | NeoForge | Source branch |
+|---|---|---|---|
+| 1.0.1+1.21.10 | 1.21.10 | 21.10.64 or newer | `main` |
+| 1.0.1+1.21.8 | 1.21.8 | 21.8.54 or newer | `1.21.8` |
+| 1.0.1+1.21.5 | 1.21.5 | 21.5.98 or newer | `1.21.5` |
+| 1.0.1+1.21.4 | 1.21.4 | 21.4.158 or newer | `1.21.4` |
+| 1.0.1+1.21.3 | 1.21.3 | 21.3.97 or newer | `1.21.3` |
+| 1.0.1+1.21.1 | 1.21.1 | 21.1.197 or newer | `1.21.1` |
+| 1.0.0 | 1.21.10 | 21.10.64 or newer | first release |
+
+Java 21; install on the server and on every client.
 
 ## Status
 Everything from the original is ported:
@@ -41,6 +53,38 @@ Requires JDK 21.
 Resources for simple content are generated from the original 1.7.10 assets by `tools/gen_resources.py`
 (see MODLOG.md for the command).
 
+## Performance
+1.0.1 measured machines against vanilla furnaces in the same scene (`tools/perf.sh`, see MODLOG.md): idle inscribers and
+pattern storages render as fast as furnaces, a big working base costs about half the frame rate and server time it did
+in 1.0.0, gravitational anomalies scan their surroundings about 9 times cheaper.
+
 ## License and credits
 GPL-3.0-or-later, the same license as the original — see [LICENSE.md](LICENSE.md).
 Original mod, art, sounds and translations: Simeon Radivoev and the Matter Overdrive contributors.
+
+<details>
+<summary><b>🇷🇺 Русский — нажмите, чтобы открыть</b></summary>
+
+## Matter Overdrive для Minecraft 1.21.1 – 1.21.10 (NeoForge)
+
+Неофициальный порт [Matter Overdrive](https://github.com/simeonradivoev/MatterOverdrive) (Simeon Radivoev) с
+Minecraft 1.7.10. Переписан под современные API с сохранением поведения, чисел, текстур, звуков и переводов оригинала
+(английский и русский; добавлены украинский, немецкий, испанский и португальский (Бразилия) — переводы не от носителей).
+
+**Скачать:** [Modrinth](https://modrinth.com/mod/matter-overdrive-1.21-unofficial-port) ·
+[GitHub releases](https://github.com/Vladeezyy/matter-overdrive-1.21/releases) — файл `matteroverdrive-1.0.1+<версия Minecraft>.jar`
+для 1.21.1, 1.21.3, 1.21.4, 1.21.5, 1.21.8 или 1.21.10. Java 21; ставить на сервер и на каждый клиент.
+
+Перенесено всё из оригинала: материалы и руда, машины и энергия, материя и репликация, аномалии и термоядерный реактор,
+энергетическое оружие, андроиды, мир (андроиды-изгои, неудачные животные, постройки, безумный учёный), звёздная карта,
+квесты и рынок контрактов. Подробности — в [MODLOG.md](MODLOG.md).
+
+**1.0.1:** новые версии Minecraft (1.21.1 – 1.21.8); машины в руке, в рамке и на земле больше не огромные; простаивающие
+инскрайберы и хранилища шаблонов рисуются как обычные блоки; большая работающая база стоит примерно вдвое меньше FPS и
+времени тика сервера, гравитационные аномалии — примерно в 9 раз дешевле.
+
+## Лицензия
+GPL-3.0-or-later, как у оригинала — см. [LICENSE.md](LICENSE.md). Оригинальный мод, графика, звуки и переводы — Simeon
+Radivoev и участники Matter Overdrive.
+
+</details>
