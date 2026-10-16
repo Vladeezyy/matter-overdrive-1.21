@@ -49,6 +49,11 @@ public class PatternStorageBlockEntity extends MachineBlockEntity {
 
     @Override
     protected boolean tickMachine(boolean redstoneAllows) {
+        // a storage loaded from an older world, or placed with drives inside, shows them from its first tick
+        if (!drivesShown) {
+            drivesShown = true;
+            showDrives();
+        }
         // 1.7.10 manageLinking
         ItemStack scanner = inventory.getStack(SCANNER);
         if (scanner.getItem() instanceof matteroverdrive.item.MatterScannerItem
@@ -58,6 +63,24 @@ public class PatternStorageBlockEntity extends MachineBlockEntity {
             inventory.setStack(SCANNER, linked);
         }
         return isOnline();
+    }
+
+    private boolean drivesShown;
+
+    @Override
+    protected void onInventoryChanged() {
+        super.onInventoryChanged();
+        showDrives();
+    }
+
+    /** Sets the drive_N block state properties to the drive slots' contents (the block model shows the drives). */
+    private void showDrives() {
+        if (level == null || level.isClientSide()) return;
+        var state = level.getBlockState(worldPosition);
+        if (!state.hasProperty(matteroverdrive.block.PatternStorageBlock.DRIVE[0])) return;
+        var next = state;
+        for (int i = 0; i < DRIVES; i++) next = next.setValue(matteroverdrive.block.PatternStorageBlock.DRIVE[i], !inventory.getStack(i).isEmpty());
+        if (next != state) level.setBlock(worldPosition, next, net.minecraft.world.level.block.Block.UPDATE_CLIENTS);
     }
 
     public List<ItemPattern> getPatterns() {
