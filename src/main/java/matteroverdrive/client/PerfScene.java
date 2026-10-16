@@ -376,7 +376,22 @@ public final class PerfScene {
             at(t + 16, mc -> shot(mc, "hand_" + name + "_third"));
             t += 18;
         }
+        // the inventory icons of the same items (the OBJ machines' gui transforms)
+        at(t, mc -> server(mc, p -> {
+            for (int i = 0; i < HAND_ITEMS.length && i < 36; i++) {
+                var key = net.minecraft.resources.ResourceLocation.parse(HAND_ITEMS[i].contains(":") ? HAND_ITEMS[i] : MatterOverdrive.MODID + ":" + HAND_ITEMS[i]);
+                p.getInventory().setItem(i, new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(key)));
+            }
+        }));
+        at(t + 4, mc -> {
+            mc.options.setCameraType(CameraType.FIRST_PERSON);
+            mc.options.hideGui = false;
+            mc.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player));
+        });
+        at(t + 14, mc -> shot(mc, "hand_inventory"));
+        t += 16;
         at(t, mc -> {
+            mc.setScreen(null);
             mc.options.setCameraType(CameraType.FIRST_PERSON);
             mc.options.hideGui = false;
             MatterOverdrive.LOGGER.info("[perf] DONE");
