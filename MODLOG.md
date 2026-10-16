@@ -711,4 +711,4 @@
   for every item, translations.
 - Checked before the release: a world saved by 1.0.0 (`tools/perf.sh look -Pworld=<save>`) — its pattern storage gets
   drive_0..2 on the first tick, nothing else changes.
-- Modrinth not updated (on request only).
+- Modrinth: six versions 1.0.1+<mc> uploaded 2026-10-17 (listed, same changelog, 1.21.10 featured); the project is still in moderation ("processing").
