@@ -21,6 +21,9 @@ import net.neoforged.neoforge.transfer.energy.EnergyHandlerUtil;
 
 /** 1.7.10 TileEntityMachineSolarPanel: up to 16 FE/t in full daylight, pushes up to 512 FE/t to each neighbour. */
 public class SolarPanelBlockEntity extends MachineBlockEntity {
+    /** Neighbours that take energy, looked up once per side. */
+    private final matteroverdrive.util.NeighbourCaps<net.neoforged.neoforge.transfer.energy.EnergyHandler> energyTargets =
+            new matteroverdrive.util.NeighbourCaps<>(Capabilities.Energy.BLOCK, this);
     public static final int CHARGE_AMOUNT = 16;
     public static final int ENERGY_STORAGE = 64000;
     public static final int MAX_ENERGY_EXTRACT = 512;
@@ -63,7 +66,7 @@ public class SolarPanelBlockEntity extends MachineBlockEntity {
     private void pushEnergy(Level level) {
         for (Direction dir : Direction.values()) {
             if (energy.getEnergy() <= 0) return;
-            var target = level.getCapability(Capabilities.Energy.BLOCK, getBlockPos().relative(dir), dir.getOpposite());
+            var target = energyTargets.get(dir);
             if (target != null) {
                 EnergyHandlerUtil.move(energy, target, MAX_ENERGY_EXTRACT, null);
             }

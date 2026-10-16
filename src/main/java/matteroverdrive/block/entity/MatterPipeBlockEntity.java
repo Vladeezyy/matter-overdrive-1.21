@@ -1,9 +1,5 @@
 package matteroverdrive.block.entity;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import matteroverdrive.block.MatterPipeBlock;
 import matteroverdrive.init.MOBlockEntities;
 import matteroverdrive.init.MOFluids;
@@ -27,6 +23,11 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
 public class MatterPipeBlockEntity extends BlockEntity {
     private final MatterTank tank;
     private final int interval;
+    private final int phase;
+    private final Direction[] order = Direction.values();
+    /** Neighbouring matter tanks (pipes and machines), looked up once per side. */
+    private final matteroverdrive.util.NeighbourCaps<net.neoforged.neoforge.transfer.ResourceHandler<FluidResource>> targets =
+            new matteroverdrive.util.NeighbourCaps<>(Capabilities.Fluid.BLOCK, this);
 
     public MatterPipeBlockEntity(BlockPos pos, BlockState state) {
         super(MOBlockEntities.MATTER_PIPE.get(), pos, state);
@@ -34,6 +35,7 @@ public class MatterPipeBlockEntity extends BlockEntity {
         int capacity = heavy ? 128 : 32;
         this.tank = new MatterTank(capacity, capacity, capacity, t -> 1, this::setChanged);
         this.interval = heavy ? 5 : 10;
+        this.phase = (int) Math.floorMod(pos.asLong(), (long) interval);
     }
 
     public MatterTank getTank() {
@@ -41,28 +43,42 @@ public class MatterPipeBlockEntity extends BlockEntity {
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, MatterPipeBlockEntity pipe) {
-        if (pipe.tank.getMatter() <= 0 || level.getGameTime() % pipe.interval != 0) return;
-        List<Direction> dirs = new ArrayList<>(List.of(Direction.values()));
-        Collections.shuffle(dirs, new java.util.Random(level.getRandom().nextLong()));
+        // spread over the period by position: a pipe network no longer moves all its matter on the same tick
+        if (pipe.tank.getMatter() <= 0 || (level.getGameTime() + pipe.phase) % pipe.interval != 0) return;
+        Direction[] dirs = pipe.order;
+        // shuffled in place: neighbours take turns being offered first (no list and random allocated per transfer)
+        for (int i = dirs.length - 1; i > 0; i--) {
+            int j = level.getRandom().nextInt(i + 1);
+            Direction t = dirs[i];
+            dirs[i] = dirs[j];
+            dirs[j] = t;
+        }
         // consumers first
         for (Direction dir : dirs) {
-            BlockPos other = pos.relative(dir);
-            if (level.getBlockEntity(other) instanceof MatterPipeBlockEntity) continue;
-            pipe.offer(level, other, dir, pipe.tank.getMatter());
+            if (pipe.tank.getMatter() <= 0) return;
+            if (pipe.neighbourPipe(level, pos, dir) != null) continue;
+            pipe.offer(dir, pipe.tank.getMatter());
         }
         // then spread to emptier pipes
         for (Direction dir : dirs) {
             if (pipe.tank.getMatter() <= 0) return;
-            if (level.getBlockEntity(pos.relative(dir)) instanceof MatterPipeBlockEntity next) {
+            MatterPipeBlockEntity next = pipe.neighbourPipe(level, pos, dir);
+            if (next != null) {
                 int diff = pipe.tank.getMatter() - next.tank.getMatter();
-                if (diff > 1) pipe.offer(level, pos.relative(dir), dir, diff / 2);
+                if (diff > 1) pipe.offer(dir, diff / 2);
             }
         }
     }
 
-    private void offer(Level level, BlockPos other, Direction dir, int amount) {
+    private @org.jetbrains.annotations.Nullable MatterPipeBlockEntity neighbourPipe(Level level, BlockPos pos, Direction dir) {
+        // only loaded neighbours: a pipe at the edge of the loaded area must not load the next chunk
+        BlockPos other = pos.relative(dir);
+        return level.isLoaded(other) && level.getBlockEntity(other) instanceof MatterPipeBlockEntity next ? next : null;
+    }
+
+    private void offer(Direction dir, int amount) {
         if (amount <= 0) return;
-        var target = level.getCapability(Capabilities.Fluid.BLOCK, other, dir.getOpposite());
+        var target = targets.get(dir);
         if (target == null) return;
         try (Transaction tx = Transaction.openRoot()) {
             int moved = target.insert(FluidResource.of(MOFluids.MATTER_PLASMA.get()), amount, tx);

@@ -68,7 +68,7 @@ public class AnalyzerBlockEntity extends MachineBlockEntity {
 
     @Override
     protected boolean tickMachine(boolean redstoneAllows) {
-        if (getLevel().getGameTime() % 20 == 0) {
+        if (every(20)) {
             ItemStack input = inventory.getStack(INPUT);
             networkAccepts = !input.isEmpty()
                     && MatterNetwork.of(getLevel(), getBlockPos(), getNetworkFilter()).storageAccepting(input.getItem()) != null;

@@ -1,13 +1,13 @@
 {
   "variants": {
     "active=false,facing=south": {
-      "model": "matteroverdrive:block/inscriber"
+      "model": "matteroverdrive:block/inscriber_idle"
     },
     "active=true,facing=south": {
       "model": "matteroverdrive:block/inscriber"
     },
     "active=false,facing=west": {
-      "model": "matteroverdrive:block/inscriber",
+      "model": "matteroverdrive:block/inscriber_idle",
       "y": 90
     },
     "active=true,facing=west": {
@@ -15,7 +15,7 @@
       "y": 90
     },
     "active=false,facing=north": {
-      "model": "matteroverdrive:block/inscriber",
+      "model": "matteroverdrive:block/inscriber_idle",
       "y": 180
     },
     "active=true,facing=north": {
@@ -23,7 +23,7 @@
       "y": 180
     },
     "active=false,facing=east": {
-      "model": "matteroverdrive:block/inscriber",
+      "model": "matteroverdrive:block/inscriber_idle",
       "y": 270
     },
     "active=true,facing=east": {
