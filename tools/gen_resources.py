@@ -62,6 +62,45 @@ def w(p, obj):
     p.write_text(json.dumps(obj, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
+# Vanilla block/block display transforms (gui, ground, item frame, hands).
+_VANILLA_BLOCK_DISPLAY = {
+    "gui": ([30, 225, 0], 0.625), "ground": ([0, 0, 0], 0.25), "fixed": ([0, 0, 0], 0.5),
+    "thirdperson_righthand": ([75, 45, 0], 0.375), "thirdperson_lefthand": ([75, 45, 0], 0.375),
+    "firstperson_righthand": ([0, 45, 0], 0.4), "firstperson_lefthand": ([0, 225, 0], 0.4),
+}
+
+
+def block_display(low=0.0, high=1.0):
+    """Display transforms for an OBJ block model, which has none of its own: without them the item is drawn at full
+    size in the hand, in item frames and on the ground (a 2.3 block tall charging station filled the screen). Vanilla
+    block values, shrunk to fit models taller than a block, and moved so the model's middle (between low and high)
+    sits where a block's middle would."""
+    import math
+    size = max(1.0, high - low)
+    centre = (low + high) / 2 - 0.5
+
+    def rotate(v, angles):
+        # the order of ItemTransform's Quaternionf.rotationXYZ: x of (y of (z of v))
+        x, y, z = v
+        ax, ay, az = (math.radians(a) for a in angles)
+        x, y = x * math.cos(az) - y * math.sin(az), x * math.sin(az) + y * math.cos(az)
+        x, z = x * math.cos(ay) + z * math.sin(ay), -x * math.sin(ay) + z * math.cos(ay)
+        y, z = y * math.cos(ax) - z * math.sin(ax), y * math.sin(ax) + z * math.cos(ax)
+        return x, y, z
+
+    display = {}
+    for slot, (rotation, scale) in _VANILLA_BLOCK_DISPLAY.items():
+        s = scale / size
+        offset = rotate((0, centre * s * 16, 0), rotation)
+        translation = [round(-c, 2) + 0.0 for c in offset]
+        if slot == "ground":
+            translation[1] += 3
+        elif slot.startswith("thirdperson"):
+            translation[1] += 2.5
+        display[slot] = {"rotation": rotation, "translation": translation, "scale": [round(s, 4)] * 3}
+    return display
+
+
 def cp(src, dst):
     if not src.exists():
         sys.exit(f"missing texture: {src}")
@@ -272,7 +311,8 @@ for part, others in [("rail", ["base", "head"]), ("head", ["base", "rail"])]:
 facing_blockstate("inscriber", f"{MOD}:block/inscriber", OBJ_FACING_Y)
 # the item keeps the whole model (the block's rail and head move in the renderer)
 w(A / "models/block/inscriber_full.json", {"loader": "neoforge:obj", "model": f"{MOD}:models/block/inscriber.obj",
-    "flip_v": True, "textures": {"texture": f"{MOD}:block/inscriber", "particle": f"{MOD}:block/base"}})
+    "flip_v": True, "textures": {"texture": f"{MOD}:block/inscriber", "particle": f"{MOD}:block/base"},
+    "display": block_display(-0.09, 0.66)})
 w(A / "items/inscriber.json", {"model": {"type": "minecraft:model", "model": f"{MOD}:block/inscriber_full"}})
 
 for n in MACHINES:
@@ -473,7 +513,7 @@ shaped("matter_analyzer", mid("matter_analyzer"), [" C ", "PMF", "ONO"],
 
 
 # --- phase 3 step 4: the matter network -----------------------------------------------------------
-def obj_model(name, materials, shift_y=False, hidden=(), particle="base", tints=None, render_type=None):
+def obj_model(name, materials, shift_y=False, hidden=(), particle="base", tints=None, render_type=None, display=None):
     """Copy a 1.7.10 Wavefront model for NeoForge's OBJ loader: one material per group (as the 1.7.10 renderer
     picked an icon per group), block-corner coordinates (shift the centred models by half a block)."""
     lines = [f"mtllib {name}.mtl"]
@@ -497,6 +537,8 @@ def obj_model(name, materials, shift_y=False, hidden=(), particle="base", tints=
         model["render_type"] = render_type
     if hidden:
         model["visibility"] = {h: False for h in hidden}
+    if display:
+        model["display"] = display
     w(A / "models/block" / f"{name}.json", model)
 
 
@@ -504,7 +546,7 @@ for tex in ["pattern_storage", "replicator", "vent", "network_router", "network_
     cp(ref / "textures/blocks" / f"{tex}.png", A / "textures/block" / f"{tex}.png")
 # 1.7.10 RendererBlockPatternStorage: pattern_storage + vents; the drive group was drawn by the tile renderer.
 obj_model("pattern_storage", {"pattern_storage": "pattern_storage", "Vents": "vent", "drive": "pattern_storage"},
-          hidden=("drive",), particle="pattern_storage")
+          hidden=("drive",), particle="pattern_storage", display=block_display(-0.05, 1.0))
 # 1.7.10 TileEntityRendererPatterStorage drew the model's "drive" group once per drive: a model of just that group
 w(A / "models/block/pattern_storage_drive.json", {"loader": "neoforge:obj", "model": f"{MOD}:models/block/pattern_storage.obj", "flip_v": True,
     "textures": {"pattern_storage": f"{MOD}:block/pattern_storage", "vent": f"{MOD}:block/vent", "particle": f"{MOD}:block/pattern_storage"},
@@ -513,7 +555,7 @@ facing_blockstate("pattern_storage", f"{MOD}:block/pattern_storage", OBJ_FACING_
 # 1.7.10 RendererBlockReplicator: front + inside replicator, shell base, vents, back network port. The front's window
 # is transparent (pass 0 alpha test = cutout), so the output item drawn by the tile renderer shows through it.
 obj_model("replicator", {"Front": "replicator", "Inside": "replicator", "Shell": "base", "Vents": "vent", "Back": "network_port"},
-          shift_y=True, particle="replicator", render_type="minecraft:cutout")
+          shift_y=True, particle="replicator", render_type="minecraft:cutout", display=block_display())
 facing_blockstate("replicator", f"{MOD}:block/replicator", OBJ_FACING_Y)
 for n in ["network_router", "network_switch"]:
     w(A / f"models/block/{n}.json", {"parent": "minecraft:block/cube_all", "textures": {"all": f"{MOD}:block/{n}"}})
@@ -940,7 +982,8 @@ for line in (ref / "models/block/charging_station.obj").read_text().splitlines()
 (A / "models/block/charging_station.obj").write_text("\n".join(obj_lines) + "\n")
 (A / "models/block/charging_station.mtl").write_text("newmtl station\nmap_Kd #texture\n")
 w(A / "models/block/charging_station.json", {"loader": "neoforge:obj", "model": f"{MOD}:models/block/charging_station.obj",
-    "flip_v": True, "textures": {"texture": f"{MOD}:block/charging_station", "particle": f"{MOD}:block/base"}})
+    "flip_v": True, "textures": {"texture": f"{MOD}:block/charging_station", "particle": f"{MOD}:block/base"},
+    "display": block_display(0, 2.3)})
 w(A / "models/block/charging_station_part.json", {"textures": {"particle": f"{MOD}:block/base"}})
 w(A / "blockstates/charging_station.json", {"variants": {
     f"active={a},facing={f},part={p}": ({"model": f"{MOD}:block/charging_station", "y": y} if p == 0 else {"model": f"{MOD}:block/charging_station_part"})
@@ -1107,7 +1150,7 @@ for t in ["tritanium_crate_base", "tritanium_crate_overlay"]:   # 16-bit origina
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(ref / "textures/blocks" / f"{t}.png"), "-pix_fmt", "rgba",
                     "-fflags", "+bitexact", "-flags", "+bitexact", str(dst_png)], check=True)
 obj_model("tritanium_crate", {"base": "tritanium_crate_base", "overlay": "tritanium_crate_overlay"},
-          particle="tritanium_crate_base", tints={"tritanium_crate_overlay": 0})
+          particle="tritanium_crate_base", tints={"tritanium_crate_overlay": 0}, display=block_display(0, 0.77))
 CRATES = [f"tritanium_crate_{dye}" for dye in DYES]
 for dye, n in zip(DYES, CRATES):
     w(A / "blockstates" / f"{n}.json", {"variants": {f"facing={f}": ({"model": f"{MOD}:block/tritanium_crate", "y": y} if y else
