@@ -6,7 +6,7 @@ An unofficial port of [Matter Overdrive](https://github.com/simeonradivoev/Matte
 from Minecraft 1.7.10 to **Minecraft 1.21.1 – 26.x** on **NeoForge** and **Fabric** (Fabric API; Team Reborn Energy for FE is
 included in the jar).
 
-This branch (Minecraft 26.2) builds both loaders from one `common` module (all game code, compiled on vanilla)
+This branch (Minecraft 26.3) builds both loaders from one `common` module (all game code, compiled on vanilla)
 plus thin `neoforge/` and `fabric/` modules. The other versions live on their own branches.
 
 The port is a rewrite against modern APIs that keeps the original's behaviour, numbers, textures, sounds and
@@ -18,6 +18,7 @@ speakers). The 1.7.10 source (0.4.2) is the specification.
 
 | Version | Minecraft | NeoForge | Source branch |
 |---|---|---|---|
+| 1.0.2+26.3 (not released yet) | 26.3 | 26.3.0.94 or newer; Fabric API 0.164.0 or newer | `mc/26.3` |
 | 1.0.2+26.2 (not released yet) | 26.2 | 26.2.0.93 or newer; Fabric API 0.161.0 or newer | `mc/26.2` |
 | 1.0.2+26.1.2 (not released yet) | 26.1.2 | 26.1.2.121 or newer; Fabric API 0.155.3 or newer | `mc/26.1.2` |
 | 1.0.1+1.21.10 | 1.21.10 | 21.10.64 or newer | `main` |
@@ -55,7 +56,7 @@ Requires JDK 25 (this branch; the 1.21.x branches use JDK 21).
 ./gradlew :neoforge:runGameTestServer  # headless in-game tests (:fabric:runGametest)
 ./gradlew :neoforge:runScene           # scripted scene: screenshots to <loader>/run/screenshots/ (:fabric:runScene)
 ```
-`runScene` needs a 26.2 world named `mo_scene` in `<loader>/run/saves/` (a flat creative world made by the
+`runScene` needs a 26.3 world named `mo_scene` in `<loader>/run/saves/` (a flat creative world made by the
 dedicated server works).
 Resources for simple content are generated from the original 1.7.10 assets by `tools/gen_resources.py`
 (see MODLOG.md for the command).
@@ -82,7 +83,7 @@ Minecraft 1.7.10. Переписан под современные API с сох
 [GitHub releases](https://github.com/Vladeezyy/matter-overdrive-1.21/releases) — файл `matteroverdrive-1.0.1+<версия Minecraft>.jar`
 для 1.21.1, 1.21.3, 1.21.4, 1.21.5, 1.21.8 или 1.21.10. Java 21 (для Minecraft 26.x — Java 25); ставить на сервер и на каждый клиент.
 
-**26.x:** порты на Minecraft 26.1.2 и 26.2 (эта ветка, `mc/26.2`) собран и проверен на обоих загрузчиках, но ещё не выпущен.
+**26.x:** порты на Minecraft 26.1.2, 26.2 и 26.3 (эта ветка, `mc/26.3`) собран и проверен на обоих загрузчиках, но ещё не выпущен.
 
 Перенесено всё из оригинала: материалы и руда, машины и энергия, материя и репликация, аномалии и термоядерный реактор,
 энергетическое оружие, андроиды, мир (андроиды-изгои, неудачные животные, постройки, безумный учёный), звёздная карта,

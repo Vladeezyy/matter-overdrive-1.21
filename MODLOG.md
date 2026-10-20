@@ -796,3 +796,35 @@
   | Fabric | 234 FPS, 4.32 ms/tick | 245 FPS, 4.33 ms | 240 FPS, 4.16 ms |
 
   The modules cost what the furnaces cost (97–98 % of their frame rate, within ±0.2 ms per tick).
+
+## 2026-10-20 — Minecraft 26.3 (branch `mc/26.3`, from `mc/26.2`)
+- Versions: NeoForge 26.3.0.94 (also built and tested against 26.3.0.95: 101/101), NeoForm 26.3-1, Fabric API 0.164.0 +
+  GameTest module 4.0.34, Team Reborn Energy 5.0.0.
+- `tools/port/port_263.py`: render pipeline classes in `com.mojang.renderpearl.api.pipeline`, `PoseStack.rotate` for
+  quaternions, blocks without `codec()`, `syncVelocity`, invulnerable time accessors, `PushReaction` names, keyboard key
+  type. Data: `tools/port/convert_263.py` (from the Rats port, plus the mod's image buildings `mo_buildings`).
+- By hand:
+  - the gravitational anomaly feature is a record with a codec (`Registries.FEATURE_TYPE`), the ore and anomaly features
+    are data in `worldgen/feature`;
+  - tritanium axe and hoe are plain items (`Properties.axe/hoe`, block transformer components); stripped blocks for
+    the matter values are found by name (`stripped_<id>`), the axe's block map is gone;
+  - keys without GLFW (`InputConstants.KEY_*`), `ByteBufCodecs.map` instead of `FriendlyByteBuf.readMap/writeMap`;
+  - NeoForge removed `IItemHandler` / `IFluidHandler` / `IEnergyStorage` and their wrappers: `NeoForgeTransfer` adapts
+    other mods' transfer handlers to the mod's own storages with transactions (simulate = no commit, nested in an open
+    transaction); `TagsUpdatedEvent.ServerDataLoad`; the hand transform gets the player render state;
+  - Fabric: first person hands in `FirstPersonHandsAndItemsRenderer`, loot modifier tables as registry holders, typed
+    loot modifier conditions, spawner counts as int providers, OBJ quads shaded by their direction.
+- Found by the GameTests: the image buildings' palettes still had `{"Name": ...}` block states (converted), and the
+  fusion reactor test's anomaly eats a little of the 26.3 test floor (sandstone), so the energy check allows 0.5 %.
+- Checks: `OverrideCheck` on both loader modules (no lost overrides; the module's classes must come first on the class
+  path), `ServerLinkCheck` on the Fabric server classes (client classes only from the client entrypoint).
+- Tests: GameTests 101/101 on both loaders; scene 142/142 on both (fresh world), compared with 26.2 and between loaders;
+  `:fabric:prodScene` on the release jar 142/142.
+- Performance (`runPerf -Pperf=stress`):
+
+  | Loader | Empty field | 576 burning vanilla furnaces | 48 MO modules (576 machines and pipes) |
+  |---|---|---|---|
+  | NeoForge | 309 FPS, 5.80 ms/tick | 307 FPS, 6.36 ms | 302 FPS, 6.27 ms |
+  | Fabric | 295 FPS, 5.17 ms/tick | 294 FPS, 5.60 ms | 298 FPS, 5.55 ms |
+
+  The modules cost what the furnaces cost (98–101 % of their frame rate, no more server time).
