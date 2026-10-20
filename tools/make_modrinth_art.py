@@ -81,13 +81,13 @@ d.text((ex+eye.size[0]+gap-b2[0],ybase-b2[1]),'RIVE',font=big,fill=white)
 wm,bm=tw(small,'MATTER')
 d.text((x0-bm[0]+4,ybase-24-(bm[3]-bm[1])-bm[1]),'MATTER',font=small,fill=white)
 # subtitle, letter-spaced
-text='1.21.10  ·  NEOFORGE  ·  UNOFFICIAL PORT'
+text='1.21.1 – 26.3  ·  NEOFORGE & FABRIC  ·  UNOFFICIAL PORT'
 spacing=6
 widths=[d.textbbox((0,0),c,font=sub)[2] for c in text]
 tot=sum(widths)+spacing*(len(text)-1)
 x=(W-tot)//2; y=ybase+cap+44
 for c,wc in zip(text,widths):
     d.text((x,y),c,font=sub,fill=(232,244,252)); x+=wc+spacing
-for (sx,sy,sz) in [(1350,88,92),(150,400,60),(1440,380,46),(190,100,40)]:
+for (sx,sy,sz) in [(1350,88,92),(80,455,50),(1530,455,40),(190,100,40)]:
     s=scaled(STAR,sz); paste_mask(ban,s,(sx-s.size[0]//2,sy-s.size[1]//2),shadow=False)
 ban.save(f'{OUT}/banner.png')
