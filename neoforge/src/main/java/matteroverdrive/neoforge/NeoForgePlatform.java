@@ -55,13 +55,10 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLEnvironment;
-import net.neoforged.neoforge.attachment.AttachmentSyncHandler;
 import net.neoforged.neoforge.attachment.AttachmentType;
-import net.neoforged.neoforge.attachment.IAttachmentHolder;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
 import net.neoforged.neoforge.fluids.FluidType;
@@ -133,7 +130,8 @@ public final class NeoForgePlatform implements Platform {
 
     @Override
     public SpawnEggItem spawnEgg(Supplier<? extends EntityType<? extends Mob>> type, int background, int highlight, Item.Properties properties) {
-        return new DeferredSpawnEggItem(type, background, highlight, properties);
+        // 1.21.2+: entity types are registered before items
+        return new SpawnEggItem(type.get(), background, highlight, properties);
     }
 
     @Override
@@ -143,7 +141,7 @@ public final class NeoForgePlatform implements Platform {
 
     @Override
     public <T extends BlockEntity> BlockEntityType<T> blockEntityType(BiFunction<BlockPos, BlockState, T> factory, Block... blocks) {
-        return BlockEntityType.Builder.of(factory::apply, blocks).build(null);
+        return new BlockEntityType<>(factory::apply, blocks);
     }
 
     @Override
@@ -188,31 +186,13 @@ public final class NeoForgePlatform implements Platform {
         return player.connection != null && player.connection.hasChannel(type);
     }
 
-    // --- player data: attachment types with NeoForge's sync ---
+    // --- player data: attachment types; NeoForge 21.3 has no attachment sync, NeoForgePlayerData sends them ---
 
     @SuppressWarnings("unchecked")
     private static <T extends INBTSerializable<CompoundTag>> void attachment(PlayerData<T> data) {
         Supplier<AttachmentType<?>> type = register(NeoForgeRegistries.Keys.ATTACHMENT_TYPES, data.id().getPath(), () -> AttachmentType.serializable(
                         () -> new SerializableData<>(data.factory().get()))
-                .copyOnDeath()
-                .sync(new AttachmentSyncHandler<SerializableData<T>>() {
-                    @Override
-                    public boolean sendToPlayer(IAttachmentHolder holder, ServerPlayer to) {
-                        return holder instanceof Player player && data.sync().sendToPlayer(player, to);
-                    }
-
-                    @Override
-                    public void write(RegistryFriendlyByteBuf buf, SerializableData<T> value, boolean initialSync) {
-                        data.sync().write(buf, value.value, initialSync);
-                    }
-
-                    @Override
-                    public SerializableData<T> read(IAttachmentHolder holder, RegistryFriendlyByteBuf buf, @Nullable SerializableData<T> previous) {
-                        T read = data.sync().read((Player) holder, buf, previous == null ? null : previous.value);
-                        if (previous != null && previous.value == read) return previous;
-                        return new SerializableData<>(read);
-                    }
-                }).build());
+                .copyOnDeath().build());
         ATTACHMENTS.put(data.id(), (Supplier<AttachmentType<?>>) (Supplier<?>) type);
     }
 
@@ -236,7 +216,7 @@ public final class NeoForgePlatform implements Platform {
     }
 
     @SuppressWarnings("unchecked")
-    private static <T extends INBTSerializable<CompoundTag>> AttachmentType<SerializableData<T>> type(PlayerData<T> data) {
+    static <T extends INBTSerializable<CompoundTag>> AttachmentType<SerializableData<T>> type(PlayerData<T> data) {
         return (AttachmentType<SerializableData<T>>) ATTACHMENTS.get(data.id()).get();
     }
 
@@ -247,7 +227,7 @@ public final class NeoForgePlatform implements Platform {
 
     @Override
     public <T extends INBTSerializable<CompoundTag>> void syncData(ServerPlayer player, PlayerData<T> data) {
-        player.syncData(type(data));
+        NeoForgePlayerData.sync(player, data);
     }
 
     // --- storages ---
@@ -327,7 +307,7 @@ public final class NeoForgePlatform implements Platform {
 
     @Override
     public ItemStack craftingRemainder(ItemStack stack) {
-        return stack.getItem().getCraftingRemainingItem(stack);
+        return stack.getItem().getCraftingRemainder(stack);
     }
 
     @Override
