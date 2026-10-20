@@ -1,0 +1,286 @@
+package matteroverdrive.init;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
+
+import matteroverdrive.MatterOverdrive;
+import matteroverdrive.item.BatteryItem;
+import matteroverdrive.item.MatterDustItem;
+import matteroverdrive.item.PatternDriveItem;
+import matteroverdrive.item.UpgradeItem;
+import matteroverdrive.item.WrenchItem;
+import matteroverdrive.item.weapon.EnergyPackItem;
+import matteroverdrive.item.weapon.IonSniperItem;
+import matteroverdrive.item.weapon.PhaserItem;
+import matteroverdrive.item.weapon.PhaserRifleItem;
+import matteroverdrive.item.weapon.PlasmaShotgunItem;
+import matteroverdrive.item.weapon.WeaponColorModuleItem;
+import matteroverdrive.item.weapon.WeaponBarrelItem;
+import matteroverdrive.item.weapon.SniperScopeItem;
+import matteroverdrive.item.android.AndroidPillItem;
+import matteroverdrive.item.android.BionicPartItem;
+import matteroverdrive.machine.UpgradeType;
+import net.minecraft.world.item.AxeItem;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.HoeItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.entity.EquipmentSlot;
+import matteroverdrive.platform.ItemEntry;
+import matteroverdrive.platform.Registrar;
+import net.minecraft.world.item.equipment.ArmorType;
+import net.minecraft.world.item.equipment.Equippable;
+
+public final class MOItems {
+    public static final Registrar.Items ITEMS = Registrar.items(MatterOverdrive.MODID);
+    /** Everything shown in the Matter Overdrive creative tab, in registration order. */
+    public static final List<ItemEntry<? extends Item>> TAB_ORDER = new ArrayList<>();
+
+    // Blocks
+    public static final ItemEntry<BlockItem> TRITANIUM_ORE = block("tritanium_ore", MOBlocks.TRITANIUM_ORE);
+    public static final ItemEntry<BlockItem> DILITHIUM_ORE = block("dilithium_ore", MOBlocks.DILITHIUM_ORE);
+    public static final ItemEntry<BlockItem> TRITANIUM_BLOCK = block("tritanium_block", MOBlocks.TRITANIUM_BLOCK);
+
+    // Materials and crafting components (plain items in 1.7.10 as well)
+    public static final ItemEntry<Item> TRITANIUM_INGOT = simple("tritanium_ingot");
+    public static final ItemEntry<Item> TRITANIUM_NUGGET = simple("tritanium_nugget");
+    public static final ItemEntry<Item> TRITANIUM_DUST = simple("tritanium_dust");
+    public static final ItemEntry<Item> TRITANIUM_PLATE = simple("tritanium_plate");
+    public static final ItemEntry<Item> DILITHIUM_CRYSTAL = simple("dilithium_crystal");
+    public static final ItemEntry<MatterDustItem> MATTER_DUST = item("matter_dust", p -> new MatterDustItem(false, p), p -> p);
+    public static final ItemEntry<MatterDustItem> MATTER_DUST_REFINED = item("matter_dust_refined", p -> new MatterDustItem(true, p), p -> p);
+    public static final ItemEntry<Item> MACHINE_CASING = simple("machine_casing");
+    public static final ItemEntry<Item> S_MAGNET = simple("s_magnet");
+    public static final ItemEntry<Item> H_COMPENSATOR = simple("h_compensator");
+    public static final ItemEntry<Item> INTEGRATION_MATRIX = simple("integration_matrix");
+    public static final ItemEntry<Item> ME_CONVERSION_MATRIX = simple("me_conversion_matrix");
+    public static final ItemEntry<Item> FORCEFIELD_EMITTER = simple("forcefield_emitter");
+    public static final ItemEntry<Item> WEAPON_HANDLE = simple("weapon_handle");
+    public static final ItemEntry<Item> WEAPON_RECEIVER = simple("weapon_receiver");
+    public static final ItemEntry<Item> PLASMA_CORE = simple("plasma_core");
+    // 1.7.10 used one item with damage values 0-3; split into four items.
+    public static final ItemEntry<Item> ISOLINEAR_CIRCUIT_MK1 = simple("isolinear_circuit_mk1");
+    public static final ItemEntry<Item> ISOLINEAR_CIRCUIT_MK2 = simple("isolinear_circuit_mk2");
+    public static final ItemEntry<Item> ISOLINEAR_CIRCUIT_MK3 = simple("isolinear_circuit_mk3");
+    public static final ItemEntry<Item> ISOLINEAR_CIRCUIT_MK4 = simple("isolinear_circuit_mk4");
+
+    // Tools: tritanium is iron-tier with 3122 durability; damage/speed follow the vanilla iron tools.
+    public static final ItemEntry<Item> TRITANIUM_SWORD = item("tritanium_sword", Item::new,
+            p -> p.sword(MOMaterials.TRITANIUM_TOOL, 3f, -2.4f));
+    public static final ItemEntry<Item> TRITANIUM_PICKAXE = item("tritanium_pickaxe", Item::new,
+            p -> p.pickaxe(MOMaterials.TRITANIUM_TOOL, 1f, -2.8f));
+    public static final ItemEntry<AxeItem> TRITANIUM_AXE = item("tritanium_axe",
+            p -> new AxeItem(MOMaterials.TRITANIUM_TOOL, 6f, -3.1f, p), p -> p);
+    public static final ItemEntry<HoeItem> TRITANIUM_HOE = item("tritanium_hoe",
+            p -> new HoeItem(MOMaterials.TRITANIUM_TOOL, -2f, -1f, p), p -> p);
+
+    // Armor
+    public static final ItemEntry<Item> TRITANIUM_HELMET = armor("tritanium_helmet", ArmorType.HELMET);
+    public static final ItemEntry<Item> TRITANIUM_CHESTPLATE = armor("tritanium_chestplate", ArmorType.CHESTPLATE);
+    public static final ItemEntry<Item> TRITANIUM_LEGGINGS = armor("tritanium_leggings", ArmorType.LEGGINGS);
+    public static final ItemEntry<Item> TRITANIUM_BOOTS = armor("tritanium_boots", ArmorType.BOOTS);
+
+    // Machines
+    public static final ItemEntry<BlockItem> SOLAR_PANEL = block("solar_panel", MOBlocks.SOLAR_PANEL);
+    public static final ItemEntry<BlockItem> INSCRIBER = block("inscriber", MOBlocks.INSCRIBER);
+    public static final ItemEntry<BlockItem> DECOMPOSER = block("decomposer", MOBlocks.DECOMPOSER);
+    public static final ItemEntry<BlockItem> RECYCLER = block("matter_recycler", MOBlocks.RECYCLER);
+    public static final ItemEntry<BlockItem> MATTER_PIPE = block("matter_pipe", MOBlocks.MATTER_PIPE);
+    public static final ItemEntry<BlockItem> HEAVY_MATTER_PIPE = block("heavy_matter_pipe", MOBlocks.HEAVY_MATTER_PIPE);
+    public static final ItemEntry<BlockItem> ANALYZER = block("matter_analyzer", MOBlocks.ANALYZER);
+    public static final ItemEntry<BlockItem> PATTERN_STORAGE = block("pattern_storage", MOBlocks.PATTERN_STORAGE);
+    public static final ItemEntry<BlockItem> PATTERN_MONITOR = block("pattern_monitor", MOBlocks.PATTERN_MONITOR);
+    public static final ItemEntry<BlockItem> REPLICATOR = block("replicator", MOBlocks.REPLICATOR);
+    public static final ItemEntry<BlockItem> NETWORK_PIPE = block("network_pipe", MOBlocks.NETWORK_PIPE);
+    public static final ItemEntry<BlockItem> NETWORK_ROUTER = block("network_router", MOBlocks.NETWORK_ROUTER);
+    public static final ItemEntry<BlockItem> NETWORK_SWITCH = block("network_switch", MOBlocks.NETWORK_SWITCH);
+    public static final ItemEntry<BlockItem> GRAVITATIONAL_ANOMALY = block("gravitational_anomaly", MOBlocks.GRAVITATIONAL_ANOMALY);
+    public static final ItemEntry<BlockItem> GRAVITATIONAL_STABILIZER = block("gravitational_stabilizer", MOBlocks.GRAVITATIONAL_STABILIZER);
+    public static final ItemEntry<BlockItem> MACHINE_HULL = block("machine_hull", MOBlocks.MACHINE_HULL);
+    public static final ItemEntry<BlockItem> FUSION_REACTOR_COIL = block("fusion_reactor_coil", MOBlocks.FUSION_REACTOR_COIL);
+    public static final ItemEntry<BlockItem> FUSION_REACTOR_IO = block("fusion_reactor_io", MOBlocks.FUSION_REACTOR_IO);
+    public static final ItemEntry<BlockItem> FUSION_REACTOR_CONTROLLER = block("fusion_reactor_controller", MOBlocks.FUSION_REACTOR_CONTROLLER);
+    /** 1.7.10 SpacetimeEqualizer: worn on the chest, it cancels a gravitational anomaly's pull. */
+    public static final ItemEntry<Item> SPACETIME_EQUALIZER = item("spacetime_equalizer", Item::new,
+            p -> p.stacksTo(1).component(DataComponents.EQUIPPABLE, Equippable.builder(EquipmentSlot.CHEST).build()));
+    // 1.7.10 PatternDrive("pattern_drive", 2)
+    public static final ItemEntry<PatternDriveItem> PATTERN_DRIVE = item("pattern_drive", p -> new PatternDriveItem(2, p), p -> p);
+    public static final ItemEntry<matteroverdrive.item.NetworkFlashDriveItem> NETWORK_FLASH_DRIVE = item("network_flash_drive",
+            matteroverdrive.item.NetworkFlashDriveItem::new, p -> p);
+
+    // Energy (1.7.10: battery 2^19 FE 400/800, hc_battery 2^20 FE 4096/4096, creative 2^24 FE 8192/8192)
+    public static final ItemEntry<BatteryItem> BATTERY = item("battery",
+            p -> new BatteryItem(1 << 19, 400, 800, false, p), p -> p);
+    public static final ItemEntry<BatteryItem> HC_BATTERY = item("hc_battery",
+            p -> new BatteryItem(1 << 20, 4096, 4096, false, p), p -> p);
+    public static final ItemEntry<BatteryItem> CREATIVE_BATTERY = item("creative_battery",
+            p -> new BatteryItem(1 << 24, 8192, 8192, true, p), p -> p);
+
+    // Upgrades (1.7.10 ItemUpgrade damage values 0-7)
+    public static final ItemEntry<UpgradeItem> UPGRADE_BASE = upgrade("upgrade_base", Map.of());
+    public static final ItemEntry<UpgradeItem> UPGRADE_SPEED = upgrade("upgrade_speed",
+            Map.of(UpgradeType.SPEED, 0.75, UpgradeType.POWER_USAGE, 1.25, UpgradeType.FAIL, 1.25));
+    public static final ItemEntry<UpgradeItem> UPGRADE_POWER = upgrade("upgrade_power",
+            Map.of(UpgradeType.SPEED, 1.5, UpgradeType.POWER_USAGE, 0.75, UpgradeType.FAIL, 1.25));
+    public static final ItemEntry<UpgradeItem> UPGRADE_FAILSAFE = upgrade("upgrade_failsafe",
+            Map.of(UpgradeType.FAIL, 0.5, UpgradeType.SPEED, 1.25, UpgradeType.POWER_USAGE, 1.25));
+    public static final ItemEntry<UpgradeItem> UPGRADE_RANGE = upgrade("upgrade_range",
+            Map.of(UpgradeType.RANGE, 4.0, UpgradeType.POWER_USAGE, 1.5));
+    public static final ItemEntry<UpgradeItem> UPGRADE_POWER_STORAGE = upgrade("upgrade_power_storage",
+            Map.of(UpgradeType.POWER_STORAGE, 2.0));
+    public static final ItemEntry<UpgradeItem> UPGRADE_HYPER_SPEED = upgrade("upgrade_hyper_speed",
+            Map.of(UpgradeType.SPEED, 0.15, UpgradeType.POWER_USAGE, 2.0, UpgradeType.FAIL, 1.25));
+    public static final ItemEntry<UpgradeItem> UPGRADE_MATTER_STORAGE = upgrade("upgrade_matter_storage",
+            Map.of(UpgradeType.MATTER_STORAGE, 2.0));
+
+    public static final ItemEntry<WrenchItem> TRITANIUM_WRENCH = item("tritanium_wrench", WrenchItem::new, p -> p);
+
+    // Weapons (phase 5)
+    public static final ItemEntry<PhaserItem> PHASER = item("phaser", PhaserItem::new, p -> p);
+    public static final ItemEntry<PhaserRifleItem> PHASER_RIFLE = item("phaser_rifle", PhaserRifleItem::new, p -> p);
+    public static final ItemEntry<matteroverdrive.item.weapon.OmniToolItem> OMNI_TOOL = item("omni_tool", matteroverdrive.item.weapon.OmniToolItem::new, p -> p);
+    public static final ItemEntry<PlasmaShotgunItem> PLASMA_SHOTGUN = item("plasma_shotgun", PlasmaShotgunItem::new, p -> p);
+    public static final ItemEntry<IonSniperItem> ION_SNIPER = item("ion_sniper", IonSniperItem::new, p -> p);
+    public static final ItemEntry<EnergyPackItem> ENERGY_PACK = item("energy_pack", EnergyPackItem::new, p -> p);
+    /** 1.7.10 MatterContainer: a portable matter tank; needed for the plasma core recipe (its tank isn't ported yet). */
+    public static final ItemEntry<matteroverdrive.item.MatterContainerItem> MATTER_CONTAINER = item("matter_container",
+            p -> new matteroverdrive.item.MatterContainerItem(false, p), p -> p.stacksTo(8));
+    public static final ItemEntry<matteroverdrive.item.MatterContainerItem> MATTER_CONTAINER_FULL = item("matter_container_full",
+            p -> new matteroverdrive.item.MatterContainerItem(true, p), p -> p.stacksTo(8));
+    public static final List<ItemEntry<WeaponColorModuleItem>> COLOR_MODULES = colorModules();
+    public static final ItemEntry<WeaponBarrelItem> BARREL_DAMAGE = barrel(WeaponBarrelItem.Type.DAMAGE);
+    public static final ItemEntry<WeaponBarrelItem> BARREL_FIRE = barrel(WeaponBarrelItem.Type.FIRE);
+    public static final ItemEntry<WeaponBarrelItem> BARREL_EXPLOSION = barrel(WeaponBarrelItem.Type.EXPLOSION);
+    public static final ItemEntry<WeaponBarrelItem> BARREL_HEAL = barrel(WeaponBarrelItem.Type.HEAL);
+    public static final ItemEntry<SniperScopeItem> SNIPER_SCOPE = item("sniper_scope", SniperScopeItem::new, p -> p);
+    public static final ItemEntry<BlockItem> WEAPON_STATION = block("weapon_station", MOBlocks.WEAPON_STATION);
+
+    // Androids (phase 6)
+    public static final ItemEntry<AndroidPillItem> ANDROID_PILL_RED = item("android_pill_red", p -> new AndroidPillItem(AndroidPillItem.Type.RED, p), p -> p);
+    public static final ItemEntry<AndroidPillItem> ANDROID_PILL_BLUE = item("android_pill_blue", p -> new AndroidPillItem(AndroidPillItem.Type.BLUE, p), p -> p);
+    public static final ItemEntry<BlockItem> ANDROID_STATION = block("android_station", MOBlocks.ANDROID_STATION);
+    public static final ItemEntry<BlockItem> CHARGING_STATION = block("charging_station", MOBlocks.CHARGING_STATION);
+    public static final ItemEntry<BionicPartItem> ROGUE_ANDROID_HEAD = item("rogue_android_part_head", p -> new BionicPartItem(0, p), p -> p);
+    public static final ItemEntry<BionicPartItem> ROGUE_ANDROID_ARMS = item("rogue_android_part_arms", p -> new BionicPartItem(1, p), p -> p);
+    public static final ItemEntry<BionicPartItem> ROGUE_ANDROID_LEGS = item("rogue_android_part_legs", p -> new BionicPartItem(2, p), p -> p);
+    public static final ItemEntry<BionicPartItem> ROGUE_ANDROID_CHEST = item("rogue_android_part_chest", p -> new BionicPartItem(3, p), p -> p);
+    /** 1.7.10 TritaniumSpine: the "other" bionic slot, +2 max health and half the glitch time. */
+    public static final ItemEntry<BionicPartItem> TRITANIUM_SPINE = item("tritanium_spine", p -> new BionicPartItem(4, 2, -0.5, p), p -> p);
+
+    // Food (phase 7a; 1.7.10 ItemFood values)
+    public static final ItemEntry<Item> EMERGENCY_RATION = item("emergency_ration", Item::new,
+            p -> p.food(new net.minecraft.world.food.FoodProperties.Builder().nutrition(8).saturationModifier(0.8f).build()));
+    /** 1.7.10 EarlGrayTea: 4 / 0.8, always drinkable, clears potion effects like milk, leaves the bottle. */
+    public static final ItemEntry<Item> EARL_GRAY_TEA = item("earl_gray_tea", Item::new,
+            p -> p.food(new net.minecraft.world.food.FoodProperties.Builder().nutrition(4).saturationModifier(0.8f).alwaysEdible().build(),
+                    net.minecraft.world.item.component.Consumables.defaultDrink()
+                            .onConsume(net.minecraft.world.item.consume_effects.ClearAllStatusEffectsConsumeEffect.INSTANCE).build())
+                    .usingConvertsTo(net.minecraft.world.item.Items.GLASS_BOTTLE).stacksTo(16));
+    public static final ItemEntry<matteroverdrive.item.food.RomulanAleItem> ROMULAN_ALE = item("romulan_ale", matteroverdrive.item.food.RomulanAleItem::new,
+            p -> p.food(new net.minecraft.world.food.FoodProperties.Builder().nutrition(4).saturationModifier(0.6f).alwaysEdible().build(),
+                    net.minecraft.world.item.component.Consumables.DEFAULT_DRINK)
+                    .usingConvertsTo(net.minecraft.world.item.Items.GLASS_BOTTLE).stacksTo(16));
+    public static final ItemEntry<BlockItem> HOLO_SIGN = block("holo_sign", MOBlocks.HOLO_SIGN);
+    public static final ItemEntry<BlockItem> MICROWAVE = block("microwave", MOBlocks.MICROWAVE);
+    public static final ItemEntry<BlockItem> TRANSPORTER = block("transporter", MOBlocks.TRANSPORTER);
+    public static final ItemEntry<BlockItem> CONTRACT_MARKET = block("contract_market", MOBlocks.CONTRACT_MARKET);
+    public static final ItemEntry<BlockItem> STAR_MAP = block("star_map", MOBlocks.STAR_MAP);
+    public static final ItemEntry<BlockItem> ANDROID_SPAWNER = block("android_spawner", MOBlocks.ANDROID_SPAWNER);
+    public static final ItemEntry<matteroverdrive.item.TransportFlashDriveItem> TRANSPORT_FLASH_DRIVE = item("transport_flash_drive",
+            matteroverdrive.item.TransportFlashDriveItem::new, p -> p);
+    public static final ItemEntry<matteroverdrive.item.ContractItem> CONTRACT = item("contract", matteroverdrive.item.ContractItem::new, p -> p);
+    public static final ItemEntry<matteroverdrive.item.SecurityProtocolItem> SECURITY_PROTOCOL = item("security_protocol",
+            matteroverdrive.item.SecurityProtocolItem::new, p -> p);
+    // star map buildings and ships (1.7.10 MatterOverdriveItems; no recipes in 1.7.10)
+    public static final ItemEntry<matteroverdrive.item.starmap.StarMapBuildingItem> BUILDING_BASE = building("building_base", "BASE");
+    public static final ItemEntry<matteroverdrive.item.starmap.StarMapBuildingItem> SHIP_FACTORY = building("ship_factory", "SHIP_FACTORY");
+    public static final ItemEntry<matteroverdrive.item.starmap.StarMapBuildingItem> BUILDING_RESIDENTIAL = building("building_residential", "RESIDENTIAL");
+    public static final ItemEntry<matteroverdrive.item.starmap.StarMapBuildingItem> BUILDING_MATTER_EXTRACTOR =
+            building("building_matter_extractor", "MATTER_EXTRACTOR");
+    public static final ItemEntry<matteroverdrive.item.starmap.StarMapBuildingItem> BUILDING_POWER_GENERATOR =
+            building("building_power_generator", "POWER_GENERATOR");
+    public static final ItemEntry<matteroverdrive.item.starmap.StarMapBuildingItem> BUILDING_SHIP_HANGAR = building("building_ship_hangar", "SHIP_HANGAR");
+    public static final ItemEntry<matteroverdrive.item.starmap.StarMapShipItem> SCOUT_SHIP = item("scout_ship",
+            p -> new matteroverdrive.item.starmap.StarMapShipItem(matteroverdrive.starmap.ShipType.SCOUT, p), p -> p);
+    public static final ItemEntry<matteroverdrive.item.starmap.StarMapShipItem> COLONIZER_SHIP = item("ship_colonizer",
+            p -> new matteroverdrive.item.starmap.StarMapShipItem(matteroverdrive.starmap.ShipType.COLONIZER, p), p -> p);
+
+    private static ItemEntry<matteroverdrive.item.starmap.StarMapBuildingItem> building(String name, String kind) {
+        return item(name, p -> new matteroverdrive.item.starmap.StarMapBuildingItem(
+                matteroverdrive.item.starmap.StarMapBuildingItem.Kind.valueOf(kind), p), p -> p);
+    }
+
+    public static final ItemEntry<matteroverdrive.item.DataPadItem> DATA_PAD = item("data_pad", matteroverdrive.item.DataPadItem::new, p -> p);
+    public static final ItemEntry<matteroverdrive.item.MatterScannerItem> MATTER_SCANNER = item("matter_scanner",
+            matteroverdrive.item.MatterScannerItem::new, p -> p);
+    public static final ItemEntry<matteroverdrive.item.PortableDecomposerItem> PORTABLE_DECOMPOSER = item("portable_decomposer",
+            matteroverdrive.item.PortableDecomposerItem::new, p -> p);
+    public static final List<ItemEntry<BlockItem>> TRITANIUM_CRATES = MOBlocks.TRITANIUM_CRATES.stream()
+            .map(b -> block(b.getId().getPath(), b)).toList();
+    public static final ItemEntry<net.minecraft.world.item.SpawnEggItem> ROGUE_ANDROID_SPAWN_EGG = item("rogue_android_spawn_egg",
+            p -> matteroverdrive.platform.Platform.INSTANCE.spawnEgg(MOEntities.ROGUE_ANDROID, 0x0FFFFF, 0, p), p -> p);
+    public static final ItemEntry<net.minecraft.world.item.SpawnEggItem> RANGED_ROGUE_ANDROID_SPAWN_EGG = item("ranged_rogue_android_spawn_egg",
+            p -> matteroverdrive.platform.Platform.INSTANCE.spawnEgg(MOEntities.RANGED_ROGUE_ANDROID, 0x0FFFFF, 0, p), p -> p);
+    public static final ItemEntry<net.minecraft.world.item.SpawnEggItem> MAD_SCIENTIST_SPAWN_EGG = item("mad_scientist_spawn_egg",
+            p -> matteroverdrive.platform.Platform.INSTANCE.spawnEgg(MOEntities.MAD_SCIENTIST, 0xFFFFFF, 0, p), p -> p);
+    public static final ItemEntry<net.minecraft.world.item.SpawnEggItem> MUTANT_SCIENTIST_SPAWN_EGG = item("mutant_scientist_spawn_egg",
+            p -> matteroverdrive.platform.Platform.INSTANCE.spawnEgg(MOEntities.MUTANT_SCIENTIST, 0xFFFFFF, 0x00FF00, p), p -> p);
+    public static final ItemEntry<net.minecraft.world.item.SpawnEggItem> FAILED_PIG_SPAWN_EGG = item("failed_pig_spawn_egg",
+            p -> matteroverdrive.platform.Platform.INSTANCE.spawnEgg(MOEntities.FAILED_PIG, 15771042, 0x33CC33, p), p -> p);
+    public static final ItemEntry<net.minecraft.world.item.SpawnEggItem> FAILED_COW_SPAWN_EGG = item("failed_cow_spawn_egg",
+            p -> matteroverdrive.platform.Platform.INSTANCE.spawnEgg(MOEntities.FAILED_COW, 4470310, 0x33CC33, p), p -> p);
+    public static final ItemEntry<net.minecraft.world.item.SpawnEggItem> FAILED_CHICKEN_SPAWN_EGG = item("failed_chicken_spawn_egg",
+            p -> matteroverdrive.platform.Platform.INSTANCE.spawnEgg(MOEntities.FAILED_CHICKEN, 10592673, 0x33CC33, p), p -> p);
+    public static final ItemEntry<net.minecraft.world.item.SpawnEggItem> FAILED_SHEEP_SPAWN_EGG = item("failed_sheep_spawn_egg",
+            p -> matteroverdrive.platform.Platform.INSTANCE.spawnEgg(MOEntities.FAILED_SHEEP, 15198183, 0x33CC33, p), p -> p);
+
+    public static final ItemEntry<AndroidPillItem> ANDROID_PILL_YELLOW = item("android_pill_yellow", p -> new AndroidPillItem(AndroidPillItem.Type.YELLOW, p), p -> p);
+
+    private static ItemEntry<WeaponBarrelItem> barrel(WeaponBarrelItem.Type type) {
+        return item("weapon_module_barrel_" + type.id(), p -> new WeaponBarrelItem(type, p), p -> p);
+    }
+
+    private static List<ItemEntry<WeaponColorModuleItem>> colorModules() {
+        List<ItemEntry<WeaponColorModuleItem>> list = new ArrayList<>();
+        for (int i = 0; i < WeaponColorModuleItem.NAMES.length; i++) {
+            int color = WeaponColorModuleItem.COLORS[i];
+            list.add(item("weapon_module_color_" + WeaponColorModuleItem.NAMES[i], p -> new WeaponColorModuleItem(color, p), p -> p));
+        }
+        return list;
+    }
+
+    private static ItemEntry<UpgradeItem> upgrade(String name, Map<UpgradeType, Double> stats) {
+        return item(name, p -> new UpgradeItem(stats, p), p -> p);
+    }
+
+    private static ItemEntry<Item> simple(String name) {
+        ItemEntry<Item> item = ITEMS.registerSimpleItem(name);
+        TAB_ORDER.add(item);
+        return item;
+    }
+
+    private static <I extends Item> ItemEntry<I> item(String name, Function<Item.Properties, I> factory, UnaryOperator<Item.Properties> props) {
+        // the properties are built at registration (tool / armour properties look up registries)
+        ItemEntry<I> item = ITEMS.registerItem(name, p -> factory.apply(props.apply(p)));
+        TAB_ORDER.add(item);
+        return item;
+    }
+
+    private static ItemEntry<Item> armor(String name, ArmorType type) {
+        return item(name, Item::new, p -> p.humanoidArmor(MOMaterials.TRITANIUM_ARMOR, type));
+    }
+
+    private static ItemEntry<BlockItem> block(String name, matteroverdrive.platform.BlockEntry<?> block) {
+        // machines get 1.7.10 MOMachineBlockItem: "[Configured]", the energy bar and the Shift tooltip
+        ItemEntry<BlockItem> item = ITEMS.registerItem(name, props -> block.get() instanceof matteroverdrive.machine.MachineBlock
+                ? new matteroverdrive.machine.MachineBlockItem(block.get(), props.useBlockDescriptionPrefix())
+                : new BlockItem(block.get(), props.useBlockDescriptionPrefix()));
+        TAB_ORDER.add(item);
+        return item;
+    }
+
+    private MOItems() {}
+}

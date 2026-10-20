@@ -1,0 +1,98 @@
+package matteroverdrive.init;
+
+import matteroverdrive.MatterOverdrive;
+import matteroverdrive.block.entity.AnalyzerBlockEntity;
+import matteroverdrive.block.entity.DecomposerBlockEntity;
+import matteroverdrive.block.entity.FusionReactorControllerBlockEntity;
+import matteroverdrive.block.entity.FusionReactorIOBlockEntity;
+import matteroverdrive.block.entity.GravitationalAnomalyBlockEntity;
+import matteroverdrive.block.entity.GravitationalStabilizerBlockEntity;
+import matteroverdrive.block.entity.InscriberBlockEntity;
+import matteroverdrive.block.entity.MatterPipeBlockEntity;
+import matteroverdrive.block.entity.PatternMonitorBlockEntity;
+import matteroverdrive.block.entity.PatternStorageBlockEntity;
+import matteroverdrive.block.entity.ReplicatorBlockEntity;
+import matteroverdrive.block.entity.RecyclerBlockEntity;
+import matteroverdrive.block.entity.SolarPanelBlockEntity;
+import matteroverdrive.block.entity.WeaponStationBlockEntity;
+import matteroverdrive.block.entity.AndroidStationBlockEntity;
+import matteroverdrive.block.entity.ChargingStationBlockEntity;
+import matteroverdrive.block.entity.HoloSignBlockEntity;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import matteroverdrive.platform.RegistryEntry;
+import matteroverdrive.platform.Registrar;
+
+public final class MOBlockEntities {
+    public static final Registrar<BlockEntityType<?>> BLOCK_ENTITIES =
+            Registrar.create(Registries.BLOCK_ENTITY_TYPE, MatterOverdrive.MODID);
+
+    public static final RegistryEntry<BlockEntityType<?>, BlockEntityType<SolarPanelBlockEntity>> SOLAR_PANEL =
+            BLOCK_ENTITIES.register("solar_panel", () -> type(SolarPanelBlockEntity::new, MOBlocks.SOLAR_PANEL.get()));
+    public static final RegistryEntry<BlockEntityType<?>, BlockEntityType<InscriberBlockEntity>> INSCRIBER =
+            BLOCK_ENTITIES.register("inscriber", () -> type(InscriberBlockEntity::new, MOBlocks.INSCRIBER.get()));
+
+    public static final RegistryEntry<BlockEntityType<?>, BlockEntityType<DecomposerBlockEntity>> DECOMPOSER =
+            BLOCK_ENTITIES.register("decomposer", () -> type(DecomposerBlockEntity::new, MOBlocks.DECOMPOSER.get()));
+    public static final RegistryEntry<BlockEntityType<?>, BlockEntityType<RecyclerBlockEntity>> RECYCLER =
+            BLOCK_ENTITIES.register("matter_recycler", () -> type(RecyclerBlockEntity::new, MOBlocks.RECYCLER.get()));
+    public static final RegistryEntry<BlockEntityType<?>, BlockEntityType<MatterPipeBlockEntity>> MATTER_PIPE =
+            BLOCK_ENTITIES.register("matter_pipe", () -> type(MatterPipeBlockEntity::new,
+                    MOBlocks.MATTER_PIPE.get(), MOBlocks.HEAVY_MATTER_PIPE.get()));
+
+    public static final RegistryEntry<BlockEntityType<?>, BlockEntityType<AnalyzerBlockEntity>> ANALYZER =
+            BLOCK_ENTITIES.register("matter_analyzer", () -> type(AnalyzerBlockEntity::new, MOBlocks.ANALYZER.get()));
+
+    public static final RegistryEntry<BlockEntityType<?>, BlockEntityType<PatternStorageBlockEntity>> PATTERN_STORAGE =
+            BLOCK_ENTITIES.register("pattern_storage", () -> type(PatternStorageBlockEntity::new, MOBlocks.PATTERN_STORAGE.get()));
+    public static final RegistryEntry<BlockEntityType<?>, BlockEntityType<PatternMonitorBlockEntity>> PATTERN_MONITOR =
+            BLOCK_ENTITIES.register("pattern_monitor", () -> type(PatternMonitorBlockEntity::new, MOBlocks.PATTERN_MONITOR.get()));
+    public static final RegistryEntry<BlockEntityType<?>, BlockEntityType<ReplicatorBlockEntity>> REPLICATOR =
+            BLOCK_ENTITIES.register("replicator", () -> type(ReplicatorBlockEntity::new, MOBlocks.REPLICATOR.get()));
+
+    public static final RegistryEntry<BlockEntityType<?>, BlockEntityType<GravitationalAnomalyBlockEntity>> GRAVITATIONAL_ANOMALY =
+            BLOCK_ENTITIES.register("gravitational_anomaly", () -> type(GravitationalAnomalyBlockEntity::new, MOBlocks.GRAVITATIONAL_ANOMALY.get()));
+    public static final RegistryEntry<BlockEntityType<?>, BlockEntityType<GravitationalStabilizerBlockEntity>> GRAVITATIONAL_STABILIZER =
+            BLOCK_ENTITIES.register("gravitational_stabilizer", () -> type(GravitationalStabilizerBlockEntity::new, MOBlocks.GRAVITATIONAL_STABILIZER.get()));
+
+    public static final RegistryEntry<BlockEntityType<?>, BlockEntityType<FusionReactorControllerBlockEntity>> FUSION_REACTOR_CONTROLLER =
+            BLOCK_ENTITIES.register("fusion_reactor_controller", () -> type(FusionReactorControllerBlockEntity::new, MOBlocks.FUSION_REACTOR_CONTROLLER.get()));
+    public static final RegistryEntry<BlockEntityType<?>, BlockEntityType<WeaponStationBlockEntity>> WEAPON_STATION =
+            BLOCK_ENTITIES.register("weapon_station", () -> type(WeaponStationBlockEntity::new, MOBlocks.WEAPON_STATION.get()));
+    public static final RegistryEntry<BlockEntityType<?>, BlockEntityType<AndroidStationBlockEntity>> ANDROID_STATION =
+            BLOCK_ENTITIES.register("android_station", () -> type(AndroidStationBlockEntity::new, MOBlocks.ANDROID_STATION.get()));
+    public static final RegistryEntry<BlockEntityType<?>, BlockEntityType<ChargingStationBlockEntity>> CHARGING_STATION =
+            BLOCK_ENTITIES.register("charging_station", () -> type(ChargingStationBlockEntity::new, MOBlocks.CHARGING_STATION.get()));
+    public static final RegistryEntry<BlockEntityType<?>, BlockEntityType<HoloSignBlockEntity>> HOLO_SIGN =
+            BLOCK_ENTITIES.register("holo_sign", () -> type(HoloSignBlockEntity::new, MOBlocks.HOLO_SIGN.get()));
+    public static final RegistryEntry<BlockEntityType<?>, BlockEntityType<FusionReactorIOBlockEntity>> FUSION_REACTOR_IO =
+            BLOCK_ENTITIES.register("fusion_reactor_io", () -> type(FusionReactorIOBlockEntity::new, MOBlocks.FUSION_REACTOR_IO.get()));
+
+    public static final RegistryEntry<BlockEntityType<?>, BlockEntityType<matteroverdrive.block.entity.TritaniumCrateBlockEntity>> TRITANIUM_CRATE =
+            BLOCK_ENTITIES.register("tritanium_crate", () -> type(matteroverdrive.block.entity.TritaniumCrateBlockEntity::new,
+                    MOBlocks.TRITANIUM_CRATES.stream().map(b -> (net.minecraft.world.level.block.Block) b.get()).toArray(net.minecraft.world.level.block.Block[]::new)));
+
+    public static final RegistryEntry<BlockEntityType<?>, BlockEntityType<matteroverdrive.block.entity.TransporterBlockEntity>> TRANSPORTER =
+            BLOCK_ENTITIES.register("transporter", () -> type(matteroverdrive.block.entity.TransporterBlockEntity::new,
+                    MOBlocks.TRANSPORTER.get()));
+
+    public static final RegistryEntry<BlockEntityType<?>, BlockEntityType<matteroverdrive.block.entity.AndroidSpawnerBlockEntity>> ANDROID_SPAWNER =
+            BLOCK_ENTITIES.register("android_spawner", () -> type(matteroverdrive.block.entity.AndroidSpawnerBlockEntity::new,
+                    MOBlocks.ANDROID_SPAWNER.get()));
+
+    public static final RegistryEntry<BlockEntityType<?>, BlockEntityType<matteroverdrive.block.entity.ContractMarketBlockEntity>> CONTRACT_MARKET =
+            BLOCK_ENTITIES.register("contract_market", () -> type(matteroverdrive.block.entity.ContractMarketBlockEntity::new,
+                    MOBlocks.CONTRACT_MARKET.get()));
+
+    public static final RegistryEntry<BlockEntityType<?>, BlockEntityType<matteroverdrive.block.entity.StarMapBlockEntity>> STAR_MAP =
+            BLOCK_ENTITIES.register("star_map", () -> type(matteroverdrive.block.entity.StarMapBlockEntity::new,
+                    MOBlocks.STAR_MAP.get()));
+
+    /** Block entity types: the factory interface is not public in vanilla, the loader builds them. */
+    private static <T extends net.minecraft.world.level.block.entity.BlockEntity> BlockEntityType<T> type(
+            java.util.function.BiFunction<net.minecraft.core.BlockPos, net.minecraft.world.level.block.state.BlockState, T> factory, net.minecraft.world.level.block.Block... blocks) {
+        return matteroverdrive.platform.Platform.INSTANCE.blockEntityType(factory, blocks);
+    }
+
+    private MOBlockEntities() {}
+}
