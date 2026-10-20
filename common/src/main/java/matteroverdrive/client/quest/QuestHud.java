@@ -111,7 +111,7 @@ public final class QuestHud {
         return ARGB.color(20 + (int) (235 * v), HOLO);
     }
 
-    static void render(GuiGraphics g, DeltaTracker delta) {
+    public static void render(GuiGraphics g, DeltaTracker delta) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.options.hideGui) return;
         Font font = mc.font;

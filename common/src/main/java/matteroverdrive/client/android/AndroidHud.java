@@ -59,7 +59,7 @@ public final class AndroidHud {
         return layer != VanillaLayer.TAB_LIST || Minecraft.getInstance().screen instanceof AbilityWheelScreen;
     }
 
-    static void render(GuiGraphics g, DeltaTracker delta) {
+    public static void render(GuiGraphics g, DeltaTracker delta) {
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
         if (player == null || mc.options.hideGui) return;

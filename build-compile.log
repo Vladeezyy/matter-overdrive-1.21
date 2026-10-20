@@ -11,9 +11,11 @@
 > Configure project :fabric
 Fabric Loom: 1.13.6
 
+> Task :neoforge:createMinecraftArtifacts UP-TO-DATE
 > Task :common:createMinecraftArtifacts UP-TO-DATE
-
 > Task :common:compileJava
+
+> Task :neoforge:compileJava
 /Users/vladeezy/Desktop/matter-overdrive-fabric/common/src/main/java/matteroverdrive/gametest/WeaponGameTests.java:76: warning: [removal] makeMockServerPlayerInLevel() in GameTestHelper has been deprecated and marked for removal
         ServerPlayer player = helper.makeMockServerPlayerInLevel();
                                     ^
@@ -32,5 +34,5 @@ Note: Recompile with -Xlint:unchecked for details.
 [Incubating] Problems report is available at: file:///Users/vladeezy/Desktop/matter-overdrive-fabric/build/reports/problems/problems-report.html
 
 BUILD SUCCESSFUL in 2s
-9 actionable tasks: 1 executed, 8 up-to-date
+11 actionable tasks: 2 executed, 9 up-to-date
 Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.2.1/userguide/configuration_cache_enabling.html
