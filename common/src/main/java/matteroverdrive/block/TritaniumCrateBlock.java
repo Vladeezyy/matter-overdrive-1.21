@@ -46,7 +46,7 @@ public class TritaniumCrateBlock extends BaseEntityBlock {
         return CODEC;
     }
 
-    /** 1.21.1 BaseEntityBlock is invisible by default (1.21.2+ draws the model) */
+    /** 1.21.1-1.21.3 BaseEntityBlock is invisible by default (1.21.4+ draws the model) */
     @Override
     protected net.minecraft.world.level.block.RenderShape getRenderShape(BlockState state) {
         return net.minecraft.world.level.block.RenderShape.MODEL;

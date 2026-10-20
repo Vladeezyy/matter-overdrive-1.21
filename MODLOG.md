@@ -794,7 +794,7 @@
   `:fabric:runServer`; the old `mo_scene` was last played in 1.21.10 and the 1.21.1 client stops on the "downgrade"
   screen): all 142 shots, compared with NeoForge where it mattered.
 - **Fixed on the way (also wrong in the released 1.21.1 NeoForge build 1.0.1):** tritanium crates were invisible —
-  1.21.1 `BaseEntityBlock.getRenderShape` is `INVISIBLE` (1.21.2+ draws the model), and `TritaniumCrateBlock` had no
+  `BaseEntityBlock.getRenderShape` is `INVISIBLE` in 1.21.1-1.21.3 (1.21.4+ draws the model; the 1.21.3 branch has the same bug), and `TritaniumCrateBlock` had no
   override. Now `RenderShape.MODEL`.
 - Fabric pitfall: at `WorldRenderEvents.AFTER_ENTITIES` (and up to the end of the translucent pass) the camera rotation
   is already in `RenderSystem.getModelViewStack()`; a pose built from `context.positionMatrix()` rotates twice (the
