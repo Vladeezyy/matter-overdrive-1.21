@@ -99,7 +99,6 @@ public final class FabricPlatform implements Platform {
         Set<ResourceLocation> order = new LinkedHashSet<>();
         order.add(Registries.ATTRIBUTE.location());
         order.add(Registries.DATA_COMPONENT_TYPE.location());
-        order.add(Registries.ARMOR_MATERIAL.location());
         List<ResourceLocation> modded = new ArrayList<>();
         // the registry of registries in registration order (its keySet() has no order)
         for (Registry<?> each : BuiltInRegistries.REGISTRY) {
@@ -112,7 +111,7 @@ public final class FabricPlatform implements Platform {
         for (ResourceLocation registryId : order) {
             List<Pending> entries = PENDING.remove(ResourceKey.createRegistryKey(registryId));
             if (entries == null) continue;
-            Registry registry = BuiltInRegistries.REGISTRY.get(registryId);
+            Registry registry = BuiltInRegistries.REGISTRY.getValue(registryId);
             for (Pending entry : entries) Registry.register(registry, entry.id(), entry.factory().get());
         }
         if (!PENDING.isEmpty()) throw new IllegalStateException("Matter Overdrive entries for registries that do not exist: " + PENDING.keySet());
@@ -321,7 +320,7 @@ public final class FabricPlatform implements Platform {
 
     @Override
     public ItemStack craftingRemainder(ItemStack stack) {
-        return stack.getItem().hasCraftingRemainingItem() ? new ItemStack(stack.getItem().getCraftingRemainingItem()) : ItemStack.EMPTY;
+        return stack.getItem().getCraftingRemainder().copy();
     }
 
     @Override
