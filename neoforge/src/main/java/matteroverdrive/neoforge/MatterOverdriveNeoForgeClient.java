@@ -50,9 +50,9 @@ import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 public final class MatterOverdriveNeoForgeClient {
     public MatterOverdriveNeoForgeClient(IEventBus modBus) {
         modBus.addListener((FMLClientSetupEvent event) -> event.enqueueWork(MOClient::init));
-        modBus.addListener((ModelEvent.RegisterAdditional event) -> MOClient.extraModels().forEach(id -> event.register(ModelResourceLocation.standalone(id))));
+        modBus.addListener((ModelEvent.RegisterAdditional event) -> MOClient.extraModels().forEach(id -> event.register(id)));
         modBus.addListener((RegisterColorHandlersEvent.Block event) -> MOClient.blockColors((color, block) -> event.register(color, block)));
-        modBus.addListener((RegisterColorHandlersEvent.Item event) -> MOClient.itemColors((color, item) -> event.register(color, item)));
+        modBus.addListener((net.neoforged.neoforge.client.event.RegisterSelectItemModelPropertyEvent event) -> MOClient.registerSelectProperties(event::register));
         modBus.addListener((RegisterMenuScreensEvent event) -> MOClient.registerScreens(new MOClient.Screens() {
             @Override
             public <M extends net.minecraft.world.inventory.AbstractContainerMenu, U extends net.minecraft.client.gui.screens.Screen & net.minecraft.client.gui.screens.inventory.MenuAccess<M>> void register(
@@ -128,12 +128,18 @@ public final class MatterOverdriveNeoForgeClient {
                 return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "block/matter_plasma_flowing");
             }
         }, NeoForgePlatform.MATTER_PLASMA_TYPE.get());
-        // 1.7.10 ModelTritaniumArmor (the layer textures: MOItems' armor getArmorTexture)
+        // 1.7.10 ModelTritaniumArmor and its two layer textures
         event.registerItem(new IClientItemExtensions() {
             @Override
-            public Model getGenericArmorModel(ItemStack stack, net.minecraft.world.item.equipment.EquipmentModel.LayerType layerType, Model original) {
+            public Model getGenericArmorModel(ItemStack stack, net.minecraft.client.resources.model.EquipmentClientInfo.LayerType layerType, Model original) {
                 // the poses come from the render state in setupAnim; don't copy the vanilla model's visibility
                 return TritaniumArmorModel.armorModel(stack);
+            }
+
+            @Override
+            public ResourceLocation getArmorTexture(ItemStack stack, net.minecraft.client.resources.model.EquipmentClientInfo.LayerType type,
+                                                    net.minecraft.client.resources.model.EquipmentClientInfo.Layer layer, ResourceLocation _default) {
+                return TritaniumArmorModel.armorTexture(stack);
             }
         }, MOItems.TRITANIUM_HELMET.get(), MOItems.TRITANIUM_CHESTPLATE.get(), MOItems.TRITANIUM_LEGGINGS.get(), MOItems.TRITANIUM_BOOTS.get());
         event.registerItem(new IClientItemExtensions() {
