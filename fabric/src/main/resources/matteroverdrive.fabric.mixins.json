@@ -1,0 +1,24 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "matteroverdrive.fabric.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "AnvilMenuMixin",
+    "BlockItemMixin",
+    "EnergyWeaponItemMixin",
+    "ItemEntityMixin",
+    "LivingEntityMixin",
+    "PlayerMixin",
+    "ResultSlotMixin",
+    "ServerLevelMixin"
+  ],
+  "client": [
+    "client.AbstractClientPlayerMixin",
+    "client.GuiMixin",
+    "client.ItemInHandRendererMixin",
+    "client.MinecraftMixin",
+    "client.PlayerRendererMixin"
+  ],
+  "injectors": {"defaultRequire": 1}
+}
