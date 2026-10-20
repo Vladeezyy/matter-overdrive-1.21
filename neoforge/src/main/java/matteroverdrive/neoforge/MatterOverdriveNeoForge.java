@@ -62,10 +62,14 @@ public final class MatterOverdriveNeoForge {
         modBus.addListener((EntityAttributeModificationEvent event) -> Android.playerAttributes().forEach(a -> event.add(EntityType.PLAYER, a)));
         modBus.addListener((RegisterSpawnPlacementsEvent event) -> NeoForgePlatform.registerSpawnPlacements(event));
         modBus.addListener((RegisterDataMapTypesEvent event) -> event.register(MatterValues.MATTER));
-        modBus.addListener((RegisterPayloadHandlersEvent event) -> MOPayloads.register(new Payloads(event.registrar("1"))));
+        modBus.addListener((RegisterPayloadHandlersEvent event) -> {
+            MOPayloads.register(new Payloads(event.registrar("1")));
+            NeoForgePlayerData.registerPayload(event.registrar("1"));
+        });
         modBus.addListener((RegisterGameTestsEvent event) -> event.register(matteroverdrive.gametest.MOGameTests.class));
 
         IEventBus game = NeoForge.EVENT_BUS;
+        NeoForgePlayerData.register(game);
         game.addListener((ServerAboutToStartEvent event) -> matteroverdrive.world.VillageHouses.onServerAboutToStart(event.getServer()));
         // matter
         game.addListener((ItemEntityPickupEvent.Pre event) -> MatterEvents.onPickup(event.getPlayer(), event.getItemEntity()));
