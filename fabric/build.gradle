@@ -61,3 +61,51 @@ loom {
 }
 
 tasks.withType(JavaCompile).configureEach { options.compilerArgs += ['-Xmaxerrs', '10000'] }
+
+// 1.21.5+: game tests are test instances (data). NeoForge registers them from MOGameTests in code; on Fabric the same
+// list becomes data files, generated from the MOGameTests.add(...) calls of the common sources.
+def gameTestSources = rootProject.file('common/src/main/java/matteroverdrive/gametest')
+def gameTestData = layout.buildDirectory.dir('generated/gametest')
+def generateGameTests = tasks.register('generateGameTestInstances') {
+    inputs.dir(gameTestSources)
+    outputs.dir(gameTestData)
+    doLast {
+        def out = gameTestData.get().asFile
+        out.deleteDir()
+        def dir = new File(out, "data/${mod_id}")
+        def environments = new File(dir, 'test_environment')
+        def instances = new File(dir, 'test_instance')
+        environments.mkdirs()
+        instances.mkdirs()
+        new File(environments, 'default.json').text = '{"type": "minecraft:all_of", "definitions": []}\n'
+        def times = [] as Set
+        int count = 0
+        gameTestSources.eachFileMatch(~/.*\.java/) { file ->
+            (file.text =~ /add\(\s*"([a-z0-9_]+)",\s*(\d+),\s*(true|false),\s*(?:(\d+),)?/).each { match, name, ticks, sky, time ->
+                def environment = time == null ? 'default' : "time_${time}"
+                if (time != null) times << time
+                instances.toPath().resolve("${name}.json").text = """{
+  "type": "minecraft:function",
+  "function": "${mod_id}:${name}",
+  "environment": "${mod_id}:${environment}",
+  "structure": "${mod_id}:gametest_area",
+  "max_ticks": ${ticks},
+  "setup_ticks": 0,
+  "required": true,
+  "rotation": "none",
+  "manual_only": false,
+  "max_attempts": 1,
+  "required_successes": 1,
+  "sky_access": ${sky}
+}
+"""
+                count++
+            }
+        }
+        times.each { t -> new File(environments, "time_${t}.json").text = "{\"type\": \"minecraft:time_of_day\", \"time\": ${t}}\n" }
+        if (count < 90) throw new GradleException("Only ${count} game tests found in ${gameTestSources}")
+    }
+}
+processResources {
+    from(generateGameTests)
+}
