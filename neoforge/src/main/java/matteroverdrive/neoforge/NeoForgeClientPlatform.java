@@ -10,6 +10,6 @@ import net.minecraft.resources.ResourceLocation;
 public final class NeoForgeClientPlatform implements ClientPlatform {
     @Override
     public BakedModel standaloneModel(ResourceLocation id) {
-        return Minecraft.getInstance().getModelManager().getModel(ModelResourceLocation.standalone(id));
+        return Minecraft.getInstance().getModelManager().getStandaloneModel(id);
     }
 }
