@@ -81,6 +81,12 @@ public final class MOGameTests {
         TESTS.forEach((name, spec) -> FUNCTIONS.register(name, () -> spec.body()));
     }
 
+    /** A test a loader module adds after the common ones (its function is registered right away) */
+    public static void addLoaderTest(String name, int maxTicks, Consumer<GameTestHelper> body) {
+        add(name, maxTicks, false, body);
+        FUNCTIONS.register(name, () -> body);
+    }
+
     /** The tests by name (the loaders register their game test instances: NeoForge's event, Fabric's data) */
     public static Map<String, Spec> tests() {
         return TESTS;

@@ -56,6 +56,7 @@ import net.neoforged.neoforge.registries.datamaps.RegisterDataMapTypesEvent;
 public final class MatterOverdriveNeoForge {
     public MatterOverdriveNeoForge(IEventBus modBus, ModContainer container) {
         MatterOverdrive.init();
+        NeoForgeTransferTests.register();
         NeoForgePlatform.registerAll(modBus);
         modBus.addListener(MatterOverdriveNeoForge::registerCapabilities);
         modBus.addListener((EntityAttributeCreationEvent event) -> MatterOverdrive.registerAttributes(event::put));
@@ -138,27 +139,37 @@ public final class MatterOverdriveNeoForge {
         MatterOverdrive.registerCapabilities(new MatterOverdrive.Capabilities() {
             @Override
             public void energyItem(java.util.function.Function<ItemStack, matteroverdrive.platform.transfer.IEnergyStorage> handler, Item... items) {
-                event.registerItem(Capabilities.EnergyStorage.ITEM, (stack, context) -> NeoForgeTransfer.toNeo(handler.apply(stack)), items);
+                event.registerItem(Capabilities.Energy.ITEM, (stack, access) -> new NeoForgeResources.ItemEnergy(access, handler), items);
             }
 
             @Override
             public void fluidItem(java.util.function.Function<ItemStack, matteroverdrive.platform.transfer.IFluidHandlerItem> handler, Item... items) {
-                event.registerItem(Capabilities.FluidHandler.ITEM, (stack, context) -> NeoForgeTransfer.toNeoItem(handler.apply(stack)), items);
+                NeoForgeResources.registerItemFluid(handler, items);
+                event.registerItem(Capabilities.Fluid.ITEM, (stack, access) -> new NeoForgeResources.ItemFluids(access, handler), items);
             }
 
             @Override
             public <T extends BlockEntity> void energy(BlockEntityType<T> type, java.util.function.BiFunction<T, Direction, matteroverdrive.platform.transfer.IEnergyStorage> handler) {
-                event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, type, (be, side) -> NeoForgeTransfer.toNeo(handler.apply(be, side)));
+                event.registerBlockEntity(Capabilities.Energy.BLOCK, type, (be, side) -> {
+                    var common = handler.apply(be, side);
+                    return common == null ? null : NeoForgeResources.exposed(be, 0, () -> new NeoForgeResources.Energy(common));
+                });
             }
 
             @Override
             public <T extends BlockEntity> void items(BlockEntityType<T> type, java.util.function.BiFunction<T, Direction, matteroverdrive.platform.transfer.IItemHandler> handler) {
-                event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, type, (be, side) -> NeoForgeTransfer.toNeo(handler.apply(be, side)));
+                event.registerBlockEntity(Capabilities.Item.BLOCK, type, (be, side) -> {
+                    var common = handler.apply(be, side);
+                    return common == null ? null : NeoForgeResources.exposed(be, 1, () -> new NeoForgeResources.Items(common));
+                });
             }
 
             @Override
             public <T extends BlockEntity> void fluids(BlockEntityType<T> type, java.util.function.BiFunction<T, Direction, matteroverdrive.platform.transfer.IFluidHandler> handler) {
-                event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, type, (be, side) -> NeoForgeTransfer.toNeo(handler.apply(be, side)));
+                event.registerBlockEntity(Capabilities.Fluid.BLOCK, type, (be, side) -> {
+                    var common = handler.apply(be, side);
+                    return common == null ? null : NeoForgeResources.exposed(be, 2, () -> new NeoForgeResources.Fluids(common));
+                });
             }
         });
     }
@@ -177,7 +188,14 @@ public final class MatterOverdriveNeoForge {
 
         @Override
         public <T extends CustomPacketPayload> PayloadRegistrar playBidirectional(CustomPacketPayload.Type<T> type, StreamCodec<? super RegistryFriendlyByteBuf, T> codec, BiConsumer<T, PacketContext> handler) {
-            this.registrar.playBidirectional(type, codec, handler(handler));
+            return this.playBidirectional(type, codec, handler, handler);
+        }
+
+        /** NeoForge 21.8+: a clientbound payload needs its client handler given here */
+        @Override
+        public <T extends CustomPacketPayload> PayloadRegistrar playBidirectional(CustomPacketPayload.Type<T> type, StreamCodec<? super RegistryFriendlyByteBuf, T> codec,
+                                                                                 BiConsumer<T, PacketContext> clientHandler, BiConsumer<T, PacketContext> serverHandler) {
+            this.registrar.playBidirectional(type, codec, handler(clientHandler), handler(serverHandler));
             return this;
         }
 

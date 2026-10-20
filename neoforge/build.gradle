@@ -20,6 +20,17 @@ neoForge {
         client {
             client()
         }
+        // Performance and look checks (matteroverdrive.client.PerfScene): ./gradlew :neoforge:runPerf -Pperf=stress|hands,
+        // -Pjfr records a Java Flight Recording to run/perf.jfr
+        perf {
+            client()
+            programArguments.addAll '--quickPlaySingleplayer', project.findProperty('world') ?: 'mo_scene'
+            systemProperty 'matteroverdrive.perf', project.findProperty('perf') ?: 'stress'
+            systemProperty 'matteroverdrive.perf.types', project.findProperty('types') ?: ''
+            if (project.hasProperty('jfr')) {
+                jvmArguments.add '-XX:StartFlightRecording=filename=perf.jfr,settings=profile'
+            }
+        }
         server {
             server()
             programArgument '--nogui'

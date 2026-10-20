@@ -73,13 +73,16 @@ public final class MatterOverdriveNeoForgeClient {
             }
 
             @Override
-            public <T extends net.minecraft.world.level.block.entity.BlockEntity> void blockEntity(net.minecraft.world.level.block.entity.BlockEntityType<? extends T> type,
-                                                                                                net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider<T> provider) {
+            public <T extends net.minecraft.world.level.block.entity.BlockEntity, S extends net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState> void blockEntity(
+                    net.minecraft.world.level.block.entity.BlockEntityType<? extends T> type, net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider<T, S> provider) {
                 event.registerBlockEntityRenderer(type, provider);
             }
         }));
         modBus.addListener((EntityRenderersEvent.RegisterLayerDefinitions event) -> MOClient.registerLayers(event::registerLayerDefinition));
-        modBus.addListener((RegisterKeyMappingsEvent event) -> MOClient.registerKeys(event::register));
+        modBus.addListener((RegisterKeyMappingsEvent event) -> {
+            MOClient.registerKeyCategories(event::registerCategory);
+            MOClient.registerKeys(event::register);
+        });
         modBus.addListener((RegisterGuiLayersEvent event) -> {
             event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, MOClient.ANDROID_HUD, AndroidHud::render);
             event.registerAbove(VanillaGuiLayers.CHAT, MOClient.QUEST_HUD, matteroverdrive.client.quest.QuestHud::render);
@@ -88,7 +91,11 @@ public final class MatterOverdriveNeoForgeClient {
 
         IEventBus game = NeoForge.EVENT_BUS;
         game.addListener((ClientTickEvent.Pre event) -> MOClient.onClientTickStart());
-        game.addListener((ClientTickEvent.Post event) -> MOClient.onClientTickEnd());
+        game.addListener((ClientTickEvent.Post event) -> {
+            MOClient.onClientTickEnd();
+            matteroverdrive.client.PerfScene.onTick();
+        });
+        game.addListener((net.neoforged.neoforge.client.event.RenderFrameEvent.Post event) -> matteroverdrive.client.PerfScene.onFrame());
         game.addListener((ClientPlayerNetworkEvent.LoggingOut event) -> MOClient.onLoggedOut());
         game.addListener((ItemTooltipEvent event) -> MOClient.onTooltip(event.getItemStack(), event.getToolTip()));
         game.addListener((RenderGuiLayerEvent.Pre event) -> {
@@ -106,15 +113,15 @@ public final class MatterOverdriveNeoForgeClient {
             }
         });
         game.addListener((ComputeFovModifierEvent event) -> event.setNewFovModifier(WeaponClient.fovModifier(event.getPlayer(), event.getNewFovModifier())));
-        game.addListener((RenderPlayerEvent.Pre event) -> TritaniumArmorModel.hideSkinOverlay(event.getRenderState()));
-        game.addListener((RenderPlayerEvent.Post event) -> {
+        game.addListener((RenderPlayerEvent.Pre<?> event) -> TritaniumArmorModel.hideSkinOverlay(event.getRenderState()));
+        game.addListener((RenderPlayerEvent.Post<?> event) -> {
             // 1.21.2+: the event has the render state; the beam needs the player
             var level = net.minecraft.client.Minecraft.getInstance().level;
             if (level != null && level.getEntity(event.getRenderState().id) instanceof net.minecraft.world.entity.player.Player player) {
-                PhaserBeamRenderer.renderPlayer(player, event.getPartialTick(), event.getPoseStack(), event.getMultiBufferSource());
+                PhaserBeamRenderer.renderPlayer(player, event.getPartialTick(), event.getPoseStack(), event.getSubmitNodeCollector());
             }
         });
-        game.addListener((RenderHandEvent event) -> PhaserBeamRenderer.renderHand(event.getHand(), event.getPartialTick(), event.getPoseStack(), event.getMultiBufferSource()));
+        game.addListener((RenderHandEvent event) -> PhaserBeamRenderer.renderHand(event.getHand(), event.getPartialTick(), event.getPoseStack(), event.getSubmitNodeCollector()));
         game.addListener((RenderLevelStageEvent.AfterEntities event) -> ShieldRenderer.renderLevel(event.getPoseStack()));
     }
 

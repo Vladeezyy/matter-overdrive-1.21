@@ -151,6 +151,11 @@ public final class MOClient {
         event.accept(ResourceLocation.fromNamespaceAndPath(matteroverdrive.MatterOverdrive.MODID, "barrel"), BarrelProperty.TYPE);
     }
 
+    /** 1.21.9+: the mod's key categories (registered before the keys) */
+    public static void registerKeyCategories(Consumer<KeyMapping.Category> categories) {
+        categories.accept(matteroverdrive.client.android.AndroidKeys.CATEGORY);
+    }
+
     public static void registerKeys(Consumer<KeyMapping> keys) {
         ScannerClient.registerKeys(keys);
         matteroverdrive.client.android.AndroidKeys.registerKeys(keys);

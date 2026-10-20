@@ -113,7 +113,7 @@ public final class NeoForgePlatform implements Platform {
 
     @Override
     public boolean isClient() {
-        return FMLEnvironment.dist.isClient();
+        return FMLEnvironment.getDist().isClient();
     }
 
     // --- registration ---
@@ -131,7 +131,7 @@ public final class NeoForgePlatform implements Platform {
     @Override
     public SpawnEggItem spawnEgg(Supplier<? extends EntityType<? extends Mob>> type, int background, int highlight, Item.Properties properties) {
         // 1.21.2+: entity types are registered before items
-        return new SpawnEggItem(type.get(), properties);
+        return new SpawnEggItem(properties.spawnEgg(type.get()));
     }
 
     @Override
@@ -235,17 +235,33 @@ public final class NeoForgePlatform implements Platform {
 
     @SuppressWarnings("unchecked")
     private static <T> BlockCapability<?, Direction> capability(StorageKind<T> kind) {
-        if (kind == StorageKind.ENERGY) return Capabilities.EnergyStorage.BLOCK;
-        if (kind == StorageKind.FLUID) return Capabilities.FluidHandler.BLOCK;
-        return Capabilities.ItemHandler.BLOCK;
+        if (kind == StorageKind.ENERGY) return Capabilities.Energy.BLOCK;
+        if (kind == StorageKind.FLUID) return Capabilities.Fluid.BLOCK;
+        return Capabilities.Item.BLOCK;
     }
 
     @SuppressWarnings("unchecked")
     private static <T> @Nullable T common(StorageKind<T> kind, @Nullable Object neo) {
         if (neo == null) return null;
-        if (kind == StorageKind.ENERGY) return (T) NeoForgeTransfer.fromNeo((net.neoforged.neoforge.energy.IEnergyStorage) neo);
-        if (kind == StorageKind.FLUID) return (T) NeoForgeTransfer.fromNeo((net.neoforged.neoforge.fluids.capability.IFluidHandler) neo);
-        return (T) NeoForgeTransfer.fromNeo((net.neoforged.neoforge.items.IItemHandler) neo);
+        // NeoForge 21.9+'s handlers through its own adapters to the legacy interfaces the common adapters wrap
+        if (kind == StorageKind.ENERGY) return (T) energy((net.neoforged.neoforge.transfer.energy.EnergyHandler) neo);
+        if (kind == StorageKind.FLUID) return (T) fluids((net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.fluid.FluidResource>) neo);
+        return (T) items((net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource>) neo);
+    }
+
+    @SuppressWarnings("deprecation")
+    private static @Nullable IEnergyStorage energy(@Nullable net.neoforged.neoforge.transfer.energy.EnergyHandler handler) {
+        return handler == null ? null : NeoForgeTransfer.fromNeo(net.neoforged.neoforge.energy.IEnergyStorage.of(handler));
+    }
+
+    @SuppressWarnings("deprecation")
+    private static @Nullable IItemHandler items(@Nullable net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> handler) {
+        return handler == null ? null : NeoForgeTransfer.fromNeo(net.neoforged.neoforge.items.IItemHandler.of(handler));
+    }
+
+    @SuppressWarnings("deprecation")
+    private static @Nullable IFluidHandler fluids(@Nullable net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.fluid.FluidResource> handler) {
+        return handler == null ? null : NeoForgeTransfer.fromNeo(net.neoforged.neoforge.fluids.capability.IFluidHandler.of(handler));
     }
 
     @Override
@@ -270,28 +286,35 @@ public final class NeoForgePlatform implements Platform {
 
     @Override
     public Optional<IEnergyStorage> energyHandler(Level level, BlockPos pos, @Nullable Direction side) {
-        return Optional.ofNullable(NeoForgeTransfer.fromNeo(level.getCapability(Capabilities.EnergyStorage.BLOCK, pos, side)));
+        return Optional.ofNullable(energy(level.getCapability(Capabilities.Energy.BLOCK, pos, side)));
     }
 
     @Override
     public Optional<IEnergyStorage> energyHandler(ItemStack stack) {
-        return Optional.ofNullable(NeoForgeTransfer.fromNeo(stack.getCapability(Capabilities.EnergyStorage.ITEM)));
+        // the stack's own access: a move changes the stack itself, as before NeoForge 21.9
+        return Optional.ofNullable(energy(net.neoforged.neoforge.transfer.access.ItemAccess.forStack(stack).getCapability(Capabilities.Energy.ITEM)));
     }
 
     @Override
     public Optional<IItemHandler> itemHandler(Level level, BlockPos pos, @Nullable Direction side) {
-        return Optional.ofNullable(NeoForgeTransfer.fromNeo(level.getCapability(Capabilities.ItemHandler.BLOCK, pos, side)));
+        return Optional.ofNullable(items(level.getCapability(Capabilities.Item.BLOCK, pos, side)));
     }
 
     @Override
     public Optional<IFluidHandler> fluidHandler(Level level, BlockPos pos, @Nullable Direction side) {
-        return Optional.ofNullable(NeoForgeTransfer.fromNeo(level.getCapability(Capabilities.FluidHandler.BLOCK, pos, side)));
+        return Optional.ofNullable(fluids(level.getCapability(Capabilities.Fluid.BLOCK, pos, side)));
     }
 
     @Override
     public Optional<IFluidHandlerItem> fluidHandler(ItemStack stack) {
-        var handler = stack.getCapability(Capabilities.FluidHandler.ITEM);
-        return handler == null ? Optional.empty() : Optional.of((IFluidHandlerItem) NeoForgeTransfer.fromNeo(handler));
+        // the mod's own containers directly; others in a one-slot handler, so a container can turn into another item
+        IFluidHandlerItem own = NeoForgeResources.ownItemFluid(stack);
+        if (own != null) return Optional.of(own);
+        var slot = new net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler(net.minecraft.core.NonNullList.of(ItemStack.EMPTY, stack.copy()));
+        var access = net.neoforged.neoforge.transfer.access.ItemAccess.forHandlerIndex(slot, 0);
+        var handler = access.getCapability(Capabilities.Fluid.ITEM);
+        return handler == null ? Optional.empty()
+                : Optional.of((IFluidHandlerItem) NeoForgeTransfer.fromNeo(new net.neoforged.neoforge.fluids.capability.FluidResourceHandlerItemAdapter(handler, access)));
     }
 
     @Override
@@ -313,7 +336,13 @@ public final class NeoForgePlatform implements Platform {
 
     @Override
     public Path modFile(String... path) {
-        return ModList.get().getModFileById(MatterOverdrive.MODID).getFile().findResource(path);
+        String relative = String.join("/", path);
+        var roots = ModList.get().getModFileById(MatterOverdrive.MODID).getFile().getContents().getContentRoots();
+        for (Path root : roots) {
+            Path file = root.resolve(relative);
+            if (java.nio.file.Files.exists(file)) return file;
+        }
+        return roots.iterator().next().resolve(relative);
     }
 
     @Override
