@@ -712,3 +712,13 @@
 - Checked before the release: a world saved by 1.0.0 (`tools/perf.sh look -Pworld=<save>`) — its pattern storage gets
   drive_0..2 on the first tick, nothing else changes.
 - Modrinth: six versions 1.0.1+<mc> uploaded 2026-10-17 (listed, same changelog, 1.21.10 featured); the project is still in moderation ("processing").
+
+## 2026-10-20 — release 1.0.2 (NeoForge and Fabric, Minecraft 1.21.1 – 26.3)
+- GitHub release v1.0.2 (Latest, tag on `mc/26.3`) with 18 jars: `matteroverdrive-neoforge-1.0.2+<mc>.jar` and
+  `matteroverdrive-fabric-1.0.2+<mc>.jar` for 1.21.1, 1.21.3, 1.21.4, 1.21.5, 1.21.8, 1.21.10, 26.1.2, 26.2, 26.3.
+  The Fabric 1.21.x jars and NeoForge 1.21.1 / 1.21.3 are the same files as on Modrinth (NeoForge ones renamed with the
+  loader); NeoForge 1.21.4 – 1.21.10 are built from the `fabric-1.21.x` branches, 26.x from `mc/26.x`.
+- CurseForge (project 1750996): the same 18 files, 9269899 – 9269930 (`~/Desktop/modrinth-publish/cf_mo_102.py`),
+  description rewritten for 1.21.1 – 26.3 and both loaders (local copy `docs/curseforge/cf-description.html`, git-excluded),
+  summary updated, banner `docs/modrinth/banner.png` regenerated with the new subtitle.
+- Modrinth not touched in this release step (it already has 1.0.2 for Fabric 1.21.x and NeoForge 1.21.1 / 1.21.3).
