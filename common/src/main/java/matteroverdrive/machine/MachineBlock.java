@@ -1,0 +1,132 @@
+package matteroverdrive.machine;
+
+import java.util.function.Supplier;
+
+import org.jetbrains.annotations.Nullable;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.phys.BlockHitResult;
+
+/** Base block for machines: horizontal facing, opens the machine GUI, server ticker, wrench dismantling. */
+public abstract class MachineBlock extends BaseEntityBlock {
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
+    /** Whether the machine is working; models may show it (1.7.10 swapped icons, e.g. the recycler animation). */
+    public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
+
+    private final Supplier<? extends BlockEntityType<? extends MachineBlockEntity>> type;
+
+    protected MachineBlock(Supplier<? extends BlockEntityType<? extends MachineBlockEntity>> type, Properties properties) {
+        super(properties);
+        this.type = type;
+        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(ACTIVE, false));
+    }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(FACING, ACTIVE);
+    }
+
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        return defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
+    }
+
+    @Override
+    protected BlockState rotate(BlockState state, Rotation rotation) {
+        return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
+    }
+
+    @Override
+    protected BlockState mirror(BlockState state, Mirror mirror) {
+        return state.rotate(mirror.getRotation(state.getValue(FACING)));
+    }
+
+    @Override
+    protected RenderShape getRenderShape(BlockState state) {
+        return RenderShape.MODEL;
+    }
+
+    @Override
+    public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return type.get().create(pos, state);
+    }
+
+    @Override
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock,
+            net.minecraft.world.level.redstone.@Nullable Orientation orientation, boolean movedByPiston) {
+        super.neighborChanged(state, level, pos, neighborBlock, orientation, movedByPiston);
+        if (level.getBlockEntity(pos) instanceof MachineBlockEntity machine) machine.neighbourChanged();
+    }
+
+    @Override
+    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
+        return createTickerHelper(blockEntityType, type.get(), level.isClientSide() ? MachineBlockEntity::clientTick : MachineBlockEntity::serverTick);
+    }
+
+    @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+        if (!level.isClientSide() && level.getBlockEntity(pos) instanceof MachineBlockEntity machine) {
+            // 1.7.10 MachineHelper.canOpenMachine
+            if (machine.isUseableByPlayer(player)) {
+                matteroverdrive.platform.Platform.INSTANCE.openMenu((net.minecraft.server.level.ServerPlayer) player, machine, buf -> buf.writeBlockPos(pos));
+            } else {
+                alert(player, "alert.matteroverdrive.no_rights", state);
+            }
+        }
+        return InteractionResult.SUCCESS;
+    }
+
+    /** 1.7.10 "[Matter Overdrive] ..." chat alert naming the machine. */
+    public static void alert(Player player, String key, BlockState state) {
+        player.displayClientMessage(net.minecraft.network.chat.Component.literal("[Matter Overdrive] ").withStyle(net.minecraft.ChatFormatting.GOLD)
+                .append(net.minecraft.network.chat.Component.translatable(key, state.getBlock().getName()).withStyle(net.minecraft.ChatFormatting.RED)), false);
+    }
+
+    /** 1.7.10 MachineHelper.canRemoveMachine: only the owner breaks a claimed machine (Fabric asks this before breaking). */
+    public static boolean canBreak(BlockState state, Level level, BlockPos pos, Player player) {
+        if (level.getBlockEntity(pos) instanceof MachineBlockEntity machine && !machine.canRemove(player)) {
+            if (!level.isClientSide()) alert(player, "alert.matteroverdrive.no_rights.break", state);
+            return false;
+        }
+        return true;
+    }
+
+    /** NeoForge IBlockExtension.onDestroyedByPlayer (its default body, after the owner check) */
+    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest,
+                                       net.minecraft.world.level.material.FluidState fluid) {
+        if (!canBreak(state, level, pos, player)) return false;
+        this.playerWillDestroy(level, pos, state, player);
+        return level.setBlock(pos, fluid.createLegacyBlock(), level.isClientSide() ? 11 : 3);
+    }
+
+    /** Wrench sneak-use: break the machine as if mined, so it drops itself with its stored energy, plus its contents. */
+    public static void dismantle(ServerLevel level, BlockPos pos, BlockState state, Player player) {
+        BlockEntity be = level.getBlockEntity(pos);
+        for (ItemStack drop : Block.getDrops(state, level, pos, be, player, ItemStack.EMPTY)) {
+            if (!player.addItem(drop)) {
+                Block.popResource(level, pos, drop);
+            }
+        }
+        level.destroyBlock(pos, false, player);
+    }
+}
