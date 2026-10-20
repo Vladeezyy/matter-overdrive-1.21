@@ -28,14 +28,14 @@ public abstract class LivingEntityMixin {
         return Android.onFall((LivingEntity) (Object) this, distance);
     }
 
-    /** NeoForge's LivingIncomingDamageEvent: on the server, for damage the entity is not immune to (below 0 cancels) */
-    @WrapMethod(method = "hurt")
-    private boolean matteroverdrive$onIncomingDamage(DamageSource source, float amount, Operation<Boolean> original) {
+    /** NeoForge's LivingIncomingDamageEvent: for damage the entity is not immune to (below 0 cancels) */
+    @WrapMethod(method = "hurtServer")
+    private boolean matteroverdrive$onIncomingDamage(net.minecraft.server.level.ServerLevel level, DamageSource source, float amount, Operation<Boolean> original) {
         LivingEntity self = (LivingEntity) (Object) this;
-        if (!self.level().isClientSide && !self.isInvulnerableTo(source)) {
+        if (!self.isInvulnerableTo(level, source)) {
             amount = Android.onIncomingDamage(self, source, amount);
             if (amount < 0) return false;
         }
-        return original.call(source, amount);
+        return original.call(level, source, amount);
     }
 }

@@ -25,8 +25,8 @@ public abstract class AnvilMenuMixin extends ItemCombinerMenu {
     @Final
     private DataSlot cost;
 
-    private AnvilMenuMixin(MenuType<?> type, int containerId, Inventory inventory, ContainerLevelAccess access) {
-        super(type, containerId, inventory, access);
+    private AnvilMenuMixin(MenuType<?> type, int containerId, Inventory inventory, ContainerLevelAccess access, net.minecraft.world.inventory.ItemCombinerMenuSlotDefinition slots) {
+        super(type, containerId, inventory, access, slots);
     }
 
     @Inject(method = "createResult", at = @At("HEAD"), cancellable = true)

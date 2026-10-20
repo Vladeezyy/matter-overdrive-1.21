@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -25,7 +24,6 @@ import matteroverdrive.MatterOverdrive;
 import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModel;
-import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
@@ -170,13 +168,8 @@ public final class FabricObjModels {
     /** The JSON model (textures, display, overrides) with the OBJ geometry */
     private record Unbaked(BlockModel json, ObjModel obj) implements UnbakedModel {
         @Override
-        public Collection<ResourceLocation> getDependencies() {
-            return this.json.getDependencies();
-        }
-
-        @Override
-        public void resolveParents(Function<ResourceLocation, UnbakedModel> models) {
-            this.json.resolveParents(models);
+        public void resolveDependencies(UnbakedModel.Resolver resolver) {
+            this.json.resolveDependencies(resolver);
         }
 
         @Override
@@ -203,9 +196,9 @@ public final class FabricObjModels {
                     this.quad(file, face, corners, sprite, tint, transform, unculled, culled);
                 }
             }
-            ItemOverrides overrides = this.json.getOverrides().isEmpty() ? ItemOverrides.EMPTY : new ItemOverrides(baker, this.json, this.json.getOverrides());
+            // 1.21.2+: item overrides are the item model's (ItemModel), not the baked block model's
             return new SimpleBakedModel(unculled, culled, this.json.hasAmbientOcclusion(), this.json.getGuiLight().lightLikeBlock(), true,
-                    sprites.apply(this.json.getMaterial("particle")), this.json.getTransforms(), overrides);
+                    sprites.apply(this.json.getMaterial("particle")), this.json.getTransforms());
         }
 
         private void quad(ObjFile file, Face face, int[] corners, TextureAtlasSprite sprite, int tint, Matrix4f transform,
@@ -242,8 +235,8 @@ public final class FabricObjModels {
                 data[offset + 6] = 0;
                 data[offset + 7] = ((int) (normal.x * 127) & 0xFF) | ((int) (normal.y * 127) & 0xFF) << 8 | ((int) (normal.z * 127) & 0xFF) << 16;
             }
-            Direction direction = Direction.getNearest(faceNormal.x, faceNormal.y, faceNormal.z);
-            BakedQuad quad = new BakedQuad(data, tint, direction, sprite, true);
+            Direction direction = Direction.getApproximateNearest(faceNormal.x, faceNormal.y, faceNormal.z);
+            BakedQuad quad = new BakedQuad(data, tint, direction, sprite, true, 0);
             Direction cull = cullFace(points, direction);
             if (cull != null) culled.get(cull).add(quad);
             else unculled.add(quad);
