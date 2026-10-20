@@ -47,10 +47,6 @@ final class FabricMatterValues {
                 return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "matter_values");
             }
 
-            @Override
-            public java.util.Collection<ResourceLocation> getFabricDependencies() {
-                return List.of(net.fabricmc.fabric.api.resource.ResourceReloadListenerKeys.TAGS);
-            }
 
             @Override
             public void onResourceManagerReload(ResourceManager manager) {
@@ -121,3 +117,4 @@ final class FabricMatterValues {
         return map;
     }
 }
+
