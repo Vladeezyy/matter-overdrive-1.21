@@ -13,7 +13,6 @@ import matteroverdrive.init.MOItems;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -50,7 +49,10 @@ import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 public final class MatterOverdriveNeoForgeClient {
     public MatterOverdriveNeoForgeClient(IEventBus modBus) {
         modBus.addListener((FMLClientSetupEvent event) -> event.enqueueWork(MOClient::init));
-        modBus.addListener((ModelEvent.RegisterAdditional event) -> MOClient.extraModels().forEach(id -> event.register(id)));
+        modBus.addListener((ModelEvent.RegisterStandalone event) -> MOClient.extraModels().forEach(id ->
+                event.register(NeoForgeClientPlatform.key(id), net.neoforged.neoforge.client.model.standalone.StandaloneModelBaker.blockStateModel())));
+        modBus.addListener((net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent event) ->
+                matteroverdrive.client.starmap.HoloRenderTypes.registerPipelines(event::registerPipeline));
         modBus.addListener((RegisterColorHandlersEvent.Block event) -> MOClient.blockColors((color, block) -> event.register(color, block)));
         modBus.addListener((net.neoforged.neoforge.client.event.RegisterSelectItemModelPropertyEvent event) -> MOClient.registerSelectProperties(event::register));
         modBus.addListener((RegisterMenuScreensEvent event) -> MOClient.registerScreens(new MOClient.Screens() {

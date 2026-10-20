@@ -68,10 +68,5 @@ var generateModMetadata = tasks.register('generateModMetadata', ProcessResources
 sourceSets.main.resources.srcDir generateModMetadata
 neoForge.ideSyncTask generateModMetadata
 
-// Before 1.21.5 the game test server reuses run/world: each run starts from a fresh world
-def gameTestWorld = file('run/world')
-tasks.matching { it.name == 'runGameTestServer' }.configureEach {
-    doFirst { gameTestWorld.deleteDir() }
-}
 
 tasks.withType(JavaCompile).configureEach { options.compilerArgs += ['-Xmaxerrs', '10000'] }
