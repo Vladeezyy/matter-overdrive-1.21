@@ -131,7 +131,7 @@ public final class NeoForgePlatform implements Platform {
     @Override
     public SpawnEggItem spawnEgg(Supplier<? extends EntityType<? extends Mob>> type, int background, int highlight, Item.Properties properties) {
         // 1.21.2+: entity types are registered before items
-        return new SpawnEggItem(type.get(), background, highlight, properties);
+        return new SpawnEggItem(type.get(), properties);
     }
 
     @Override
