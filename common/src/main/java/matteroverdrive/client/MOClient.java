@@ -106,7 +106,7 @@ public final class MOClient {
     public interface Renderers {
         <E extends Entity> void entity(EntityType<? extends E> type, EntityRendererProvider<E> provider);
 
-        <T extends BlockEntity> void blockEntity(BlockEntityType<? extends T> type, BlockEntityRendererProvider<T> provider);
+        <T extends BlockEntity, S extends net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState> void blockEntity(BlockEntityType<? extends T> type, BlockEntityRendererProvider<T, S> provider);
     }
 
     public static void registerRenderers(Renderers renderers) {

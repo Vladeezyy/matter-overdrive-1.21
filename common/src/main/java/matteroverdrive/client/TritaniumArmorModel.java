@@ -92,7 +92,7 @@ public final class TritaniumArmorModel {
     }
 
     /** Before the player is drawn (NeoForge RenderPlayerEvent.Pre): hide the skin overlay under the worn pieces */
-    public static void hideSkinOverlay(net.minecraft.client.renderer.entity.state.PlayerRenderState state) {
+    public static void hideSkinOverlay(net.minecraft.client.renderer.entity.state.AvatarRenderState state) {
         if (isTritanium(state.headEquipment)) state.showHat = false;
         if (isTritanium(state.chestEquipment)) {
             state.showJacket = false;

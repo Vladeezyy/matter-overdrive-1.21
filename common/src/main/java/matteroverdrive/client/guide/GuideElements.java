@@ -200,7 +200,7 @@ public final class GuideElements {
             if (stack == null) return null;
             var handler = matteroverdrive.platform.Platform.INSTANCE.energyHandler(stack).orElse(null);
             if (handler == null) return null;
-            String text = handler.getCapacityAsInt() + " FE";
+            String text = handler.getMaxEnergyStored() + " FE";
             return new Chunk(text, uniWidth(text), null, 0);
         }
         if (type.equalsIgnoreCase("guide")) {

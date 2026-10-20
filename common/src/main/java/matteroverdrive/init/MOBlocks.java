@@ -109,8 +109,8 @@ public final class MOBlocks {
     /** 1.7.10 tritanium_crate.<dye>: hardness 20, resistance 9, iron pickaxe; one block per dye colour. */
     public static final java.util.List<BlockEntry<matteroverdrive.block.TritaniumCrateBlock>> TRITANIUM_CRATES =
             java.util.Arrays.stream(net.minecraft.world.item.DyeColor.values()).map(color -> BLOCKS.registerBlock("tritanium_crate_" + color.getName(),
-                    matteroverdrive.block.TritaniumCrateBlock::new, p -> p.mapColor(color.getMapColor()).strength(20f, 9f).sound(SoundType.METAL)
-                            .requiresCorrectToolForDrops().noOcclusion())).toList();
+                    matteroverdrive.block.TritaniumCrateBlock::new, MOBlocks.props(p -> p.mapColor(color.getMapColor()).strength(20f, 9f).sound(SoundType.METAL)
+                            .requiresCorrectToolForDrops().noOcclusion()))).toList();
 
     public static BlockEntry<matteroverdrive.block.TritaniumCrateBlock> crate(net.minecraft.world.item.DyeColor color) {
         return TRITANIUM_CRATES.get(color.getId());
@@ -141,7 +141,7 @@ public final class MOBlocks {
     /** 1.7.10 blockMatterPlasma: the placed fluid. */
     public static final BlockEntry<net.minecraft.world.level.block.LiquidBlock> MATTER_PLASMA = BLOCKS.registerBlock("matter_plasma",
             p -> new net.minecraft.world.level.block.LiquidBlock(MOFluids.MATTER_PLASMA.get(), p) {},
-            MOBlocks.props(p -> p.mapColor(MapColor.COLOR_LIGHT_BLUE).replaceable().noCollission().strength(100f).pushReaction(
+            MOBlocks.props(p -> p.mapColor(MapColor.COLOR_LIGHT_BLUE).replaceable().noCollision().strength(100f).pushReaction(
                     net.minecraft.world.level.material.PushReaction.DESTROY).noLootTable().liquid().lightLevel(s -> 15)
                     .sound(SoundType.EMPTY)));
 

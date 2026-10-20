@@ -32,11 +32,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.RenderFrameEvent;
 
 /**
  * Performance and look checks for development, inert unless {@code matteroverdrive.perf} is set
@@ -49,7 +44,6 @@ import net.neoforged.neoforge.client.event.RenderFrameEvent;
  * person screenshots {@code run/screenshots/hand_*.png}, then quits.</li>
  * </ul>
  */
-@EventBusSubscriber(modid = MatterOverdrive.MODID, value = Dist.CLIENT)
 public final class PerfScene {
     private static final String MODE = System.getProperty("matteroverdrive.perf", "");
     private static final int MODULES_X = 6, MODULES_Z = 8;
@@ -145,8 +139,8 @@ public final class PerfScene {
                 name, frames / seconds, mspt, tickMax / 1e6));
     }
 
-    @SubscribeEvent
-    static void onFrame(RenderFrameEvent.Post event) {
+    /** After each rendered frame (both loaders call this) */
+    public static void onFrame() {
         if (measuring) frames++;
     }
 
@@ -436,8 +430,8 @@ public final class PerfScene {
 
     // --- plumbing --------------------------------------------------------------------------------
 
-    @SubscribeEvent
-    static void onTick(ClientTickEvent.Post event) {
+    /** After each client tick (both loaders call this) */
+    public static void onTick() {
         if (MODE.isEmpty()) return;
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.getSingleplayerServer() == null) return;
