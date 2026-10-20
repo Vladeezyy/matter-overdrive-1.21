@@ -5,9 +5,7 @@
   "palette": [
     {
       "states": [
-        {
-          "Name": "matteroverdrive:decorative_tritanium_plate_stripe"
-        }
+        "matteroverdrive:decorative_tritanium_plate_stripe"
       ],
       "noise": false,
       "group": 5727336,
@@ -16,8 +14,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:decorative_separator",
-          "Properties": {
+          "id": "matteroverdrive:decorative_separator",
+          "properties": {
             "axis": "x"
           }
         }
@@ -28,9 +26,7 @@
     },
     {
       "states": [
-        {
-          "Name": "matteroverdrive:decorative_tritanium_plate"
-        }
+        "matteroverdrive:decorative_tritanium_plate"
       ],
       "noise": false,
       "group": 4674649,
@@ -38,9 +34,7 @@
     },
     {
       "states": [
-        {
-          "Name": "matteroverdrive:machine_hull"
-        }
+        "matteroverdrive:machine_hull"
       ],
       "noise": false,
       "group": 13842205,
@@ -48,9 +42,7 @@
     },
     {
       "states": [
-        {
-          "Name": "matteroverdrive:decorative_tritanium_lamp"
-        }
+        "matteroverdrive:decorative_tritanium_lamp"
       ],
       "noise": false,
       "group": 13957365,
@@ -58,9 +50,7 @@
     },
     {
       "states": [
-        {
-          "Name": "minecraft:air"
-        }
+        "minecraft:air"
       ],
       "noise": false,
       "group": 16711935,
@@ -68,9 +58,7 @@
     },
     {
       "states": [
-        {
-          "Name": "matteroverdrive:force_glass"
-        }
+        "matteroverdrive:force_glass"
       ],
       "noise": false,
       "group": 13826896,
@@ -78,9 +66,7 @@
     },
     {
       "states": [
-        {
-          "Name": "matteroverdrive:decorative_white_plate"
-        }
+        "matteroverdrive:decorative_white_plate"
       ],
       "noise": false,
       "group": 14935011,
@@ -88,9 +74,7 @@
     },
     {
       "states": [
-        {
-          "Name": "matteroverdrive:decorative_floor_tile_white"
-        }
+        "matteroverdrive:decorative_floor_tile_white"
       ],
       "noise": false,
       "group": 10724508,
@@ -98,9 +82,7 @@
     },
     {
       "states": [
-        {
-          "Name": "matteroverdrive:decorative_floor_tiles_green"
-        }
+        "matteroverdrive:decorative_floor_tiles_green"
       ],
       "noise": false,
       "group": 5462335,
@@ -108,9 +90,7 @@
     },
     {
       "states": [
-        {
-          "Name": "minecraft:grass_block"
-        }
+        "minecraft:grass_block"
       ],
       "noise": false,
       "group": 12523945,
@@ -119,8 +99,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:decorative_beams",
-          "Properties": {
+          "id": "matteroverdrive:decorative_beams",
+          "properties": {
             "axis": "y"
           }
         }
@@ -131,9 +111,7 @@
     },
     {
       "states": [
-        {
-          "Name": "minecraft:farmland"
-        }
+        "minecraft:farmland"
       ],
       "noise": false,
       "group": 794190,
@@ -141,9 +119,7 @@
     },
     {
       "states": [
-        {
-          "Name": "matteroverdrive:decorative_carbon_fiber_plate"
-        }
+        "matteroverdrive:decorative_carbon_fiber_plate"
       ],
       "noise": false,
       "group": 1842976,
@@ -152,8 +128,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:decorative_separator",
-          "Properties": {
+          "id": "matteroverdrive:decorative_separator",
+          "properties": {
             "axis": "y"
           }
         }
@@ -164,9 +140,7 @@
     },
     {
       "states": [
-        {
-          "Name": "matteroverdrive:decorative_floor_tiles"
-        }
+        "matteroverdrive:decorative_floor_tiles"
       ],
       "noise": false,
       "group": 9801084,
@@ -174,9 +148,7 @@
     },
     {
       "states": [
-        {
-          "Name": "matteroverdrive:decorative_floor_noise"
-        }
+        "matteroverdrive:decorative_floor_noise"
       ],
       "noise": false,
       "group": 8355451,
@@ -185,8 +157,8 @@
     {
       "states": [
         {
-          "Name": "minecraft:iron_door",
-          "Properties": {
+          "id": "minecraft:iron_door",
+          "properties": {
             "facing": "north",
             "open": "false",
             "half": "lower",
@@ -200,9 +172,7 @@
     },
     {
       "states": [
-        {
-          "Name": "minecraft:potted_dandelion"
-        }
+        "minecraft:potted_dandelion"
       ],
       "noise": false,
       "group": 12607070,
@@ -211,8 +181,8 @@
     {
       "states": [
         {
-          "Name": "minecraft:potatoes",
-          "Properties": {
+          "id": "minecraft:potatoes",
+          "properties": {
             "age": "7"
           }
         }
@@ -224,8 +194,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:tritanium_crate_yellow",
-          "Properties": {
+          "id": "matteroverdrive:tritanium_crate_yellow",
+          "properties": {
             "facing": "east"
           }
         }
@@ -237,8 +207,8 @@
     {
       "states": [
         {
-          "Name": "minecraft:carrots",
-          "Properties": {
+          "id": "minecraft:carrots",
+          "properties": {
             "age": "7"
           }
         }
@@ -249,9 +219,7 @@
     },
     {
       "states": [
-        {
-          "Name": "minecraft:birch_sapling"
-        }
+        "minecraft:birch_sapling"
       ],
       "noise": false,
       "group": 16241163,
@@ -260,8 +228,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:charging_station",
-          "Properties": {
+          "id": "matteroverdrive:charging_station",
+          "properties": {
             "facing": "east"
           }
         }
@@ -273,8 +241,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:android_station",
-          "Properties": {
+          "id": "matteroverdrive:android_station",
+          "properties": {
             "facing": "north"
           }
         }
@@ -285,9 +253,7 @@
     },
     {
       "states": [
-        {
-          "Name": "minecraft:short_grass"
-        }
+        "minecraft:short_grass"
       ],
       "noise": false,
       "group": 14456732,
@@ -296,8 +262,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:tritanium_crate_lime",
-          "Properties": {
+          "id": "matteroverdrive:tritanium_crate_lime",
+          "properties": {
             "facing": "west"
           }
         }
@@ -309,8 +275,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:network_switch",
-          "Properties": {
+          "id": "matteroverdrive:network_switch",
+          "properties": {
             "facing": "north"
           }
         }
@@ -322,8 +288,8 @@
     {
       "states": [
         {
-          "Name": "minecraft:ladder",
-          "Properties": {
+          "id": "minecraft:ladder",
+          "properties": {
             "facing": "west"
           }
         }
@@ -334,9 +300,7 @@
     },
     {
       "states": [
-        {
-          "Name": "minecraft:fern"
-        }
+        "minecraft:fern"
       ],
       "noise": false,
       "group": 14456732,
@@ -344,9 +308,7 @@
     },
     {
       "states": [
-        {
-          "Name": "minecraft:oxeye_daisy"
-        }
+        "minecraft:oxeye_daisy"
       ],
       "noise": false,
       "group": 7852470,
@@ -355,8 +317,8 @@
     {
       "states": [
         {
-          "Name": "minecraft:ladder",
-          "Properties": {
+          "id": "minecraft:ladder",
+          "properties": {
             "facing": "north"
           }
         }
@@ -368,8 +330,8 @@
     {
       "states": [
         {
-          "Name": "minecraft:iron_door",
-          "Properties": {
+          "id": "minecraft:iron_door",
+          "properties": {
             "facing": "west",
             "open": "false",
             "half": "lower",
@@ -384,8 +346,8 @@
     {
       "states": [
         {
-          "Name": "minecraft:iron_door",
-          "Properties": {
+          "id": "minecraft:iron_door",
+          "properties": {
             "facing": "east",
             "open": "false",
             "half": "lower",
@@ -400,8 +362,8 @@
     {
       "states": [
         {
-          "Name": "minecraft:ladder",
-          "Properties": {
+          "id": "minecraft:ladder",
+          "properties": {
             "facing": "south"
           }
         }
@@ -413,8 +375,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:tritanium_crate_orange",
-          "Properties": {
+          "id": "matteroverdrive:tritanium_crate_orange",
+          "properties": {
             "facing": "east"
           }
         }
@@ -426,8 +388,8 @@
     {
       "states": [
         {
-          "Name": "minecraft:ladder",
-          "Properties": {
+          "id": "minecraft:ladder",
+          "properties": {
             "facing": "east"
           }
         }
@@ -438,9 +400,7 @@
     },
     {
       "states": [
-        {
-          "Name": "matteroverdrive:network_pipe"
-        }
+        "matteroverdrive:network_pipe"
       ],
       "noise": false,
       "group": 1781751,
@@ -451,8 +411,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:network_switch",
-          "Properties": {
+          "id": "matteroverdrive:network_switch",
+          "properties": {
             "facing": "south"
           }
         }
@@ -464,8 +424,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:weapon_station",
-          "Properties": {
+          "id": "matteroverdrive:weapon_station",
+          "properties": {
             "facing": "south"
           }
         }
@@ -477,8 +437,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:replicator",
-          "Properties": {
+          "id": "matteroverdrive:replicator",
+          "properties": {
             "facing": "south"
           }
         }
@@ -490,8 +450,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:pattern_storage",
-          "Properties": {
+          "id": "matteroverdrive:pattern_storage",
+          "properties": {
             "facing": "east"
           }
         }
@@ -503,8 +463,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:network_switch",
-          "Properties": {
+          "id": "matteroverdrive:network_switch",
+          "properties": {
             "facing": "west"
           }
         }
@@ -516,8 +476,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:tritanium_crate_light_blue",
-          "Properties": {
+          "id": "matteroverdrive:tritanium_crate_light_blue",
+          "properties": {
             "facing": "north"
           }
         }
@@ -529,8 +489,8 @@
     {
       "states": [
         {
-          "Name": "minecraft:iron_door",
-          "Properties": {
+          "id": "minecraft:iron_door",
+          "properties": {
             "facing": "south",
             "open": "false",
             "half": "lower",
@@ -544,9 +504,7 @@
     },
     {
       "states": [
-        {
-          "Name": "matteroverdrive:decorative_coils"
-        }
+        "matteroverdrive:decorative_coils"
       ],
       "noise": false,
       "group": 11952670,
@@ -555,8 +513,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:holo_sign",
-          "Properties": {
+          "id": "matteroverdrive:holo_sign",
+          "properties": {
             "facing": "east"
           }
         }
@@ -568,8 +526,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:holo_sign",
-          "Properties": {
+          "id": "matteroverdrive:holo_sign",
+          "properties": {
             "facing": "west"
           }
         }
@@ -581,8 +539,8 @@
     {
       "states": [
         {
-          "Name": "minecraft:stone_button",
-          "Properties": {
+          "id": "minecraft:stone_button",
+          "properties": {
             "face": "wall",
             "facing": "north"
           }
@@ -595,8 +553,8 @@
     {
       "states": [
         {
-          "Name": "minecraft:iron_door",
-          "Properties": {
+          "id": "minecraft:iron_door",
+          "properties": {
             "facing": "north",
             "open": "false",
             "half": "upper",
@@ -611,8 +569,8 @@
     {
       "states": [
         {
-          "Name": "minecraft:stone_button",
-          "Properties": {
+          "id": "minecraft:stone_button",
+          "properties": {
             "face": "wall",
             "facing": "south"
           }
@@ -624,9 +582,15 @@
     },
     {
       "states": [
-        {
-          "Name": "minecraft:yellow_stained_glass"
-        }
+        "minecraft:yellow_stained_glass"
+      ],
+      "noise": false,
+      "group": 14067476,
+      "specials": []
+    },
+    {
+      "states": [
+        "minecraft:lime_stained_glass"
       ],
       "noise": false,
       "group": 14067476,
@@ -635,18 +599,8 @@
     {
       "states": [
         {
-          "Name": "minecraft:lime_stained_glass"
-        }
-      ],
-      "noise": false,
-      "group": 14067476,
-      "specials": []
-    },
-    {
-      "states": [
-        {
-          "Name": "matteroverdrive:charging_station",
-          "Properties": {
+          "id": "matteroverdrive:charging_station",
+          "properties": {
             "part": "1"
           }
         }
@@ -658,8 +612,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:holo_sign",
-          "Properties": {
+          "id": "matteroverdrive:holo_sign",
+          "properties": {
             "facing": "south"
           }
         }
@@ -671,8 +625,8 @@
     {
       "states": [
         {
-          "Name": "minecraft:stone_button",
-          "Properties": {
+          "id": "minecraft:stone_button",
+          "properties": {
             "face": "wall",
             "facing": "west"
           }
@@ -685,8 +639,8 @@
     {
       "states": [
         {
-          "Name": "minecraft:iron_door",
-          "Properties": {
+          "id": "minecraft:iron_door",
+          "properties": {
             "facing": "west",
             "open": "false",
             "half": "upper",
@@ -701,8 +655,8 @@
     {
       "states": [
         {
-          "Name": "minecraft:iron_door",
-          "Properties": {
+          "id": "minecraft:iron_door",
+          "properties": {
             "facing": "east",
             "open": "false",
             "half": "upper",
@@ -717,8 +671,8 @@
     {
       "states": [
         {
-          "Name": "minecraft:stone_button",
-          "Properties": {
+          "id": "minecraft:stone_button",
+          "properties": {
             "face": "wall",
             "facing": "east"
           }
@@ -731,8 +685,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:holo_sign",
-          "Properties": {
+          "id": "matteroverdrive:holo_sign",
+          "properties": {
             "facing": "north"
           }
         }
@@ -743,9 +697,15 @@
     },
     {
       "states": [
-        {
-          "Name": "minecraft:orange_stained_glass"
-        }
+        "minecraft:orange_stained_glass"
+      ],
+      "noise": false,
+      "group": 14067476,
+      "specials": []
+    },
+    {
+      "states": [
+        "minecraft:light_blue_stained_glass"
       ],
       "noise": false,
       "group": 14067476,
@@ -754,18 +714,8 @@
     {
       "states": [
         {
-          "Name": "minecraft:light_blue_stained_glass"
-        }
-      ],
-      "noise": false,
-      "group": 14067476,
-      "specials": []
-    },
-    {
-      "states": [
-        {
-          "Name": "matteroverdrive:matter_analyzer",
-          "Properties": {
+          "id": "matteroverdrive:matter_analyzer",
+          "properties": {
             "facing": "west"
           }
         }
@@ -777,8 +727,8 @@
     {
       "states": [
         {
-          "Name": "minecraft:iron_door",
-          "Properties": {
+          "id": "minecraft:iron_door",
+          "properties": {
             "facing": "south",
             "open": "false",
             "half": "upper",
@@ -793,8 +743,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:charging_station",
-          "Properties": {
+          "id": "matteroverdrive:charging_station",
+          "properties": {
             "part": "2"
           }
         }
@@ -806,8 +756,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:pattern_monitor",
-          "Properties": {
+          "id": "matteroverdrive:pattern_monitor",
+          "properties": {
             "facing": "south"
           }
         }
@@ -818,9 +768,7 @@
     },
     {
       "states": [
-        {
-          "Name": "matteroverdrive:decorative_vent_bright"
-        }
+        "matteroverdrive:decorative_vent_bright"
       ],
       "noise": false,
       "group": 4148046,
@@ -829,8 +777,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:decorative_beams",
-          "Properties": {
+          "id": "matteroverdrive:decorative_beams",
+          "properties": {
             "axis": "x"
           }
         }
@@ -842,8 +790,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:tritanium_crate_white",
-          "Properties": {
+          "id": "matteroverdrive:tritanium_crate_white",
+          "properties": {
             "facing": "south"
           }
         }
@@ -855,8 +803,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:tritanium_crate_white",
-          "Properties": {
+          "id": "matteroverdrive:tritanium_crate_white",
+          "properties": {
             "facing": "east"
           }
         }
@@ -868,8 +816,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:star_map",
-          "Properties": {
+          "id": "matteroverdrive:star_map",
+          "properties": {
             "facing": "west"
           }
         }
@@ -883,8 +831,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:tritanium_crate_white",
-          "Properties": {
+          "id": "matteroverdrive:tritanium_crate_white",
+          "properties": {
             "facing": "west"
           }
         }
@@ -896,8 +844,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:tritanium_crate_white",
-          "Properties": {
+          "id": "matteroverdrive:tritanium_crate_white",
+          "properties": {
             "facing": "north"
           }
         }
@@ -909,8 +857,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:decorative_matter_tube",
-          "Properties": {
+          "id": "matteroverdrive:decorative_matter_tube",
+          "properties": {
             "axis": "x"
           }
         }
@@ -922,8 +870,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:decorative_matter_tube",
-          "Properties": {
+          "id": "matteroverdrive:decorative_matter_tube",
+          "properties": {
             "axis": "y"
           }
         }

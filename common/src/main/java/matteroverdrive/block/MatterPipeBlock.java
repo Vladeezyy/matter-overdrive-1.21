@@ -4,7 +4,6 @@ import java.util.Map;
 
 import org.jetbrains.annotations.Nullable;
 
-import com.mojang.serialization.MapCodec;
 
 import matteroverdrive.block.entity.MatterPipeBlockEntity;
 import matteroverdrive.init.MOBlockEntities;
@@ -35,7 +34,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  * pipes and to anything that exposes a fluid handler on that side.
  */
 public class MatterPipeBlock extends BaseEntityBlock {
-    public static final MapCodec<MatterPipeBlock> CODEC = simpleCodec(p -> new MatterPipeBlock(false, p));
     private static final Map<Direction, BooleanProperty> SIDES = PipeBlock.PROPERTY_BY_DIRECTION;
     // 1.7.10 RendererBlockPipe: a core and arms, each a cube of 1/3 block.
     private static final double A = 16 / 3.0, B = 32 / 3.0;
@@ -60,10 +58,6 @@ public class MatterPipeBlock extends BaseEntityBlock {
         return heavy;
     }
 
-    @Override
-    protected MapCodec<MatterPipeBlock> codec() {
-        return CODEC;
-    }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {

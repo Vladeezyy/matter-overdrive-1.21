@@ -21,7 +21,7 @@ public record TimeOfDayEnvironment(int time) implements TestEnvironmentDefinitio
     @Override
     public Long setup(ServerLevel level) {
         Holder<WorldClock> clock = level.dimensionType().defaultClock().orElseThrow();
-        long previous = level.getServer().clockManager().getTotalTicks(clock);
+        long previous = level.getServer().clockManager().getInstance(clock).totalTicks();
         level.getServer().clockManager().setTotalTicks(clock, time);
         return previous;
     }

@@ -65,7 +65,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.HoneycombItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -343,7 +342,11 @@ public final class FabricPlatform implements Platform {
 
     @Override
     public @Nullable Block stripped(Block block) {
-        return AxeItem.STRIPPABLES.get(block);
+        // 26.3: stripping is a data-driven block transformer of the axe (no block-to-block map any more); the vanilla
+        // and conventional pairs are named "stripped_<id>"
+        var id = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(block);
+        if (id.getPath().startsWith("stripped_")) return null;
+        return net.minecraft.core.registries.BuiltInRegistries.BLOCK.getOptional(id.withPrefix("stripped_")).orElse(null);
     }
 
     @Override

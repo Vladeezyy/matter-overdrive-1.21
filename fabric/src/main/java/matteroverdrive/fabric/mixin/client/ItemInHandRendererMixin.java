@@ -14,26 +14,27 @@ import matteroverdrive.item.weapon.EnergyWeaponItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.ItemInHandRenderer;
+import net.minecraft.client.renderer.FirstPersonHandsAndItemsRenderer;
+import net.minecraft.client.renderer.state.level.PlayerRenderState;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.item.ItemStack;
 
-@Mixin(ItemInHandRenderer.class)
+@Mixin(FirstPersonHandsAndItemsRenderer.class)
 public abstract class ItemInHandRendererMixin {
     /** The stack renderArmWithItem is drawing (first person, main thread only) */
     @Unique
     private static ItemStack matteroverdrive$stack = ItemStack.EMPTY;
 
     @Inject(method = "submitArmWithItem", at = @At("HEAD"))
-    private void matteroverdrive$beginArm(AbstractClientPlayer player, float partial, float pitch, InteractionHand hand, float swing, ItemStack stack,
-                                          float equip, PoseStack pose, net.minecraft.client.renderer.SubmitNodeCollector collector, int light, CallbackInfo ci) {
+    private void matteroverdrive$beginArm(PlayerRenderState player, net.minecraft.client.renderer.state.level.FirstPersonHandsAndItemsRenderState handsState, float partial, float pitch, InteractionHand hand, float swing,
+                                          ItemStack stack, float equip, PoseStack pose, net.minecraft.client.renderer.SubmitNodeCollector collector, int light, CallbackInfo ci) {
         matteroverdrive$stack = stack;
     }
 
     @Inject(method = "submitArmWithItem", at = @At("RETURN"))
-    private void matteroverdrive$endArm(AbstractClientPlayer player, float partial, float pitch, InteractionHand hand, float swing, ItemStack stack,
-                                        float equip, PoseStack pose, net.minecraft.client.renderer.SubmitNodeCollector collector, int light, CallbackInfo ci) {
+    private void matteroverdrive$endArm(PlayerRenderState player, net.minecraft.client.renderer.state.level.FirstPersonHandsAndItemsRenderState handsState, float partial, float pitch, InteractionHand hand, float swing,
+                                        ItemStack stack, float equip, PoseStack pose, net.minecraft.client.renderer.SubmitNodeCollector collector, int light, CallbackInfo ci) {
         matteroverdrive$stack = ItemStack.EMPTY;
     }
 
@@ -48,9 +49,10 @@ public abstract class ItemInHandRendererMixin {
 
     /** NeoForge's RenderHandEvent (main hand): the first person phaser beam */
     @Inject(method = "submitHandsWithItems", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/renderer/ItemInHandRenderer;submitArmWithItem(Lnet/minecraft/client/player/AbstractClientPlayer;FFLnet/minecraft/world/InteractionHand;FLnet/minecraft/world/item/ItemStack;FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;I)V",
+            target = "Lnet/minecraft/client/renderer/FirstPersonHandsAndItemsRenderer;submitArmWithItem(Lnet/minecraft/client/renderer/state/level/PlayerRenderState;Lnet/minecraft/client/renderer/state/level/FirstPersonHandsAndItemsRenderState;FFLnet/minecraft/world/InteractionHand;FLnet/minecraft/world/item/ItemStack;FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;I)V",
             ordinal = 0))
-    private void matteroverdrive$handBeam(float partial, PoseStack pose, net.minecraft.client.renderer.SubmitNodeCollector collector, LocalPlayer player, int light, CallbackInfo ci) {
+    private void matteroverdrive$handBeam(float partial, PoseStack pose, net.minecraft.client.renderer.SubmitNodeCollector collector, PlayerRenderState player,
+                                         net.minecraft.client.renderer.state.level.FirstPersonHandsAndItemsRenderState handsState, CallbackInfo ci) {
         PhaserBeamRenderer.renderHand(InteractionHand.MAIN_HAND, partial, pose, collector);
     }
 }

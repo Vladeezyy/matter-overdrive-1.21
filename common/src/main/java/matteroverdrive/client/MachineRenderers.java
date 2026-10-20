@@ -119,7 +119,7 @@ public final class MachineRenderers {
         /** Block centre at the floor, turned like the block model: the 1.7.10 renderers' frame (x / z centred). */
         protected void facingFrame(PoseStack pose, State state, double y) {
             pose.translate(0.5, y, 0.5);
-            pose.mulPose(Axis.YP.rotationDegrees(-modelYaw(state.facing)));
+            pose.rotate(Axis.YP.rotationDegrees(-modelYaw(state.facing)));
         }
 
         /** The blockstate's y rotation for this block's model. */
@@ -163,7 +163,7 @@ public final class MachineRenderers {
             pose.pushPose();
             pose.translate(0.5, 0.25, 0.5);
             // 1.7.10 turned the item 90 degrees in world space (edge-on through a south window): face the window instead
-            pose.mulPose(Axis.YP.rotationDegrees(-modelYaw(state.facing)));
+            pose.rotate(Axis.YP.rotationDegrees(-modelYaw(state.facing)));
             state.item.submit(pose, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
             pose.popPose();
         }
@@ -224,8 +224,8 @@ public final class MachineRenderers {
             if (!state.item.isEmpty()) {
                 pose.pushPose();
                 pose.translate(-0.23, 0.69, 0);
-                pose.mulPose(Axis.YP.rotationDegrees(90));
-                pose.mulPose(Axis.XP.rotationDegrees(90));
+                pose.rotate(Axis.YP.rotationDegrees(90));
+                pose.rotate(Axis.XP.rotationDegrees(90));
                 state.item.submit(pose, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
                 pose.popPose();
             }
@@ -277,7 +277,7 @@ public final class MachineRenderers {
             // the north-facing frame: screen 0.15 in front of the centre, x / y running right / down as seen from the front
             facingFrame(pose, state, 0.5);
             pose.translate(0, 0, 0.15);
-            pose.mulPose(Axis.ZP.rotationDegrees(180));
+            pose.rotate(Axis.ZP.rotationDegrees(180));
             pose.translate(-0.5, -0.5, 0);
             // 1.7.10 noise(x, worldTime * 0.01, z) * 0.5 + 0.5
             double noise = Mth.sin((float) (state.time * 0.01 + (state.seed & 0xFF))) * 0.5 * Mth.cos((float) (state.time * 0.023)) + 0.5;

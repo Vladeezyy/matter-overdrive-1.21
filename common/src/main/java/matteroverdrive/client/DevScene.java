@@ -395,7 +395,7 @@ public final class DevScene {
                         new BlockPos(found[0].getX(), p.level().getMinY() + 1, found[0].getZ()), holder);
                 BlockPos lookup = found[0];
                 if (!start.isValid()) {
-                    for (var s2 : p.level().structureManager().startsForStructure(net.minecraft.world.level.ChunkPos.containing(lookup), st -> st == holder)) {
+                    for (var s2 : p.level().structureManager().startsForStructure(net.minecraft.core.SectionPos.blockToSectionCoord(lookup.getX()), net.minecraft.core.SectionPos.blockToSectionCoord(lookup.getZ()), st -> st == holder)) {
                         start = s2;
                     }
                 }

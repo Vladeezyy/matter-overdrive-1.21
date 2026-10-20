@@ -3,36 +3,36 @@
   "pools": [
     {
       "rolls": 1,
-      "bonus_rolls": 0,
       "entries": [
         {
           "type": "minecraft:item",
           "name": "matteroverdrive:charging_station",
-          "functions": [
-            {
-              "function": "minecraft:copy_components",
-              "source": "block_entity",
-              "include": [
-                "matteroverdrive:energy",
-                "matteroverdrive:machine_storage",
-                "matteroverdrive:security_owner"
-              ]
-            }
-          ]
-        }
-      ],
-      "conditions": [
-        {
-          "condition": "minecraft:survives_explosion"
-        },
-        {
-          "condition": "minecraft:block_state_property",
-          "block": "matteroverdrive:charging_station",
-          "properties": {
-            "part": "0"
+          "modifier": {
+            "type": "minecraft:copy_components",
+            "source": "block_entity",
+            "include": [
+              "matteroverdrive:energy",
+              "matteroverdrive:machine_storage",
+              "matteroverdrive:security_owner"
+            ]
           }
         }
-      ]
+      ],
+      "condition": {
+        "type": "minecraft:all_of",
+        "terms": [
+          {
+            "type": "minecraft:survives_explosion"
+          },
+          {
+            "type": "minecraft:match_block",
+            "blocks": "matteroverdrive:charging_station",
+            "state": {
+              "part": "0"
+            }
+          }
+        ]
+      }
     }
   ]
 }

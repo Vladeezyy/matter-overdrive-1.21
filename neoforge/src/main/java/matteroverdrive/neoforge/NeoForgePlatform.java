@@ -243,25 +243,22 @@ public final class NeoForgePlatform implements Platform {
     @SuppressWarnings("unchecked")
     private static <T> @Nullable T common(StorageKind<T> kind, @Nullable Object neo) {
         if (neo == null) return null;
-        // NeoForge 21.9+'s handlers through its own adapters to the legacy interfaces the common adapters wrap
+        // NeoForge 26.3: other mods' transfer handlers through the mod's own adapters (the legacy interfaces are gone)
         if (kind == StorageKind.ENERGY) return (T) energy((net.neoforged.neoforge.transfer.energy.EnergyHandler) neo);
         if (kind == StorageKind.FLUID) return (T) fluids((net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.fluid.FluidResource>) neo);
         return (T) items((net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource>) neo);
     }
 
-    @SuppressWarnings("deprecation")
     private static @Nullable IEnergyStorage energy(@Nullable net.neoforged.neoforge.transfer.energy.EnergyHandler handler) {
-        return handler == null ? null : NeoForgeTransfer.fromNeo(net.neoforged.neoforge.energy.IEnergyStorage.of(handler));
+        return NeoForgeTransfer.energy(handler);
     }
 
-    @SuppressWarnings("deprecation")
     private static @Nullable IItemHandler items(@Nullable net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> handler) {
-        return handler == null ? null : NeoForgeTransfer.fromNeo(net.neoforged.neoforge.items.IItemHandler.of(handler));
+        return NeoForgeTransfer.items(handler);
     }
 
-    @SuppressWarnings("deprecation")
     private static @Nullable IFluidHandler fluids(@Nullable net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.fluid.FluidResource> handler) {
-        return handler == null ? null : NeoForgeTransfer.fromNeo(net.neoforged.neoforge.fluids.capability.IFluidHandler.of(handler));
+        return NeoForgeTransfer.fluids(handler);
     }
 
     @Override
@@ -314,7 +311,7 @@ public final class NeoForgePlatform implements Platform {
         var access = net.neoforged.neoforge.transfer.access.ItemAccess.forHandlerIndex(slot, 0);
         var handler = access.getCapability(Capabilities.Fluid.ITEM);
         return handler == null ? Optional.empty()
-                : Optional.of((IFluidHandlerItem) NeoForgeTransfer.fromNeo(new net.neoforged.neoforge.fluids.capability.FluidResourceHandlerItemAdapter(handler, access)));
+                : Optional.of(NeoForgeTransfer.itemFluids(handler, slot));
     }
 
     @Override
@@ -359,8 +356,11 @@ public final class NeoForgePlatform implements Platform {
 
     @Override
     public @Nullable Block stripped(Block block) {
-        var stripped = block.builtInRegistryHolder().getData(NeoForgeDataMaps.STRIPPABLES);
-        return stripped == null ? null : stripped.strippedBlock();
+        // 26.3: stripping is a data-driven block transformer of the axe (no block-to-block map any more); the vanilla
+        // and conventional pairs are named "stripped_<id>"
+        var id = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(block);
+        if (id.getPath().startsWith("stripped_")) return null;
+        return net.minecraft.core.registries.BuiltInRegistries.BLOCK.getOptional(id.withPrefix("stripped_")).orElse(null);
     }
 
     @Override

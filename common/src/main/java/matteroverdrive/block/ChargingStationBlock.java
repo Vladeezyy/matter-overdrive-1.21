@@ -1,6 +1,5 @@
 package matteroverdrive.block;
 
-import com.mojang.serialization.MapCodec;
 
 import matteroverdrive.init.MOBlockEntities;
 import matteroverdrive.machine.MachineBlock;
@@ -34,7 +33,6 @@ import org.jetbrains.annotations.Nullable;
  * invisible bounding blocks). Breaking any part breaks the whole station.
  */
 public class ChargingStationBlock extends MachineBlock {
-    public static final MapCodec<ChargingStationBlock> CODEC = simpleCodec(ChargingStationBlock::new);
     public static final IntegerProperty PART = IntegerProperty.create("part", 0, 2);
     private static final VoxelShape BASE = Block.box(0, 0, 0, 16, 16, 16);
     private static final VoxelShape ROD = Block.box(5, 0, 5, 11, 16, 11);
@@ -45,10 +43,6 @@ public class ChargingStationBlock extends MachineBlock {
         registerDefaultState(defaultBlockState().setValue(PART, 0));
     }
 
-    @Override
-    protected MapCodec<ChargingStationBlock> codec() {
-        return CODEC;
-    }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {

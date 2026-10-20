@@ -401,7 +401,7 @@ final class StatImpls {
             if (id().equals(data.getActiveStat()) && !player.onGround() && m.y < 0 && player.isShiftKeyDown()) {
                 Vec3 dir = m.subtract(0, 1, 0).normalize();
                 player.setDeltaMovement(m.add(-dir.x * 0.2, -dir.y * 0.2, -dir.z * 0.2));
-                player.hurtMarked = true;
+                player.syncVelocity = true;
             }
         }
 
@@ -426,7 +426,7 @@ final class StatImpls {
                 double multiply = range / Math.max(1, dir.length());
                 dir = dir.normalize();
                 target.push(dir.x * power * multiply, power * 0.2f, dir.z * power * multiply);
-                target.hurtMarked = true;
+                target.syncVelocity = true;
                 target.hurtServer(player.level(), source, power * 3);
             }
             data.setEffect(LAST_USE, player.level().getGameTime() + DELAY);

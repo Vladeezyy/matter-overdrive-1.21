@@ -204,7 +204,7 @@ public class GravitationalAnomalyBlockEntity extends BlockEntity {
             }
             if (!entity.isRemoved()) {
                 entity.addDeltaMovement(pull);
-                entity.hurtMarked = true;      // players only see velocity the server marks as changed
+                entity.syncVelocity = true;      // players only see velocity the server marks as changed
             }
         }
     }

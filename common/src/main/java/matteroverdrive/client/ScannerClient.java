@@ -11,12 +11,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
-import org.lwjgl.glfw.GLFW;
 
 /** Matter scanner client side: the C key opens its screen (1.7.10 KeyHandler.MATTER_SCANNER_KEY), the scanning sound. */
 public final class ScannerClient {
-    public static final KeyMapping OPEN = new KeyMapping("key." + MatterOverdrive.MODID + ".matter_scanner", InputConstants.Type.KEYSYM,
-            GLFW.GLFW_KEY_C, AndroidKeys.CATEGORY);
+    public static final KeyMapping OPEN = new KeyMapping("key." + MatterOverdrive.MODID + ".matter_scanner", InputConstants.Type.KEYBOARD,
+            InputConstants.KEY_C, AndroidKeys.CATEGORY);
     public static void registerKeys(java.util.function.Consumer<net.minecraft.client.KeyMapping> event) {
         event.accept(OPEN);
         MatterScannerItem.scannerKeyName = () -> OPEN.getTranslatedKeyMessage().getString();

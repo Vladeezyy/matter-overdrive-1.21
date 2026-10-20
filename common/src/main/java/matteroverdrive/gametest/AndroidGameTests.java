@@ -239,7 +239,7 @@ final class AndroidGameTests {
         player.hurtServer(helper.getLevel(), helper.getLevel().damageSources().arrow((net.minecraft.world.entity.projectile.arrow.AbstractArrow) arrow, null), 2);
         check(helper, player.getHealth() == 20, "arrow got through the shield: " + player.getHealth());
         // 6 damage = 1536 FE: more than one pull, so (1.7.10) only 1024/1536 of it is absorbed
-        player.invulnerableTime = 0;
+        player.setInvulnerableTime(0);
         player.hurtServer(helper.getLevel(), helper.getLevel().damageSources().arrow((net.minecraft.world.entity.projectile.arrow.AbstractArrow) arrow, null), 6);
         check(helper, Math.abs(player.getHealth() - 16) < 1e-4, "partial shield: " + player.getHealth());
         var pig = helper.spawnWithNoFreeWill(net.minecraft.world.entity.EntityTypes.PIG, new BlockPos(6, 1, 3));

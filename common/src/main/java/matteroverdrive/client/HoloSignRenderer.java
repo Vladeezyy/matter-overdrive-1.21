@@ -53,7 +53,7 @@ public class HoloSignRenderer implements BlockEntityRenderer<HoloSignBlockEntity
         pose.pushPose();
         pose.translate(0.5, 0.5, 0.5);
         // local +z = the sign's facing; the 2 px panel sits at the back, its front face 6 px behind the centre
-        pose.mulPose(Axis.YP.rotationDegrees(-state.facing.toYRot()));
+        pose.rotate(Axis.YP.rotationDegrees(-state.facing.toYRot()));
         pose.translate(0, 0, -(0.5 - 2 / 16f) + 0.002);
         int widest = 1;
         for (String line : state.lines) widest = Math.max(widest, font.width(line));

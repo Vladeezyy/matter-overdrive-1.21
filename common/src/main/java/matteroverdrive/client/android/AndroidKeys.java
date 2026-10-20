@@ -1,6 +1,6 @@
 package matteroverdrive.client.android;
 
-import org.lwjgl.glfw.GLFW;
+import com.mojang.blaze3d.platform.InputConstants;
 
 import matteroverdrive.MatterOverdrive;
 import matteroverdrive.android.Android;
@@ -30,8 +30,8 @@ import matteroverdrive.platform.Platform;
  */
 public final class AndroidKeys {
     public static final KeyMapping.Category CATEGORY = new KeyMapping.Category(Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "android"));
-    public static final KeyMapping ABILITY_USE = new KeyMapping("key." + MatterOverdrive.MODID + ".ability_use", GLFW.GLFW_KEY_X, CATEGORY);
-    public static final KeyMapping ABILITY_SWITCH = new KeyMapping("key." + MatterOverdrive.MODID + ".ability_switch", GLFW.GLFW_KEY_TAB, CATEGORY);
+    public static final KeyMapping ABILITY_USE = new KeyMapping("key." + MatterOverdrive.MODID + ".ability_use", InputConstants.KEY_X, CATEGORY);
+    public static final KeyMapping ABILITY_SWITCH = new KeyMapping("key." + MatterOverdrive.MODID + ".ability_switch", InputConstants.KEY_TAB, CATEGORY);
     private static boolean teleportHeld;
     public static void registerKeys(java.util.function.Consumer<net.minecraft.client.KeyMapping> event) {
         event.accept(ABILITY_USE);

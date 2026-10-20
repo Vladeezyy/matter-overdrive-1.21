@@ -70,7 +70,7 @@ public class RangedRogueAndroid extends RogueAndroid implements RangedAttackMob,
         getLookControl().setLookAt(target, 30, 30);
         lookAt(target, 360, 360);
         weapon.fireFromMob(server, this, getMainHandItem());
-        swing(InteractionHand.MAIN_HAND);
+        swing(InteractionHand.MAIN_HAND, net.minecraft.world.item.component.SwingAnimation.DEFAULT, false);
     }
 
     /** 1.7.10: damage x (0.2 x difficulty, max 0.6) + level x 0.133 + 0.3 legendary. */

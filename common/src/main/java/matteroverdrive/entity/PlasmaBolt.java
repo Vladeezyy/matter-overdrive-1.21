@@ -116,7 +116,7 @@ public class PlasmaBolt extends Projectile {
         if (!(level() instanceof ServerLevel server)) return;
         Vec3 before = target.getDeltaMovement();
         DamageSource source = server.damageSources().source(PLASMA, this, getOwner());
-        target.invulnerableTime = 0;
+        target.setInvulnerableTime(0);
         if (damage > 0 && target.hurtServer(server, source, damage)) {
             target.setDeltaMovement(before);     // 1.7.10 restored the target's motion: no knockback
             if (fireMultiplier > 0) target.igniteForSeconds(10 * fireMultiplier);   // 1.7.10 setFire(10 x multiplier)

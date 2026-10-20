@@ -3,19 +3,16 @@
   "pools": [
     {
       "rolls": 1,
-      "bonus_rolls": 0,
-      "conditions": [
-        {
-          "condition": "minecraft:random_chance",
-          "chance": 0.1
-        }
-      ],
       "entries": [
         {
           "type": "minecraft:item",
           "name": "matteroverdrive:android_pill_red"
         }
-      ]
+      ],
+      "condition": {
+        "type": "minecraft:random_chance",
+        "chance": 0.1
+      }
     }
   ]
 }

@@ -3,13 +3,13 @@ package matteroverdrive.client.starmap;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.mojang.blaze3d.pipeline.BlendFunction;
-import com.mojang.blaze3d.pipeline.ColorTargetState;
-import com.mojang.blaze3d.pipeline.DepthStencilState;
-import com.mojang.blaze3d.platform.CompareOp;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.renderpearl.api.pipeline.BlendFunction;
+import com.mojang.renderpearl.api.pipeline.ColorTargetState;
+import com.mojang.renderpearl.api.pipeline.DepthStencilState;
+import com.mojang.renderpearl.api.pipeline.CompareOp;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.PrimitiveTopology;
+import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
 
 import matteroverdrive.MatterOverdrive;
 import net.minecraft.client.renderer.BindGroupLayouts;
@@ -27,7 +27,7 @@ public final class HoloRenderTypes {
     private static final DepthStencilState NO_DEPTH_WRITE = new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, false);
 
     private static RenderPipeline.Builder base(String name) {
-        return RenderPipeline.builder().withBindGroupLayout(BindGroupLayouts.GLOBALS).withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION).withLocation(Identifier.fromNamespaceAndPath(MatterOverdrive.MODID,
+        return RenderPipeline.builder().withBindGroupLayout(BindGroupLayouts.GLOBALS).withBindGroupLayout(BindGroupLayouts.PROJECTION).withBindGroupLayout(BindGroupLayouts.DYNAMIC_TRANSFORMS).withLocation(Identifier.fromNamespaceAndPath(MatterOverdrive.MODID,
                 "pipeline/" + name)).withColorTargetState(new ColorTargetState(BlendFunction.ADDITIVE)).withCull(false)
                 .withDepthStencilState(NO_DEPTH_WRITE);
     }
@@ -52,7 +52,7 @@ public final class HoloRenderTypes {
 
     /** 1.7.10 block screens: glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR). */
     public static final RenderPipeline SCREEN = base("holo_screen").withColorTargetState(new ColorTargetState(new BlendFunction(
-                    com.mojang.blaze3d.platform.BlendFactor.ONE, com.mojang.blaze3d.platform.BlendFactor.ONE_MINUS_SRC_COLOR)))
+                    com.mojang.renderpearl.api.pipeline.BlendFactor.ONE, com.mojang.renderpearl.api.pipeline.BlendFactor.ONE_MINUS_SRC_COLOR)))
             .withVertexShader("core/position_tex_color").withFragmentShader("core/position_tex_color").withBindGroupLayout(BindGroupLayouts.SAMPLER0)
             .withVertexBinding(0, DefaultVertexFormat.POSITION_TEX_COLOR).withPrimitiveTopology(PrimitiveTopology.QUADS).build();
     private static final Map<Identifier, RenderType> SCREEN_TYPES = new HashMap<>();

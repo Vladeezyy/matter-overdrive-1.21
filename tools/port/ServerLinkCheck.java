@@ -6,7 +6,7 @@ import java.util.stream.*;
 public class ServerLinkCheck {
     public static void main(String[] args) throws Exception {
         Path root = Path.of(args[0]);
-        List<String> skip = List.of("com/github/alexthe666/rats/client/", "com/github/alexthe666/rats/compat/jei/");
+        List<String> skip = List.of("matteroverdrive/client/", "matteroverdrive/fabric/client/", "matteroverdrive/fabric/mixin/", "matteroverdrive/neoforge/MatterOverdriveNeoForgeClient", "matteroverdrive/neoforge/NeoForgeClientPlatform");
         Map<String, Set<String>> problems = new TreeMap<>();
         Map<String, Integer> other = new TreeMap<>();
         int checked = 0;

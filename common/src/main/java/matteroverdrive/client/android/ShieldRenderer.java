@@ -128,8 +128,8 @@ public final class ShieldRenderer {
         pose.translate(pos.x - camera.x, pos.y + centre - camera.y, pos.z - camera.z);
         pose.scale(3, 3, 3);
         Vec3 motion = player.getDeltaMovement();
-        pose.mulPose(Axis.XN.rotationDegrees((float) (motion.z * 45)));
-        pose.mulPose(Axis.ZP.rotationDegrees((float) (motion.x * 45)));
+        pose.rotate(Axis.XN.rotationDegrees((float) (motion.z * 45)));
+        pose.rotate(Axis.ZP.rotationDegrees((float) (motion.x * 45)));
         // seen from outside the shield mesh shows its front faces only; from inside (first person) all of them
         boolean outside = !own || mc.options.getCameraType() != CameraType.FIRST_PERSON;
         RenderType shieldType = outside ? HoloRenderTypes.texturedCulled(SHIELD) : HoloRenderTypes.textured(SHIELD);
@@ -146,7 +146,7 @@ public final class ShieldRenderer {
                 Vector3f axis = dir.cross(new Vector3f(1, 0, 0), new Vector3f());
                 pose.pushPose();
                 if (axis.lengthSquared() > 1e-8f) {
-                    pose.mulPose(new Quaternionf().rotationAxis((float) Math.acos(Math.max(-1, Math.min(1, dir.x))), axis.normalize()));
+                    pose.rotate(new Quaternionf().rotationAxis((float) Math.acos(Math.max(-1, Math.min(1, dir.x))), axis.normalize()));
                 }
                 int hitColor = holo(hit.time / (float) HIT_TIME * strength);
                 buffers.submitCustomGeometry(pose, HoloRenderTypes.textured(DAMAGE), (p, vc) -> sphere.render(vc, p, hitColor));
@@ -159,7 +159,7 @@ public final class ShieldRenderer {
         buffers.submitCustomGeometry(pose, HoloRenderTypes.textured(FORCEFIELD), (p, vc) -> sphere.render(vc, p, fieldColor));
         pose.pushPose();
         Vector3f spin = new Vector3f((float) Math.sin(time * 0.01), (float) Math.cos(time * 0.01), 0).normalize();
-        pose.mulPose(new Quaternionf().rotationAxis((float) Math.toRadians(time * 0.005), spin));
+        pose.rotate(new Quaternionf().rotationAxis((float) Math.toRadians(time * 0.005), spin));
         pose.scale(1.01f, 1.01f, 1.01f);
         int plasmaColor = holo(0.05f * strength);
         buffers.submitCustomGeometry(pose, HoloRenderTypes.textured(PLASMA), (p, vc) -> sphere.render(vc, p, plasmaColor));
@@ -172,9 +172,9 @@ public final class ShieldRenderer {
         Player player = mc.player;
         pose.pushPose();
         pose.translate(target.x - camera.x, target.y - camera.y, target.z - camera.z);
-        pose.mulPose(Axis.YN.rotationDegrees(player.getYRot()));
-        pose.mulPose(Axis.XP.rotationDegrees(player.getXRot()));
-        pose.mulPose(Axis.ZP.rotationDegrees(mc.level.getDefaultClockTime() * 10 % 360));
+        pose.rotate(Axis.YN.rotationDegrees(player.getYRot()));
+        pose.rotate(Axis.XP.rotationDegrees(player.getXRot()));
+        pose.rotate(Axis.ZP.rotationDegrees(mc.level.getDefaultClockTime() * 10 % 360));
         pose.translate(-0.5f, -0.5f, 0);
         int color = holo(0.5f);
         buffers.submitCustomGeometry(pose, HoloRenderTypes.textured(GLOW), (last, vc) -> {

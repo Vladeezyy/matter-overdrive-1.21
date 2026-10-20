@@ -150,7 +150,7 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
         double yaw = Math.round((Math.PI / 2 - angle) * (180 / Math.PI) / 90d) * 90;
         pose.pushPose();
         pose.translate(0, -renderer.height() + 0.3, 0);
-        pose.mulPose(Axis.YP.rotationDegrees((float) yaw));
+        pose.rotate(Axis.YP.rotationDegrees((float) yaw));
         pose.translate(-1, 0, 0.8);
         pose.scale(0.01f, -0.01f, 0.01f);
         renderer.renderGuiInfo(ctx, body, 0.5f);
@@ -239,13 +239,13 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
     private void drawAccessDenied(State state, PoseStack pose, SubmitNodeCollector collector) {
         pose.pushPose();
         pose.translate(0.5, 0.8, 0.5);
-        pose.mulPose(Axis.YN.rotationDegrees((float) (state.time * 0.5 + 1800 * state.noise)));
+        pose.rotate(Axis.YN.rotationDegrees((float) (state.time * 0.5 + 1800 * state.noise)));
         pose.scale(0.02f, -0.02f, 0.02f);
         int color = Holo.mul(Galaxy.COLOR_HOLO_RED, 0.33f);
         String[] words = Component.translatable("gui.matteroverdrive.hologram.access_denied").getString().split(" ");
         // 1.7.10 drew it without culling: both sides (the back mirrored there; readable here)
         for (int side = 0; side < 2; side++) {
-            if (side == 1) pose.mulPose(Axis.YP.rotationDegrees(180));
+            if (side == 1) pose.rotate(Axis.YP.rotationDegrees(180));
             for (int i = 0; i < words.length; i++) {
                 var text = Component.literal(words[i]).getVisualOrderText();
                 collector.submitText(pose, -font.width(text) / 2f, -32 + i * 10, text, false, Font.DisplayMode.NORMAL, 0xF000F0,
@@ -362,7 +362,7 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
                 pose.pushPose();
                 pose.translate(from.x + dir.x * percent, from.y + dir.y * percent, from.z + dir.z * percent);
                 Vec3 n = dir.normalize();
-                pose.mulPose(new Quaternionf().rotationTo(-1, 0, 0, (float) n.x, (float) n.y, (float) n.z));
+                pose.rotate(new Quaternionf().rotationTo(-1, 0, 0, (float) n.x, (float) n.y, (float) n.z));
                 ctx.sink().geometry(pose, HoloRenderTypes.COLOR_TRIANGLES,
                         (p, vc) -> Holo.ship(p, vc, 0.02f, Holo.mul(Galaxy.COLOR_HOLO, 0.5f)));
                 pose.popPose();
@@ -481,7 +481,7 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
                 random.setSeed(planet.getSeed());
                 pose.pushPose();
                 double axisRotation = random.nextInt(30) - 15;
-                pose.mulPose(Axis.XP.rotationDegrees((float) axisRotation));
+                pose.rotate(Axis.XP.rotationDegrees((float) axisRotation));
                 double radius = planet.getOrbit() * 2 + (star.getSize() / 2 + 0.1);
                 int orbitColor = Holo.mul(planetColor, 0.1f);
                 ctx.sink().geometry(pose, HoloRenderTypes.LINE_TYPE, (p, vc) -> {
@@ -500,12 +500,12 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
                             planet.getSize() * 0.25f, 0, 0, 0, Holo.r(planetColor), Holo.g(planetColor), Holo.b(planetColor)));
                 }
                 pose.pushPose();
-                pose.mulPose(Axis.XP.rotationDegrees((float) -axisRotation));
+                pose.rotate(Axis.XP.rotationDegrees((float) -axisRotation));
                 drawPlanetInfo(ctx, planet);
                 pose.popPose();
                 int wire = Holo.mul(planetColor, 0.3f * (1f / distance));
-                pose.mulPose(Axis.XP.rotationDegrees(100));
-                pose.mulPose(Axis.ZP.rotationDegrees((float) (time * 2)));
+                pose.rotate(Axis.XP.rotationDegrees(100));
+                pose.rotate(Axis.ZP.rotationDegrees((float) (time * 2)));
                 float planetSize = planet.getSize();
                 ctx.sink().geometry(pose, HoloRenderTypes.LINE_TYPE, (p, vc) -> Holo.wireSphere(p, vc,
                         planetSize * 0.1f * sizeMultiply, (int) (16 + planetSize * 2), (int) (8 + planetSize * 2), wire));
@@ -517,7 +517,7 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
         private void drawPlanetInfo(Ctx ctx, Planet planet) {
             PoseStack pose = ctx.pose();
             pose.translate(0, planet.getSize() * 0.13f + 0.05f, 0);
-            pose.mulPose(ctx.orientation());
+            pose.rotate(ctx.orientation());
             pose.scale(0.005f, -0.005f, 0.005f);
             Player player = ctx.player();
             boolean known = player != null && GalaxyClient.canSeePlanetInfo(planet, player);
@@ -586,11 +586,11 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
             float size = clampedSize(planet);
             float distance = ctx.distance();
             pose.pushPose();
-            pose.mulPose(Axis.XP.rotationDegrees(10));
-            pose.mulPose(Axis.YP.rotationDegrees((float) (ctx.time() * 0.1)));
+            pose.rotate(Axis.XP.rotationDegrees(10));
+            pose.rotate(Axis.YP.rotationDegrees((float) (ctx.time() * 0.1)));
             ctx.sink().geometry(pose, HoloRenderTypes.DEPTH, (p, vc) -> Holo.solidSphere(p, vc, size * 0.99f, 64, 32, 0));
             pose.pushPose();
-            pose.mulPose(Axis.XP.rotationDegrees(90));
+            pose.rotate(Axis.XP.rotationDegrees(90));
             int wire = Holo.mul(planet.getGuiColor(ctx.player()), 0.2f * (1f / distance));
             ctx.sink().geometry(pose, HoloRenderTypes.LINE_TYPE, (p, vc) -> Holo.wireSphere(p, vc, size, 64, 32, wire));
             pose.popPose();
@@ -598,8 +598,8 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
             random.setSeed(planet.getSeed());
             for (int i = 0; i < planet.getBuildings().size(); i++) {
                 pose.pushPose();
-                pose.mulPose(Axis.YP.rotationDegrees((float) (random.nextDouble() * 360)));
-                pose.mulPose(Axis.ZP.rotationDegrees((float) (random.nextDouble() * 360)));
+                pose.rotate(Axis.YP.rotationDegrees((float) (random.nextDouble() * 360)));
+                pose.rotate(Axis.ZP.rotationDegrees((float) (random.nextDouble() * 360)));
                 pose.translate(size - 0.04, 0, 0);
                 int cube = Holo.mul(Galaxy.COLOR_HOLO, 1f / distance);
                 ctx.sink().geometry(pose, HoloRenderTypes.COLOR_QUADS, (p, vc) -> Holo.cube(p, vc, 0.1f, 0.1f, 0.1f, cube));
@@ -615,7 +615,7 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
             if (ctx.player() == null || !GalaxyClient.canSeePlanetInfo(planet, ctx.player())) return;
             PoseStack pose = ctx.pose();
             pose.pushPose();
-            pose.mulPose(ctx.orientation());
+            pose.rotate(ctx.orientation());
             pose.scale(0.01f, -0.01f, 0.01f);
             double radius = clampedSize(planet) * 140;
             var buildings = planet.getBuildings();
@@ -644,7 +644,7 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
                 PoseStack pose = ctx.pose();
                 pose.pushPose();
                 pose.translate(Math.sin(phi) * Math.sin(theta) * radius, Math.sin(phi) * Math.cos(theta) * radius, Math.cos(phi) * radius);
-                pose.mulPose(ctx.orientation());
+                pose.rotate(ctx.orientation());
                 pose.scale(0.01f, -0.01f, 0.01f);
                 item(ctx, shipStack, -8, -8);
                 pose.popPose();
@@ -750,7 +750,7 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
                 renderPlanet(ctx, from);
                 pose.popPose();
                 pose.pushPose();
-                pose.mulPose(ctx.orientation());
+                pose.rotate(ctx.orientation());
                 pose.scale(0.01f, -0.01f, 0.01f);
                 drawTravelingShips(ctx, to);
                 icon(ctx, "arrow_right", -9, -9, Galaxy.COLOR_HOLO);

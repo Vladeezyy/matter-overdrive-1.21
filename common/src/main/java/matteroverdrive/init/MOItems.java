@@ -23,9 +23,7 @@ import matteroverdrive.item.weapon.SniperScopeItem;
 import matteroverdrive.item.android.AndroidPillItem;
 import matteroverdrive.item.android.BionicPartItem;
 import matteroverdrive.machine.UpgradeType;
-import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.HoeItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -72,10 +70,11 @@ public final class MOItems {
             p -> p.sword(MOMaterials.TRITANIUM_TOOL, 3f, -2.4f));
     public static final ItemEntry<Item> TRITANIUM_PICKAXE = item("tritanium_pickaxe", Item::new,
             p -> p.pickaxe(MOMaterials.TRITANIUM_TOOL, 1f, -2.8f));
-    public static final ItemEntry<AxeItem> TRITANIUM_AXE = item("tritanium_axe",
-            p -> new AxeItem(MOMaterials.TRITANIUM_TOOL, 6f, -3.1f, p), p -> p);
-    public static final ItemEntry<HoeItem> TRITANIUM_HOE = item("tritanium_hoe",
-            p -> new HoeItem(MOMaterials.TRITANIUM_TOOL, -2f, -1f, p), p -> p);
+    // 26.3: axes and hoes are plain items with a block transformer component (stripping, tilling)
+    public static final ItemEntry<Item> TRITANIUM_AXE = item("tritanium_axe", Item::new,
+            p -> p.axe(MOMaterials.TRITANIUM_TOOL, 6f, -3.1f));
+    public static final ItemEntry<Item> TRITANIUM_HOE = item("tritanium_hoe", Item::new,
+            p -> p.hoe(MOMaterials.TRITANIUM_TOOL, -2f, -1f));
 
     // Armor
     public static final ItemEntry<Item> TRITANIUM_HELMET = armor("tritanium_helmet", ArmorType.HELMET);

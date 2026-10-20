@@ -189,7 +189,7 @@ public final class FabricObjModels {
                     Material.Baked material = materialOf.apply(m);
                     Transparency transparency = material.forceTranslucent() ? Transparency.TRANSLUCENT
                             : material.sprite().contents().computeTransparency(0, 0, 1, 1);
-                    return interner.materialInfo(BakedQuad.MaterialInfo.of(material, transparency, file.materialTints().getOrDefault(m, -1), true, 0));
+                    return interner.materialInfo(BakedQuad.MaterialInfo.of(material, transparency, file.materialTints().getOrDefault(m, -1), null, 0));
                 });
                 // triangles become quads with a repeated vertex; larger polygons a fan of them
                 for (int start = 1; start + 1 < face.positions().length; start += 2) {

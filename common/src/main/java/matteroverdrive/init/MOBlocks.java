@@ -142,7 +142,7 @@ public final class MOBlocks {
     public static final BlockEntry<net.minecraft.world.level.block.LiquidBlock> MATTER_PLASMA = BLOCKS.registerBlock("matter_plasma",
             p -> new net.minecraft.world.level.block.LiquidBlock(MOFluids.MATTER_PLASMA.get(), p) {},
             MOBlocks.props(p -> p.mapColor(MapColor.COLOR_LIGHT_BLUE).replaceable().noCollision().strength(100f).pushReaction(
-                    net.minecraft.world.level.material.PushReaction.DESTROY).noLootTable().liquid().lightLevel(s -> 15)
+                    net.minecraft.world.level.material.PushReaction.POPPED).noLootTable().liquid().lightLevel(s -> 15)
                     .sound(SoundType.EMPTY)));
 
     /** NeoForge 21.10's Registrar.Blocks takes a "p -> p..." operator; older ones take finished properties. */

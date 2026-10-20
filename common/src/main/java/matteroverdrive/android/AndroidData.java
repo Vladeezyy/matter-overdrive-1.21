@@ -19,6 +19,14 @@ import matteroverdrive.platform.transfer.ItemStackHandler;
  * android inventory (head, arms, legs, chest, other bionic parts + a battery slot).
  */
 public class AndroidData implements ValueIOSerializable {
+    // 26.3: FriendlyByteBuf lost readMap / writeMap; same wire format (VarInt size, then the entries)
+    private static final net.minecraft.network.codec.StreamCodec<io.netty.buffer.ByteBuf, java.util.Map<String, Integer>> STATS_STREAM_CODEC =
+            net.minecraft.network.codec.ByteBufCodecs.map(java.util.HashMap::new, net.minecraft.network.codec.ByteBufCodecs.STRING_UTF8,
+                    net.minecraft.network.codec.ByteBufCodecs.VAR_INT);
+    private static final net.minecraft.network.codec.StreamCodec<io.netty.buffer.ByteBuf, java.util.Map<String, Long>> EFFECTS_STREAM_CODEC =
+            net.minecraft.network.codec.ByteBufCodecs.map(java.util.HashMap::new, net.minecraft.network.codec.ByteBufCodecs.STRING_UTF8,
+                    net.minecraft.network.codec.ByteBufCodecs.VAR_LONG);
+
     public static final int SLOT_HEAD = 0, SLOT_ARMS = 1, SLOT_LEGS = 2, SLOT_CHEST = 3, SLOT_OTHER = 4, SLOT_BATTERY = 5, SLOTS = 6;
     public static final int MAX_ENERGY = 512000;
     private static final Codec<Map<String, Integer>> STATS_CODEC = Codec.unboundedMap(Codec.STRING, Codec.INT);
@@ -162,11 +170,11 @@ public class AndroidData implements ValueIOSerializable {
     void write(RegistryFriendlyByteBuf buf) {
         buf.writeBoolean(android);
         buf.writeVarInt(energy);
-        buf.writeMap(stats, (b, k) -> b.writeUtf(k), (b, v) -> b.writeVarInt(v));
+        STATS_STREAM_CODEC.encode(buf, stats);
         buf.writeVarInt(turning);
         buf.writeVarInt(glitchTime);
         buf.writeUtf(activeStat);
-        buf.writeMap(effects, (b, k) -> b.writeUtf(k), (b, v) -> b.writeVarLong(v));
+        EFFECTS_STREAM_CODEC.encode(buf, effects);
         for (int i = 0; i < SLOTS; i++) {
             ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, getStack(i));
         }
@@ -176,12 +184,12 @@ public class AndroidData implements ValueIOSerializable {
         android = buf.readBoolean();
         energy = buf.readVarInt();
         stats.clear();
-        stats.putAll(buf.readMap(b -> b.readUtf(), b -> b.readVarInt()));
+        stats.putAll(STATS_STREAM_CODEC.decode(buf));
         turning = buf.readVarInt();
         glitchTime = buf.readVarInt();
         activeStat = buf.readUtf();
         effects.clear();
-        effects.putAll(buf.readMap(b -> b.readUtf(), b -> b.readVarLong()));
+        effects.putAll(EFFECTS_STREAM_CODEC.decode(buf));
         for (int i = 0; i < SLOTS; i++) {
             ItemStack stack = ItemStack.OPTIONAL_STREAM_CODEC.decode(buf);
             inventory.setStackInSlot(i, stack);

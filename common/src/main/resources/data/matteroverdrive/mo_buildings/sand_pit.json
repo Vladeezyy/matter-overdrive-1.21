@@ -5,9 +5,7 @@
   "palette": [
     {
       "states": [
-        {
-          "Name": "minecraft:sand"
-        }
+        "minecraft:sand"
       ],
       "noise": false,
       "group": 16776960,
@@ -15,9 +13,7 @@
     },
     {
       "states": [
-        {
-          "Name": "minecraft:sandstone"
-        }
+        "minecraft:sandstone"
       ],
       "noise": false,
       "group": 14801717,
@@ -25,9 +21,7 @@
     },
     {
       "states": [
-        {
-          "Name": "minecraft:water"
-        }
+        "minecraft:water"
       ],
       "noise": false,
       "group": 3515105,
@@ -35,9 +29,7 @@
     },
     {
       "states": [
-        {
-          "Name": "minecraft:air"
-        }
+        "minecraft:air"
       ],
       "noise": false,
       "group": 15856113,
@@ -45,9 +37,7 @@
     },
     {
       "states": [
-        {
-          "Name": "minecraft:glowstone"
-        }
+        "minecraft:glowstone"
       ],
       "noise": false,
       "group": 13055457,
@@ -55,9 +45,7 @@
     },
     {
       "states": [
-        {
-          "Name": "matteroverdrive:decorative_tritanium_plate"
-        }
+        "matteroverdrive:decorative_tritanium_plate"
       ],
       "noise": false,
       "group": 3513057,
@@ -65,9 +53,7 @@
     },
     {
       "states": [
-        {
-          "Name": "minecraft:oak_fence"
-        }
+        "minecraft:oak_fence"
       ],
       "noise": false,
       "group": 7029760,
@@ -77,9 +63,7 @@
     },
     {
       "states": [
-        {
-          "Name": "matteroverdrive:decorative_coils"
-        }
+        "matteroverdrive:decorative_coils"
       ],
       "noise": false,
       "group": 16745472,

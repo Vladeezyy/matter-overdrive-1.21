@@ -179,7 +179,7 @@ public class StabilizerRenderer implements BlockEntityRenderer<GravitationalStab
         pose.pushPose();
         pose.translate(0.5 + side.getStepX() * 0.55, 0.5, 0.5 + side.getStepZ() * 0.55);
         // local +z out of the face, +x to the viewer's right
-        pose.mulPose(Axis.YP.rotation((float) Math.atan2(side.getStepX(), side.getStepZ())));
+        pose.rotate(Axis.YP.rotation((float) Math.atan2(side.getStepX(), side.getStepZ())));
         double noise = matteroverdrive.util.MOMath.noise(state.pos.getX(), state.dayTime * 0.01, state.pos.getZ()) * 0.5 + 0.5;
         screenPlane(pose, collector, GLOW, mul(HOLO, noise), 0);
         screenPlane(pose, collector, BACK, mul(HOLO, 0.05), 0.05f);

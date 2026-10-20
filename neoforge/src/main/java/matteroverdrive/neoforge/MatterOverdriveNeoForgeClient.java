@@ -147,9 +147,11 @@ public final class MatterOverdriveNeoForgeClient {
         }, MOItems.TRITANIUM_HELMET.get(), MOItems.TRITANIUM_CHESTPLATE.get(), MOItems.TRITANIUM_LEGGINGS.get(), MOItems.TRITANIUM_BOOTS.get());
         event.registerItem(new IClientItemExtensions() {
             @Override
-            public boolean applyForgeHandTransform(PoseStack pose, LocalPlayer player, HumanoidArm arm, ItemStack stack,
-                                                   float partialTick, float equipProgress, float swingProgress) {
-                return WeaponClient.applyHandTransform(pose, player, arm, stack);
+            public boolean applyForgeHandTransform(PoseStack pose, net.minecraft.client.renderer.state.level.PlayerRenderState state, HumanoidArm arm,
+                                                   ItemStack stack, float partialTick, float equipProgress, float swingProgress) {
+                // 26.3 passes the render state; the first person hand is always the local player's
+                LocalPlayer player = net.minecraft.client.Minecraft.getInstance().player;
+                return player != null && WeaponClient.applyHandTransform(pose, player, arm, stack);
             }
 
             @Override

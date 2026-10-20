@@ -1,6 +1,5 @@
 package matteroverdrive.block;
 
-import com.mojang.serialization.MapCodec;
 
 import matteroverdrive.block.entity.TritaniumCrateBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -32,7 +31,6 @@ import org.jetbrains.annotations.Nullable;
  * It keeps its contents when broken (like a shulker box).
  */
 public class TritaniumCrateBlock extends BaseEntityBlock {
-    public static final MapCodec<TritaniumCrateBlock> CODEC = simpleCodec(TritaniumCrateBlock::new);
     private static final VoxelShape NORTH_SOUTH = Block.box(0, 0, 2, 16, 13, 14);
     private static final VoxelShape EAST_WEST = Block.box(2, 0, 0, 14, 13, 16);
 
@@ -41,10 +39,6 @@ public class TritaniumCrateBlock extends BaseEntityBlock {
         registerDefaultState(stateDefinition.any().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
     }
 
-    @Override
-    protected MapCodec<TritaniumCrateBlock> codec() {
-        return CODEC;
-    }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {

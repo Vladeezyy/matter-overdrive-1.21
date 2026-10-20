@@ -143,7 +143,7 @@ final class QuestGameTests {
             long ours = templates.stream().filter(e -> e.toString().contains("mad_scientist_house")).count();
             check(helper, ours == matteroverdrive.world.VillageHouses.WEIGHT, pool + ": " + ours);
         }
-        var template = level.getStructureManager().get(net.minecraft.resources.Identifier.fromNamespaceAndPath(
+        var template = level.getStructureTemplateManager().get(net.minecraft.resources.Identifier.fromNamespaceAndPath(
                 matteroverdrive.MatterOverdrive.MODID, "village/mad_scientist_house")).orElseThrow();
         check(helper, template.getSize().equals(new net.minecraft.core.Vec3i(9, 9, 7)), "size " + template.getSize());
         BlockPos origin = helper.absolutePos(new BlockPos(1, 1, 1));

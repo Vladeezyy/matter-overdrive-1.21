@@ -1,6 +1,5 @@
 package matteroverdrive.block;
 
-import com.mojang.serialization.MapCodec;
 
 import matteroverdrive.block.entity.HoloSignBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -33,7 +32,6 @@ import java.util.function.Consumer;
  * wall behind it). Right-click to edit the text.
  */
 public class HoloSignBlock extends HorizontalDirectionalBlock implements EntityBlock {
-    public static final MapCodec<HoloSignBlock> CODEC = simpleCodec(HoloSignBlock::new);
     /** Set by the client: opens the text editor for the sign at this position. */
     public static Consumer<BlockPos> openEditor = pos -> {};
 
@@ -42,10 +40,6 @@ public class HoloSignBlock extends HorizontalDirectionalBlock implements EntityB
         registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH));
     }
 
-    @Override
-    protected MapCodec<HoloSignBlock> codec() {
-        return CODEC;
-    }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {

@@ -2,7 +2,6 @@ package matteroverdrive.block;
 
 import java.util.Map;
 
-import com.mojang.serialization.MapCodec;
 
 import matteroverdrive.matternet.MatterNetworkBlock;
 import net.minecraft.core.BlockPos;
@@ -23,7 +22,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 /** 1.7.10 network_pipe: links matter network machines. It carries no matter, only connectivity. */
 public class NetworkPipeBlock extends Block implements MatterNetworkBlock {
-    public static final MapCodec<NetworkPipeBlock> CODEC = simpleCodec(NetworkPipeBlock::new);
     private static final Map<Direction, BooleanProperty> SIDES = PipeBlock.PROPERTY_BY_DIRECTION;
     // same 1/3-block core and arms as the matter pipe (1.7.10 drew both with RendererBlockPipe)
     private static final double A = 16 / 3.0, B = 32 / 3.0;
@@ -40,10 +38,6 @@ public class NetworkPipeBlock extends Block implements MatterNetworkBlock {
         registerDefaultState(state);
     }
 
-    @Override
-    protected MapCodec<NetworkPipeBlock> codec() {
-        return CODEC;
-    }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {

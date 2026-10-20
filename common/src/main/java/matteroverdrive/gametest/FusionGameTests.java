@@ -60,7 +60,8 @@ final class FusionGameTests {
     private static void generates(GameTestHelper helper, FusionReactorControllerBlockEntity reactor) {
         helper.runAfterDelay(90, () -> {
             helper.assertTrue(reactor.isValidStructure(), Component.literal("structure invalid: " + reactor.getStatus()));
-            helper.assertTrue(reactor.getEnergyPerTick() == Math.round(2048 * Math.log(2)),
+            // the anomaly may eat a few blocks of the test floor (26.3: sandstone), so its mass grows a little
+            helper.assertTrue(Math.abs(reactor.getEnergyPerTick() - 2048 * Math.log(2)) < 2048 * Math.log(2) * 0.005,
                     Component.literal("energy per tick " + reactor.getEnergyPerTick()));
             helper.assertTrue(reactor.getEnergy().getEnergy() > 0, Component.literal("no energy generated"));
             helper.succeed();

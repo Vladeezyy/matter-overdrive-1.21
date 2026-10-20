@@ -53,7 +53,7 @@ public class WeaponStationRenderer implements BlockEntityRenderer<WeaponStationB
         if (state.item.isEmpty()) return;
         pose.pushPose();
         pose.translate(0.5f, 0.8f + 0.1f * (float) Math.sin(state.time / 10), 0.5f);
-        pose.mulPose(Axis.YP.rotation(state.time / 20));
+        pose.rotate(Axis.YP.rotation(state.time / 20));
         state.item.submit(pose, collector, 0xF000F0, OverlayTexture.NO_OVERLAY, 0);
         pose.popPose();
     }

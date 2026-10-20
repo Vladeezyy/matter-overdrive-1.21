@@ -57,8 +57,8 @@ public class PlasmaBoltRenderer extends EntityRenderer<PlasmaBolt, PlasmaBoltRen
     @Override
     public void submit(State state, PoseStack pose, SubmitNodeCollector collector, CameraRenderState camera) {
         pose.pushPose();
-        pose.mulPose(Axis.YP.rotationDegrees(state.yRot - 90));
-        pose.mulPose(Axis.ZP.rotationDegrees(state.xRot));
+        pose.rotate(Axis.YP.rotationDegrees(state.yRot - 90));
+        pose.rotate(Axis.ZP.rotationDegrees(state.xRot));
         float alpha = 1 - (1 - state.life) * (1 - state.life);        // 1.7.10 Quad.easeOut over the life
         int color = ARGB.color(Math.round(255 * alpha), state.color);
         // 1.7.10: length (6 x speed + 10) and width renderSize, both scaled by 0.05625

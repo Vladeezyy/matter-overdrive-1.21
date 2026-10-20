@@ -5,9 +5,7 @@
   "palette": [
     {
       "states": [
-        {
-          "Name": "matteroverdrive:decorative_tritanium_plate_orange"
-        }
+        "matteroverdrive:decorative_tritanium_plate_orange"
       ],
       "noise": false,
       "group": 5263440,
@@ -15,9 +13,7 @@
     },
     {
       "states": [
-        {
-          "Name": "matteroverdrive:decorative_tritanium_plate"
-        }
+        "matteroverdrive:decorative_tritanium_plate"
       ],
       "noise": false,
       "group": 4674649,
@@ -25,9 +21,7 @@
     },
     {
       "states": [
-        {
-          "Name": "minecraft:air"
-        }
+        "minecraft:air"
       ],
       "noise": false,
       "group": 16711935,
@@ -35,18 +29,10 @@
     },
     {
       "states": [
-        {
-          "Name": "minecraft:gold_ore"
-        },
-        {
-          "Name": "minecraft:iron_ore"
-        },
-        {
-          "Name": "minecraft:coal_ore"
-        },
-        {
-          "Name": "matteroverdrive:tritanium_ore"
-        }
+        "minecraft:gold_ore",
+        "minecraft:iron_ore",
+        "minecraft:coal_ore",
+        "matteroverdrive:tritanium_ore"
       ],
       "noise": true,
       "group": 16542516,
@@ -54,9 +40,7 @@
     },
     {
       "states": [
-        {
-          "Name": "matteroverdrive:decorative_tritanium_lamp"
-        }
+        "matteroverdrive:decorative_tritanium_lamp"
       ],
       "noise": false,
       "group": 13957365,
@@ -64,9 +48,7 @@
     },
     {
       "states": [
-        {
-          "Name": "matteroverdrive:decorative_tritanium_plate_white"
-        }
+        "matteroverdrive:decorative_tritanium_plate_white"
       ],
       "noise": false,
       "group": 5263440,
@@ -74,9 +56,7 @@
     },
     {
       "states": [
-        {
-          "Name": "matteroverdrive:decorative_vent_dark"
-        }
+        "matteroverdrive:decorative_vent_dark"
       ],
       "noise": false,
       "group": 3291452,
@@ -85,8 +65,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:tritanium_crate_white",
-          "Properties": {
+          "id": "matteroverdrive:tritanium_crate_white",
+          "properties": {
             "facing": "east"
           }
         }
@@ -98,8 +78,8 @@
     {
       "states": [
         {
-          "Name": "minecraft:red_bed",
-          "Properties": {
+          "id": "minecraft:red_bed",
+          "properties": {
             "facing": "north",
             "part": "head"
           }
@@ -112,8 +92,8 @@
     {
       "states": [
         {
-          "Name": "minecraft:ladder",
-          "Properties": {
+          "id": "minecraft:ladder",
+          "properties": {
             "facing": "east"
           }
         }
@@ -125,8 +105,8 @@
     {
       "states": [
         {
-          "Name": "minecraft:red_bed",
-          "Properties": {
+          "id": "minecraft:red_bed",
+          "properties": {
             "facing": "north",
             "part": "foot"
           }
@@ -139,8 +119,8 @@
     {
       "states": [
         {
-          "Name": "minecraft:oak_stairs",
-          "Properties": {
+          "id": "minecraft:oak_stairs",
+          "properties": {
             "facing": "north",
             "half": "bottom"
           }
@@ -152,9 +132,7 @@
     },
     {
       "states": [
-        {
-          "Name": "minecraft:oak_fence"
-        }
+        "minecraft:oak_fence"
       ],
       "noise": false,
       "group": 11225124,
@@ -164,9 +142,7 @@
     },
     {
       "states": [
-        {
-          "Name": "minecraft:yellow_carpet"
-        }
+        "minecraft:yellow_carpet"
       ],
       "noise": false,
       "group": 6870840,
@@ -175,8 +151,8 @@
     {
       "states": [
         {
-          "Name": "minecraft:oak_stairs",
-          "Properties": {
+          "id": "minecraft:oak_stairs",
+          "properties": {
             "facing": "south",
             "half": "bottom"
           }
@@ -189,8 +165,8 @@
     {
       "states": [
         {
-          "Name": "minecraft:red_bed",
-          "Properties": {
+          "id": "minecraft:red_bed",
+          "properties": {
             "facing": "south",
             "part": "foot"
           }
@@ -203,8 +179,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:tritanium_crate_white",
-          "Properties": {
+          "id": "matteroverdrive:tritanium_crate_white",
+          "properties": {
             "facing": "west"
           }
         }
@@ -216,8 +192,8 @@
     {
       "states": [
         {
-          "Name": "minecraft:red_bed",
-          "Properties": {
+          "id": "minecraft:red_bed",
+          "properties": {
             "facing": "south",
             "part": "head"
           }
@@ -230,8 +206,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:holo_sign",
-          "Properties": {
+          "id": "matteroverdrive:holo_sign",
+          "properties": {
             "facing": "east"
           }
         }
@@ -242,9 +218,7 @@
     },
     {
       "states": [
-        {
-          "Name": "matteroverdrive:force_glass"
-        }
+        "matteroverdrive:force_glass"
       ],
       "noise": false,
       "group": 13826896,
@@ -252,9 +226,7 @@
     },
     {
       "states": [
-        {
-          "Name": "minecraft:oak_pressure_plate"
-        }
+        "minecraft:oak_pressure_plate"
       ],
       "noise": false,
       "group": 14418392,
@@ -262,9 +234,7 @@
     },
     {
       "states": [
-        {
-          "Name": "matteroverdrive:decorative_tritanium_plate_stripe"
-        }
+        "matteroverdrive:decorative_tritanium_plate_stripe"
       ],
       "noise": false,
       "group": 5727336,
@@ -272,9 +242,7 @@
     },
     {
       "states": [
-        {
-          "Name": "matteroverdrive:decorative_carbon_fiber_plate"
-        }
+        "matteroverdrive:decorative_carbon_fiber_plate"
       ],
       "noise": false,
       "group": 1842976,
@@ -282,9 +250,7 @@
     },
     {
       "states": [
-        {
-          "Name": "matteroverdrive:decorative_tritanium_plate_yellow"
-        }
+        "matteroverdrive:decorative_tritanium_plate_yellow"
       ],
       "noise": false,
       "group": 5263440,
@@ -292,9 +258,7 @@
     },
     {
       "states": [
-        {
-          "Name": "matteroverdrive:decorative_engine_exhaust_plasma"
-        }
+        "matteroverdrive:decorative_engine_exhaust_plasma"
       ],
       "noise": false,
       "group": 3701918,
@@ -303,8 +267,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:decorative_beams",
-          "Properties": {
+          "id": "matteroverdrive:decorative_beams",
+          "properties": {
             "axis": "x"
           }
         }
@@ -315,9 +279,7 @@
     },
     {
       "states": [
-        {
-          "Name": "matteroverdrive:decorative_clean"
-        }
+        "matteroverdrive:decorative_clean"
       ],
       "noise": false,
       "group": 3885131,
@@ -326,8 +288,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:transporter",
-          "Properties": {
+          "id": "matteroverdrive:transporter",
+          "properties": {
             "facing": "west"
           }
         }
@@ -339,8 +301,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:decorative_matter_tube",
-          "Properties": {
+          "id": "matteroverdrive:decorative_matter_tube",
+          "properties": {
             "axis": "y"
           }
         }
@@ -352,8 +314,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:decorative_beams",
-          "Properties": {
+          "id": "matteroverdrive:decorative_beams",
+          "properties": {
             "axis": "y"
           }
         }
@@ -365,8 +327,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:fusion_reactor_io",
-          "Properties": {
+          "id": "matteroverdrive:fusion_reactor_io",
+          "properties": {
             "facing": "west"
           }
         }
@@ -378,8 +340,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:fusion_reactor_io",
-          "Properties": {
+          "id": "matteroverdrive:fusion_reactor_io",
+          "properties": {
             "facing": "south"
           }
         }
@@ -390,9 +352,7 @@
     },
     {
       "states": [
-        {
-          "Name": "matteroverdrive:heavy_matter_pipe"
-        }
+        "matteroverdrive:heavy_matter_pipe"
       ],
       "noise": false,
       "group": 11070748,
@@ -403,8 +363,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:decorative_separator",
-          "Properties": {
+          "id": "matteroverdrive:decorative_separator",
+          "properties": {
             "axis": "x"
           }
         }
@@ -415,9 +375,7 @@
     },
     {
       "states": [
-        {
-          "Name": "matteroverdrive:network_pipe"
-        }
+        "matteroverdrive:network_pipe"
       ],
       "noise": false,
       "group": 1781751,
@@ -428,8 +386,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:network_router",
-          "Properties": {
+          "id": "matteroverdrive:network_router",
+          "properties": {
             "facing": "west"
           }
         }
@@ -441,8 +399,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:network_router",
-          "Properties": {
+          "id": "matteroverdrive:network_router",
+          "properties": {
             "facing": "south"
           }
         }
@@ -454,8 +412,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:pattern_monitor",
-          "Properties": {
+          "id": "matteroverdrive:pattern_monitor",
+          "properties": {
             "facing": "south"
           }
         }
@@ -467,8 +425,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:holo_sign",
-          "Properties": {
+          "id": "matteroverdrive:holo_sign",
+          "properties": {
             "facing": "south"
           }
         }
@@ -480,8 +438,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:holo_sign",
-          "Properties": {
+          "id": "matteroverdrive:holo_sign",
+          "properties": {
             "facing": "north"
           }
         }
@@ -493,8 +451,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:pattern_monitor",
-          "Properties": {
+          "id": "matteroverdrive:pattern_monitor",
+          "properties": {
             "facing": "north"
           }
         }
@@ -506,8 +464,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:fusion_reactor_io",
-          "Properties": {
+          "id": "matteroverdrive:fusion_reactor_io",
+          "properties": {
             "facing": "east"
           }
         }
@@ -519,8 +477,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:pattern_monitor",
-          "Properties": {
+          "id": "matteroverdrive:pattern_monitor",
+          "properties": {
             "facing": "east"
           }
         }
@@ -531,9 +489,7 @@
     },
     {
       "states": [
-        {
-          "Name": "matteroverdrive:decorative_coils"
-        }
+        "matteroverdrive:decorative_coils"
       ],
       "noise": false,
       "group": 11952670,
@@ -542,8 +498,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:fusion_reactor_io",
-          "Properties": {
+          "id": "matteroverdrive:fusion_reactor_io",
+          "properties": {
             "facing": "north"
           }
         }
@@ -555,8 +511,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:network_switch",
-          "Properties": {
+          "id": "matteroverdrive:network_switch",
+          "properties": {
             "facing": "north"
           }
         }
@@ -567,9 +523,7 @@
     },
     {
       "states": [
-        {
-          "Name": "matteroverdrive:decorative_vent_bright"
-        }
+        "matteroverdrive:decorative_vent_bright"
       ],
       "noise": false,
       "group": 4148046,
@@ -578,8 +532,8 @@
     {
       "states": [
         {
-          "Name": "matteroverdrive:decorative_matter_tube",
-          "Properties": {
+          "id": "matteroverdrive:decorative_matter_tube",
+          "properties": {
             "axis": "x"
           }
         }

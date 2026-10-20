@@ -129,7 +129,7 @@ public class RogueAndroidRenderer<T extends RogueAndroid> extends HumanoidMobRen
         @Override
         public void submit(PoseStack pose, SubmitNodeCollector collector, int light, State state, float yRot, float xRot) {
             collector.order(1).submitModel(visor, state, pose, net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucentEmissive(RANGED_TEXTURE), 0xF000F0,
-                    OverlayTexture.NO_OVERLAY, ARGB.color(255, state.visorColor), null, state.outlineColor, null);
+                    OverlayTexture.NO_OVERLAY, ARGB.color(255, state.visorColor), null, state.outlineColor);
         }
     }
 }

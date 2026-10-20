@@ -106,8 +106,8 @@ final class AnomalyGameTests {
 
     private static void featurePlaces(GameTestHelper helper) {
         var level = helper.getLevel();
-        var feature = level.registryAccess().lookupOrThrow(Registries.CONFIGURED_FEATURE).getOrThrow(ResourceKey.create(
-                Registries.CONFIGURED_FEATURE, Identifier.fromNamespaceAndPath("matteroverdrive", "gravitational_anomaly"))).value();
+        var feature = level.registryAccess().lookupOrThrow(Registries.FEATURE).getOrThrow(ResourceKey.create(
+                Registries.FEATURE, Identifier.fromNamespaceAndPath("matteroverdrive", "gravitational_anomaly"))).value();
         BlockPos pos = helper.absolutePos(CORE);
         helper.assertTrue(feature.place(level, level.getChunkSource().getGenerator(), level.getRandom(), pos),
                 Component.literal("feature refused to place"));

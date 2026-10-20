@@ -93,8 +93,9 @@ final class FabricBiomeModifiers {
 
     private static void addSpawn(BiomeModificationContext context, JsonObject spawner) {
         EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.parse(spawner.get("type").getAsString()));
-        context.getMobSpawnSettings().addSpawn(type.getCategory(), new MobSpawnSettings.SpawnerData(type,
-                spawner.get("minCount").getAsInt(), spawner.get("maxCount").getAsInt()), spawner.get("weight").getAsInt());
+        // 26.3: the count is an int provider (a number or {"type": "minecraft:uniform", ...})
+        var count = net.minecraft.util.valueproviders.IntProviders.CODEC.parse(com.mojang.serialization.JsonOps.INSTANCE, spawner.get("count")).getOrThrow();
+        context.getMobSpawnSettings().addSpawn(type.getCategory(), new MobSpawnSettings.SpawnerData(type, count), spawner.get("weight").getAsInt());
     }
 
     private static Predicate<BiomeSelectionContext> biomes(JsonElement biomes) {

@@ -48,7 +48,7 @@ public final class MODecorative {
     public static final BlockEntry<TransparentBlock> FORCE_GLASS = add(MOBlocks.BLOCKS.registerBlock("force_glass", p -> new TransparentBlock(p) {},
             MOBlocks.props(p -> p.mapColor(MapColor.NONE).strength(40, 6).sound(SoundType.GLASS).noOcclusion()
                     .isValidSpawn((s, l, pos, type) -> false).isRedstoneConductor((s, l, pos) -> false)
-                    .isSuffocating((s, l, pos) -> false).isViewBlocking((s, l, pos) -> false))));
+                    .isSuffocating((s, l, pos) -> false).isViewBlocking((s, l, pos, box) -> false))));
 
     static {
         for (DyeColor color : DyeColor.values()) {

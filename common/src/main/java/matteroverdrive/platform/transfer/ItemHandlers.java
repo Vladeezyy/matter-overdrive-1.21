@@ -57,7 +57,7 @@ public final class ItemHandlers {
             return;
         }
         if (!player.getInventory().add(stack) || !stack.isEmpty()) {
-            ItemEntity drop = player.drop(stack, false);
+            ItemEntity drop = player.drop(stack, false, net.minecraft.util.Prediction.SERVER_ONLY);
             if (drop != null) {
                 drop.setNoPickUpDelay();
                 drop.setTarget(player.getUUID());

@@ -48,19 +48,23 @@ final class FabricLootModifiers {
                 throw new IllegalStateException("Unsupported loot modifier " + id + ": " + json.get("type"));
             }
             ResourceKey<LootTable> table = ResourceKey.create(Registries.LOOT_TABLE, Identifier.parse(json.get("table").getAsString()));
-            for (JsonElement condition : json.getAsJsonArray("conditions")) {
-                collectTables(condition.getAsJsonObject(), id, target -> added.computeIfAbsent(target, key -> new java.util.ArrayList<>()).add(table));
-            }
+            // 26.3: one typed condition (was a list of "condition" objects)
+            collectTables(json.getAsJsonObject("condition"), id, target -> added.computeIfAbsent(target, key -> new java.util.ArrayList<>()).add(table));
         }
         LootTableEvents.MODIFY.register((key, builder, source, registries) -> {
             List<ResourceKey<LootTable>> tables = added.get(key);
             if (tables == null) return;
-            for (ResourceKey<LootTable> table : tables) builder.withPool(LootPool.lootPool().add(NestedLootTable.lootTableReference(table)));
+            // 26.3: loot tables are registry entries, the nested entry takes the holder
+            var lootTables = registries.lookupOrThrow(Registries.LOOT_TABLE);
+            for (ResourceKey<LootTable> table : tables) {
+                lootTables.get(table).ifPresentOrElse(holder -> builder.withPool(LootPool.lootPool().add(NestedLootTable.lootTableReference(holder))),
+                        () -> MatterOverdrive.LOGGER.warn("Loot modifier table {} is missing", table));
+            }
         });
     }
 
     private static void collectTables(JsonObject condition, Identifier id, java.util.function.Consumer<ResourceKey<LootTable>> target) {
-        String type = condition.get("condition").getAsString();
+        String type = condition.get("type").getAsString();
         switch (type) {
             case "neoforge:loot_table_id" -> target.accept(ResourceKey.create(Registries.LOOT_TABLE, Identifier.parse(condition.get("loot_table_id").getAsString())));
             case "minecraft:any_of" -> condition.getAsJsonArray("terms").forEach(term -> collectTables(term.getAsJsonObject(), id, target));

@@ -62,7 +62,7 @@ public class StarMapPipRenderer extends PictureInPictureRenderer<StarMapPipRende
         float yaw = 180 + rotation, pitch = 15;
         Quaternionf orientation = new Quaternionf().rotationYXZ((float) Math.PI - yaw * Mth.DEG_TO_RAD, -pitch * Mth.DEG_TO_RAD, 0);
         PoseStack pose = new PoseStack();
-        pose.mulPose(Axis.XP.rotationDegrees(15));
+        pose.rotate(Axis.XP.rotationDegrees(15));
         pose.translate(0, -0.8f, 0);
         switch (starMap.getZoomLevel()) {
             case 0 -> pose.translate(0, -1.1, -4);
@@ -75,7 +75,7 @@ public class StarMapPipRenderer extends PictureInPictureRenderer<StarMapPipRende
             }
             default -> pose.translate(0, 0.1f, -3);
         }
-        pose.mulPose(Axis.YP.rotationDegrees(rotation));
+        pose.rotate(Axis.YP.rotationDegrees(rotation));
         pose.translate(-0.5f, -1.8f, -0.5f);
         // 26.2: the renderer submits, the picture-in-picture renderer draws the submits into this texture
         var ctx = new StarMapRenderer.Ctx(view, pose, HoloSink.of(collector), mc.font, yaw, pitch, orientation, mc.player, galaxy);

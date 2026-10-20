@@ -82,9 +82,7 @@ public final class MatterOverdriveNeoForge {
             event.setXpCost(result.cost());
             event.setMaterialCost(result.materialCost());
         });
-        game.addListener((TagsUpdatedEvent event) -> {
-            if (event.getUpdateCause() == TagsUpdatedEvent.UpdateCause.SERVER_DATA_LOAD) MatterEvents.onServerDataLoaded();
-        });
+        game.addListener((TagsUpdatedEvent.ServerDataLoad event) -> MatterEvents.onServerDataLoaded());
         game.addListener((OnDatapackSyncEvent event) -> MatterEvents.onDatapackSync(event.getPlayerList().getServer(), event.getRelevantPlayers().toList()));
         // galaxy
         game.addListener((LevelEvent.Load event) -> {
@@ -131,7 +129,7 @@ public final class MatterOverdriveNeoForge {
                     t -> event.registerEnvironment(id.apply("time_" + t), new matteroverdrive.gametest.TimeOfDayEnvironment(t)));
             event.registerTest(id.apply(name), new net.minecraft.gametest.framework.FunctionGameTestInstance(
                     net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.TEST_FUNCTION, id.apply(name)),
-                    new net.minecraft.gametest.framework.TestData<>(environment, id.apply("gametest_area"), spec.maxTicks(), 0, true,
+                    new net.minecraft.gametest.framework.TestData<>(environment, net.minecraft.world.level.Level.OVERWORLD, id.apply("gametest_area"), spec.maxTicks(), 0, true,
                             net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, spec.skyAccess(), 0)));
         });
     }

@@ -65,8 +65,8 @@ public class AnomalyRenderer implements BlockEntityRenderer<GravitationalAnomaly
         // 1.7.10 sphere.obj has radius 0.5, scaled by the (pulsing) event horizon
         collector.submitCustomGeometry(pose, net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(BLACK), (p, vc) -> sphere(vc, p, r * 0.5f));
         // the glowing plane: twice the sphere, facing the camera, spinning about the view axis
-        pose.mulPose(camera.orientation);
-        pose.mulPose(Axis.ZP.rotationDegrees(state.spin));
+        pose.rotate(camera.orientation);
+        pose.rotate(Axis.ZP.rotationDegrees(state.spin));
         float half = r;     // a unit plane scaled by 2 x horizon
         // the core is a black disc, the glow a half-transparent white ring; both alpha blended (1.7.10 GL_SRC_ALPHA,
         // GL_ONE_MINUS_SRC_ALPHA) and unlit (lighting disabled)

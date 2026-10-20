@@ -97,7 +97,7 @@ public final class MatterOverdriveFabricClient implements ClientModInitializer {
         ArmorRenderer.register((pose, collector, stack, state, slot, light, contextModel) -> collector.submitModel(
                         TritaniumArmorModel.armorModel(stack), state, pose,
                         net.minecraft.client.renderer.rendertype.RenderTypes.armorCutoutNoCull(TritaniumArmorModel.armorTexture(stack)), light,
-                        net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY, state.outlineColor, null),
+                        net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY, state.outlineColor),
                 MOItems.TRITANIUM_HELMET.get(), MOItems.TRITANIUM_CHESTPLATE.get(), MOItems.TRITANIUM_LEGGINGS.get(), MOItems.TRITANIUM_BOOTS.get());
 
         ClientTickEvents.START_CLIENT_TICK.register(client -> MOClient.onClientTickStart());

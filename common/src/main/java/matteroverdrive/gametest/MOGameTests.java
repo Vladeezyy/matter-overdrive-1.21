@@ -34,7 +34,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.GenerationStep;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 /**
@@ -122,11 +121,11 @@ public final class MOGameTests {
     /** Each configured ore feature actually turns stone into ore. */
     private static void oresPlaceInStone(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
-        var features = level.registryAccess().lookupOrThrow(Registries.CONFIGURED_FEATURE);
+        var features = level.registryAccess().lookupOrThrow(Registries.FEATURE);
         BlockPos origin = helper.absolutePos(new BlockPos(2, 2, 2));
         for (var entry : new Object[][] {{"ore_tritanium", MOBlocks.TRITANIUM_ORE.get()}, {"ore_dilithium", MOBlocks.DILITHIUM_ORE.get()}}) {
             fill(level, origin, 9, Blocks.STONE.defaultBlockState());
-            ConfiguredFeature<?, ?> feature = features.getOrThrow(ResourceKey.create(Registries.CONFIGURED_FEATURE, id((String) entry[0]))).value();
+            net.minecraft.world.level.levelgen.feature.Feature feature = features.getOrThrow(ResourceKey.create(Registries.FEATURE, id((String) entry[0]))).value();
             RandomSource random = RandomSource.create(42);
             for (int i = 0; i < 4; i++) {
                 feature.place(level, level.getChunkSource().getGenerator(), random, origin.offset(4, 4, 4));
