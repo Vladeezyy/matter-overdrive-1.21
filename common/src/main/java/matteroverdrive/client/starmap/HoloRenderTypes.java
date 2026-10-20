@@ -68,7 +68,7 @@ public final class HoloRenderTypes {
 
     private static final Map<Identifier, RenderType> TEXTURED_TYPES = new HashMap<>();
     public static final RenderType COLOR_QUADS = RenderType.create("mo_holo_quads", RenderSetup.builder(QUADS).sortOnUpload().createRenderSetup());
-    public static final RenderType COLOR_TRIANGLES = RenderType.create("mo_holo_triangles", RenderSetup.builder(TRIANGLES).sortOnUpload().createRenderSetup());
+    public static final RenderType COLOR_TRIANGLES = RenderType.create("mo_holo_triangles", RenderSetup.builder(TRIANGLES).createRenderSetup());   // additive: order-free (26.2 can't sort triangles)
     public static final RenderType DEPTH = RenderType.create("mo_holo_depth", RenderSetup.builder(DEPTH_QUADS).createRenderSetup());
     public static final RenderType LINE_TYPE = RenderType.create("mo_holo_lines", RenderSetup.builder(LINES).createRenderSetup());
 
