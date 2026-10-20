@@ -128,7 +128,7 @@ public final class FluidStack {
         if (block != net.minecraft.world.level.block.Blocks.AIR) {
             return block.getName();
         }
-        return this.fluid.getBucket().getDescription();
+        return Component.translatable(this.fluid.getBucket().getDescriptionId());
     }
 
     @Override

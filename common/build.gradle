@@ -19,7 +19,7 @@ repositories {
 
 dependencies {
     // mixins live in common, both loaders ship Mixin at runtime
-    compileOnly 'net.fabricmc:sponge-mixin:0.15.4+mixin.0.8.7'
+    compileOnly('net.fabricmc:sponge-mixin:0.15.4+mixin.0.8.7') { transitive = false }  // Minecraft pins its own asm
     compileOnly 'io.github.llamalad7:mixinextras-common:0.5.0'
     annotationProcessor 'io.github.llamalad7:mixinextras-common:0.5.0'
 }
