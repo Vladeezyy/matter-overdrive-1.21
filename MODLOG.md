@@ -769,3 +769,8 @@
 - Tests: NeoForge 95/95, Fabric 100/100 GameTests; scene (`:fabric:runScene` / `:neoforge:runScene`, world: a 1.21.3 flat creative `mo_scene` made by `:fabric:runServer`) on both loaders.
 - Not done: MSPT/FPS against vanilla on Fabric, a run of the jars outside dev, release pages.
 - Fabric armor: `ArmorRenderer.renderPart` draws the shared armor model without `setupAnim`, so on a moving player the armor stayed in the default pose (skin over the armor in the scene). `model.setupAnim(state)` first, as vanilla's armor layer.
+
+### Release preparation (Fabric 1.0.2)
+- The release jar ships without GameTests: the `fabric-gametest` entrypoint made Fabric API scan the test classes whenever a world opened, and in production that scan failed (`AnnotationFormatError ... GameTest.rotation()`), so the world hung on "Preparing resources". `jar` excludes the test classes and test instances and drops the entrypoint line; dev runs keep the tests.
+- `fabric-api` dependency `>=` the version the jar is built against.
+- Checked outside dev: the release jar on the official Fabric server launcher (world generated, clean stop) and `:fabric:prodScene` (Loom `ClientProductionRunTask`: the scripted scene on the release jar in a production client): 142/142 shots.
