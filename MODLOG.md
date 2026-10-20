@@ -736,3 +736,11 @@
   (gen_resources.py + the branch's backport step).
 - The PerfScene / tools/perf.sh measuring tools stay on main (1.21.10 APIs); the numbers are in main's MODLOG.
 - 95 GameTests pass.
+
+## 2026-10-20 — Fabric 1.21.4 (branch `fabric-1.21.4`)
+- Same layout as `fabric-1.21.1` (common / neoforge / fabric, see that branch's MODLOG): the commits of the previous version's Fabric branch cherry-picked onto this branch, then fixed for the version's API.
+- Versions: NeoForge 21.4.158, Fabric API 0.119.4, Team Reborn Energy 4.1.0 (in the jar).
+- Model API with texture slots: `FabricObjModels` replaces the unbaked model on load and takes the texture slots from the child model; item model `select` properties registered through `SelectItemModelProperties.ID_MAPPER` (NeoForge: `RegisterSelectItemModelPropertyEvent`).
+- Standalone models by id (`ClientPlatform.standaloneModel`), armor texture hook, spawn eggs without colours.
+- Tests: NeoForge 95/95, Fabric 100/100 GameTests; scene (`:fabric:runScene` / `:neoforge:runScene`, world: a 1.21.4 flat creative `mo_scene` made by `:fabric:runServer`) on both loaders.
+- Not done: MSPT/FPS against vanilla on Fabric, a run of the jars outside dev, release pages.
