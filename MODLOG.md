@@ -755,3 +755,5 @@
 - `BaseEntityBlock.getRenderShape` is `INVISIBLE` in 1.21.1-1.21.3 (1.21.4+ draws the model) and `TritaniumCrateBlock`
   had no override, so placed crates were invisible since this branch was made (found by the Fabric port scene). Now
   `RenderShape.MODEL`; 95 GameTests pass, the scene shot shows all 16 crates.
+- Released as 1.0.2 on Modrinth for 1.21.1 (version YMIESSz3) and 1.21.3 (lhfAWc8V); 1.21.4+ stay on 1.0.1. No GitHub
+  release for 1.0.2 yet.
