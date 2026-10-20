@@ -744,3 +744,4 @@
 - Standalone models by id (`ClientPlatform.standaloneModel`), armor texture hook, spawn eggs without colours.
 - Tests: NeoForge 95/95, Fabric 100/100 GameTests; scene (`:fabric:runScene` / `:neoforge:runScene`, world: a 1.21.4 flat creative `mo_scene` made by `:fabric:runServer`) on both loaders.
 - Not done: MSPT/FPS against vanilla on Fabric, a run of the jars outside dev, release pages.
+- Fabric armor: `ArmorRenderer.renderPart` draws the shared armor model without `setupAnim`, so on a moving player the armor stayed in the default pose (skin over the armor in the scene). `model.setupAnim(state)` first, as vanilla's armor layer.
