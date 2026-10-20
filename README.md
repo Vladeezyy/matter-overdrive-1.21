@@ -1,12 +1,12 @@
-# Matter Overdrive for Minecraft 1.21.1 – 1.21.10 (NeoForge and Fabric)
+# Matter Overdrive for Minecraft 1.21.1 – 26.x (NeoForge and Fabric)
 
 ![Matter Overdrive](docs/modrinth/banner.png)
 
 An unofficial port of [Matter Overdrive](https://github.com/simeonradivoev/MatterOverdrive) by Simeon Radivoev
-from Minecraft 1.7.10 to **Minecraft 1.21.1 – 1.21.10** on **NeoForge** and **Fabric** (Fabric API; Team Reborn Energy for FE is
+from Minecraft 1.7.10 to **Minecraft 1.21.1 – 26.x** on **NeoForge** and **Fabric** (Fabric API; Team Reborn Energy for FE is
 included in the jar).
 
-This branch (Minecraft 1.21.10) builds both loaders from one `common` module (all game code, compiled on vanilla)
+This branch (Minecraft 26.1.2) builds both loaders from one `common` module (all game code, compiled on vanilla)
 plus thin `neoforge/` and `fabric/` modules. The other versions live on their own branches.
 
 The port is a rewrite against modern APIs that keeps the original's behaviour, numbers, textures, sounds and
@@ -18,6 +18,7 @@ speakers). The 1.7.10 source (0.4.2) is the specification.
 
 | Version | Minecraft | NeoForge | Source branch |
 |---|---|---|---|
+| 1.0.2+26.1.2 (not released yet) | 26.1.2 | 26.1.2.121 or newer; Fabric API 0.155.3 or newer | `mc/26.1.2` |
 | 1.0.1+1.21.10 | 1.21.10 | 21.10.64 or newer | `main` |
 | 1.0.1+1.21.8 | 1.21.8 | 21.8.54 or newer | `1.21.8` |
 | 1.0.1+1.21.5 | 1.21.5 | 21.5.98 or newer | `1.21.5` |
@@ -26,7 +27,7 @@ speakers). The 1.7.10 source (0.4.2) is the specification.
 | 1.0.1+1.21.1 | 1.21.1 | 21.1.197 or newer | `1.21.1` |
 | 1.0.0 | 1.21.10 | 21.10.64 or newer | first release |
 
-Java 21; install on the server and on every client.
+Java 21 (Minecraft 26.x: Java 25); install on the server and on every client.
 
 ## Status
 Everything from the original is ported:
@@ -46,14 +47,14 @@ Details: [MODDING_PLAN.md](MODDING_PLAN.md) and the work log [MODLOG.md](MODLOG.
 difference from 1.7.10.
 
 ## Building
-Requires JDK 21.
+Requires JDK 25 (this branch; the 1.21.x branches use JDK 21).
 ```bash
 ./gradlew build                        # jars in neoforge/build/libs/ and fabric/build/libs/
 ./gradlew :neoforge:runClient          # dev client (:fabric:runClient for Fabric)
 ./gradlew :neoforge:runGameTestServer  # headless in-game tests (:fabric:runGametest)
 ./gradlew :neoforge:runScene           # scripted scene: screenshots to <loader>/run/screenshots/ (:fabric:runScene)
 ```
-`runScene` needs a 1.21.10 world named `mo_scene` in `<loader>/run/saves/` (a flat creative world made by the
+`runScene` needs a 26.1.2 world named `mo_scene` in `<loader>/run/saves/` (a flat creative world made by the
 dedicated server works).
 Resources for simple content are generated from the original 1.7.10 assets by `tools/gen_resources.py`
 (see MODLOG.md for the command).
@@ -70,7 +71,7 @@ Original mod, art, sounds and translations: Simeon Radivoev and the Matter Overd
 <details>
 <summary><b>🇷🇺 Русский — нажмите, чтобы открыть</b></summary>
 
-## Matter Overdrive для Minecraft 1.21.1 – 1.21.10 (NeoForge)
+## Matter Overdrive для Minecraft 1.21.1 – 26.x (NeoForge и Fabric)
 
 Неофициальный порт [Matter Overdrive](https://github.com/simeonradivoev/MatterOverdrive) (Simeon Radivoev) с
 Minecraft 1.7.10. Переписан под современные API с сохранением поведения, чисел, текстур, звуков и переводов оригинала
@@ -78,7 +79,9 @@ Minecraft 1.7.10. Переписан под современные API с сох
 
 **Скачать:** [Modrinth](https://modrinth.com/mod/matter-overdrive-1.21-unofficial-port) ·
 [GitHub releases](https://github.com/Vladeezyy/matter-overdrive-1.21/releases) — файл `matteroverdrive-1.0.1+<версия Minecraft>.jar`
-для 1.21.1, 1.21.3, 1.21.4, 1.21.5, 1.21.8 или 1.21.10. Java 21; ставить на сервер и на каждый клиент.
+для 1.21.1, 1.21.3, 1.21.4, 1.21.5, 1.21.8 или 1.21.10. Java 21 (для Minecraft 26.x — Java 25); ставить на сервер и на каждый клиент.
+
+**26.x:** порт на Minecraft 26.1.2 (эта ветка, `mc/26.1.2`) собран и проверен на обоих загрузчиках, но ещё не выпущен.
 
 Перенесено всё из оригинала: материалы и руда, машины и энергия, материя и репликация, аномалии и термоядерный реактор,
 энергетическое оружие, андроиды, мир (андроиды-изгои, неудачные животные, постройки, безумный учёный), звёздная карта,

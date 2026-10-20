@@ -727,3 +727,47 @@
 - The release jar ships without GameTests: the `fabric-gametest` entrypoint made Fabric API scan the test classes whenever a world opened, and in production that scan failed (`AnnotationFormatError ... GameTest.rotation()`), so the world hung on "Preparing resources". `jar` excludes the test classes and test instances and drops the entrypoint line; dev runs keep the tests.
 - `fabric-api` dependency `>=` the version the jar is built against.
 - Checked outside dev: the release jar on the official Fabric server launcher (world generated, clean stop) and `:fabric:prodScene` (Loom `ClientProductionRunTask`: the scripted scene on the release jar in a production client): 142/142 shots.
+
+## 2026-10-20 — Minecraft 26.1.2 (branch `mc/26.1.2`, from `fabric-1.21.10`)
+- Versions: NeoForge 26.1.2.121, NeoForm 26.1.2-1, Fabric API 0.155.3 + its GameTest module 4.0.18 (not in the 26.x
+  bundle), Fabric Loader 0.19.5, Team Reborn Energy 5.0.0 (in the jar), Java 25, Gradle 9.8.1, Loom 1.18 (no
+  remapping, the release jar is `jar`), no Parchment. `org.gradle.java.home` points at the JDK 25 in gradle.properties.
+- Mechanical rewrites: `tools/port/port_26.py` (from the Rats port: Identifier, moved classes, render types) and
+  `tools/port/port_gui26.py` (GUI extraction: `text`/`item`/`outline`, `extractRenderState`/`extractBackground`/
+  `extractLabels`, container screens size themselves in the constructor). The access widener is generated from the AT
+  again (`tools/port/at2aw.py`, header `official`).
+- API changes worth knowing:
+  - Recipes: `RecipeSerializer` is a record (codec + stream codec), results are `ItemStackTemplate`, `assemble(input)`.
+  - Time lives on world clocks: `getDefaultClockTime()`, the sun angle is an environment attribute, `/time` in the
+    scenes via `clockManager().setTotalTicks`. GameTests with a fixed time use the mod's own `matteroverdrive:time_of_day`
+    environment on both loaders (vanilla's `clock_time` needs the clock holder, which code can't get before a world).
+  - Rendering: `RenderType.create(name, RenderSetup)`, pipelines with `ColorTargetState` / `DepthStencilState`, lines
+    carry their width per vertex (`setLineWidth`), block models are submitted as model parts (collected once per baked
+    model), block colours are `BlockTintSource` lists, fluid textures are `FluidModel`s (NeoForge
+    `RegisterFluidModelsEvent`, Fabric `FluidRenderingRegistry`), the android shield is submitted with the level's custom
+    geometry (NeoForge `SubmitCustomGeometryEvent`, Fabric `LevelRenderEvents.COLLECT_SUBMITS`).
+  - The render layer comes from the texture's alpha now: the tritanium crates' colour overlay is cut out as its texture
+    says (1.21.x drew its transparent pixels in the dye colour, so the crates had big coloured panels).
+  - `HumanoidModel.setAllVisible` is gone: hide only the main parts (hiding `allParts()` also hid the armor's plates).
+  - `EditBox.setFilter` is gone: `client/screen/FilteredEditBox` rejects typed text the filter refuses.
+  - NeoForge: `BreakBlockEvent`, `LivingDamageEvent.Post.getHealthDamage()`, global loot modifiers are single files in
+    `data/<ns>/loot_modifiers/` (the `global_loot_modifiers.json` list is gone; Fabric reads the same folder).
+  - Fabric API 0.155: `FabricCreativeModeTab`, `ExtendedMenuType`/`ExtendedMenuProvider`, `KeyMappingHelper`,
+    `ModelLayerRegistry`, `HudElementRegistry`, `LevelRenderEvents`, `ServerLevelEvents`,
+    `ServerEntityLevelChangeEvents`, `PayloadTypeRegistry.clientboundPlay/serverboundPlay`,
+    `PictureInPictureRendererRegistry`; the OBJ loader bakes 26.x quads (positions + packed UVs, material info, no vertex
+    normals) into a `CuboidModel`; Gui mixins on `extractHearts/Food/AirBubbles/TabList`.
+- Tests: GameTests 101/101 on NeoForge and Fabric. Scene (world `mo_scene` made by `:fabric:runServer` on 26.1.2,
+  copied to both loaders' `run/saves`) 142/142 on both loaders; compared shot by shot with 1.21.10 and with each other:
+  same scenes, differences are random loot, mob poses, village layout and the crates above.
+  `:fabric:prodScene` on the release jar: 142/142 (Team Reborn Energy nested, no GameTests in the jar).
+- Performance (`:<loader>:runPerf -Pperf=stress`, MacBook Air M4, sky platform; FPS swings ~20 % between runs):
+
+  | Loader | Empty field | 576 burning vanilla furnaces | 48 MO modules (576 machines and pipes) |
+  |---|---|---|---|
+  | NeoForge | 685 FPS, 4.48 ms/tick | 635 FPS, 4.41 ms | 640 FPS, 4.50 ms |
+  | Fabric, run 1 | 582 FPS, 4.11 ms | 542 FPS, 4.25 ms | 494 FPS, 4.66 ms |
+  | Fabric, run 2 | 514 FPS, 5.67 ms | 434 FPS, 6.48 ms | 443 FPS, 6.81 ms |
+
+  The working modules cost what the same number of burning furnaces cost (NeoForge +0.09 ms per tick, Fabric +0.33 to
+  +0.41 ms, frame rate 91–102 % of the furnaces').
