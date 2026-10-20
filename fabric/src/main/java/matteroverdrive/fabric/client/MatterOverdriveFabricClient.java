@@ -102,11 +102,8 @@ public final class MatterOverdriveFabricClient implements ClientModInitializer {
             AndroidHud.render(graphics, delta);
             QuestHud.render(graphics, delta);
         });
-        WorldRenderEvents.AFTER_ENTITIES.register(context -> {
-            PoseStack pose = new PoseStack();
-            pose.mulPose(context.positionMatrix());
-            ShieldRenderer.renderLevel(pose);
-        });
+        // the camera's rotation is already in RenderSystem's model-view stack at this stage (1.21.1): an identity pose
+        WorldRenderEvents.AFTER_ENTITIES.register(context -> ShieldRenderer.renderLevel(new PoseStack()));
     }
 
     /** NeoForge reads the render type from the block's model ("render_type"); Fabric needs it per block */
