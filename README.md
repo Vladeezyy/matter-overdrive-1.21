@@ -1,11 +1,13 @@
-# Matter Overdrive for Minecraft 1.21.8 (NeoForge)
+# Matter Overdrive for Minecraft 1.21.8 (NeoForge and Fabric)
 
 ![Matter Overdrive](docs/modrinth/banner.png)
 
 An unofficial port of [Matter Overdrive](https://github.com/simeonradivoev/MatterOverdrive) by Simeon Radivoev
-from Minecraft 1.7.10 to **Minecraft 1.21.8** on **NeoForge 21.8**.
+from Minecraft 1.7.10 to **Minecraft 1.21.8** on **NeoForge 21.8** and **Fabric** (Fabric API; Team Reborn Energy for
+FE is included in the jar).
 
-This is the `1.21.8` branch. Every supported Minecraft version has its own branch with the same game code: `main`
+This is the `1.21.8` branch. It builds both loaders from one `common` module (all game code, compiled on
+vanilla) plus thin `neoforge/` and `fabric/` modules. Every supported Minecraft version has its own branch with the same game code: `main`
 (1.21.10), `1.21.8`, `1.21.5`, `1.21.4`, `1.21.3` and `1.21.1`. The APIs that differ are bridged in
 `matteroverdrive.compat`, and `tools/backport.py` converts the generated resources for the branch's version.
 
@@ -36,12 +38,13 @@ difference from 1.7.10.
 ## Building
 Requires JDK 21.
 ```bash
-./gradlew build              # jar in build/libs/
-./gradlew runClient          # dev client
-./gradlew runGameTestServer  # headless in-game tests
-./gradlew runScene           # scripted scene: screenshots of the machines and features to run/screenshots/
+./gradlew build                        # jars in neoforge/build/libs/ and fabric/build/libs/
+./gradlew :neoforge:runClient          # dev client (:fabric:runClient for Fabric)
+./gradlew :neoforge:runGameTestServer  # headless in-game tests (:fabric:runGametest)
+./gradlew :neoforge:runScene           # scripted scene: screenshots to <loader>/run/screenshots/ (:fabric:runScene)
 ```
-`runScene` needs a world named `mo_scene` in `run/saves/` (any copy of a dev world).
+`runScene` needs a 1.21.8 world named `mo_scene` in `<loader>/run/saves/` (a flat creative world made by the
+dedicated server works).
 Resources for simple content are generated from the original 1.7.10 assets by `tools/gen_resources.py`, then
 converted for the branch's Minecraft version by `tools/backport.py` (see MODLOG.md for the commands).
 

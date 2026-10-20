@@ -9,7 +9,6 @@ import java.util.Map;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.mojang.blaze3d.vertex.PoseStack;
 
 import matteroverdrive.MatterOverdrive;
 import matteroverdrive.client.MOClient;
@@ -108,7 +107,7 @@ public final class MatterOverdriveFabricClient implements ClientModInitializer {
             QuestHud.render(graphics, delta);
         });
         // the camera's rotation is already in RenderSystem's model-view stack at this stage (1.21.1): an identity pose
-        WorldRenderEvents.AFTER_ENTITIES.register(context -> ShieldRenderer.renderLevel(new PoseStack()));
+        WorldRenderEvents.AFTER_ENTITIES.register(context -> ShieldRenderer.renderLevel(context.matrixStack()));
     }
 
     /** NeoForge reads the render type from the block's model ("render_type"); Fabric needs it per block */

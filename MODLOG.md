@@ -708,3 +708,12 @@
   (gen_resources.py + the branch's backport step).
 - The PerfScene / tools/perf.sh measuring tools stay on main (1.21.10 APIs); the numbers are in main's MODLOG.
 - 96 GameTests pass.
+
+## 2026-10-20 — Fabric 1.21.8 (branch `fabric-1.21.8`)
+- Same layout as `fabric-1.21.1` (common / neoforge / fabric, see that branch's MODLOG): the commits of the previous version's Fabric branch cherry-picked onto this branch, then fixed for the version's API.
+- Versions: NeoForge 21.8.54, Fabric API 0.136.1, Team Reborn Energy 4.2.0 (in the jar).
+- Storages save through `ValueOutput` / `ValueInput` (`platform.ValueIOSerializable`; item stacks as `ItemStackWithSlot`), the star map draws as a picture-in-picture element (`GuiGraphics.guiRenderState`), render layers are `ChunkSectionLayer`s, stripped logs through the platform (NeoForge data map, Fabric `AxeItem.STRIPPABLES`).
+- NeoForge 21.8 refuses clientbound payloads without a client handler ("missing client-side handlers"): bidirectional payloads register both handlers.
+- Fabric pitfall: from 1.21.6 the camera rotation is no longer in the model-view stack at `WorldRenderEvents.AFTER_ENTITIES`; it is in `context.matrixStack()`. The identity pose kept from 1.21.1 drew the android shield in screen space (large purple shapes in the scene). Now the shield uses the context's matrices.
+- Tests: NeoForge 96/96, Fabric 101/101 GameTests; scene (`:fabric:runScene` / `:neoforge:runScene`, world: a 1.21.8 flat creative `mo_scene` made by `:fabric:runServer`) on both loaders.
+- Not done: MSPT/FPS against vanilla on Fabric, a run of the jars outside dev, release pages.
