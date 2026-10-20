@@ -24,7 +24,8 @@ for line in open(at):
     else:
         txt=javap(cls)
         mm=re.search(r' '+re.escape(member)+r';\n\s+descriptor: (\S+)',txt)
-        if not mm: sys.exit(f'no field {cls}.{member}')
+        if not mm:
+            print(f'missing field {cls}.{member} (dropped)', file=sys.stderr); continue
         out.append(f'accessible field {internal} {member} {mm.group(1)}')
         if mod.endswith('-f'): out.append(f'mutable field {internal} {member} {mm.group(1)}')
 out.append('# Fabric only')

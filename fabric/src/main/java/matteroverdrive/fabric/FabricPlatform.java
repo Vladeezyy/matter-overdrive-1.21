@@ -65,6 +65,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.HoneycombItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -337,6 +338,11 @@ public final class FabricPlatform implements Platform {
     @Override
     public @Nullable Block nextOxidation(Block block) {
         return WeatheringCopper.getNext(block).orElse(null);
+    }
+
+    @Override
+    public @Nullable Block stripped(Block block) {
+        return AxeItem.STRIPPABLES.get(block);
     }
 
     @Override
