@@ -771,3 +771,28 @@
 
   The working modules cost what the same number of burning furnaces cost (NeoForge +0.09 ms per tick, Fabric +0.33 to
   +0.41 ms, frame rate 91–102 % of the furnaces').
+
+## 2026-10-20 — Minecraft 26.2 (branch `mc/26.2`, from `mc/26.1.2`)
+- Versions: NeoForge 26.2.0.93, NeoForm 26.2-2, Fabric API 0.161.0 + GameTest module 4.0.22, Team Reborn Energy 5.0.0.
+- `tools/port/port_262.py`: screen and HUD under `Minecraft.gui`, `EntityTypes`, `Vec3.atCenterOf`, colour and copper
+  collections, `GameRenderer` accessors, `LightCoordsUtil`, `Language.has`, team colours. By hand: structure processors
+  as an interface with `codec()`, render pipelines with bind group layouts and primitive topologies, the star map's
+  picture-in-picture renderer submitting into its own collector, Fabric mixins on `Hud` and the `submit*` hand methods.
+- Found by comparing the scene with 26.1.2 (fixed on `mc/26.1.2` and merged down):
+  - 26.2 reverses the depth range (`DepthStencilState.DEFAULT` is `GREATER_THAN_OR_EQUAL`): the holograms' no-depth-write
+    state with a fixed `LESS_THAN_OR_EQUAL` drew only behind geometry (the own android shield vanished in first person,
+    the star map lost its glow). The test now comes from `DEFAULT`.
+  - Fabric crashed in the star map: 26.2 can't sort triangle draws on upload; the additive holo triangles don't need it.
+  - NeoForge's `logoFile` warning screen held the dev client before the main menu: `bannerFile`.
+- Tests: GameTests 101/101 on both loaders; scene 142/142 on both (a fresh flat world per run: a reused world has an
+  evening sky and the previous run's builds), shots compared with 26.1.2 and between loaders; `:fabric:prodScene` on the
+  release jar 142/142.
+- Performance (`runPerf -Pperf=stress`; a CI session was building other repos at the same time, so the absolute frame
+  rate is lower on every field, the empty one too):
+
+  | Loader | Empty field | 576 burning vanilla furnaces | 48 MO modules (576 machines and pipes) |
+  |---|---|---|---|
+  | NeoForge | 237 FPS, 4.15 ms/tick | 244 FPS, 4.69 ms | 236 FPS, 4.74 ms |
+  | Fabric | 234 FPS, 4.32 ms/tick | 245 FPS, 4.33 ms | 240 FPS, 4.16 ms |
+
+  The modules cost what the furnaces cost (97–98 % of their frame rate, within ±0.2 ms per tick).
