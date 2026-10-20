@@ -177,7 +177,14 @@ public final class MatterOverdriveNeoForge {
 
         @Override
         public <T extends CustomPacketPayload> PayloadRegistrar playBidirectional(CustomPacketPayload.Type<T> type, StreamCodec<? super RegistryFriendlyByteBuf, T> codec, BiConsumer<T, PacketContext> handler) {
-            this.registrar.playBidirectional(type, codec, handler(handler));
+            return this.playBidirectional(type, codec, handler, handler);
+        }
+
+        /** NeoForge 21.8+: a clientbound payload needs its client handler given here */
+        @Override
+        public <T extends CustomPacketPayload> PayloadRegistrar playBidirectional(CustomPacketPayload.Type<T> type, StreamCodec<? super RegistryFriendlyByteBuf, T> codec,
+                                                                                 BiConsumer<T, PacketContext> clientHandler, BiConsumer<T, PacketContext> serverHandler) {
+            this.registrar.playBidirectional(type, codec, handler(clientHandler), handler(serverHandler));
             return this;
         }
 
