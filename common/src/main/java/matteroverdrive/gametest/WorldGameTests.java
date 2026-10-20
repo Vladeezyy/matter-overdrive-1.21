@@ -1,0 +1,189 @@
+package matteroverdrive.gametest;
+
+import matteroverdrive.entity.animal.FailedPig;
+import matteroverdrive.entity.animal.FailedSheep;
+import matteroverdrive.init.MOEntities;
+import net.minecraft.core.BlockPos;
+import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.DyeColor;
+
+/** Phase 7 checks: world mobs. */
+final class WorldGameTests {
+    static void addAll() {
+        MOGameTests.add("failed_animals", 20, false, WorldGameTests::failedAnimals);
+        MOGameTests.add("mutant_scientist", 20, false, WorldGameTests::mutantScientist);
+        MOGameTests.add("tritanium_crate", 20, false, WorldGameTests::tritaniumCrate);
+        MOGameTests.add("buildings", 20, false, WorldGameTests::buildings);
+        MOGameTests.add("matter_container", 20, false, WorldGameTests::matterContainer);
+        MOGameTests.add("portable_decomposer", 20, false, WorldGameTests::portableDecomposer);
+        MOGameTests.add("transporter", 120, false, WorldGameTests::transporter);
+        MOGameTests.add("android_spawner", 60, false, WorldGameTests::androidSpawner);
+    }
+
+    private static void check(GameTestHelper helper, boolean ok, String message) {
+        helper.assertTrue(ok, message);
+    }
+
+    /** Failed animals breed failed young, and only with their own kind. */
+    private static void failedAnimals(GameTestHelper helper) {
+        var level = helper.getLevel();
+        FailedPig pig = helper.spawnWithNoFreeWill(MOEntities.FAILED_PIG.get(), new BlockPos(2, 1, 2));
+        FailedPig pig2 = helper.spawnWithNoFreeWill(MOEntities.FAILED_PIG.get(), new BlockPos(3, 1, 2));
+        var vanilla = helper.spawnWithNoFreeWill(EntityType.PIG, new BlockPos(4, 1, 2));
+        check(helper, pig.getBreedOffspring(level, pig2) instanceof FailedPig, "piglet isn't a failed pig");
+        pig.setInLove(null);
+        pig2.setInLove(null);
+        vanilla.setInLove(null);
+        check(helper, pig.canMate(pig2) && !pig.canMate(vanilla), "failed pigs mate with normal pigs");
+        check(helper, MOEntities.FAILED_COW.get().create(level)
+                .getBreedOffspring(level, null).getType() == MOEntities.FAILED_COW.get(), "calf isn't a failed cow");
+        var chicken = helper.spawnWithNoFreeWill(MOEntities.FAILED_CHICKEN.get(), new BlockPos(6, 1, 6));
+        check(helper, chicken.getBreedOffspring(level, chicken).getType() == MOEntities.FAILED_CHICKEN.get(), "chick isn't a failed chicken");
+        FailedSheep sheep = helper.spawnWithNoFreeWill(MOEntities.FAILED_SHEEP.get(), new BlockPos(8, 1, 8));
+        FailedSheep sheep2 = helper.spawnWithNoFreeWill(MOEntities.FAILED_SHEEP.get(), new BlockPos(9, 1, 8));
+        sheep.setColor(DyeColor.RED);
+        sheep2.setColor(DyeColor.YELLOW);
+        var lamb = sheep.getBreedOffspring(level, sheep2);
+        check(helper, lamb instanceof FailedSheep && lamb.getColor() == DyeColor.ORANGE, "lamb " + lamb);
+        helper.succeed();
+    }
+
+    /** Mutant scientist: 256 health, rogue androids hunt it. */
+    private static void mutantScientist(GameTestHelper helper) {
+        var mutant = helper.spawnWithNoFreeWill(MOEntities.MUTANT_SCIENTIST.get(), new BlockPos(3, 1, 3));
+        check(helper, mutant.getMaxHealth() == 256 && mutant.getHealth() == 256, "health " + mutant.getMaxHealth());
+        check(helper, matteroverdrive.entity.monster.RogueAndroid.isEnemy(mutant), "rogue androids ignore mutants");
+        helper.succeed();
+    }
+
+    /** Tritanium crate: 54 slots, keeps its contents in the dropped item. */
+    private static void tritaniumCrate(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(2, 1, 2);
+        helper.setBlock(pos, matteroverdrive.init.MOBlocks.crate(DyeColor.ORANGE).get());
+        var crate = (matteroverdrive.block.entity.TritaniumCrateBlockEntity) helper.<matteroverdrive.block.entity.TritaniumCrateBlockEntity>getBlockEntity(pos);
+        check(helper, crate.getContainerSize() == 54, "size " + crate.getContainerSize());
+        crate.setItem(53, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DIAMOND, 7));
+        BlockPos abs = helper.absolutePos(pos);
+        var drops = net.minecraft.world.level.block.Block.getDrops(helper.getLevel().getBlockState(abs), helper.getLevel(), abs, crate,
+                null, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DIAMOND_PICKAXE));
+        check(helper, drops.size() == 1, "drops " + drops);
+        var contents = drops.get(0).get(net.minecraft.core.component.DataComponents.CONTAINER);
+        check(helper, contents != null && contents.nonEmptyStream().anyMatch(s -> s.getCount() == 7), "contents not kept: " + contents);
+        helper.succeed();
+    }
+
+    /** Image buildings: every template loads with its 1.7.10 size and every structure is registered from its JSON. */
+    private static void buildings(GameTestHelper helper) {
+        var structures = helper.getLevel().registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.STRUCTURE);
+        int[][] sizes = {{21, 9, 21}, {24, 16, 24}, {11, 6, 35}, {43, 25, 43}, {58, 16, 23}};
+        for (var building : matteroverdrive.world.Building.values()) {
+            var t = building.template();
+            int[] size = sizes[building.ordinal()];
+            check(helper, t.width() == size[0] && t.height() == size[1] && t.depth() == size[2],
+                    building + " size " + t.width() + "x" + t.height() + "x" + t.depth());
+            var key = net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("matteroverdrive", building.getSerializedName());
+            check(helper, structures.getOptional(key).isPresent(), "structure " + key + " missing");
+        }
+        helper.succeed();
+    }
+
+    /** Matter container: holds exactly 32 mB of Matter Plasma through the fluid item capability; the plasma block is a source. */
+    private static void matterContainer(GameTestHelper helper) {
+        var plasma = matteroverdrive.init.MOFluids.MATTER_PLASMA.get();
+        var container = new net.minecraft.world.item.ItemStack(matteroverdrive.init.MOItems.MATTER_CONTAINER.get());
+        var tank = matteroverdrive.platform.Platform.INSTANCE.fluidHandler(container).orElse(null);
+        check(helper, tank != null, "no fluid capability");
+        var simulate = matteroverdrive.platform.transfer.IFluidHandler.FluidAction.SIMULATE;
+        var execute = matteroverdrive.platform.transfer.IFluidHandler.FluidAction.EXECUTE;
+        int partial = tank.fill(new matteroverdrive.platform.transfer.FluidStack(plasma, 10), simulate);
+        int full = tank.fill(new matteroverdrive.platform.transfer.FluidStack(plasma, 100), execute);
+        check(helper, partial == 0 && full == 32, "inserted " + partial + " / " + full);
+        check(helper, tank.getContainer().is(matteroverdrive.init.MOItems.MATTER_CONTAINER_FULL.get()), "container not full: " + tank.getContainer());
+        BlockPos pos = new BlockPos(3, 1, 3);
+        helper.setBlock(pos, matteroverdrive.init.MOBlocks.MATTER_PLASMA.get());
+        var fluid = helper.getLevel().getFluidState(helper.absolutePos(pos));
+        check(helper, fluid.isSource() && fluid.getType() == matteroverdrive.init.MOFluids.MATTER_PLASMA.get(), "plasma block " + fluid);
+        helper.succeed();
+    }
+
+    /** Portable decomposer: listed items become 10% of their matter for 1 FE per point; others are left alone. */
+    private static void portableDecomposer(GameTestHelper helper) {
+        var server = helper.getLevel().getServer();
+        var item = net.minecraft.world.item.Items.IRON_INGOT;
+        int value = matteroverdrive.matter.MatterHelper.getMatter(server, new net.minecraft.world.item.ItemStack(item));
+        check(helper, value > 0, "iron has no matter");
+        var decomposer = new net.minecraft.world.item.ItemStack(matteroverdrive.init.MOItems.PORTABLE_DECOMPOSER.get());
+        decomposer.set(matteroverdrive.init.MODataComponents.ENERGY.get(), 100000);
+        var dirt = new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.COBBLESTONE, 10);
+        matteroverdrive.item.PortableDecomposerItem.decompose(server, decomposer, dirt);
+        check(helper, dirt.getCount() == 10, "unlisted item decomposed");
+        check(helper, matteroverdrive.item.PortableDecomposerItem.addToList(decomposer, new net.minecraft.world.item.ItemStack(item)), "not listed");
+        var ingots = new net.minecraft.world.item.ItemStack(item, 3);
+        matteroverdrive.item.PortableDecomposerItem.decompose(server, decomposer, ingots);
+        float matter = matteroverdrive.item.PortableDecomposerItem.getMatter(decomposer);
+        check(helper, ingots.isEmpty() && Math.abs(matter - 3 * value * 0.1f) < 0.01f
+                && matteroverdrive.item.PortableDecomposerItem.getEnergy(decomposer) == 100000 - 3 * value,
+                "matter " + matter + ", energy " + matteroverdrive.item.PortableDecomposerItem.getEnergy(decomposer) + ", left " + ingots.getCount());
+        helper.succeed();
+    }
+
+    /** Transporter: after 70 ticks the pig on it is at the destination, for 16 FE per block; the flash drive imports a spot. */
+    private static void transporter(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, matteroverdrive.init.MOBlocks.TRANSPORTER.get());
+        var t = helper.<matteroverdrive.block.entity.TransporterBlockEntity>getBlockEntity(pos);
+        t.getEnergy().set(100000);
+        BlockPos abs = helper.absolutePos(pos);
+        var drive = new net.minecraft.world.item.ItemStack(matteroverdrive.init.MOItems.TRANSPORT_FLASH_DRIVE.get());
+        drive.set(matteroverdrive.init.MODataComponents.TRANSPORT_TARGET.get(), abs.offset(10, -1, 0));
+        t.getInventory().setStack(matteroverdrive.block.entity.TransporterBlockEntity.FLASH_DRIVE, drive);
+        check(helper, t.importFromFlashDrive("East") && t.getSelected().pos().equals(abs.offset(10, 0, 0)), "import " + t.getSelected());
+        var pig = helper.spawnWithNoFreeWill(EntityType.PIG, pos.above());
+        helper.runAfterDelay(80, () -> {
+            check(helper, pig.getBlockX() == abs.getX() + 10 && pig.getBlockZ() == abs.getZ(), "pig at " + pig.blockPosition() + ", expected " + abs.offset(10, 0, 0));
+            check(helper, t.getEnergy().getEnergy() == 100000 - 160, "energy " + t.getEnergy().getEnergy());
+            helper.succeed();
+        });
+    }
+
+    /** Android spawner: waits for its team, keeps max androids on the team with the flash drive path, Kill All removes them. */
+    private static void androidSpawner(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(2, 1, 2);
+        helper.setBlock(pos, matteroverdrive.init.MOBlocks.ANDROID_SPAWNER.get());
+        var spawner = helper.<matteroverdrive.block.entity.AndroidSpawnerBlockEntity>getBlockEntity(pos);
+        var scoreboard = helper.getLevel().getScoreboard();
+        String teamName = "mo_spawner_test";
+        if (scoreboard.getPlayerTeam(teamName) != null) scoreboard.removePlayerTeam(scoreboard.getPlayerTeam(teamName));
+        spawner.setConfig(2, 3, 0, teamName);
+        BlockPos abs = helper.absolutePos(pos);
+        helper.runAfterDelay(5, () -> {
+            check(helper, spawner.getSpawnedCount() == 0 && !spawner.isActive(), "spawned without its team");
+            var team = scoreboard.addPlayerTeam(teamName);
+            spawner.getInventory().setStack(matteroverdrive.block.entity.AndroidSpawnerBlockEntity.COLOR_MODULE_SLOT,
+                    new net.minecraft.world.item.ItemStack(matteroverdrive.init.MOItems.COLOR_MODULES.get(0).get()));
+            helper.runAfterDelay(10, () -> {
+                var androids = helper.getLevel().getEntitiesOfClass(matteroverdrive.entity.monster.RogueAndroid.class,
+                        new net.minecraft.world.phys.AABB(abs).inflate(8));
+                check(helper, spawner.getSpawnedCount() == 2 && androids.size() == 2, "spawned " + spawner.getSpawnedCount() + ", found " + androids.size());
+                for (var android : androids) {
+                    check(helper, android.getTeam() == team && abs.equals(android.getSpawnerPos()) && android.isPersistenceRequired(),
+                            "android not tied to the spawner/team");
+                    check(helper, net.minecraft.world.phys.Vec3.atLowerCornerOf(abs).equals(android.getPathTarget()), "path " + android.getPathTarget());
+                    check(helper, android.getVisorColor() == 0xCC0000, "visor " + Integer.toHexString(android.getVisorColor()));
+                }
+                var drive = new net.minecraft.world.item.ItemStack(matteroverdrive.init.MOItems.TRANSPORT_FLASH_DRIVE.get());
+                drive.set(matteroverdrive.init.MODataComponents.TRANSPORT_TARGET.get(), abs.offset(5, 0, 5));
+                spawner.getInventory().setStack(matteroverdrive.block.entity.AndroidSpawnerBlockEntity.FLASH_DRIVE_SLOT_START, drive);
+                check(helper, net.minecraft.world.phys.Vec3.atLowerCornerOf(abs.offset(5, 0, 5)).equals(androids.get(0).getPathTarget()),
+                        "path not updated: " + androids.get(0).getPathTarget());
+                spawner.setConfig(2, 3, 100000, teamName);
+                spawner.removeAllAndroids();
+                check(helper, spawner.getSpawnedCount() == 0 && androids.stream().allMatch(net.minecraft.world.entity.Entity::isRemoved), "kill all");
+                scoreboard.removePlayerTeam(team);
+                helper.succeed();
+            });
+        });
+    }
+}
