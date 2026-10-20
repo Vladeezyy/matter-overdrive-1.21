@@ -91,8 +91,6 @@ public final class MOGameTests {
         return FUNCTIONS;
     }
 
-    }
-
     /** The biome modifiers attach both placed features to an overworld biome's ore step. */
     private static void oresInOverworld(GameTestHelper helper) {
         var registries = helper.getLevel().registryAccess();
@@ -168,7 +166,7 @@ public final class MOGameTests {
         return n;
     }
 
-    private static ResourceLocation id(String path) {
+    public static ResourceLocation id(String path) {
         return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, path);
     }
 

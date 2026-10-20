@@ -21,7 +21,7 @@ public class FluidTank implements IFluidHandler {
     }
 
     public FluidTank readFromNBT(HolderLookup.Provider provider, CompoundTag tag) {
-        this.fluid = FluidStack.parseOptional(provider, tag.getCompound("Fluid"));
+        this.fluid = FluidStack.parseOptional(provider, tag.getCompoundOrEmpty("Fluid"));
         return this;
     }
 
