@@ -5,13 +5,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
-
 import matteroverdrive.client.android.AndroidHud;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 
 /** NeoForge's RenderGuiLayerEvent.Pre for the vanilla layers an android's HUD replaces */
@@ -28,10 +25,9 @@ public abstract class GuiMixin {
         if (AndroidHud.hides(AndroidHud.VanillaLayer.FOOD)) ci.cancel();
     }
 
-    /** The air bubbles are the only sprites renderPlayerHealth draws itself */
-    @WrapWithCondition(method = "renderPlayerHealth", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lnet/minecraft/resources/ResourceLocation;IIII)V"))
-    private boolean matteroverdrive$air(GuiGraphics graphics, ResourceLocation sprite, int x, int y, int width, int height) {
-        return !AndroidHud.hides(AndroidHud.VanillaLayer.AIR);
+    @Inject(method = "renderAirBubbles", at = @At("HEAD"), cancellable = true)
+    private void matteroverdrive$air(GuiGraphics graphics, Player player, int y, int x, int vehicleRows, CallbackInfo ci) {
+        if (AndroidHud.hides(AndroidHud.VanillaLayer.AIR)) ci.cancel();
     }
 
     @Inject(method = "renderTabList", at = @At("HEAD"), cancellable = true)
