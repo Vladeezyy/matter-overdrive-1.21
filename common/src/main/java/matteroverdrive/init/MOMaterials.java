@@ -35,40 +35,6 @@ public final class MOMaterials {
     public static final net.minecraft.resources.ResourceLocation ARMOR_LAYER_1 = net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/entity/equipment/humanoid/tritanium.png");
     public static final net.minecraft.resources.ResourceLocation ARMOR_LAYER_2 = net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/entity/equipment/humanoid_leggings/tritanium.png");
 
-    /** A tool tier (NeoForge's SimpleTier) */
-    private record SimpleTier(net.minecraft.tags.TagKey<net.minecraft.world.level.block.Block> incorrectBlocksForDrops, int uses, float speed,
-                              float attackDamageBonus, int enchantmentValue, java.util.function.Supplier<Ingredient> repair) implements Tier {
-        @Override
-        public int getUses() {
-            return this.uses;
-        }
-
-        @Override
-        public float getSpeed() {
-            return this.speed;
-        }
-
-        @Override
-        public float getAttackDamageBonus() {
-            return this.attackDamageBonus;
-        }
-
-        @Override
-        public net.minecraft.tags.TagKey<net.minecraft.world.level.block.Block> getIncorrectBlocksForDrops() {
-            return this.incorrectBlocksForDrops;
-        }
-
-        @Override
-        public int getEnchantmentValue() {
-            return this.enchantmentValue;
-        }
-
-        @Override
-        public Ingredient getRepairIngredient() {
-            return this.repair.get();
-        }
-    }
-
     private static ResourceLocation id(String path) {
         return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, path);
     }
