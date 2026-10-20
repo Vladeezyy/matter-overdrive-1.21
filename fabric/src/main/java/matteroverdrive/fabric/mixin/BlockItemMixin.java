@@ -15,7 +15,7 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 public abstract class BlockItemMixin {
     @Inject(method = "place", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;consume(ILnet/minecraft/world/entity/LivingEntity;)V"))
     private void matteroverdrive$onPlace(BlockPlaceContext context, CallbackInfoReturnable<InteractionResult> cir) {
-        if (!context.getLevel().isClientSide && context.getPlayer() != null) {
+        if (!context.getLevel().isClientSide() && context.getPlayer() != null) {
             QuestEvents.onPlace(context.getPlayer(), context.getClickedPos(), context.getLevel().getBlockState(context.getClickedPos()));
         }
     }

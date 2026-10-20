@@ -53,7 +53,7 @@ public final class FabricObjModels {
     static void register() {
         // 1.21.5+: a JSON model's geometry is its own object; the OBJ models keep the JSON's textures, display and
         // parent and get the OBJ geometry (children without elements inherit it, as on NeoForge)
-        PreparableModelLoadingPlugin.register(FabricObjModels::load, (models, context) ->
+        PreparableModelLoadingPlugin.register((state, executor) -> load(state.resourceManager(), executor), (models, context) ->
                 context.modifyModelOnLoad().register((model, ctx) -> {
                     ObjModel obj = models.get(ctx.id());
                     return obj != null && model instanceof BlockModel json ? new BlockModel(new Geometry(obj), json.guiLight(),

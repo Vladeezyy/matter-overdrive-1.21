@@ -19,6 +19,6 @@ public abstract class ItemEntityMixin {
     @Inject(method = "playerTouch", at = @At("HEAD"))
     private void matteroverdrive$onPickup(Player player, CallbackInfo ci) {
         ItemEntity self = (ItemEntity) (Object) this;
-        if (!self.level().isClientSide && this.pickupDelay <= 0 && !self.isRemoved()) MatterEvents.onPickup(player, self);
+        if (!self.level().isClientSide() && this.pickupDelay <= 0 && !self.isRemoved()) MatterEvents.onPickup(player, self);
     }
 }

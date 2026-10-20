@@ -154,7 +154,7 @@ public final class FabricPlatform implements Platform {
     @SuppressWarnings("unchecked")
     public SpawnEggItem spawnEgg(Supplier<? extends EntityType<? extends Mob>> type, int background, int highlight, Item.Properties properties) {
         // entity types are registered before items here (vanilla registry order)
-        return new SpawnEggItem((EntityType<? extends Mob>) type.get(), properties);
+        return new SpawnEggItem(properties.spawnEgg(type.get()));
     }
 
     @Override

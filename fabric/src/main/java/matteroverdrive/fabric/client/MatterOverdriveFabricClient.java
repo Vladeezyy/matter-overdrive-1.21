@@ -34,7 +34,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry;
 import net.fabricmc.fabric.api.client.render.fluid.v1.SimpleFluidRenderHandler;
 import net.minecraft.client.gui.screens.MenuScreens;
@@ -83,11 +83,14 @@ public final class MatterOverdriveFabricClient implements ClientModInitializer {
             }
 
             @Override
-            public <T extends BlockEntity> void blockEntity(BlockEntityType<? extends T> type, BlockEntityRendererProvider<T> provider) {
+            public <T extends BlockEntity, S extends net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState> void blockEntity(
+                    BlockEntityType<? extends T> type, BlockEntityRendererProvider<T, S> provider) {
                 BlockEntityRenderers.register(type, provider);
             }
         });
         MOClient.registerLayers((location, definition) -> EntityModelLayerRegistry.registerModelLayer(location, definition::get));
+        // 1.21.9+: key categories are registered in vanilla's sort order list
+        MOClient.registerKeyCategories(category -> net.minecraft.client.KeyMapping.Category.register(category.id()));
         MOClient.registerKeys(KeyBindingHelper::registerKeyBinding);
         registerRenderLayers();
         // Matter Plasma (1.7.10 matter_plasma_still / _flowing)
@@ -95,20 +98,27 @@ public final class MatterOverdriveFabricClient implements ClientModInitializer {
                 ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "block/matter_plasma_still"),
                 ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "block/matter_plasma_flowing")));
         // 1.7.10 ModelTritaniumArmor with the layer textures of TritaniumArmorItem.getArmorTexture
-        ArmorRenderer.register((pose, buffers, stack, entity, slot, light, contextModel) -> ArmorRenderer.renderPart(pose, buffers, light, stack,
-                        TritaniumArmorModel.armorModel(stack), slot == EquipmentSlot.FEET ? TritaniumArmorModel.LAYER_2 : TritaniumArmorModel.LAYER_1),
+        ArmorRenderer.register((pose, collector, stack, state, slot, light, contextModel) -> ArmorRenderer.submitTransformCopyingModel(
+                        contextModel, state, TritaniumArmorModel.armorModel(stack), state, false, collector, pose,
+                        net.minecraft.client.renderer.RenderType.armorCutoutNoCull(TritaniumArmorModel.armorTexture(stack)), light,
+                        net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY, -1, null),
                 MOItems.TRITANIUM_HELMET.get(), MOItems.TRITANIUM_CHESTPLATE.get(), MOItems.TRITANIUM_LEGGINGS.get(), MOItems.TRITANIUM_BOOTS.get());
 
         ClientTickEvents.START_CLIENT_TICK.register(client -> MOClient.onClientTickStart());
-        ClientTickEvents.END_CLIENT_TICK.register(client -> MOClient.onClientTickEnd());
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            MOClient.onClientTickEnd();
+            matteroverdrive.client.PerfScene.onTick();
+        });
+        // PerfScene counts frames (NeoForge: RenderFrameEvent.Post)
+        WorldRenderEvents.END_MAIN.register(context -> matteroverdrive.client.PerfScene.onFrame());
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> MOClient.onLoggedOut());
         ItemTooltipCallback.EVENT.register((stack, context, flag, lines) -> MOClient.onTooltip(stack, lines));
         HudRenderCallback.EVENT.register((graphics, delta) -> {
             AndroidHud.render(graphics, delta);
             QuestHud.render(graphics, delta);
         });
-        // the camera's rotation is already in RenderSystem's model-view stack at this stage (1.21.1): an identity pose
-        WorldRenderEvents.AFTER_ENTITIES.register(context -> ShieldRenderer.renderLevel(new PoseStack()));
+        // the level's pose at this stage, as NeoForge's RenderLevelStageEvent.AfterEntities gives it
+        WorldRenderEvents.AFTER_ENTITIES.register(context -> ShieldRenderer.renderLevel(context.matrices()));
     }
 
     /** NeoForge reads the render type from the block's model ("render_type"); Fabric needs it per block */
