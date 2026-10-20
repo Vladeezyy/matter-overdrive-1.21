@@ -14,15 +14,15 @@
   "icon": "matteroverdrive_logo.png",
   "environment": "*",
   "entrypoints": {
+    "fabric-gametest": ["matteroverdrive.gametest.MOGameTests", "matteroverdrive.fabric.FabricTransferTests"],
     "main": ["matteroverdrive.fabric.MatterOverdriveFabric"],
-    "client": ["matteroverdrive.fabric.client.MatterOverdriveFabricClient"],
-    "fabric-gametest": ["matteroverdrive.gametest.MOGameTests", "matteroverdrive.fabric.FabricTransferTests"]
+    "client": ["matteroverdrive.fabric.client.MatterOverdriveFabricClient"]
   },
   "mixins": ["matteroverdrive.fabric.mixins.json"],
   "accessWidener": "matteroverdrive.accesswidener",
   "depends": {
     "fabricloader": ">=${fabric_loader_version}",
-    "fabric-api": "*",
+    "fabric-api": ">=${fabric_version}",
     "team_reborn_energy": "*",
     "minecraft": "${minecraft_version}",
     "java": ">=${java_version}"

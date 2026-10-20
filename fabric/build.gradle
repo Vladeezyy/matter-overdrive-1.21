@@ -61,3 +61,24 @@ loom {
 }
 
 tasks.withType(JavaCompile).configureEach { options.compilerArgs += ['-Xmaxerrs', '10000'] }
+
+// The release jar (remapJar) in a production client with Fabric API: the scripted scene outside dev
+// (world: run-prod/saves/mo_scene, a copy of run/saves/mo_scene)
+configurations.maybeCreate('productionRuntimeMods')
+dependencies {
+    productionRuntimeMods "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+}
+tasks.register('prodScene', net.fabricmc.loom.task.prod.ClientProductionRunTask) {
+    jvmArgs.add('-Dmatteroverdrive.scene=true')
+    programArgs.addAll('--quickPlaySingleplayer', 'mo_scene')
+    runDir = project.layout.projectDirectory.dir('run-prod')
+}
+
+// Release jar without GameTests: the fabric-gametest entrypoint makes Fabric API scan the tests whenever a world opens
+// (in production the scan failed and the world hung on "Preparing resources"), and 1.21.5+ test instances are data.
+// Dev runs read build/resources, so runGametest keeps them. The entrypoint is the first one, so dropping its line
+// leaves valid JSON.
+tasks.named('jar') {
+    exclude 'matteroverdrive/fabric/FabricTransferTests*', 'data/matteroverdrive/test_instance/**', 'data/matteroverdrive/test_environment/**'
+    filesMatching('fabric.mod.json') { filter { String line -> line.contains('"fabric-gametest"') ? null : line } }
+}

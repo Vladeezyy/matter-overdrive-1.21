@@ -805,3 +805,8 @@
 - Not done: MSPT/FPS measurement against vanilla on Fabric (the game logic is the same common code; the Fabric layer adds
   event hooks and transfer adapters used only by other mods' pipes), a run of the jar on a clean Fabric server/client
   outside dev, release pages.
+
+### Release preparation (Fabric 1.0.2)
+- The release jar ships without GameTests: the `fabric-gametest` entrypoint made Fabric API scan the test classes whenever a world opened, and in production that scan failed (`AnnotationFormatError ... GameTest.rotation()`), so the world hung on "Preparing resources". `jar` excludes the test classes and test instances and drops the entrypoint line; dev runs keep the tests.
+- `fabric-api` dependency `>=` the version the jar is built against.
+- Checked outside dev: the release jar on the official Fabric server launcher (world generated, clean stop) and `:fabric:prodScene` (Loom `ClientProductionRunTask`: the scripted scene on the release jar in a production client): 142/142 shots.
