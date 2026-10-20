@@ -6,7 +6,6 @@ import java.util.Map;
 import com.mojang.renderpearl.api.pipeline.BlendFunction;
 import com.mojang.renderpearl.api.pipeline.ColorTargetState;
 import com.mojang.renderpearl.api.pipeline.DepthStencilState;
-import com.mojang.renderpearl.api.pipeline.CompareOp;
 import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
@@ -24,7 +23,8 @@ import net.minecraft.resources.Identifier;
  * black core sphere writes depth (and adds nothing) so the far side of its wire sphere is hidden.
  */
 public final class HoloRenderTypes {
-    private static final DepthStencilState NO_DEPTH_WRITE = new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, false);
+    /** Vanilla's depth test without depth writes (26.2+ uses reversed depth: the test comes from DEFAULT, never a fixed op) */
+    private static final DepthStencilState NO_DEPTH_WRITE = new DepthStencilState(DepthStencilState.DEFAULT.depthTest(), false);
 
     private static RenderPipeline.Builder base(String name) {
         return RenderPipeline.builder().withBindGroupLayout(BindGroupLayouts.GLOBALS).withBindGroupLayout(BindGroupLayouts.PROJECTION).withBindGroupLayout(BindGroupLayouts.DYNAMIC_TRANSFORMS).withLocation(Identifier.fromNamespaceAndPath(MatterOverdrive.MODID,
