@@ -4,7 +4,7 @@ import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.Tag;
 
 /** A simple energy store with transfer limits (NeoForge's {@code EnergyStorage}); saves as an int tag like it */
-public class EnergyStorage implements IEnergyStorage {
+public class EnergyStorage implements IEnergyStorage, matteroverdrive.platform.ValueIOSerializable {
     protected int energy;
     protected int capacity;
     protected int maxReceive;
@@ -73,21 +73,13 @@ public class EnergyStorage implements IEnergyStorage {
         return this.maxReceive > 0;
     }
 
-    public Tag serializeNBT(net.minecraft.core.HolderLookup.Provider provider) {
-        return this.serializeNBT();
+    @Override
+    public void serialize(net.minecraft.world.level.storage.ValueOutput output) {
+        output.putInt("energy", this.energy);
     }
 
-    public void deserializeNBT(net.minecraft.core.HolderLookup.Provider provider, Tag tag) {
-        this.deserializeNBT(tag);
-    }
-
-    public Tag serializeNBT() {
-        return IntTag.valueOf(this.energy);
-    }
-
-    public void deserializeNBT(Tag tag) {
-        if (tag instanceof IntTag intTag) {
-            this.energy = intTag.intValue();
-        }
+    @Override
+    public void deserialize(net.minecraft.world.level.storage.ValueInput input) {
+        this.energy = input.getIntOr("energy", 0);
     }
 }
