@@ -126,7 +126,7 @@ public final class MatterOverdriveNeoForgeClient {
             }
         });
         game.addListener((RenderHandEvent event) -> PhaserBeamRenderer.renderHand(event.getHand(), event.getPartialTick(), event.getPoseStack(), event.getSubmitNodeCollector()));
-        game.addListener((RenderLevelStageEvent.AfterTranslucentFeatures event) -> ShieldRenderer.renderLevel(event.getPoseStack()));
+        game.addListener((net.neoforged.neoforge.client.event.SubmitCustomGeometryEvent event) -> ShieldRenderer.renderLevel(event.getPoseStack(), event.getSubmitNodeCollector()));
     }
 
     private static void registerClientExtensions(RegisterClientExtensionsEvent event) {

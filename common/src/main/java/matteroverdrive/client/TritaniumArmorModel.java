@@ -70,8 +70,7 @@ public final class TritaniumArmorModel {
     public static HumanoidModel<HumanoidRenderState> forSlot(EquipmentSlot slot) {
         return MODELS.computeIfAbsent(slot, s -> {
             HumanoidModel<HumanoidRenderState> model = new HumanoidModel<>(createLayer(s == EquipmentSlot.FEET ? 0.5f : 0).bakeRoot());
-            model.allParts().forEach(part -> part.visible = false);   // 26.x: no setAllVisible
-            model.root().visible = true;
+            // the main parts only, as 1.21's setAllVisible (gone in 26.x): the plates and visor are children and stay visible
             model.head.visible = s == EquipmentSlot.HEAD;
             model.hat.visible = false;   // 1.7.10 bipedHeadwear.isHidden
             model.body.visible = s == EquipmentSlot.CHEST;

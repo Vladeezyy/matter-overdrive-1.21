@@ -111,7 +111,7 @@ public final class MatterOverdriveFabricClient implements ClientModInitializer {
         ItemTooltipCallback.EVENT.register((stack, context, flag, lines) -> MOClient.onTooltip(stack, lines));
         HudElementRegistry.addLast(MOClient.ANDROID_HUD, AndroidHud::render);
         HudElementRegistry.addLast(MOClient.QUEST_HUD, QuestHud::render);
-        // the level's pose at this stage, as NeoForge's RenderLevelStageEvent.AfterTranslucentFeatures gives it
-        LevelRenderEvents.AFTER_TRANSLUCENT_FEATURES.register(context -> ShieldRenderer.renderLevel(context.poseStack()));
+        // with the level's submits, as NeoForge's SubmitCustomGeometryEvent
+        LevelRenderEvents.COLLECT_SUBMITS.register(context -> ShieldRenderer.renderLevel(context.poseStack(), context.submitNodeCollector()));
     }
 }

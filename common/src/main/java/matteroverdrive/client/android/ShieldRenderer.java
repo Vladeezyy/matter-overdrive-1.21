@@ -21,7 +21,7 @@ import matteroverdrive.client.starmap.HoloRenderTypes;
 import matteroverdrive.init.MOSounds;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
@@ -92,34 +92,29 @@ public final class ShieldRenderer {
             mc.getSoundManager().play(loop);
         }
     }
-    /** After the entities of the level are drawn (the pose is the level's camera pose) */
-    public static void renderLevel(PoseStack eventPose) {
+    /** With the level's submits (the pose is the level's camera pose); translucent types sort on upload */
+    public static void renderLevel(PoseStack eventPose, SubmitNodeCollector buffers) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null) return;
         float partial = mc.getDeltaTracker().getGameTimeDeltaPartialTick(false);
         Vec3 camera = mc.gameRenderer.getMainCamera().position();
-        MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
         PoseStack pose = eventPose;
-        boolean drew = false;
         for (Player player : mc.level.players()) {
             boolean own = player == mc.player;
             float strength = own ? opacity : 1;
             if (!(own ? opacity > 0 || shieldOn(player) : shieldOn(player)) || strength <= 0) continue;
             renderShield(mc, pose, buffers, player, camera, partial, own, strength);
-            drew = true;
         }
         if (AndroidKeys.isAimingTeleport() && AndroidKeys.ABILITY_USE.isDown()
                 && Android.get(mc.player).isUnlocked(BioticStats.TELEPORT, BioticStats.TELEPORT.maxLevel())) {
             Vec3 target = AndroidKeys.teleportTarget(mc.player);
             if (target != null) {
                 renderTeleportMarker(mc, pose, buffers, target, camera);
-                drew = true;
             }
         }
-        if (drew) buffers.endBatch();
     }
 
-    private static void renderShield(Minecraft mc, PoseStack pose, MultiBufferSource buffers, Player player, Vec3 camera, float partial,
+    private static void renderShield(Minecraft mc, PoseStack pose, SubmitNodeCollector buffers, Player player, Vec3 camera, float partial,
                                      boolean own, float strength) {
         if (shieldMesh == null) {
             shieldMesh = ObjMesh.load(Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "models/fx/shield_sphere.obj"));
@@ -138,7 +133,8 @@ public final class ShieldRenderer {
         // seen from outside the shield mesh shows its front faces only; from inside (first person) all of them
         boolean outside = !own || mc.options.getCameraType() != CameraType.FIRST_PERSON;
         RenderType shieldType = outside ? HoloRenderTypes.texturedCulled(SHIELD) : HoloRenderTypes.textured(SHIELD);
-        shieldMesh.render(buffers.getBuffer(shieldType), pose.last(), holo(0.2f * strength));
+        int shieldColor = holo(0.2f * strength);
+        buffers.submitCustomGeometry(pose, shieldType, (p, vc) -> shieldMesh.render(vc, p, shieldColor));
 
         Deque<Hit> hits = HITS.get(player.getId());
         if (hits != null) {
@@ -152,24 +148,27 @@ public final class ShieldRenderer {
                 if (axis.lengthSquared() > 1e-8f) {
                     pose.mulPose(new Quaternionf().rotationAxis((float) Math.acos(Math.max(-1, Math.min(1, dir.x))), axis.normalize()));
                 }
-                sphere.render(buffers.getBuffer(HoloRenderTypes.textured(DAMAGE)), pose.last(), holo(hit.time / (float) HIT_TIME * strength));
+                int hitColor = holo(hit.time / (float) HIT_TIME * strength);
+                buffers.submitCustomGeometry(pose, HoloRenderTypes.textured(DAMAGE), (p, vc) -> sphere.render(vc, p, hitColor));
                 pose.popPose();
             }
         }
 
         pose.scale(1.02f, 1.02f, 1.02f);
-        sphere.render(buffers.getBuffer(HoloRenderTypes.textured(FORCEFIELD)), pose.last(), holo(0.1f * strength));
+        int fieldColor = holo(0.1f * strength);
+        buffers.submitCustomGeometry(pose, HoloRenderTypes.textured(FORCEFIELD), (p, vc) -> sphere.render(vc, p, fieldColor));
         pose.pushPose();
         Vector3f spin = new Vector3f((float) Math.sin(time * 0.01), (float) Math.cos(time * 0.01), 0).normalize();
         pose.mulPose(new Quaternionf().rotationAxis((float) Math.toRadians(time * 0.005), spin));
         pose.scale(1.01f, 1.01f, 1.01f);
-        sphere.render(buffers.getBuffer(HoloRenderTypes.textured(PLASMA)), pose.last(), holo(0.05f * strength));
+        int plasmaColor = holo(0.05f * strength);
+        buffers.submitCustomGeometry(pose, HoloRenderTypes.textured(PLASMA), (p, vc) -> sphere.render(vc, p, plasmaColor));
         pose.popPose();
         pose.popPose();
     }
 
     /** 1.7.10 BioticStatRendererTeleporter: a 1-block glow facing the player's view, spinning, at the landing spot. */
-    private static void renderTeleportMarker(Minecraft mc, PoseStack pose, MultiBufferSource buffers, Vec3 target, Vec3 camera) {
+    private static void renderTeleportMarker(Minecraft mc, PoseStack pose, SubmitNodeCollector buffers, Vec3 target, Vec3 camera) {
         Player player = mc.player;
         pose.pushPose();
         pose.translate(target.x - camera.x, target.y - camera.y, target.z - camera.z);
@@ -177,13 +176,13 @@ public final class ShieldRenderer {
         pose.mulPose(Axis.XP.rotationDegrees(player.getXRot()));
         pose.mulPose(Axis.ZP.rotationDegrees(mc.level.getDefaultClockTime() * 10 % 360));
         pose.translate(-0.5f, -0.5f, 0);
-        var vc = buffers.getBuffer(HoloRenderTypes.textured(GLOW));
         int color = holo(0.5f);
-        PoseStack.Pose last = pose.last();
-        vc.addVertex(last, 0, 0, 0).setUv(0, 1).setColor(color);
-        vc.addVertex(last, 1, 0, 0).setUv(1, 1).setColor(color);
-        vc.addVertex(last, 1, 1, 0).setUv(1, 0).setColor(color);
-        vc.addVertex(last, 0, 1, 0).setUv(0, 0).setColor(color);
+        buffers.submitCustomGeometry(pose, HoloRenderTypes.textured(GLOW), (last, vc) -> {
+            vc.addVertex(last, 0, 0, 0).setUv(0, 1).setColor(color);
+            vc.addVertex(last, 1, 0, 0).setUv(1, 1).setColor(color);
+            vc.addVertex(last, 1, 1, 0).setUv(1, 0).setColor(color);
+            vc.addVertex(last, 0, 1, 0).setUv(0, 0).setColor(color);
+        });
         pose.popPose();
     }
 
