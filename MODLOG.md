@@ -732,3 +732,4 @@
 - Access widener generated from the AT: `tools/port/at2aw.py AT VANILLA_JAR tools/port/aw-fabric-extra.txt` (javap on the vanilla jar, skips members that do not exist on the version).
 - Tests: NeoForge 96/96, Fabric 101/101 GameTests; scene (`:fabric:runScene` / `:neoforge:runScene`, world: a 1.21.5 flat creative `mo_scene` made by `:fabric:runServer`) on both loaders.
 - Not done: MSPT/FPS against vanilla on Fabric, a run of the jars outside dev, release pages.
+- Fabric armor: `ArmorRenderer.renderPart` draws the shared armor model without `setupAnim`, so on a moving player the armor stayed in the default pose (skin over the armor in the scene). `model.setupAnim(state)` first, as vanilla's armor layer.
