@@ -184,7 +184,7 @@ public class GravitationalAnomalyBlockEntity extends BlockEntity {
 
     private void pullEntities(ServerLevel level) {
         double range = getMaxRange() + 1;
-        Vec3 center = getBlockPos().getCenter();
+        Vec3 center = net.minecraft.world.phys.Vec3.atCenterOf(getBlockPos());
         double horizon = getEventHorizon();
         for (Entity entity : level.getEntities((Entity) null, new AABB(getBlockPos()).inflate(range), e -> !e.isSpectator())) {
             if (entity instanceof Player p && (p.isCreative() || p.isSpectator())) continue;
@@ -227,7 +227,7 @@ public class GravitationalAnomalyBlockEntity extends BlockEntity {
             addMass(MatterHelper.getMatter(level.getServer(), new ItemStack(falling.getBlockState().getBlock())));
             falling.discard();
         } else if (entity instanceof LivingEntity living) {
-            float strength = getBreakStrength((float) Math.sqrt(entity.distanceToSqr(getBlockPos().getCenter())), (float) getMaxRange());
+            float strength = getBreakStrength((float) Math.sqrt(entity.distanceToSqr(net.minecraft.world.phys.Vec3.atCenterOf(getBlockPos()))), (float) getMaxRange());
             addMass((long) Math.min(living.getHealth(), strength));
             if (living.getHealth() <= strength && !(living instanceof Player)) {
                 living.discard();

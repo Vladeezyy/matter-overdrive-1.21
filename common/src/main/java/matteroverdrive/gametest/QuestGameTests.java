@@ -17,6 +17,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -104,7 +105,7 @@ final class QuestGameTests {
         // creepers killed with a shovel count, others don't
         player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(Items.IRON_SHOVEL));
         for (int i = 0; i < 6; i++) {
-            var creeper = EntityType.CREEPER.create(helper.getLevel(), EntitySpawnReason.COMMAND);
+            var creeper = EntityTypes.CREEPER.create(helper.getLevel(), EntitySpawnReason.COMMAND);
             QuestEvents.onEvent(player, new QuestEvents.Death(creeper, helper.getLevel().damageSources().playerAttack(player)));
         }
         check(helper, CocktailOfAscensionLogic.getCreeperKills(stack) == 5, "creeper kills " + CocktailOfAscensionLogic.getCreeperKills(stack));

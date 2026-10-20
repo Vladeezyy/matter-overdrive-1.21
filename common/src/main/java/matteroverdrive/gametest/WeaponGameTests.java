@@ -13,6 +13,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -43,7 +44,7 @@ final class WeaponGameTests {
         net.minecraft.world.item.ItemStack plain = new net.minecraft.world.item.ItemStack(rifle);
         net.minecraft.world.item.ItemStack legendary = plain.copy();
         legendary.set(matteroverdrive.init.MODataComponents.LEGENDARY_WEAPON.get(), new matteroverdrive.item.weapon.WeaponFactory.Legendary(1.3f, 0.7f, 0.85f, 1.45f));
-        var zombie = helper.spawn(net.minecraft.world.entity.EntityType.ZOMBIE, new net.minecraft.core.BlockPos(1, 1, 1));
+        var zombie = helper.spawn(net.minecraft.world.entity.EntityTypes.ZOMBIE, new net.minecraft.core.BlockPos(1, 1, 1));
         float base = rifle.getDamage(plain, zombie), boosted = rifle.getDamage(legendary, zombie);
         float attack = (float) zombie.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE);
         helper.assertTrue(Math.abs((boosted - attack) - (base - attack) * 1.3f) < 1e-4, net.minecraft.network.chat.Component.literal("damage " + base + " -> " + boosted));
@@ -74,7 +75,7 @@ final class WeaponGameTests {
 
     private static ServerPlayer shooter(GameTestHelper helper, ItemStack weapon) {
         ServerPlayer player = helper.makeMockServerPlayerInLevel();
-        var pos = helper.absolutePos(new BlockPos(6, 1, 1)).getBottomCenter();
+        var pos = net.minecraft.world.phys.Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(6, 1, 1)));
         player.snapTo(pos.x, pos.y, pos.z, 0, 0);      // yaw 0: looking south (+z)
         player.setItemSlot(EquipmentSlot.MAINHAND, weapon);
         return player;
@@ -107,7 +108,7 @@ final class WeaponGameTests {
     private static void boltHurtsMob(GameTestHelper helper) {
         ItemStack rifle = charged(MOItems.PHASER_RIFLE.get());
         ServerPlayer player = shooter(helper, rifle);
-        var pig = helper.spawnWithNoFreeWill(EntityType.PIG, new BlockPos(6, 1, 6));
+        var pig = helper.spawnWithNoFreeWill(EntityTypes.PIG, new BlockPos(6, 1, 6));
         player.lookAt(net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES, pig.position().add(0, 0.4, 0));
         MOItems.PHASER_RIFLE.get().tryFire(player, rifle, true);
         helper.runAfterDelay(20, () -> {
@@ -178,7 +179,7 @@ final class WeaponGameTests {
         ItemStack phaser = charged(MOItems.PHASER.get());
         phaser.set(matteroverdrive.init.MODataComponents.PHASER_LEVEL.get(), level);
         ServerPlayer player = shooter(helper, phaser);
-        var pig = helper.spawnWithNoFreeWill(EntityType.PIG, new BlockPos(6, 1, 5));
+        var pig = helper.spawnWithNoFreeWill(EntityTypes.PIG, new BlockPos(6, 1, 5));
         player.lookAt(net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES, pig.position().add(0, 0.4, 0));
         MOItems.PHASER.get().onUseTick(helper.getLevel(), player, phaser, 1000);
         if (level < 3) {

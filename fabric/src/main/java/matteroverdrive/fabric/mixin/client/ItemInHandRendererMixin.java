@@ -25,13 +25,13 @@ public abstract class ItemInHandRendererMixin {
     @Unique
     private static ItemStack matteroverdrive$stack = ItemStack.EMPTY;
 
-    @Inject(method = "renderArmWithItem", at = @At("HEAD"))
+    @Inject(method = "submitArmWithItem", at = @At("HEAD"))
     private void matteroverdrive$beginArm(AbstractClientPlayer player, float partial, float pitch, InteractionHand hand, float swing, ItemStack stack,
                                           float equip, PoseStack pose, net.minecraft.client.renderer.SubmitNodeCollector collector, int light, CallbackInfo ci) {
         matteroverdrive$stack = stack;
     }
 
-    @Inject(method = "renderArmWithItem", at = @At("RETURN"))
+    @Inject(method = "submitArmWithItem", at = @At("RETURN"))
     private void matteroverdrive$endArm(AbstractClientPlayer player, float partial, float pitch, InteractionHand hand, float swing, ItemStack stack,
                                         float equip, PoseStack pose, net.minecraft.client.renderer.SubmitNodeCollector collector, int light, CallbackInfo ci) {
         matteroverdrive$stack = ItemStack.EMPTY;
@@ -47,8 +47,8 @@ public abstract class ItemInHandRendererMixin {
     }
 
     /** NeoForge's RenderHandEvent (main hand): the first person phaser beam */
-    @Inject(method = "renderHandsWithItems", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/renderer/ItemInHandRenderer;renderArmWithItem(Lnet/minecraft/client/player/AbstractClientPlayer;FFLnet/minecraft/world/InteractionHand;FLnet/minecraft/world/item/ItemStack;FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;I)V",
+    @Inject(method = "submitHandsWithItems", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/renderer/ItemInHandRenderer;submitArmWithItem(Lnet/minecraft/client/player/AbstractClientPlayer;FFLnet/minecraft/world/InteractionHand;FLnet/minecraft/world/item/ItemStack;FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;I)V",
             ordinal = 0))
     private void matteroverdrive$handBeam(float partial, PoseStack pose, net.minecraft.client.renderer.SubmitNodeCollector collector, LocalPlayer player, int light, CallbackInfo ci) {
         PhaserBeamRenderer.renderHand(InteractionHand.MAIN_HAND, partial, pose, collector);

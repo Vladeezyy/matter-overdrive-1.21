@@ -18,7 +18,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
 import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.ProjectionMatrixBuffer;
 import net.minecraft.util.Mth;
 
@@ -36,8 +35,7 @@ public class StarMapPipRenderer extends PictureInPictureRenderer<StarMapPipRende
         }
     }
 
-    public StarMapPipRenderer(MultiBufferSource.BufferSource bufferSource) {
-        super(bufferSource);
+    public StarMapPipRenderer() {
     }
 
     @Override
@@ -51,7 +49,7 @@ public class StarMapPipRenderer extends PictureInPictureRenderer<StarMapPipRende
     }
 
     @Override
-    protected void renderToTexture(State state, PoseStack ignored) {
+    protected void renderToTexture(State state, PoseStack ignored, net.minecraft.client.renderer.SubmitNodeCollector collector) {
         var mc = Minecraft.getInstance();
         Galaxy galaxy = GalaxyClient.getGalaxy();
         if (galaxy == null) return;
@@ -79,10 +77,8 @@ public class StarMapPipRenderer extends PictureInPictureRenderer<StarMapPipRende
         }
         pose.mulPose(Axis.YP.rotationDegrees(rotation));
         pose.translate(-0.5f, -1.8f, -0.5f);
-        // like GuiEntityRenderer: submit to the feature dispatcher, then render it into this texture
-        var features = mc.gameRenderer.getFeatureRenderDispatcher();
-        var ctx = new StarMapRenderer.Ctx(view, pose, HoloSink.of(features.getSubmitNodeStorage()), mc.font, yaw, pitch, orientation, mc.player, galaxy);
+        // 26.2: the renderer submits, the picture-in-picture renderer draws the submits into this texture
+        var ctx = new StarMapRenderer.Ctx(view, pose, HoloSink.of(collector), mc.font, yaw, pitch, orientation, mc.player, galaxy);
         StarMapRenderer.renderHologram(ctx);
-        features.renderAllFeatures();
     }
 }

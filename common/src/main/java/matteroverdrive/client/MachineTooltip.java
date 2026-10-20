@@ -26,7 +26,7 @@ public final class MachineTooltip {
         List<Component> lines = new ArrayList<>();
         if (sceneShift || Minecraft.getInstance().hasShiftDown()) {
             String details = stack.getItem().getDescriptionId() + ".details";
-            if (I18n.exists(details)) lines.add(Component.translatable(details).withStyle(ChatFormatting.GRAY));
+            if (net.minecraft.locale.Language.getInstance().has(details)) lines.add(Component.translatable(details).withStyle(ChatFormatting.GRAY));
             MachineStorage storage = stack.get(MODataComponents.MACHINE_STORAGE.get());
             Integer energy = stack.get(MODataComponents.ENERGY.get());
             if (storage != null && energy != null && storage.maxEnergy() > 0) {

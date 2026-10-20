@@ -47,7 +47,7 @@ public final class MachineSounds {
             this.block = block;
             this.looping = true;
             this.delay = 0;
-            Vec3 c = block.getBlockPos().getCenter();
+            Vec3 c = net.minecraft.world.phys.Vec3.atCenterOf(block.getBlockPos());
             this.x = c.x;
             this.y = c.y;
             this.z = c.z;

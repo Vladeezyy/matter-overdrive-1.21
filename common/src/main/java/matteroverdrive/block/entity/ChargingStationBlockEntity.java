@@ -45,7 +45,7 @@ public class ChargingStationBlockEntity extends MachineBlockEntity {
         boolean charged = false;
         for (Player player : getLevel().getEntitiesOfClass(Player.class, new AABB(getBlockPos()).inflate(range))) {
             if (!Android.isAndroid(player)) continue;
-            double distance = player.position().distanceTo(getBlockPos().getCenter());
+            double distance = player.position().distanceTo(net.minecraft.world.phys.Vec3.atCenterOf(getBlockPos()));
             int required = (int) (ENERGY_TRANSFER * (1 - Mth.clamp(distance / range, 0, 1)));
             int toGive = Math.min(required, Math.min(energy.getEnergy(), getMaxCharging()));
             int received = Android.receiveEnergy(player, toGive, false);

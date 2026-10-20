@@ -97,7 +97,7 @@ public final class ShieldRenderer {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null) return;
         float partial = mc.getDeltaTracker().getGameTimeDeltaPartialTick(false);
-        Vec3 camera = mc.gameRenderer.getMainCamera().position();
+        Vec3 camera = mc.gameRenderer.mainCamera().position();
         PoseStack pose = eventPose;
         for (Player player : mc.level.players()) {
             boolean own = player == mc.player;

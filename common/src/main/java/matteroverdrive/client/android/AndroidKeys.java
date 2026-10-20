@@ -60,7 +60,7 @@ public final class AndroidKeys {
             if (target != null) Platform.INSTANCE.sendToServer(new AndroidPayloads.Teleport(target.x, target.y, target.z));
         }
         while (ABILITY_SWITCH.consumeClick()) {
-            if (mc.screen == null && AbilityWheelScreen.hasStats(player)) mc.setScreen(new AbilityWheelScreen());
+            if (mc.gui.screen() == null && AbilityWheelScreen.hasStats(player)) mc.gui.setScreen(new AbilityWheelScreen());
         }
     }
 

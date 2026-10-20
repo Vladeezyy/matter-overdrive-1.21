@@ -17,6 +17,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -176,7 +177,7 @@ final class NetworkGameTests {
         r.getEnergy().set(r.getEnergy().getCapacity());
         r.getMatterTank().setMatter(50);
         r.setTask(new Task(new ItemPattern(Items.COBBLESTONE.builtInRegistryHolder(), 100), 10));
-        var pig = helper.spawnWithNoFreeWill(EntityType.PIG, new BlockPos(4, 2, 1));
+        var pig = helper.spawnWithNoFreeWill(EntityTypes.PIG, new BlockPos(4, 2, 1));
         helper.runAfterDelay(40, () -> {
             helper.assertTrue(pig.hasEffect(MobEffects.POISON), Component.literal("unshielded replicator didn't irradiate"));
             helper.succeed();

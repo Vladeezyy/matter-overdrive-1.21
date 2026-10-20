@@ -17,6 +17,7 @@ import matteroverdrive.quest.logic.PlaceBlockLogic;
 import matteroverdrive.quest.logic.ScanBlockLogic;
 import matteroverdrive.quest.logic.SingleEventLogic;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.animal.chicken.Chicken;
 import net.minecraft.world.entity.animal.cow.Cow;
 import net.minecraft.world.item.Items;
@@ -42,8 +43,8 @@ public final class Quests {
             .autoComplete(true), 1, 0).rewards(() -> new ItemStack(MOItems.ROGUE_ANDROID_HEAD.get())));
     /** 1.7.10: chicken, cow, cow (cows twice as likely), young ones only. */
     public static final Quest SACRIFICE = register(new Quest("sacrifice", new KillCreatureLogic(8, 15, 10,
-            new KillCreatureLogic.Target(Chicken.class, () -> EntityType.CHICKEN), new KillCreatureLogic.Target(Cow.class, () -> EntityType.COW),
-            new KillCreatureLogic.Target(Cow.class, () -> EntityType.COW)).onlyChildren().autoComplete(true), 0)
+            new KillCreatureLogic.Target(Chicken.class, () -> EntityTypes.CHICKEN), new KillCreatureLogic.Target(Cow.class, () -> EntityTypes.COW),
+            new KillCreatureLogic.Target(Cow.class, () -> EntityTypes.COW)).onlyChildren().autoComplete(true), 0)
             .rewards(() -> new ItemStack(Items.SADDLE), () -> new ItemStack(Items.NAME_TAG)));
     public static final Quest DEPARTMENT_OF_AGRICULTURE = register(new Quest("department_of_agriculture", new CollectItemLogic(
             List.of(() -> new ItemStack(Items.WHEAT), () -> new ItemStack(Items.CARROT), () -> new ItemStack(Items.POTATO)), 31, 63, 3), 0)

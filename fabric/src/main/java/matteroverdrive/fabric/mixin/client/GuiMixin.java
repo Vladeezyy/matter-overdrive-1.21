@@ -7,12 +7,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import matteroverdrive.client.android.AndroidHud;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.Hud;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.entity.player.Player;
 
 /** NeoForge's RenderGuiLayerEvent.Pre for the vanilla layers an android's HUD replaces */
-@Mixin(Gui.class)
+@Mixin(Hud.class)
 public abstract class GuiMixin {
     @Inject(method = "extractHearts", at = @At("HEAD"), cancellable = true)
     private void matteroverdrive$hearts(GuiGraphicsExtractor graphics, Player player, int x, int y, int height, int offsetHeartIndex, float maxHealth,

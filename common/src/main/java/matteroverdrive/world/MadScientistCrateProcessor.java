@@ -24,14 +24,13 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
 /**
  * 1.7.10 MadScientistHouse crate: a GMO contract and the "Mad Scientist's Data Pad" (scans carrots, potatoes and wheat,
  * destroys what it scans, no screen).
  */
-public class MadScientistCrateProcessor extends StructureProcessor {
+public class MadScientistCrateProcessor implements StructureProcessor {
     public static final MadScientistCrateProcessor INSTANCE = new MadScientistCrateProcessor();
     public static final MapCodec<MadScientistCrateProcessor> CODEC = MapCodec.unit(() -> INSTANCE);
 
@@ -44,9 +43,9 @@ public class MadScientistCrateProcessor extends StructureProcessor {
     }
 
     @Override
-    public StructureTemplate.StructureBlockInfo processBlock(LevelReader level, BlockPos offset, BlockPos pos,
-                                                            StructureTemplate.StructureBlockInfo blockInfo,
-                                                            StructureTemplate.StructureBlockInfo relative, StructurePlaceSettings settings) {
+    public StructureTemplate.StructureBlockInfo processBlock(LevelReader level, BlockPos targetPosition, BlockPos referencePos,
+                                                            BlockPos templateRelativePos, StructureTemplate.StructureBlockInfo relative,
+                                                            StructurePlaceSettings settings) {
         if (!(relative.state().getBlock() instanceof TritaniumCrateBlock)) return relative;
         var ops = RegistryOps.create(NbtOps.INSTANCE, level.registryAccess());
         ListTag items = new ListTag();
@@ -62,7 +61,7 @@ public class MadScientistCrateProcessor extends StructureProcessor {
     }
 
     @Override
-    protected StructureProcessorType<?> getType() {
-        return MOStructures.MAD_SCIENTIST_CRATE.get();
+    public MapCodec<? extends StructureProcessor> codec() {
+        return CODEC;
     }
 }

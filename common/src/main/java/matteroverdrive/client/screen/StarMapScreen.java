@@ -50,7 +50,7 @@ public class StarMapScreen extends AbstractContainerScreen<StarMapMenu> {
     private static final int COLOR_MATTER = 0xBFE4E6;
     private static final String[] PAGE_ICONS = {"page_icon_galaxy", "page_icon_quadrant", "page_icon_star", "page_icon_planet", "icon_stats"};
     private static final String[] PAGE_NAMES = {"galaxy", "quadrant", "star", "planet", "planet_stats"};
-    private static final FontDescription ALT = new FontDescription.Resource(net.minecraft.client.Minecraft.ALT_FONT);
+    private static final FontDescription ALT = new FontDescription.Resource(net.minecraft.resources.Identifier.withDefaultNamespace("alt"));
     private static final int[] SCROLL = new int[5];
     private final StarMapBlockEntity starMap;
     private int page;

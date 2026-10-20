@@ -44,27 +44,27 @@ public final class MOClient {
         matteroverdrive.block.HoloSignBlock.openEditor = pos -> {
             var mc = net.minecraft.client.Minecraft.getInstance();
             String text = mc.level.getBlockEntity(pos) instanceof matteroverdrive.block.entity.HoloSignBlockEntity sign ? sign.getText() : "";
-            mc.setScreen(new matteroverdrive.client.screen.HoloSignScreen(pos, text));
+            mc.gui.setScreen(new matteroverdrive.client.screen.HoloSignScreen(pos, text));
         };
         // 1.7.10 AndroidPlayer.playTransformMusic
         matteroverdrive.quest.PlayerQuests.clientUpdated = matteroverdrive.client.quest.QuestHud::onSync;
         matteroverdrive.network.GuideRecipePayload.onGrid = matteroverdrive.client.guide.GuideRecipes::receive;
-        matteroverdrive.item.ContractItem.openScreen = hand -> net.minecraft.client.Minecraft.getInstance().setScreen(
+        matteroverdrive.item.ContractItem.openScreen = hand -> net.minecraft.client.Minecraft.getInstance().gui.setScreen(
                 new matteroverdrive.client.quest.ContractScreen(hand));
         matteroverdrive.item.ContractItem.clientPlayer = () -> net.minecraft.client.Minecraft.getInstance().player;
-        matteroverdrive.item.DataPadItem.openScreen = hand -> net.minecraft.client.Minecraft.getInstance().setScreen(
+        matteroverdrive.item.DataPadItem.openScreen = hand -> net.minecraft.client.Minecraft.getInstance().gui.setScreen(
                 new matteroverdrive.client.quest.DataPadScreen(hand));
-        matteroverdrive.dialog.DialogPayloads.openScreen = npc -> net.minecraft.client.Minecraft.getInstance().setScreen(
+        matteroverdrive.dialog.DialogPayloads.openScreen = npc -> net.minecraft.client.Minecraft.getInstance().gui.setScreen(
                 new matteroverdrive.client.quest.DialogScreen(npc, net.minecraft.client.Minecraft.getInstance().player));
         matteroverdrive.dialog.DialogMessage.showOnClient = message -> {
             var mc = net.minecraft.client.Minecraft.getInstance();
-            if (mc.screen instanceof matteroverdrive.client.quest.DialogScreen screen) {
+            if (mc.gui.screen() instanceof matteroverdrive.client.quest.DialogScreen screen) {
                 if (message == null) screen.onClose();
                 else screen.setCurrent(message);
             }
         };
         matteroverdrive.dialog.DialogMessage.shownOnClient = () ->
-                net.minecraft.client.Minecraft.getInstance().screen instanceof matteroverdrive.client.quest.DialogScreen screen ? screen.getCurrent() : null;
+                net.minecraft.client.Minecraft.getInstance().gui.screen() instanceof matteroverdrive.client.quest.DialogScreen screen ? screen.getCurrent() : null;
         matteroverdrive.android.AndroidClientHooks.transformationStarted = player -> {
             var mc = net.minecraft.client.Minecraft.getInstance();
             if (player == mc.player) {

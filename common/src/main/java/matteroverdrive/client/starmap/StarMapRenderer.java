@@ -44,7 +44,7 @@ import net.minecraft.world.phys.Vec3;
 public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, StarMapRenderer.State> {
     private static final Identifier BEAM = tex("textures/fx/hologram_beam.png");
     private static final Identifier PARTICLES = tex("textures/particle/particles_additive.png");
-    private static final FontDescription ALT = new FontDescription.Resource(Minecraft.ALT_FONT);
+    private static final FontDescription ALT = new FontDescription.Resource(net.minecraft.resources.Identifier.withDefaultNamespace("alt"));
     // 1.7.10 StarMapRendererAbstract icons on the 128 px additive particle sheet
     private static final float[] STAR_ICON = {0, 0, 32 / 128f, 32 / 128f}, SELECTED_ICON = {32 / 128f, 0, 64 / 128f, 32 / 128f},
             CURRENT_ICON = {64 / 128f, 0, 96 / 128f, 32 / 128f};
@@ -90,7 +90,7 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
         state.blockCenter = Vec3.atCenterOf(pos);
         state.starMap = starMap;
         // the star map screen shows the hologram itself (1.7.10 skipped the world one while GuiStarMap was open)
-        state.hidden = Minecraft.getInstance().screen instanceof matteroverdrive.client.screen.StarMapScreen;
+        state.hidden = Minecraft.getInstance().gui.screen() instanceof matteroverdrive.client.screen.StarMapScreen;
     }
 
     @Override
@@ -126,7 +126,7 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
     @Override
     public void submit(State state, PoseStack pose, SubmitNodeCollector collector, CameraRenderState camera) {
         var mc = Minecraft.getInstance();
-        var cam = mc.gameRenderer.getMainCamera();
+        var cam = mc.gameRenderer.mainCamera();
         Galaxy galaxy = GalaxyClient.getGalaxy();
         if (state.hidden) return;
         drawHoloLights(state, pose, collector);

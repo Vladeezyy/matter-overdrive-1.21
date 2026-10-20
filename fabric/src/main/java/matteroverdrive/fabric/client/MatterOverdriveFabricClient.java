@@ -64,7 +64,7 @@ public final class MatterOverdriveFabricClient implements ClientModInitializer {
         MOClient.blockColors((tints, block) -> net.fabricmc.fabric.api.client.rendering.v1.BlockColorRegistry.register(tints, block));
         // the star map screen's hologram (1.21.6+ GUI: a picture-in-picture renderer)
         net.fabricmc.fabric.api.client.rendering.v1.PictureInPictureRendererRegistry.register(context ->
-                new matteroverdrive.client.starmap.StarMapPipRenderer(context.bufferSource()));
+                new matteroverdrive.client.starmap.StarMapPipRenderer());
         // 1.21.4+: the select properties of the client item definitions (vanilla registers its own the same way)
         MOClient.registerSelectProperties(net.minecraft.client.renderer.item.properties.select.SelectItemModelProperties.ID_MAPPER::put);
         MOClient.registerScreens(new MOClient.Screens() {

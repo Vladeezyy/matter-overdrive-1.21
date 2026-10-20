@@ -28,7 +28,7 @@ public final class AnomalyParticles {
         // MOMathHelper.randomSpherePoint
         double radius = anomaly.getBlockBreakRange();
         double theta = 2 * Math.PI * rand.nextDouble(), phi = Math.acos(2 * rand.nextDouble() - 1);
-        Vec3 centre = anomaly.getBlockPos().getCenter();
+        Vec3 centre = net.minecraft.world.phys.Vec3.atCenterOf(anomaly.getBlockPos());
         Vec3 at = centre.add(radius * Math.sin(phi) * Math.cos(theta), radius * Math.sin(phi) * Math.sin(theta), radius * Math.cos(phi));
         Minecraft.getInstance().particleEngine.add(new Speck(level, at, centre));
     }

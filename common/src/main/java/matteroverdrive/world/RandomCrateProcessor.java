@@ -12,18 +12,17 @@ import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
 /** Gives template tritanium crates a random colour (1.7.10 MadScientistHouse: tritaniumCrate[random.nextInt(16)]). */
-public class RandomCrateProcessor extends StructureProcessor {
+public class RandomCrateProcessor implements StructureProcessor {
     public static final RandomCrateProcessor INSTANCE = new RandomCrateProcessor();
     public static final MapCodec<RandomCrateProcessor> CODEC = MapCodec.unit(() -> INSTANCE);
 
     @Override
-    public StructureTemplate.StructureBlockInfo processBlock(LevelReader level, BlockPos offset, BlockPos pos,
-                                                            StructureTemplate.StructureBlockInfo blockInfo,
-                                                            StructureTemplate.StructureBlockInfo relative, StructurePlaceSettings settings) {
+    public StructureTemplate.StructureBlockInfo processBlock(LevelReader level, BlockPos targetPosition, BlockPos referencePos,
+                                                            BlockPos templateRelativePos, StructureTemplate.StructureBlockInfo relative,
+                                                            StructurePlaceSettings settings) {
         if (!(relative.state().getBlock() instanceof TritaniumCrateBlock)) return relative;
         RandomSource random = settings.getRandom(relative.pos());
         BlockState crate = MOBlocks.TRITANIUM_CRATES.get(random.nextInt(MOBlocks.TRITANIUM_CRATES.size())).get().defaultBlockState()
@@ -32,7 +31,7 @@ public class RandomCrateProcessor extends StructureProcessor {
     }
 
     @Override
-    protected StructureProcessorType<?> getType() {
-        return MOStructures.RANDOM_CRATE.get();
+    public MapCodec<? extends StructureProcessor> codec() {
+        return CODEC;
     }
 }

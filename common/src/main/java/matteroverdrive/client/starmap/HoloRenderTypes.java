@@ -9,9 +9,10 @@ import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.platform.CompareOp;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.blaze3d.PrimitiveTopology;
 
 import matteroverdrive.MatterOverdrive;
+import net.minecraft.client.renderer.BindGroupLayouts;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -26,34 +27,34 @@ public final class HoloRenderTypes {
     private static final DepthStencilState NO_DEPTH_WRITE = new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, false);
 
     private static RenderPipeline.Builder base(String name) {
-        return RenderPipeline.builder(RenderPipelines.MATRICES_PROJECTION_SNIPPET).withLocation(Identifier.fromNamespaceAndPath(MatterOverdrive.MODID,
+        return RenderPipeline.builder().withBindGroupLayout(BindGroupLayouts.GLOBALS).withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION).withLocation(Identifier.fromNamespaceAndPath(MatterOverdrive.MODID,
                 "pipeline/" + name)).withColorTargetState(new ColorTargetState(BlendFunction.ADDITIVE)).withCull(false)
                 .withDepthStencilState(NO_DEPTH_WRITE);
     }
 
     public static final RenderPipeline TEXTURED = base("holo_textured").withVertexShader("core/position_tex_color")
-            .withFragmentShader("core/position_tex_color").withSampler("Sampler0")
-            .withVertexFormat(DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS).build();
+            .withFragmentShader("core/position_tex_color").withBindGroupLayout(BindGroupLayouts.SAMPLER0)
+            .withVertexBinding(0, DefaultVertexFormat.POSITION_TEX_COLOR).withPrimitiveTopology(PrimitiveTopology.QUADS).build();
     /** The textured holo with back faces culled (the android shield seen from outside). */
     public static final RenderPipeline TEXTURED_CULL = base("holo_textured_cull").withCull(true).withVertexShader("core/position_tex_color")
-            .withFragmentShader("core/position_tex_color").withSampler("Sampler0")
-            .withVertexFormat(DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS).build();
+            .withFragmentShader("core/position_tex_color").withBindGroupLayout(BindGroupLayouts.SAMPLER0)
+            .withVertexBinding(0, DefaultVertexFormat.POSITION_TEX_COLOR).withPrimitiveTopology(PrimitiveTopology.QUADS).build();
     public static final RenderPipeline QUADS = base("holo_quads").withVertexShader("core/position_color").withFragmentShader("core/position_color")
-            .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS).build();
+            .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR).withPrimitiveTopology(PrimitiveTopology.QUADS).build();
     public static final RenderPipeline TRIANGLES = base("holo_triangles").withVertexShader("core/position_color")
-            .withFragmentShader("core/position_color").withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLES).build();
+            .withFragmentShader("core/position_color").withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR).withPrimitiveTopology(PrimitiveTopology.TRIANGLES).build();
     public static final RenderPipeline DEPTH_QUADS = base("holo_depth_quads").withVertexShader("core/position_color")
             .withFragmentShader("core/position_color").withDepthStencilState(DepthStencilState.DEFAULT)
-            .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS).build();
+            .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR).withPrimitiveTopology(PrimitiveTopology.QUADS).build();
     public static final RenderPipeline LINES = RenderPipeline.builder(RenderPipelines.LINES_SNIPPET)
             .withLocation(Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "pipeline/holo_lines"))
             .withColorTargetState(new ColorTargetState(BlendFunction.ADDITIVE)).withDepthStencilState(NO_DEPTH_WRITE).build();
 
     /** 1.7.10 block screens: glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR). */
     public static final RenderPipeline SCREEN = base("holo_screen").withColorTargetState(new ColorTargetState(new BlendFunction(
-                    com.mojang.blaze3d.platform.SourceFactor.ONE, com.mojang.blaze3d.platform.DestFactor.ONE_MINUS_SRC_COLOR)))
-            .withVertexShader("core/position_tex_color").withFragmentShader("core/position_tex_color").withSampler("Sampler0")
-            .withVertexFormat(DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS).build();
+                    com.mojang.blaze3d.platform.BlendFactor.ONE, com.mojang.blaze3d.platform.BlendFactor.ONE_MINUS_SRC_COLOR)))
+            .withVertexShader("core/position_tex_color").withFragmentShader("core/position_tex_color").withBindGroupLayout(BindGroupLayouts.SAMPLER0)
+            .withVertexBinding(0, DefaultVertexFormat.POSITION_TEX_COLOR).withPrimitiveTopology(PrimitiveTopology.QUADS).build();
     private static final Map<Identifier, RenderType> SCREEN_TYPES = new HashMap<>();
 
     public static RenderType screen(Identifier texture) {

@@ -51,7 +51,7 @@ public final class MatterOverdriveFabric implements ModInitializer {
         // NeoForge's EntityAttributeModificationEvent: the player's attributes with the android ones
         var playerAttributes = net.minecraft.world.entity.player.Player.createAttributes();
         Android.playerAttributes().forEach(playerAttributes::add);
-        FabricDefaultAttributeRegistry.register(net.minecraft.world.entity.EntityType.PLAYER, playerAttributes);
+        FabricDefaultAttributeRegistry.register(net.minecraft.world.entity.EntityTypes.PLAYER, playerAttributes);
         MatterOverdrive.registerSpawnPlacements();
         FabricMatterValues.register();
         FabricBiomeModifiers.register();

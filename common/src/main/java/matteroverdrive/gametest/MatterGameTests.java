@@ -59,18 +59,18 @@ final class MatterGameTests {
         var server = helper.getLevel().getServer();
         var estimated = MatterRegistry.estimated(server);
         // weathering + waxing (block conversions, then the waxing recipe)
-        int copper = MatterRegistry.get(server, Items.CHISELED_COPPER);
-        helper.assertTrue(copper > 0 && MatterRegistry.get(server, Items.WAXED_OXIDIZED_CHISELED_COPPER) > 0
-                && !estimated.contains(Items.WAXED_OXIDIZED_CHISELED_COPPER), Component.literal("waxed oxidized chiseled copper"));
+        int copper = MatterRegistry.get(server, Items.CHISELED_COPPER.weathering().unaffected());
+        helper.assertTrue(copper > 0 && MatterRegistry.get(server, Items.CHISELED_COPPER.waxed().oxidized()) > 0
+                && !estimated.contains(Items.CHISELED_COPPER.waxed().oxidized()), Component.literal("waxed oxidized chiseled copper"));
         // (the stonecutter makes cut copper 4 per block, cheaper than the crafting table: either derivation may win)
-        helper.assertTrue(MatterRegistry.get(server, Items.OXIDIZED_CHISELED_COPPER) > 0 && !estimated.contains(Items.OXIDIZED_CHISELED_COPPER),
+        helper.assertTrue(MatterRegistry.get(server, Items.CHISELED_COPPER.weathering().oxidized()) > 0 && !estimated.contains(Items.CHISELED_COPPER.weathering().oxidized()),
                 Component.literal("oxidized chiseled copper"));
         // smithing: netherite from ancient debris; stonecutting: polished tuff; concrete from its powder; infested stone
         helper.assertTrue(MatterRegistry.get(server, Items.NETHERITE_INGOT) > 4 * 512 && !estimated.contains(Items.NETHERITE_SWORD)
                 && MatterRegistry.get(server, Items.NETHERITE_SWORD) > MatterRegistry.get(server, Items.DIAMOND_SWORD),
                 Component.literal("netherite " + MatterRegistry.get(server, Items.NETHERITE_INGOT)));
         helper.assertTrue(MatterRegistry.get(server, Items.POLISHED_TUFF) > 0 && !estimated.contains(Items.POLISHED_TUFF), Component.literal("polished tuff"));
-        expect(helper, server, Items.WHITE_CONCRETE, MatterRegistry.get(server, Items.WHITE_CONCRETE_POWDER));
+        expect(helper, server, Items.CONCRETE.white(), MatterRegistry.get(server, Items.CONCRETE_POWDER.white()));
         expect(helper, server, Items.INFESTED_STONE, MatterRegistry.get(server, Items.STONE));
         expect(helper, server, Items.STRIPPED_OAK_LOG, 16);
         // never estimated: the blacklist tag, unbreakable blocks, spawn eggs (1.7.10 itself gave bedrock 1024)

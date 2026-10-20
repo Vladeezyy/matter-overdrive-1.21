@@ -13,6 +13,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
@@ -51,7 +52,7 @@ final class AnomalyGameTests {
 
     private static void swallowsItems(GameTestHelper helper) {
         GravitationalAnomalyBlockEntity a = anomaly(helper, 6000);
-        ItemEntity item = helper.spawnItem(Items.IRON_INGOT, new BlockPos(6, 4, 8).getCenter());
+        ItemEntity item = helper.spawnItem(Items.IRON_INGOT, net.minecraft.world.phys.Vec3.atCenterOf(new BlockPos(6, 4, 8)));
         item.setDeltaMovement(0, 0, 0);
         helper.runAfterDelay(60, () -> {
             helper.assertTrue(item.isRemoved(), Component.literal("ingot still there, " + item.position()));
@@ -62,11 +63,11 @@ final class AnomalyGameTests {
 
     private static void pullsMobs(GameTestHelper helper) {
         anomaly(helper, 100000);
-        var pig = helper.spawnWithNoFreeWill(EntityType.PIG, new BlockPos(6, 3, 10));
-        double start = pig.distanceToSqr(helper.absolutePos(CORE).getCenter());
+        var pig = helper.spawnWithNoFreeWill(EntityTypes.PIG, new BlockPos(6, 3, 10));
+        double start = pig.distanceToSqr(net.minecraft.world.phys.Vec3.atCenterOf(helper.absolutePos(CORE)));
         // mass 100000: ~0.26 blocks/tick^2 at this distance, so check before the pig flies through the core
         helper.runAfterDelay(5, () -> {
-            double now = pig.isRemoved() ? 0 : pig.distanceToSqr(helper.absolutePos(CORE).getCenter());
+            double now = pig.isRemoved() ? 0 : pig.distanceToSqr(net.minecraft.world.phys.Vec3.atCenterOf(helper.absolutePos(CORE)));
             helper.assertTrue(now < start, Component.literal("pig not pulled: " + start + " -> " + now));
             helper.succeed();
         });
@@ -74,7 +75,7 @@ final class AnomalyGameTests {
 
     private static void equalizerStopsPull(GameTestHelper helper) {
         anomaly(helper, 100000);
-        var pig = helper.spawnWithNoFreeWill(EntityType.PIG, new BlockPos(6, 3, 10));
+        var pig = helper.spawnWithNoFreeWill(EntityTypes.PIG, new BlockPos(6, 3, 10));
         pig.setItemSlot(EquipmentSlot.CHEST, new ItemStack(MOItems.SPACETIME_EQUALIZER.get()));
         var start = pig.position();
         helper.runAfterDelay(20, () -> {
@@ -86,7 +87,7 @@ final class AnomalyGameTests {
 
     private static void netherStarCollapse(GameTestHelper helper) {
         anomaly(helper, 6000);
-        helper.spawnItem(Items.NETHER_STAR, new BlockPos(6, 4, 7).getCenter());
+        helper.spawnItem(Items.NETHER_STAR, net.minecraft.world.phys.Vec3.atCenterOf(new BlockPos(6, 4, 7)));
         helper.runAfterDelay(60, () -> {
             helper.assertBlockNotPresent(MOBlocks.GRAVITATIONAL_ANOMALY.get(), CORE);
             helper.succeed();

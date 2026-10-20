@@ -22,7 +22,7 @@ import net.minecraft.world.item.ItemStack;
  */
 public abstract class GuideElement {
     /** 1.7.10 setUnicodeFlag(true) = the uniform font. */
-    public static final FontDescription UNIFORM = new FontDescription.Resource(Minecraft.UNIFORM_FONT);
+    public static final FontDescription UNIFORM = new FontDescription.Resource(net.minecraft.resources.Identifier.withDefaultNamespace("uniform"));
 
     /** A clickable area (link) found while drawing, in screen coordinates. */
     public record Link(int x, int y, int w, int h, Runnable action) {}

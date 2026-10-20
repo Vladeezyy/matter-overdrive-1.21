@@ -106,7 +106,7 @@ public class ImageStructurePiece extends StructurePiece {
     /** 1.7.10 onBlockPlace of the buildings. */
     private void placed(WorldGenLevel level, BuildingTemplate.Entry entry, BlockPos pos, RandomSource random) {
         if (entry.has("connect")) {
-            level.getChunk(pos).markPosForPostprocessing(pos);   // pipes and fences connect once the chunk is done
+            level.getChunk(pos).markPosForPostProcessing(pos);   // pipes and fences connect once the chunk is done
         }
         if (entry.has("crate_loot") && level.getBlockEntity(pos) instanceof TritaniumCrateBlockEntity crate) {
             RandomizableContainer.setBlockEntityLootTable(level, random, pos, ANDROID_HOUSE_LOOT);

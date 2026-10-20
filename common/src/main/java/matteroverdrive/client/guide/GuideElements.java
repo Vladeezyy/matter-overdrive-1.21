@@ -373,7 +373,7 @@ public final class GuideElements {
             ItemStack stack = element.hasAttribute("item") ? shortcodeStack(decodeShortcode(element.getAttribute("item"))) : null;
             if (stack == null) return;
             String key = stack.getItem().getDescriptionId() + ".details";
-            if (net.minecraft.client.resources.language.I18n.exists(key)) {
+            if (net.minecraft.locale.Language.getInstance().has(key)) {
                 details = List.of(net.minecraft.client.resources.language.I18n.get(key).split("\\\\n|\n"));
             }
             this.height = details.size() * font().lineHeight;

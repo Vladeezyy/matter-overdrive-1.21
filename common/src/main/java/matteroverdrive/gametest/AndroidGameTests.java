@@ -47,7 +47,7 @@ final class AndroidGameTests {
         helper.getLevel().getServer().getPlayerList().placeNewPlayer(connection, player, cookie);
         player.connection.handleAcceptPlayerLoad(new net.minecraft.network.protocol.game.ServerboundPlayerLoadedPacket());      // players are invulnerable until their client reports it has loaded
         net.minecraft.world.level.GameType.SURVIVAL.updatePlayerAbilities(player.getAbilities());   // abilities came from the creative default
-        var pos = helper.absolutePos(new BlockPos(6, 1, 1)).getBottomCenter();
+        var pos = net.minecraft.world.phys.Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(6, 1, 1)));
         player.snapTo(pos.x, pos.y, pos.z, 0, 0);
         return player;
     }
@@ -234,7 +234,7 @@ final class AndroidGameTests {
         Android.get(player).setActiveStat(BioticStats.SHIELD.id());
         Android.onActionKey(player);
         check(helper, Android.get(player).getFlag("Shield"), "shield not up");
-        var arrow = net.minecraft.world.entity.EntityType.ARROW.create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        var arrow = net.minecraft.world.entity.EntityTypes.ARROW.create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         // 2 damage = 512 FE: within the built-in store's 1024 FE per pull, so the hit is blocked outright
         player.hurtServer(helper.getLevel(), helper.getLevel().damageSources().arrow((net.minecraft.world.entity.projectile.arrow.AbstractArrow) arrow, null), 2);
         check(helper, player.getHealth() == 20, "arrow got through the shield: " + player.getHealth());
@@ -242,7 +242,7 @@ final class AndroidGameTests {
         player.invulnerableTime = 0;
         player.hurtServer(helper.getLevel(), helper.getLevel().damageSources().arrow((net.minecraft.world.entity.projectile.arrow.AbstractArrow) arrow, null), 6);
         check(helper, Math.abs(player.getHealth() - 16) < 1e-4, "partial shield: " + player.getHealth());
-        var pig = helper.spawnWithNoFreeWill(net.minecraft.world.entity.EntityType.PIG, new BlockPos(6, 1, 3));
+        var pig = helper.spawnWithNoFreeWill(net.minecraft.world.entity.EntityTypes.PIG, new BlockPos(6, 1, 3));
         Android.get(player).setActiveStat(BioticStats.SHOCKWAVE.id());
         Android.onActionKey(player);
         check(helper, pig.getHealth() < pig.getMaxHealth(), "shockwave missed the pig");
@@ -302,7 +302,7 @@ final class AndroidGameTests {
         var ranged = helper.spawnWithNoFreeWill(matteroverdrive.init.MOEntities.RANGED_ROGUE_ANDROID.get(), new BlockPos(6, 1, 6));
         ItemStack rifle = new ItemStack(MOItems.PHASER_RIFLE.get());
         ranged.setItemSlot(net.minecraft.world.entity.EquipmentSlot.MAINHAND, rifle);
-        var pig = helper.spawnWithNoFreeWill(net.minecraft.world.entity.EntityType.PIG, new BlockPos(6, 1, 10));
+        var pig = helper.spawnWithNoFreeWill(net.minecraft.world.entity.EntityTypes.PIG, new BlockPos(6, 1, 10));
         ranged.performRangedAttack(pig, 1);
         var bolts = helper.getLevel().getEntitiesOfClass(matteroverdrive.entity.PlasmaBolt.class, ranged.getBoundingBox().inflate(8),
                 b -> b.getOwner() == ranged);

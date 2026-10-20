@@ -27,13 +27,13 @@ public final class ScannerClient {
     public static void onClientTick() {
         Minecraft mc = Minecraft.getInstance();
         while (OPEN.consumeClick()) {
-            if (mc.player == null || mc.screen != null) continue;
+            if (mc.player == null || mc.gui.screen() != null) continue;
             var inventory = mc.player.getInventory();
             int slot = inventory.getSelectedItem().getItem() instanceof MatterScannerItem ? inventory.getSelectedSlot() : -1;
             for (int i = 0; slot < 0 && i < inventory.getContainerSize(); i++) {
                 if (inventory.getItem(i).getItem() instanceof MatterScannerItem) slot = i;
             }
-            if (slot >= 0) mc.setScreen(new MatterScannerScreen(slot));
+            if (slot >= 0) mc.gui.setScreen(new MatterScannerScreen(slot));
         }
     }
 

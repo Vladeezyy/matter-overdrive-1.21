@@ -57,13 +57,13 @@ public final class AndroidHud {
     public static boolean hides(VanillaLayer layer) {
         Player player = Minecraft.getInstance().player;
         if (player == null || !Android.isAndroid(player)) return false;
-        return layer != VanillaLayer.TAB_LIST || Minecraft.getInstance().screen instanceof AbilityWheelScreen;
+        return layer != VanillaLayer.TAB_LIST || Minecraft.getInstance().gui.screen() instanceof AbilityWheelScreen;
     }
 
     public static void render(GuiGraphicsExtractor g, DeltaTracker delta) {
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
-        if (player == null || mc.options.hideGui) return;
+        if (player == null || mc.gui.hud.isHidden()) return;
         AndroidData data = Android.get(player);
         if (data.isAndroid()) {
             if (BioticStats.CLOAK.isActive(player, data, 1)) {

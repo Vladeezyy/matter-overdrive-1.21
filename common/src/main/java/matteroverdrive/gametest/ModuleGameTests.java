@@ -32,7 +32,7 @@ final class ModuleGameTests {
 
     private static ServerPlayer player(GameTestHelper helper) {
         ServerPlayer player = helper.makeMockServerPlayerInLevel();
-        var pos = helper.absolutePos(new BlockPos(6, 1, 1)).getBottomCenter();
+        var pos = net.minecraft.world.phys.Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(6, 1, 1)));
         player.snapTo(pos.x, pos.y, pos.z, 0, 0);
         return player;
     }

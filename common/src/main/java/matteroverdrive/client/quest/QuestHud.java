@@ -113,7 +113,7 @@ public final class QuestHud {
 
     public static void render(GuiGraphicsExtractor g, DeltaTracker delta) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.options.hideGui) return;
+        if (mc.gui.hud.isHidden()) return;
         Font font = mc.font;
         float dt = delta.getGameTimeDeltaTicks();
         int sw = g.guiWidth(), sh = g.guiHeight();

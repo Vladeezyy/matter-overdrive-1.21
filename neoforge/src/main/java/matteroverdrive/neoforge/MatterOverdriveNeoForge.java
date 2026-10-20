@@ -16,6 +16,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -60,7 +61,7 @@ public final class MatterOverdriveNeoForge {
         NeoForgePlatform.registerAll(modBus);
         modBus.addListener(MatterOverdriveNeoForge::registerCapabilities);
         modBus.addListener((EntityAttributeCreationEvent event) -> MatterOverdrive.registerAttributes(event::put));
-        modBus.addListener((EntityAttributeModificationEvent event) -> Android.playerAttributes().forEach(a -> event.add(EntityType.PLAYER, a)));
+        modBus.addListener((EntityAttributeModificationEvent event) -> Android.playerAttributes().forEach(a -> event.add(EntityTypes.PLAYER, a)));
         modBus.addListener((RegisterSpawnPlacementsEvent event) -> NeoForgePlatform.registerSpawnPlacements(event));
         modBus.addListener((RegisterDataMapTypesEvent event) -> event.register(MatterValues.MATTER));
         modBus.addListener((RegisterPayloadHandlersEvent event) -> {

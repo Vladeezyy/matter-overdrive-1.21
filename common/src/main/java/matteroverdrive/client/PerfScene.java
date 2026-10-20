@@ -84,7 +84,7 @@ public final class PerfScene {
             // 1.21.2+ caps an idle game ("AFK" after a minute without input) at 30 FPS: nobody touches it during the run
             mc.options.inactivityFpsLimit().set(net.minecraft.client.InactivityFpsLimit.MINIMIZED);
             mc.options.cloudStatus().set(net.minecraft.client.CloudStatus.OFF);
-            mc.options.hideGui = true;
+            matteroverdrive.client.MOClientCompat.setHudHidden(mc, true);
             server(mc, PerfScene::prepareField);
         });
         // the world settles first (chunks, lighting), so the empty baseline is not inflated by loading
@@ -117,7 +117,7 @@ public final class PerfScene {
         });
         at(t += 20, mc -> {
             MatterOverdrive.LOGGER.info("[perf] DONE");
-            mc.options.hideGui = false;
+            matteroverdrive.client.MOClientCompat.setHudHidden(mc, false);
             mc.stop();
         });
     }
@@ -254,7 +254,7 @@ public final class PerfScene {
             // 1.21.2+ caps an idle game ("AFK" after a minute without input) at 30 FPS: nobody touches it during the run
             mc.options.inactivityFpsLimit().set(net.minecraft.client.InactivityFpsLimit.MINIMIZED);
             mc.options.cloudStatus().set(net.minecraft.client.CloudStatus.OFF);
-            mc.options.hideGui = true;
+            matteroverdrive.client.MOClientCompat.setHudHidden(mc, true);
             server(mc, PerfScene::prepareField);
         });
         t += 400;
@@ -278,7 +278,7 @@ public final class PerfScene {
         }
         at(t + 5, mc -> {
             MatterOverdrive.LOGGER.info("[perf] DONE");
-            mc.options.hideGui = false;
+            matteroverdrive.client.MOClientCompat.setHudHidden(mc, false);
             mc.stop();
         });
     }
@@ -343,7 +343,7 @@ public final class PerfScene {
             p.setGameMode(GameType.SPECTATOR);
             p.teleportTo(level, base.getX() - 0.5, base.getY() + 0.6, base.getZ() - 4.6, Set.of(), 180f, 10f, false);
         }));
-        at(45, mc -> mc.options.hideGui = true);
+        at(45, mc -> matteroverdrive.client.MOClientCompat.setHudHidden(mc, true));
         // the first machine tick sets the drive properties; the client gets the block update
         at(80, mc -> {
             shot(mc, "look_storage");
@@ -355,7 +355,7 @@ public final class PerfScene {
             MatterOverdrive.LOGGER.info("[perf] CHECK storage state {}", p.level().getBlockState(storage));
         }));
         at(90, mc -> {
-            mc.options.hideGui = false;
+            matteroverdrive.client.MOClientCompat.setHudHidden(mc, false);
             MatterOverdrive.LOGGER.info("[perf] DONE");
             mc.stop();
         });
@@ -395,12 +395,12 @@ public final class PerfScene {
             at(t + 1, mc -> {
                 mc.player.getInventory().setSelectedSlot(0);
                 mc.options.setCameraType(CameraType.FIRST_PERSON);
-                mc.options.hideGui = false;
+                matteroverdrive.client.MOClientCompat.setHudHidden(mc, false);
             });
             at(t + 10, mc -> shot(mc, "hand_" + name + "_first"));
             at(t + 11, mc -> {
                 mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);
-                mc.options.hideGui = true;
+                matteroverdrive.client.MOClientCompat.setHudHidden(mc, true);
             });
             at(t + 16, mc -> shot(mc, "hand_" + name + "_third"));
             t += 18;
@@ -414,15 +414,15 @@ public final class PerfScene {
         }));
         at(t + 4, mc -> {
             mc.options.setCameraType(CameraType.FIRST_PERSON);
-            mc.options.hideGui = false;
-            mc.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player));
+            matteroverdrive.client.MOClientCompat.setHudHidden(mc, false);
+            mc.gui.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player));
         });
         at(t + 14, mc -> shot(mc, "hand_inventory"));
         t += 16;
         at(t, mc -> {
-            mc.setScreen(null);
+            mc.gui.setScreen(null);
             mc.options.setCameraType(CameraType.FIRST_PERSON);
-            mc.options.hideGui = false;
+            matteroverdrive.client.MOClientCompat.setHudHidden(mc, false);
             MatterOverdrive.LOGGER.info("[perf] DONE");
             mc.stop();
         });
@@ -438,8 +438,8 @@ public final class PerfScene {
         if (tick == 0 && STEPS.isEmpty()) initSteps();
         // the window is usually unfocused while this runs: never pause, or the integrated server stops
         mc.options.pauseOnLostFocus = false;
-        if (mc.screen instanceof net.minecraft.client.gui.screens.PauseScreen) {
-            mc.setScreen(null);
+        if (mc.gui.screen() instanceof net.minecraft.client.gui.screens.PauseScreen) {
+            mc.gui.setScreen(null);
         }
         if (measuring) {
             long avg = mc.getSingleplayerServer().getAverageTickTimeNanos();
@@ -471,7 +471,7 @@ public final class PerfScene {
     }
 
     private static void shot(Minecraft mc, String name) {
-        Screenshot.grab(mc.gameDirectory, name + ".png", mc.getMainRenderTarget(), 1,
+        Screenshot.grab(mc.gameDirectory, name + ".png", mc.gameRenderer.mainRenderTarget(), 1,
                 msg -> MatterOverdrive.LOGGER.info("[perf] {}", msg.getString()));
     }
 

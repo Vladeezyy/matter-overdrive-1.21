@@ -7,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.item.DyeColor;
 
 /** Phase 7 checks: world mobs. */
@@ -31,7 +32,7 @@ final class WorldGameTests {
         var level = helper.getLevel();
         FailedPig pig = helper.spawnWithNoFreeWill(MOEntities.FAILED_PIG.get(), new BlockPos(2, 1, 2));
         FailedPig pig2 = helper.spawnWithNoFreeWill(MOEntities.FAILED_PIG.get(), new BlockPos(3, 1, 2));
-        var vanilla = helper.spawnWithNoFreeWill(EntityType.PIG, new BlockPos(4, 1, 2));
+        var vanilla = helper.spawnWithNoFreeWill(EntityTypes.PIG, new BlockPos(4, 1, 2));
         check(helper, pig.getBreedOffspring(level, pig2) instanceof FailedPig, "piglet isn't a failed pig");
         pig.setInLove(null);
         pig2.setInLove(null);
@@ -140,7 +141,7 @@ final class WorldGameTests {
         drive.set(matteroverdrive.init.MODataComponents.TRANSPORT_TARGET.get(), abs.offset(10, -1, 0));
         t.getInventory().setStack(matteroverdrive.block.entity.TransporterBlockEntity.FLASH_DRIVE, drive);
         check(helper, t.importFromFlashDrive("East") && t.getSelected().pos().equals(abs.offset(10, 0, 0)), "import " + t.getSelected());
-        var pig = helper.spawnWithNoFreeWill(EntityType.PIG, pos.above());
+        var pig = helper.spawnWithNoFreeWill(EntityTypes.PIG, pos.above());
         helper.runAfterDelay(80, () -> {
             check(helper, pig.getBlockX() == abs.getX() + 10 && pig.getBlockZ() == abs.getZ(), "pig at " + pig.blockPosition() + ", expected " + abs.offset(10, 0, 0));
             check(helper, t.getEnergy().getEnergy() == 100000 - 160, "energy " + t.getEnergy().getEnergy());

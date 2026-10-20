@@ -24,7 +24,7 @@ public final class WeaponClient {
     }
     private static void onTick() {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.player == null || mc.screen != null || !mc.options.keyAttack.isDown()) return;
+        if (mc.player == null || mc.gui.screen() != null || !mc.options.keyAttack.isDown()) return;
         if (mc.player.getMainHandItem().getItem() instanceof EnergyWeaponItem weapon
                 && !mc.player.getCooldowns().isOnCooldown(mc.player.getMainHandItem())
                 && weapon.canFire(mc.player.getMainHandItem())) {

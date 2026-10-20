@@ -18,15 +18,13 @@ public final class MOStructures {
     public static final RegistryEntry<StructurePieceType, StructurePieceType> IMAGE_PIECE = PIECES.register("image",
             () -> (StructurePieceType.ContextlessType) ImageStructurePiece::new);
 
-    public static final Registrar<net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType<?>> PROCESSORS =
+    public static final Registrar<com.mojang.serialization.MapCodec<? extends net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor>> PROCESSORS =
             Registrar.create(Registries.STRUCTURE_PROCESSOR, MatterOverdrive.MODID);
-    public static final RegistryEntry<net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType<?>,
-            net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType<matteroverdrive.world.RandomCrateProcessor>> RANDOM_CRATE =
-            PROCESSORS.register("random_crate", () -> () -> matteroverdrive.world.RandomCrateProcessor.CODEC);
+    public static final RegistryEntry<com.mojang.serialization.MapCodec<? extends net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor>,
+            com.mojang.serialization.MapCodec<matteroverdrive.world.RandomCrateProcessor>> RANDOM_CRATE = PROCESSORS.register("random_crate", () -> matteroverdrive.world.RandomCrateProcessor.CODEC);
 
-    public static final RegistryEntry<net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType<?>,
-            net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType<matteroverdrive.world.MadScientistCrateProcessor>> MAD_SCIENTIST_CRATE =
-            PROCESSORS.register("mad_scientist_crate", () -> () -> matteroverdrive.world.MadScientistCrateProcessor.CODEC);
+    public static final RegistryEntry<com.mojang.serialization.MapCodec<? extends net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor>,
+            com.mojang.serialization.MapCodec<matteroverdrive.world.MadScientistCrateProcessor>> MAD_SCIENTIST_CRATE = PROCESSORS.register("mad_scientist_crate", () -> matteroverdrive.world.MadScientistCrateProcessor.CODEC);
 
     private MOStructures() {}
 }

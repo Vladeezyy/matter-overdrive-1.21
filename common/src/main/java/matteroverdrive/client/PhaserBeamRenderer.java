@@ -1,6 +1,5 @@
 package matteroverdrive.client;
 
-import net.minecraft.client.renderer.MultiBufferSource;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
@@ -39,7 +38,7 @@ public final class PhaserBeamRenderer {
         Vec3 right = look.cross(new Vec3(0, 1, 0)).normalize();
         Vec3 start = eye.add(look.scale(0.7)).add(right.scale(0.35)).add(0, -0.25, 0).subtract(origin);
         Vec3 end = target(mc, player, phaser).subtract(origin);
-        Vec3 camera = mc.gameRenderer.getMainCamera().position().subtract(origin);
+        Vec3 camera = mc.gameRenderer.mainCamera().position().subtract(origin);
         submit(collector, eventPose, start, end, camera, phaser, player);
     }
 

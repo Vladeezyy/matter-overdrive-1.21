@@ -130,7 +130,7 @@ public final class MachineRenderers {
         protected void part(PoseStack pose, SubmitNodeCollector collector, State state, Identifier key) {
             pose.pushPose();
             pose.translate(-0.5, 0, -0.5);   // the OBJ models are shifted to the block corner
-            collector.submitBlockModel(pose, Sheets.cutoutBlockSheet(), parts(model(key)), NO_TINTS, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
+            collector.submitBlockModel(pose, Sheets.cutoutBlockItemSheet(), parts(model(key)), NO_TINTS, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
             pose.popPose();
         }
     }
@@ -153,7 +153,7 @@ public final class MachineRenderers {
             items.updateForTopItem(state.item, replicator.getInventory().getStack(ReplicatorBlockEntity.OUTPUT), ItemDisplayContext.GROUND,
                     replicator.getLevel(), null, (int) state.seed);
             // the machine is a full opaque block, so its own light is 0: light the item from in front of the opening
-            state.lightCoords = net.minecraft.client.renderer.LevelRenderer.getLightCoords(replicator.getLevel(),
+            state.lightCoords = net.minecraft.util.LightCoordsUtil.getLightCoords(replicator.getLevel(),
                     replicator.getBlockPos().relative(state.facing));
         }
 
