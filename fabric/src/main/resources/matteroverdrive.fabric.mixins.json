@@ -17,6 +17,7 @@
     "client.AbstractClientPlayerMixin",
     "client.GuiMixin",
     "client.ItemInHandRendererMixin",
+    "client.LivingEntityRendererMixin",
     "client.MinecraftMixin",
     "client.PlayerRendererMixin"
   ],
