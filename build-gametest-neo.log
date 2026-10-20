@@ -1,0 +1,312 @@
+> Task :buildSrc:extractPluginRequests UP-TO-DATE
+> Task :buildSrc:generatePluginAdapters UP-TO-DATE
+> Task :buildSrc:compileJava UP-TO-DATE
+> Task :buildSrc:compileGroovy NO-SOURCE
+> Task :buildSrc:compileGroovyPlugins UP-TO-DATE
+> Task :buildSrc:pluginDescriptors UP-TO-DATE
+> Task :buildSrc:processResources UP-TO-DATE
+> Task :buildSrc:classes UP-TO-DATE
+> Task :buildSrc:jar UP-TO-DATE
+
+> Configure project :fabric
+Fabric Loom: 1.13.6
+
+> Task :common:createMinecraftArtifacts UP-TO-DATE
+> Task :neoforge:createMinecraftArtifacts UP-TO-DATE
+> Task :common:compileJava UP-TO-DATE
+> Task :neoforge:generateModMetadata
+> Task :neoforge:compileJava UP-TO-DATE
+> Task :neoforge:processResources
+> Task :neoforge:classes
+
+> Task :neoforge:downloadAssets
+Loaded 137 artifacts from /Users/vladeezy/Desktop/matter-overdrive-fabric/neoforge/build/tmp/downloadAssets/nfrt_artifact_manifest.properties
+Downloading asset index 17
+Using Minecraft asset root: /Users/vladeezy/.gradle/caches/neoformruntime/assets
+  ↓ https://piston-meta.mojang.com/v1/packages/00551f206ccb65cb965fd0aebc14d22cda282db7/17.json
+
+> Task :neoforge:writeGameTestServerLegacyClasspath
+> Task :neoforge:prepareGameTestServerRun
+
+> Task :neoforge:runGameTestServer
+WARN StatusConsoleListener Advanced terminal features are not available in this environment
+[09:01:01] [main/INFO] [cp.mo.mo.Launcher/MODLAUNCHER]: ModLauncher running: args [--launchTarget, forgeserverdev, --gameDir, ., --fml.fmlVersion, 4.0.45, --fml.mcVersion, 1.21.1, --fml.neoForgeVersion, 21.1.256, --fml.neoFormVersion, 20240808.144430]
+[09:01:01] [main/INFO] [cp.mo.mo.Launcher/MODLAUNCHER]: JVM identified as Homebrew OpenJDK 64-Bit Server VM 21.0.12.1
+[09:01:01] [main/INFO] [cp.mo.mo.Launcher/MODLAUNCHER]: ModLauncher 11.0.5+main.901c6ea8 starting: java version 21.0.12.1 by Homebrew; OS Mac OS X arch aarch64 version 26.6.2
+[09:01:01] [main/INFO] [ne.ne.fm.lo.ImmediateWindowHandler/]: ImmediateWindowProvider not loading because launch target is forgeserverdev
+[09:01:01] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.7 Source=union:/Users/vladeezy/.gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.16.4+mixin.0.8.7/26d01f0567ab46e9ca0d2ed89d0ecc11aadbd433/sponge-mixin-0.16.4+mixin.0.8.7.jar%2394!/ Service=ModLauncher Env=SERVER
+[09:01:01] [main/INFO] [ne.ne.fm.lo.mo.lo.JarInJarDependencyLocator/]: Found 2 dependencies adding them to mods collection
+[09:01:01] [main/INFO] [ne.ne.fm.lo.mo.ModDiscoverer/]: 
+     Mod List:
+		Name Version (Mod Id)
+
+		Matter Overdrive 1.0.1 (matteroverdrive)
+		Minecraft 1.21.1 (minecraft)
+		NeoForge 21.1.256 (neoforge)
+[09:01:02] [main/INFO] [cp.mo.mo.LaunchServiceHandler/MODLAUNCHER]: Launching target 'forgeserverdev' with arguments [--gameDir, .]
+[09:01:03] [main/INFO] [MixinExtras|Service/]: Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.5.5).
+[09:01:04] [main/WARN] [minecraft/Commands]: Ambiguity between arguments [teleport, location] and [teleport, destination] with inputs: [0.1 -0.5 .9, 0 0 0]
+[09:01:04] [main/WARN] [minecraft/Commands]: Ambiguity between arguments [teleport, location] and [teleport, targets] with inputs: [0.1 -0.5 .9, 0 0 0]
+[09:01:04] [main/WARN] [minecraft/Commands]: Ambiguity between arguments [teleport, destination] and [teleport, targets] with inputs: [Player, 0123, @e, dd12be42-52a9-4a91-a8a1-11c01849e498]
+[09:01:04] [main/WARN] [minecraft/Commands]: Ambiguity between arguments [teleport, targets] and [teleport, destination] with inputs: [Player, 0123, dd12be42-52a9-4a91-a8a1-11c01849e498]
+[09:01:04] [main/WARN] [minecraft/Commands]: Ambiguity between arguments [teleport, targets, location] and [teleport, targets, destination] with inputs: [0.1 -0.5 .9, 0 0 0]
+[09:01:04] [modloading-worker-0/INFO] [ne.ne.ne.co.NeoForgeMod/NEOFORGE-MOD]: NeoForge mod loading, version 21.1.256, for MC 1.21.1
+[09:01:05] [main/ERROR] [minecraft/Settings]: Failed to load properties from file: server.properties
+java.nio.file.NoSuchFileException: server.properties
+	at java.base/sun.nio.fs.UnixException.translateToIOException(UnixException.java:92) ~[?:?] {}
+	at java.base/sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:106) ~[?:?] {}
+	at java.base/sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:111) ~[?:?] {}
+	at java.base/sun.nio.fs.UnixFileSystemProvider.newByteChannel(UnixFileSystemProvider.java:261) ~[?:?] {}
+	at java.base/java.nio.file.Files.newByteChannel(Files.java:380) ~[?:?] {}
+	at java.base/java.nio.file.Files.newByteChannel(Files.java:432) ~[?:?] {}
+	at java.base/java.nio.file.spi.FileSystemProvider.newInputStream(FileSystemProvider.java:420) ~[?:?] {}
+	at java.base/java.nio.file.Files.newInputStream(Files.java:160) ~[?:?] {}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.dedicated.Settings.loadFromFile(Settings.java:38) ~[neoforge-21.1.256.jar%23125!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.dedicated.DedicatedServerProperties.fromFile(DedicatedServerProperties.java:132) ~[neoforge-21.1.256.jar%23125!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.dedicated.DedicatedServerSettings.<init>(DedicatedServerSettings.java:12) ~[neoforge-21.1.256.jar%23125!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.Main.main(Main.java:125) ~[neoforge-21.1.256.jar%23125!/:?] {re:classloading}
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[?:?] {}
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[?:?] {}
+	at MC-BOOTSTRAP/fml_loader@4.0.45/net.neoforged.fml.loading.targets.CommonLaunchHandler.runTarget(CommonLaunchHandler.java:136) ~[loader-4.0.45.jar%23102!/:4.0] {}
+	at MC-BOOTSTRAP/fml_loader@4.0.45/net.neoforged.fml.loading.targets.CommonLaunchHandler.serverService(CommonLaunchHandler.java:128) ~[loader-4.0.45.jar%23102!/:4.0] {}
+	at MC-BOOTSTRAP/fml_loader@4.0.45/net.neoforged.fml.loading.targets.NeoForgeServerDevLaunchHandler.runService(NeoForgeServerDevLaunchHandler.java:23) ~[loader-4.0.45.jar%23102!/:4.0] {}
+	at MC-BOOTSTRAP/fml_loader@4.0.45/net.neoforged.fml.loading.targets.CommonLaunchHandler.lambda$launchService$4(CommonLaunchHandler.java:118) ~[loader-4.0.45.jar%23102!/:4.0] {}
+	at MC-BOOTSTRAP/cpw.mods.modlauncher@11.0.5/cpw.mods.modlauncher.LaunchServiceHandlerDecorator.launch(LaunchServiceHandlerDecorator.java:30) [modlauncher-11.0.5.jar%2382!/:?] {}
+	at MC-BOOTSTRAP/cpw.mods.modlauncher@11.0.5/cpw.mods.modlauncher.LaunchServiceHandler.launch(LaunchServiceHandler.java:53) [modlauncher-11.0.5.jar%2382!/:?] {}
+	at MC-BOOTSTRAP/cpw.mods.modlauncher@11.0.5/cpw.mods.modlauncher.LaunchServiceHandler.launch(LaunchServiceHandler.java:71) [modlauncher-11.0.5.jar%2382!/:?] {}
+	at MC-BOOTSTRAP/cpw.mods.modlauncher@11.0.5/cpw.mods.modlauncher.Launcher.run(Launcher.java:103) [modlauncher-11.0.5.jar%2382!/:?] {}
+	at MC-BOOTSTRAP/cpw.mods.modlauncher@11.0.5/cpw.mods.modlauncher.Launcher.main(Launcher.java:74) [modlauncher-11.0.5.jar%2382!/:?] {}
+	at MC-BOOTSTRAP/cpw.mods.modlauncher@11.0.5/cpw.mods.modlauncher.BootstrapLaunchConsumer.accept(BootstrapLaunchConsumer.java:26) [modlauncher-11.0.5.jar%2382!/:?] {}
+	at MC-BOOTSTRAP/cpw.mods.modlauncher@11.0.5/cpw.mods.modlauncher.BootstrapLaunchConsumer.accept(BootstrapLaunchConsumer.java:23) [modlauncher-11.0.5.jar%2382!/:?] {}
+	at cpw.mods.bootstraplauncher@2.0.2/cpw.mods.bootstraplauncher.BootstrapLauncher.run(BootstrapLauncher.java:210) [bootstraplauncher-2.0.2.jar:?] {}
+	at cpw.mods.bootstraplauncher@2.0.2/cpw.mods.bootstraplauncher.BootstrapLauncher.main(BootstrapLauncher.java:69) [bootstraplauncher-2.0.2.jar:?] {}
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[?:?] {}
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[?:?] {}
+	at net.neoforged.devlaunch.Main.main(Main.java:57) [DevLaunch-1.0.2.jar:?] {}
+[09:01:05] [main/INFO] [mojang/YggdrasilAuthenticationService]: Environment: Environment[sessionHost=https://sessionserver.mojang.com, servicesHost=https://api.minecraftservices.com, name=PROD]
+[09:01:05] [main/WARN] [minecraft/VanillaPackResourcesBuilder]: Assets URL 'union:/Users/vladeezy/Desktop/matter-overdrive-fabric/neoforge/build/moddev/artifacts/neoforge-21.1.256.jar%23125!/assets/.mcassetsroot' uses unexpected schema
+[09:01:05] [main/WARN] [minecraft/VanillaPackResourcesBuilder]: Assets URL 'union:/Users/vladeezy/Desktop/matter-overdrive-fabric/neoforge/build/moddev/artifacts/neoforge-21.1.256.jar%23125!/data/.mcassetsroot' uses unexpected schema
+[09:01:05] [main/INFO] [ne.ne.ne.ga.GameTestHooks/]: Enabled Gametest Namespaces: [matteroverdrive]
+[09:01:05] [main/INFO] [minecraft/RecipeManager]: Loaded 1426 recipes
+[09:01:05] [main/INFO] [minecraft/AdvancementTree]: Loaded 1400 advancements
+[09:01:05] [Server thread/INFO] [ma.MatterOverdrive/]: Galaxy Generated and saved to './world/./galaxy.dat'. Took 50 milliseconds
+[09:01:05] [Server thread/INFO] [minecraft/MinecraftServer]: Preparing start region for dimension minecraft:overworld
+[09:01:05] [worldgen/INFO] [minecraft/LoggerChunkProgressListener]: Preparing spawn area: 2%
+[09:01:06] [Server thread/INFO] [minecraft/LoggerChunkProgressListener]: Time elapsed: 114 ms
+[09:01:06] [Server thread/INFO] [minecraft/GameTestServer]: Started game test server
+[09:01:06] [Server thread/INFO] [ne.ne.ne.se.pe.PermissionAPI/]: Successfully initialized permission handler neoforge:default_handler
+[09:01:06] [Server thread/INFO] [minecraft/GameTestServer]: 95 tests are now running at position -27384, -59, 2105972!
+[09:01:06] [Server thread/INFO] [minecraft/GameTestRunner]: Running test batch 'matteroverdrive_time_6000:0' (1 tests)...
+[09:01:06] [Server thread/INFO] [minecraft/GameTestServer]: [                                                                                               ]
+[09:01:06] [Server thread/INFO] [minecraft/GameTestServer]: [                                                                                               ]
+[09:01:06] [Server thread/INFO] [minecraft/GameTestServer]: [_                                                                                              ]
+[09:01:06] [Server thread/INFO] [minecraft/GameTestRunner]: Running test batch 'matteroverdrive_time_18000:0' (1 tests)...
+[09:01:06] [Server thread/INFO] [minecraft/GameTestServer]: [+                                                                                              ]
+[09:01:06] [Server thread/INFO] [minecraft/GameTestServer]: [+                                                                                              ]
+[09:01:06] [Server thread/INFO] [minecraft/GameTestServer]: [+_                                                                                             ]
+[09:01:06] [Server thread/INFO] [minecraft/GameTestRunner]: Running test batch 'matteroverdrive:0' (50 tests)...
+[09:01:06] [Server thread/INFO] [minecraft/GameTestServer]: [++                                                                                             ]
+[09:01:06] [Server thread/INFO] [minecraft/GameTestServer]: [++                                                                                             ]
+[09:01:06] [Server thread/ERROR] [minecraft/ChunkAccess]: Unprimed heightmap: OCEAN_FLOOR_WG 15 8
+[09:01:06] [Server thread/INFO] [ma.MatterOverdrive/]: Matter registry: 429 base, 596 from crafting / smelting, 105 from other recipes and blocks, 269 estimated in 13 ms
+[09:01:06] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++ _+++++  +___+_  __+_+_  _++___                                                        ]
+[09:01:06] [Server thread/INFO] [minecraft/PlayerList]: test-mock-player[embedded] logged in with entity id 40 at (8.5, -60.0, -2.5)
+[09:01:06] [Server thread/INFO] [minecraft/MinecraftServer]: test-mock-player joined the game
+[09:01:06] [Server thread/INFO] [minecraft/PlayerList]: test-mock-player[embedded] logged in with entity id 43 at (-8.5, -60.0, 1.5)
+[09:01:06] [Server thread/INFO] [minecraft/MinecraftServer]: test-mock-player joined the game
+[09:01:06] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++_+++++++_+___+__+__+_+__ _++___  _+                                                    ]
+[09:01:06] [Server thread/INFO] [minecraft/PlayerList]: test-mock-player[embedded] logged in with entity id 87 at (-2.5, -60.0, 10.5)
+[09:01:06] [Server thread/INFO] [minecraft/MinecraftServer]: test-mock-player joined the game
+[09:01:06] [Server thread/INFO] [minecraft/PlayerList]: test-mock-player[embedded] logged in with entity id 88 at (-8.5, -60.0, -2.5)
+[09:01:06] [Server thread/INFO] [minecraft/MinecraftServer]: test-mock-player joined the game
+[09:01:06] [Server thread/INFO] [minecraft/PlayerList]: test-mock-player[embedded] logged in with entity id 90 at (6.5, -60.0, 1.5)
+[09:01:06] [Server thread/INFO] [minecraft/MinecraftServer]: test-mock-player joined the game
+[09:01:06] [Server thread/INFO] [minecraft/PlayerList]: test-mock-player[embedded] logged in with entity id 101 at (4.5, -60.0, 1.5)
+[09:01:06] [Server thread/INFO] [minecraft/MinecraftServer]: test-mock-player joined the game
+[09:01:06] [Server thread/INFO] [minecraft/PlayerList]: test-mock-player[embedded] logged in with entity id 134 at (7.5, -60.0, 4.5)
+[09:01:06] [Server thread/INFO] [minecraft/MinecraftServer]: test-mock-player joined the game
+[09:01:06] [Server thread/INFO] [minecraft/PlayerList]: test-mock-player[embedded] logged in with entity id 135 at (5.5, -60.0, 6.5)
+[09:01:06] [Server thread/INFO] [minecraft/MinecraftServer]: test-mock-player joined the game
+[09:01:06] [Server thread/INFO] [minecraft/PlayerList]: test-mock-player[embedded] logged in with entity id 137 at (9.5, -60.0, 3.5)
+[09:01:06] [Server thread/INFO] [minecraft/MinecraftServer]: test-mock-player joined the game
+[09:01:06] [Server thread/INFO] [minecraft/PlayerList]: test-mock-player[embedded] logged in with entity id 169 at (-2.5, -60.0, 6.5)
+[09:01:06] [Server thread/INFO] [minecraft/MinecraftServer]: test-mock-player joined the game
+[09:01:06] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++_+++++++_+___+_++_++++_+__++____++++++++++++                                           ]
+[09:01:06] [Server thread/INFO] [minecraft/MinecraftServer]: test-mock-player has made the advancement [Bring Home the Beacon]
+[09:01:06] [Server thread/INFO] [minecraft/MinecraftServer]: test-mock-player has made the advancement [Bring Home the Beacon]
+[09:01:06] [Server thread/INFO] [minecraft/MinecraftServer]: test-mock-player has made the advancement [Bring Home the Beacon]
+[09:01:06] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++_+++++++_+___+_++_++++++++++_++_++++++++++++                                           ]
+[09:01:07] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++_+++++++_+___+_++_+++++++++++++_++++++++++++                                           ]
+[09:01:07] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++_+++++++_++__+_++_+++++++++++++_++++++++++++                                           ]
+[09:01:07] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++_+++++++_++__+_++_+++++++++++++_++++++++++++                                           ]
+[09:01:07] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++_+++++++_+++_++++_+++++++++++++_++++++++++++                                           ]
+[09:01:07] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++_+++++++_+++_++++_++++++++++++++++++++++++++                                           ]
+[09:01:07] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++_+++++++_+++_++++_++++++++++++++++++++++++++                                           ]
+[09:01:07] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++_+++++++_++++++++_++++++++++++++++++++++++++                                           ]
+[09:01:07] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++_+++++++_++++++++_++++++++++++++++++++++++++                                           ]
+[09:01:07] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++_+++++++_++++++++_++++++++++++++++++++++++++                                           ]
+[09:01:07] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++_+++++++_++++++++_++++++++++++++++++++++++++                                           ]
+[09:01:07] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++_+++++++_++++++++_++++++++++++++++++++++++++                                           ]
+[09:01:07] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++_+++++++_++++++++_++++++++++++++++++++++++++                                           ]
+[09:01:07] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++_+++++++_++++++++_++++++++++++++++++++++++++                                           ]
+[09:01:07] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++_+++++++++++++++++++++++++++++++++++                                           ]
+[09:01:07] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++_+++++++++++++++++++++++++++++++++++                                           ]
+[09:01:07] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++_+++++++++++++++++++++++++++++++++++                                           ]
+[09:01:07] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++_+++++++++++++++++++++++++++++++++++                                           ]
+[09:01:07] [Server thread/INFO] [minecraft/GameTestRunner]: Running test batch 'matteroverdrive:1' (43 tests)...
+[09:01:07] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++                                           ]
+[09:01:07] [Server thread/INFO] [minecraft/PlayerList]: test-mock-player[embedded] logged in with entity id 926 at (10.5, -60.0, 7.5)
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-mock-player joined the game
+[09:01:07] [Server thread/WARN] [ma.MatterOverdrive/]: test-mock-player could not claim planet.
+[09:01:07] [Server thread/INFO] [minecraft/PlayerList]: test-mock-player[embedded] logged in with entity id 928 at (6.5, -60.0, 1.5)
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-mock-player joined the game
+[09:01:07] [Server thread/INFO] [minecraft/PlayerList]: test-mock-player[embedded] logged in with entity id 930 at (9.5, -60.0, -7.5)
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-mock-player joined the game
+[09:01:07] [Server thread/INFO] [minecraft/PlayerList]: test-android[embedded] logged in with entity id 932 at (-9.5, -60.0, 9.5)
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android joined the game
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android has ended his biological existence
+[09:01:07] [Server thread/INFO] [minecraft/PlayerList]: test-android[embedded] logged in with entity id 933 at (-6.5, -60.0, 8.5)
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android joined the game
+[09:01:07] [Server thread/WARN] [ma.MatterOverdrive/]: test-android could not claim planet.
+[09:01:07] [Server thread/INFO] [minecraft/PlayerList]: test-android[embedded] logged in with entity id 934 at (-5.5, -60.0, -1.5)
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android joined the game
+[09:01:07] [Server thread/INFO] [minecraft/PlayerList]: test-android[embedded] logged in with entity id 935 at (0.5, -60.0, 5.5)
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android joined the game
+[09:01:07] [Server thread/INFO] [minecraft/PlayerList]: test-android[embedded] logged in with entity id 936 at (-8.5, -60.0, -0.5)
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android joined the game
+[09:01:07] [Server thread/INFO] [minecraft/PlayerList]: test-android[embedded] logged in with entity id 937 at (4.5, -60.0, -4.5)
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android joined the game
+[09:01:07] [Server thread/INFO] [minecraft/PlayerList]: test-android[embedded] logged in with entity id 938 at (10.5, -60.0, 1.5)
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android joined the game
+[09:01:07] [Server thread/INFO] [minecraft/PlayerList]: test-android[embedded] logged in with entity id 939 at (1.5, -60.0, -0.5)
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android joined the game
+[09:01:07] [Server thread/INFO] [minecraft/PlayerList]: test-android[embedded] logged in with entity id 942 at (-7.5, -60.0, 9.5)
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android joined the game
+[09:01:07] [Server thread/INFO] [minecraft/PlayerList]: test-android[embedded] logged in with entity id 943 at (8.5, -60.0, -9.5)
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android joined the game
+[09:01:07] [Server thread/INFO] [minecraft/PlayerList]: test-android[embedded] logged in with entity id 945 at (10.5, -60.0, 5.5)
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android joined the game
+[09:01:07] [Server thread/INFO] [minecraft/PlayerList]: test-android[embedded] logged in with entity id 951 at (-4.5, -60.0, -6.5)
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android joined the game
+[09:01:07] [Server thread/INFO] [minecraft/PlayerList]: test-android[embedded] logged in with entity id 964 at (4.5, -60.0, -9.5)
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android joined the game
+[09:01:07] [Server thread/INFO] [minecraft/PlayerList]: test-android[embedded] logged in with entity id 965 at (7.5, -60.0, -4.5)
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android joined the game
+[09:01:07] [Server thread/INFO] [minecraft/GameTestServer]: [+++++++++++++++++++++++++++++++++++++++++++++++++++++++  ++++++  ++++++  ++++__  ++++          ]
+[09:01:07] [Server thread/INFO] [minecraft/PlayerList]: test-android[embedded] logged in with entity id 966 at (-6.5, -60.0, 7.5)
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android joined the game
+[09:01:07] [Server thread/INFO] [minecraft/PlayerList]: test-mock-player[embedded] logged in with entity id 967 at (-4.5, -60.0, 2.5)
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-mock-player joined the game
+[09:01:07] [Server thread/INFO] [minecraft/PlayerList]: test-mock-player[embedded] logged in with entity id 968 at (-2.5, -60.0, -9.5)
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-mock-player joined the game
+[09:01:07] [Server thread/WARN] [ma.MatterOverdrive/]: test-mock-player could not claim planet.
+[09:01:07] [Server thread/INFO] [minecraft/PlayerList]: test-android[embedded] logged in with entity id 969 at (6.5, -60.0, -5.5)
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android joined the game
+[09:01:07] [Server thread/INFO] [minecraft/PlayerList]: test-android[embedded] logged in with entity id 970 at (1.5, -60.0, 10.5)
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android joined the game
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-mock-player has made the advancement [Bring Home the Beacon]
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-mock-player has made the advancement [Bring Home the Beacon]
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-mock-player has made the advancement [Bring Home the Beacon]
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-mock-player has made the advancement [Bring Home the Beacon]
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-mock-player has made the advancement [Bring Home the Beacon]
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android has made the advancement [Bring Home the Beacon]
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android has made the advancement [Bring Home the Beacon]
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android has made the advancement [Bring Home the Beacon]
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android has made the advancement [Bring Home the Beacon]
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android has made the advancement [Bring Home the Beacon]
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android has made the advancement [Bring Home the Beacon]
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android has made the advancement [Bring Home the Beacon]
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android has made the advancement [Bring Home the Beacon]
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android has made the advancement [Bring Home the Beacon]
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android has made the advancement [Bring Home the Beacon]
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android has made the advancement [Bring Home the Beacon]
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android has made the advancement [Bring Home the Beacon]
+[09:01:07] [Server thread/INFO] [minecraft/GameTestServer]: [+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++_+  +++++         ]
+[09:01:07] [Server thread/INFO] [minecraft/PlayerList]: test-android[embedded] logged in with entity id 984 at (-3.5, -60.0, 9.5)
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android joined the game
+[09:01:07] [Server thread/INFO] [minecraft/PlayerList]: test-android[embedded] logged in with entity id 986 at (3.5, -60.0, 10.5)
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android joined the game
+[09:01:07] [Server thread/INFO] [minecraft/PlayerList]: test-android[embedded] logged in with entity id 988 at (-9.5, -60.0, 7.5)
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android joined the game
+[09:01:07] [Server thread/INFO] [minecraft/PlayerList]: test-android[embedded] logged in with entity id 989 at (1.5, -60.0, 9.5)
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android joined the game
+[09:01:07] [Server thread/INFO] [minecraft/PlayerList]: test-android[embedded] logged in with entity id 990 at (7.5, -60.0, -1.5)
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android joined the game
+[09:01:07] [Server thread/INFO] [minecraft/PlayerList]: test-android[embedded] logged in with entity id 991 at (8.5, -60.0, -2.5)
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android joined the game
+[09:01:07] [Server thread/WARN] [ma.MatterOverdrive/]: test-android could not claim planet.
+[09:01:07] [Server thread/INFO] [minecraft/PlayerList]: test-android[embedded] logged in with entity id 992 at (0.5, -60.0, -7.5)
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android joined the game
+[09:01:07] [Server thread/INFO] [minecraft/PlayerList]: test-android[embedded] logged in with entity id 993 at (1.5, -60.0, -3.5)
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android joined the game
+[09:01:07] [Server thread/INFO] [minecraft/PlayerList]: test-android[embedded] logged in with entity id 994 at (-2.5, -60.0, 8.5)
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android joined the game
+[09:01:07] [Server thread/INFO] [minecraft/PlayerList]: test-android[embedded] logged in with entity id 995 at (-0.5, -60.0, 6.5)
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android joined the game
+[09:01:07] [Server thread/INFO] [minecraft/PlayerList]: test-android[embedded] logged in with entity id 996 at (-4.5, -60.0, -7.5)
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android joined the game
+[09:01:07] [Server thread/INFO] [minecraft/GameTestServer]: [+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++_+++++++++++++++++]
+[09:01:07] [Server thread/INFO] [minecraft/GameTestServer]: [+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++_+++++++++++++++++]
+[09:01:07] [Server thread/INFO] [minecraft/GameTestServer]: [+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++]
+[09:01:07] [Server thread/INFO] [minecraft/GameTestServer]: ========= 95 GAME TESTS COMPLETE IN 1.526 s ======================
+[09:01:07] [Server thread/INFO] [minecraft/GameTestServer]: All 95 required tests passed :)
+[09:01:07] [Server thread/INFO] [minecraft/GameTestServer]: ====================================================
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: Stopping server
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: Saving players
+[09:01:07] [Server thread/INFO] [minecraft/ServerGamePacketListenerImpl]: test-mock-player lost connection: Server closed
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-mock-player left the game
+[09:01:07] [Server thread/INFO] [minecraft/ServerGamePacketListenerImpl]: test-mock-player lost connection: Server closed
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-mock-player left the game
+[09:01:07] [Server thread/INFO] [minecraft/ServerGamePacketListenerImpl]: test-mock-player lost connection: Server closed
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-mock-player left the game
+[09:01:07] [Server thread/INFO] [minecraft/ServerGamePacketListenerImpl]: test-mock-player lost connection: Server closed
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-mock-player left the game
+[09:01:07] [Server thread/INFO] [minecraft/ServerGamePacketListenerImpl]: test-mock-player lost connection: Server closed
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-mock-player left the game
+[09:01:07] [Server thread/INFO] [minecraft/ServerGamePacketListenerImpl]: test-mock-player lost connection: Server closed
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-mock-player left the game
+[09:01:07] [Server thread/INFO] [minecraft/ServerGamePacketListenerImpl]: test-mock-player lost connection: Server closed
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-mock-player left the game
+[09:01:07] [Server thread/INFO] [minecraft/ServerGamePacketListenerImpl]: test-android lost connection: Server closed
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android left the game
+[09:01:07] [Server thread/INFO] [minecraft/ServerGamePacketListenerImpl]: test-android lost connection: Server closed
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android left the game
+[09:01:07] [Server thread/INFO] [minecraft/ServerGamePacketListenerImpl]: test-android lost connection: Server closed
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android left the game
+[09:01:07] [Server thread/INFO] [minecraft/ServerGamePacketListenerImpl]: test-android lost connection: Server closed
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android left the game
+[09:01:07] [Server thread/INFO] [minecraft/ServerGamePacketListenerImpl]: test-android lost connection: Server closed
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android left the game
+[09:01:07] [Server thread/INFO] [minecraft/ServerGamePacketListenerImpl]: test-android lost connection: Server closed
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android left the game
+[09:01:07] [Server thread/INFO] [minecraft/ServerGamePacketListenerImpl]: test-android lost connection: Server closed
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android left the game
+[09:01:07] [Server thread/INFO] [minecraft/ServerGamePacketListenerImpl]: test-mock-player lost connection: Server closed
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-mock-player left the game
+[09:01:07] [Server thread/INFO] [minecraft/ServerGamePacketListenerImpl]: test-android lost connection: Server closed
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android left the game
+[09:01:07] [Server thread/INFO] [minecraft/ServerGamePacketListenerImpl]: test-android lost connection: Server closed
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android left the game
+[09:01:07] [Server thread/INFO] [minecraft/ServerGamePacketListenerImpl]: test-android lost connection: Server closed
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android left the game
+[09:01:07] [Server thread/INFO] [minecraft/ServerGamePacketListenerImpl]: test-android lost connection: Server closed
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android left the game
+[09:01:07] [Server thread/INFO] [minecraft/ServerGamePacketListenerImpl]: test-android lost connection: Server closed
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android left the game
+[09:01:07] [Server thread/INFO] [minecraft/ServerGamePacketListenerImpl]: test-android lost connection: Server closed
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android left the game
+[09:01:07] [Server thread/INFO] [minecraft/ServerGamePacketListenerImpl]: test-android lost connection: Server closed
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: test-android left the game
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: Saving worlds
+[09:01:07] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[Test Level]'/minecraft:overworld
+[09:01:08] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[Test Level]'/minecraft:the_nether
+[09:01:08] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[Test Level]'/minecraft:the_end
+[09:01:08] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (world): All chunks are saved
+[09:01:08] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved
+[09:01:08] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved
+[09:01:08] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage: All dimensions are saved
+[09:01:08] [Server thread/INFO] [minecraft/GameTestServer]: Game test server shutting down
+
+BUILD SUCCESSFUL in 8s
+17 actionable tasks: 6 executed, 11 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.2.1/userguide/configuration_cache_enabling.html
