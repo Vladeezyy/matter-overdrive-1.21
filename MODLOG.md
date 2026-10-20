@@ -723,3 +723,12 @@
   (gen_resources.py + the branch's backport step).
 - The PerfScene / tools/perf.sh measuring tools stay on main (1.21.10 APIs); the numbers are in main's MODLOG.
 - 96 GameTests pass.
+
+## 2026-10-20 — Fabric 1.21.5 (branch `fabric-1.21.5`)
+- Same layout as `fabric-1.21.1` (common / neoforge / fabric, see that branch's MODLOG): the commits of the previous version's Fabric branch cherry-picked onto this branch, then fixed for the version's API.
+- Versions: NeoForge 21.5.98, Fabric API 0.128.2, Team Reborn Energy 4.2.0 (in the jar).
+- Game tests are data (`test_instance` / `test_environment`). Common: test functions are registry entries (`MOGameTests.functions()`); NeoForge registers environments and instances in code; on Fabric the Gradle task `generateGameTestInstances` writes the instance JSON from the `add(name, ticks, sky[, time], …)` calls of the common test sources. Fabric-only tests use Fabric's `@GameTest(structure = …)`.
+- OBJ models: `UnbakedGeometry` / `QuadCollection`; extra models are `BlockStateModel`s by key (`SimpleUnbakedExtraModel` on Fabric, `StandaloneModelKey` on NeoForge); render pipelines for the holo types.
+- Access widener generated from the AT: `tools/port/at2aw.py AT VANILLA_JAR tools/port/aw-fabric-extra.txt` (javap on the vanilla jar, skips members that do not exist on the version).
+- Tests: NeoForge 96/96, Fabric 101/101 GameTests; scene (`:fabric:runScene` / `:neoforge:runScene`, world: a 1.21.5 flat creative `mo_scene` made by `:fabric:runServer`) on both loaders.
+- Not done: MSPT/FPS against vanilla on Fabric, a run of the jars outside dev, release pages.
