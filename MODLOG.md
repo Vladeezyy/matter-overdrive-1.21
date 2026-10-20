@@ -757,3 +757,14 @@
   `RenderShape.MODEL`; 95 GameTests pass, the scene shot shows all 16 crates.
 - Released as 1.0.2 on Modrinth for 1.21.1 (version YMIESSz3) and 1.21.3 (lhfAWc8V); 1.21.4+ stay on 1.0.1. No GitHub
   release for 1.0.2 yet.
+
+## 2026-10-20 — Fabric 1.21.3 (branch `fabric-1.21.3`)
+- Same layout as `fabric-1.21.1` (common / neoforge / fabric, see that branch's MODLOG): the commits of the previous version's Fabric branch cherry-picked onto this branch, then fixed for the version's API.
+- Versions: NeoForge 21.3.97, Fabric API 0.114.1, Team Reborn Energy 4.1.0 (in the jar).
+- Common: item/block `Properties` need their id (`Registrar` calls `setId` before the factory), `ToolMaterial` / `ArmorMaterial` records, registry `getValue` / `getOrThrow`, `hurtServer(ServerLevel, …)`, item models still with overrides.
+- NeoForge 21.3 has no attachment sync (added in 21.6): `NeoForgePlayerData` syncs player data with the mod's own `player_data` payload (kept on every version).
+- Fabric: player hooks on render states (`LivingEntityRenderer.render` for the skin overlay and the beam, `PlayerRenderer.getArmPose`), air bubbles hidden through `Gui.renderAirBubbles`, `BakedQuad` with 6 arguments.
+- Fabric API 0.114 lacks the convention tags `c:ores/*` and `c:sands/*` the matter values use: shipped in the Fabric resources (without them iron ore etc. had no matter).
+- Tritanium crates: `BaseEntityBlock.getRenderShape` is `INVISIBLE` here too, fixed with `RenderShape.MODEL` (released as 1.0.2 for 1.21.1 and 1.21.3).
+- Tests: NeoForge 95/95, Fabric 100/100 GameTests; scene (`:fabric:runScene` / `:neoforge:runScene`, world: a 1.21.3 flat creative `mo_scene` made by `:fabric:runServer`) on both loaders.
+- Not done: MSPT/FPS against vanilla on Fabric, a run of the jars outside dev, release pages.
