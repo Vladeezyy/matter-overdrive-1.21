@@ -64,7 +64,8 @@ public final class MatterOverdriveFabricClient implements ClientModInitializer {
         FabricObjModels.register();
         ModelLoadingPlugin.register(context -> context.addModels(MOClient.extraModels()));
         MOClient.blockColors(ColorProviderRegistry.BLOCK::register);
-        MOClient.itemColors(ColorProviderRegistry.ITEM::register);
+        // 1.21.4+: the select properties of the client item definitions (vanilla registers its own the same way)
+        MOClient.registerSelectProperties(net.minecraft.client.renderer.item.properties.select.SelectItemModelProperties.ID_MAPPER::put);
         MOClient.registerScreens(new MOClient.Screens() {
             @Override
             public <M extends AbstractContainerMenu, U extends Screen & MenuAccess<M>> void register(MenuType<? extends M> type, MOClient.ScreenFactory<M, U> factory) {
