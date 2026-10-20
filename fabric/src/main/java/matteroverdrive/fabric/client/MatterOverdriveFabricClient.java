@@ -23,7 +23,7 @@ import matteroverdrive.init.MOFluids;
 import matteroverdrive.init.MOItems;
 import matteroverdrive.platform.Platform;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
+import net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -40,7 +40,7 @@ import net.fabricmc.fabric.api.client.render.fluid.v1.SimpleFluidRenderHandler;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -65,6 +65,9 @@ public final class MatterOverdriveFabricClient implements ClientModInitializer {
         ModelLoadingPlugin.register(context -> MOClient.extraModels().forEach(id -> context.addModel(FabricClientPlatform.key(id),
                 net.fabricmc.fabric.api.client.model.loading.v1.SimpleUnbakedExtraModel.blockStateModel(id))));
         MOClient.blockColors(ColorProviderRegistry.BLOCK::register);
+        // the star map screen's hologram (1.21.6+ GUI: a picture-in-picture renderer)
+        net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry.register(context ->
+                new matteroverdrive.client.starmap.StarMapPipRenderer(context.vertexConsumers()));
         // 1.21.4+: the select properties of the client item definitions (vanilla registers its own the same way)
         MOClient.registerSelectProperties(net.minecraft.client.renderer.item.properties.select.SelectItemModelProperties.ID_MAPPER::put);
         MOClient.registerScreens(new MOClient.Screens() {
@@ -110,26 +113,26 @@ public final class MatterOverdriveFabricClient implements ClientModInitializer {
 
     /** NeoForge reads the render type from the block's model ("render_type"); Fabric needs it per block */
     private static void registerRenderLayers() {
-        Map<String, RenderType> types = Map.of("minecraft:cutout", RenderType.cutout(), "minecraft:cutout_mipped", RenderType.cutoutMipped(),
-                "minecraft:translucent", RenderType.translucent());
-        Map<ResourceLocation, RenderType> modelTypes = new HashMap<>();
+        Map<String, ChunkSectionLayer> types = Map.of("minecraft:cutout", ChunkSectionLayer.CUTOUT, "minecraft:cutout_mipped", ChunkSectionLayer.CUTOUT_MIPPED,
+                "minecraft:translucent", ChunkSectionLayer.TRANSLUCENT);
+        Map<ResourceLocation, ChunkSectionLayer> modelTypes = new HashMap<>();
         for (Block block : BuiltInRegistries.BLOCK) {
             ResourceLocation id = BuiltInRegistries.BLOCK.getKey(block);
             if (!id.getNamespace().equals(MatterOverdrive.MODID)) continue;
             JsonObject state = json(Platform.INSTANCE.modFile("assets", MatterOverdrive.MODID, "blockstates", id.getPath() + ".json"));
             if (state == null) continue;
-            RenderType type = null;
+            ChunkSectionLayer type = null;
             for (String model : models(state)) {
                 ResourceLocation modelId = ResourceLocation.parse(model);
-                RenderType modelType = modelTypes.computeIfAbsent(modelId, m -> {
+                ChunkSectionLayer modelType = modelTypes.computeIfAbsent(modelId, m -> {
                     JsonObject json = json(Platform.INSTANCE.modFile("assets", m.getNamespace(), "models", m.getPath() + ".json"));
-                    return json != null && json.has("render_type") ? types.get(json.get("render_type").getAsString()) : RenderType.solid();
+                    return json != null && json.has("render_type") ? types.get(json.get("render_type").getAsString()) : ChunkSectionLayer.SOLID;
                 });
-                if (modelType != RenderType.solid()) type = modelType;
+                if (modelType != ChunkSectionLayer.SOLID) type = modelType;
             }
-            if (type != null) BlockRenderLayerMap.INSTANCE.putBlock(block, type);
+            if (type != null) BlockRenderLayerMap.putBlock(block, type);
         }
-        BlockRenderLayerMap.INSTANCE.putFluids(RenderType.translucent(), MOFluids.MATTER_PLASMA.get(), MOFluids.MATTER_PLASMA_FLOWING.get());
+        BlockRenderLayerMap.putFluids(ChunkSectionLayer.TRANSLUCENT, MOFluids.MATTER_PLASMA.get(), MOFluids.MATTER_PLASMA_FLOWING.get());
     }
 
     private static java.util.List<String> models(JsonObject state) {

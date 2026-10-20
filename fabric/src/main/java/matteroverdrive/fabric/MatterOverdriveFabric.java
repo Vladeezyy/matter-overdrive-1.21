@@ -64,7 +64,7 @@ public final class MatterOverdriveFabric implements ModInitializer {
             matteroverdrive.world.VillageHouses.onServerAboutToStart(server);
         });
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resources, success) -> MatterEvents.onServerDataLoaded());
-        ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS.register((player, joined) -> MatterEvents.onDatapackSync(player.server, List.of(player)));
+        ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS.register((player, joined) -> MatterEvents.onDatapackSync(player.level().getServer(), List.of(player)));
         // galaxy (saving: ServerLevelMixin)
         ServerWorldEvents.LOAD.register((server, level) -> GalaxyServer.onLevelLoad(level));
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
