@@ -1,0 +1,63 @@
+plugins {
+    id 'multiloader-loader'
+    id 'fabric-loom'
+}
+
+repositories {
+    maven {
+        name = 'Fabric'
+        url = 'https://maven.fabricmc.net'
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+    mappings loom.layered {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-${parchment_minecraft}:${parchment_version}@zip")
+    }
+    modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+    // FE on Fabric: Team Reborn Energy (the common energy API of Fabric tech mods), shipped inside the jar
+    modApi include("teamreborn:energy:${team_reborn_energy_version}")
+    compileOnly 'io.github.llamalad7:mixinextras-common:0.5.0'
+    annotationProcessor 'io.github.llamalad7:mixinextras-common:0.5.0'
+}
+
+loom {
+    accessWidenerPath = file('src/main/resources/matteroverdrive.accesswidener')
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
+        }
+    }
+    runs {
+        client {
+            client()
+            runDir('run')
+        }
+        server {
+            server()
+            runDir('run')
+        }
+        // Scripted test scene (matteroverdrive.client.DevScene), as on NeoForge
+        scene {
+            client()
+            name 'Scene'
+            vmArg '-Dmatteroverdrive.scene=true'
+            vmArg "-Dmatteroverdrive.scene.from=${project.findProperty('sceneFrom') ?: '0'}"
+            programArgs '--quickPlaySingleplayer', 'mo_scene'
+            runDir('run')
+        }
+        // headless in-game tests (fabric-gametest entrypoint), then exits
+        gametest {
+            server()
+            name 'Game Test'
+            vmArg '-Dfabric-api.gametest'
+            vmArg "-Dfabric-api.gametest.report-file=${project.layout.buildDirectory.get()}/gametest.xml"
+            runDir('run-gametest')
+        }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach { options.compilerArgs += ['-Xmaxerrs', '10000'] }
