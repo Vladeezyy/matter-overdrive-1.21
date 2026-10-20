@@ -101,8 +101,14 @@ public final class MatterOverdriveNeoForgeClient {
             }
         });
         game.addListener((ComputeFovModifierEvent event) -> event.setNewFovModifier(WeaponClient.fovModifier(event.getPlayer(), event.getNewFovModifier())));
-        game.addListener((RenderPlayerEvent.Pre event) -> TritaniumArmorModel.hideSkinOverlay(event.getEntity(), event.getRenderer().getModel()));
-        game.addListener((RenderPlayerEvent.Post event) -> PhaserBeamRenderer.renderPlayer(event.getEntity(), event.getPartialTick(), event.getPoseStack(), event.getMultiBufferSource()));
+        game.addListener((RenderPlayerEvent.Pre event) -> TritaniumArmorModel.hideSkinOverlay(event.getRenderState()));
+        game.addListener((RenderPlayerEvent.Post event) -> {
+            // 1.21.2+: the event has the render state; the beam needs the player
+            var level = net.minecraft.client.Minecraft.getInstance().level;
+            if (level != null && level.getEntity(event.getRenderState().id) instanceof net.minecraft.world.entity.player.Player player) {
+                PhaserBeamRenderer.renderPlayer(player, event.getPartialTick(), event.getPoseStack(), event.getMultiBufferSource());
+            }
+        });
         game.addListener((RenderHandEvent event) -> PhaserBeamRenderer.renderHand(event.getHand(), event.getPartialTick(), event.getPoseStack(), event.getMultiBufferSource()));
         game.addListener((RenderLevelStageEvent event) -> {
             if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_ENTITIES) ShieldRenderer.renderLevel(event.getPoseStack());
@@ -125,8 +131,9 @@ public final class MatterOverdriveNeoForgeClient {
         // 1.7.10 ModelTritaniumArmor (the layer textures: MOItems' armor getArmorTexture)
         event.registerItem(new IClientItemExtensions() {
             @Override
-            public Model getGenericArmorModel(LivingEntity entity, ItemStack stack, EquipmentSlot slot, HumanoidModel<?> original) {
-                return TritaniumArmorModel.posed(slot, original);
+            public Model getGenericArmorModel(ItemStack stack, net.minecraft.world.item.equipment.EquipmentModel.LayerType layerType, Model original) {
+                // the poses come from the render state in setupAnim; don't copy the vanilla model's visibility
+                return TritaniumArmorModel.armorModel(stack);
             }
         }, MOItems.TRITANIUM_HELMET.get(), MOItems.TRITANIUM_CHESTPLATE.get(), MOItems.TRITANIUM_LEGGINGS.get(), MOItems.TRITANIUM_BOOTS.get());
         event.registerItem(new IClientItemExtensions() {
