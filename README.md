@@ -1,9 +1,13 @@
-# Matter Overdrive for Minecraft 1.21.1 – 1.21.10 (NeoForge)
+# Matter Overdrive for Minecraft 1.21.1 – 1.21.10 (NeoForge and Fabric)
 
 ![Matter Overdrive](docs/modrinth/banner.png)
 
 An unofficial port of [Matter Overdrive](https://github.com/simeonradivoev/MatterOverdrive) by Simeon Radivoev
-from Minecraft 1.7.10 to **Minecraft 1.21.1 – 1.21.10** on **NeoForge**.
+from Minecraft 1.7.10 to **Minecraft 1.21.1 – 1.21.10** on **NeoForge** and **Fabric** (Fabric API; Team Reborn Energy for FE is
+included in the jar).
+
+This branch (Minecraft 1.21.10) builds both loaders from one `common` module (all game code, compiled on vanilla)
+plus thin `neoforge/` and `fabric/` modules. The other versions live on their own branches.
 
 The port is a rewrite against modern APIs that keeps the original's behaviour, numbers, textures, sounds and
 translations (English and Russian; the port adds Ukrainian, German, Spanish and Portuguese (Brazil), not by native
@@ -44,12 +48,13 @@ difference from 1.7.10.
 ## Building
 Requires JDK 21.
 ```bash
-./gradlew build              # jar in build/libs/
-./gradlew runClient          # dev client
-./gradlew runGameTestServer  # headless in-game tests
-./gradlew runScene           # scripted scene: screenshots of the machines and features to run/screenshots/
+./gradlew build                        # jars in neoforge/build/libs/ and fabric/build/libs/
+./gradlew :neoforge:runClient          # dev client (:fabric:runClient for Fabric)
+./gradlew :neoforge:runGameTestServer  # headless in-game tests (:fabric:runGametest)
+./gradlew :neoforge:runScene           # scripted scene: screenshots to <loader>/run/screenshots/ (:fabric:runScene)
 ```
-`runScene` needs a world named `mo_scene` in `run/saves/` (any copy of a dev world).
+`runScene` needs a 1.21.10 world named `mo_scene` in `<loader>/run/saves/` (a flat creative world made by the
+dedicated server works).
 Resources for simple content are generated from the original 1.7.10 assets by `tools/gen_resources.py`
 (see MODLOG.md for the command).
 

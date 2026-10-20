@@ -712,3 +712,13 @@
 - Checked before the release: a world saved by 1.0.0 (`tools/perf.sh look -Pworld=<save>`) — its pattern storage gets
   drive_0..2 on the first tick, nothing else changes.
 - Modrinth: six versions 1.0.1+<mc> uploaded 2026-10-17 (listed, same changelog, 1.21.10 featured); the project is still in moderation ("processing").
+
+## 2026-10-20 — Fabric 1.21.10 (branch `fabric-1.21.10`)
+- Same layout as `fabric-1.21.1` (common / neoforge / fabric, see that branch's MODLOG): the commits of the previous version's Fabric branch cherry-picked onto this branch, then fixed for the version's API.
+- Versions: NeoForge 21.10.64, Fabric API 0.138.4 (Fabric Loader 0.17.3), Team Reborn Energy 4.2.0 (in the jar).
+- NeoForge 21.9+ transfer API (`EnergyHandler`, `ResourceHandler<ItemResource|FluidResource>`, `Transaction`): the common storages stay as on the other versions; `NeoForgeResources` adapts them (`SnapshotJournal`, one adapter per block entity and kind) and other mods' handlers come in through NeoForge's legacy wrappers (`IEnergyStorage.of` etc.). Matter containers exchange their stack through `ItemAccess`. 5 NeoForge-only GameTests for the adapters.
+- Rendering: `AvatarRenderer` / `AvatarRenderState`, `SubmitNodeCollector` hooks (player, item in hand, armor via `ArmorRenderer.submitTransformCopyingModel`), block entity renderers with render states, `KeyMapping.Category`.
+- Fabric API 0.138 needs Fabric Loader 0.17.
+- Fabric armor on 1.21.10: `ArmorRenderer.submitTransformCopyingModel(..., light, overlay, outlineColor, crumbling)` — `-1` there is a white outline colour (the armor was drawn white), and copying the context model's transforms tilted the armor stands' sleeves. Now `collector.submitModel(model, state, pose, armorCutoutNoCull(texture), light, NO_OVERLAY, state.outlineColor, null)`, as vanilla's armor layer: the armor model poses itself from the render state.
+- Tests: NeoForge 101/101, Fabric 101/101 GameTests; scene (`:fabric:runScene` / `:neoforge:runScene`, world: a 1.21.10 flat creative `mo_scene` made by `:fabric:runServer`) on both loaders.
+- Not done: MSPT/FPS against vanilla on Fabric, a run of the jars outside dev, release pages.

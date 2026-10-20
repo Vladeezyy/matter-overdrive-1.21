@@ -98,10 +98,12 @@ public final class MatterOverdriveFabricClient implements ClientModInitializer {
                 ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "block/matter_plasma_still"),
                 ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "block/matter_plasma_flowing")));
         // 1.7.10 ModelTritaniumArmor with the layer textures of TritaniumArmorItem.getArmorTexture
-        ArmorRenderer.register((pose, collector, stack, state, slot, light, contextModel) -> ArmorRenderer.submitTransformCopyingModel(
-                        contextModel, state, TritaniumArmorModel.armorModel(stack), state, false, collector, pose,
+        // as vanilla's armor layer and NeoForge: the armor model poses itself from the render state (copying the context
+        // model's transforms tilted the armor stands' sleeves and lost the player's leggings)
+        ArmorRenderer.register((pose, collector, stack, state, slot, light, contextModel) -> collector.submitModel(
+                        TritaniumArmorModel.armorModel(stack), state, pose,
                         net.minecraft.client.renderer.RenderType.armorCutoutNoCull(TritaniumArmorModel.armorTexture(stack)), light,
-                        net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY, -1, null),
+                        net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY, state.outlineColor, null),
                 MOItems.TRITANIUM_HELMET.get(), MOItems.TRITANIUM_CHESTPLATE.get(), MOItems.TRITANIUM_LEGGINGS.get(), MOItems.TRITANIUM_BOOTS.get());
 
         ClientTickEvents.START_CLIENT_TICK.register(client -> MOClient.onClientTickStart());
