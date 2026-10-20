@@ -16,7 +16,7 @@
   "entrypoints": {
     "main": ["matteroverdrive.fabric.MatterOverdriveFabric"],
     "client": ["matteroverdrive.fabric.client.MatterOverdriveFabricClient"],
-    "fabric-gametest": ["matteroverdrive.gametest.MOGameTests", "matteroverdrive.fabric.FabricTransferTests"]
+    "fabric-gametest": ["matteroverdrive.fabric.FabricTransferTests"]
   },
   "mixins": ["matteroverdrive.fabric.mixins.json"],
   "accessWidener": "matteroverdrive.accesswidener",

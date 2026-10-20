@@ -1,33 +1,38 @@
 accessWidener v2 named
-# the same as neoforge/src/main/resources/META-INF/accesstransformer.cfg
+# generated from neoforge/src/main/resources/META-INF/accesstransformer.cfg by tools/port/at2aw.py
+# VillageHouses adds the mad scientist's house to the vanilla village house pools
 accessible field net/minecraft/world/level/levelgen/structure/pools/StructureTemplatePool templates Lit/unimi/dsi/fastutil/objects/ObjectArrayList;
+# the full-screen star map screen lays its slots out for the window size (1.7.10 GuiStarMap)
 accessible field net/minecraft/world/inventory/Slot x I
 mutable field net/minecraft/world/inventory/Slot x I
 accessible field net/minecraft/world/inventory/Slot y I
 mutable field net/minecraft/world/inventory/Slot y I
+# MatterRegistry: stripped logs (the NeoForge STRIPPABLES data map came with 21.6)
 accessible field net/minecraft/world/item/AxeItem STRIPPABLES Ljava/util/Map;
+# Common code is compiled on vanilla with this file: what NeoForge itself opens and the mod uses
 accessible method net/minecraft/world/damagesource/DamageSources source (Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/world/damagesource/DamageSource;
 accessible method net/minecraft/world/damagesource/DamageSources source (Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/world/entity/Entity;)Lnet/minecraft/world/damagesource/DamageSource;
 accessible method net/minecraft/world/damagesource/DamageSources source (Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/Entity;)Lnet/minecraft/world/damagesource/DamageSource;
 accessible method net/minecraft/world/entity/projectile/Projectile <init> (Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/level/Level;)V
-accessible method net/minecraft/client/renderer/item/ItemProperties register (Lnet/minecraft/world/item/Item;Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/client/renderer/item/ClampedItemPropertyFunction;)V
 accessible field net/minecraft/world/item/CreativeModeTabs SPAWN_EGGS Lnet/minecraft/resources/ResourceKey;
-accessible method net/minecraft/client/renderer/RenderType create (Ljava/lang/String;Lcom/mojang/blaze3d/vertex/VertexFormat;Lcom/mojang/blaze3d/vertex/VertexFormat$Mode;IZZLnet/minecraft/client/renderer/RenderType$CompositeState;)Lnet/minecraft/client/renderer/RenderType$CompositeRenderType;
+# holo render types (1.21.5 pipelines): what NeoForge's own AT opens
+accessible field net/minecraft/client/renderer/RenderPipelines MATRICES_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
+accessible field net/minecraft/client/renderer/RenderPipelines LINES_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
+accessible method net/minecraft/client/renderer/RenderType create (Ljava/lang/String;IZZLcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/client/renderer/RenderType$CompositeState;)Lnet/minecraft/client/renderer/RenderType$CompositeRenderType;
+accessible method net/minecraft/client/renderer/RenderType$CompositeState$CompositeStateBuilder setTextureState (Lnet/minecraft/client/renderer/RenderStateShard$EmptyTextureStateShard;)Lnet/minecraft/client/renderer/RenderType$CompositeState$CompositeStateBuilder;
+accessible method net/minecraft/client/renderer/RenderType$CompositeState$CompositeStateBuilder setLightmapState (Lnet/minecraft/client/renderer/RenderStateShard$LightmapStateShard;)Lnet/minecraft/client/renderer/RenderType$CompositeState$CompositeStateBuilder;
+accessible method net/minecraft/client/renderer/RenderType$CompositeState$CompositeStateBuilder setOverlayState (Lnet/minecraft/client/renderer/RenderStateShard$OverlayStateShard;)Lnet/minecraft/client/renderer/RenderType$CompositeState$CompositeStateBuilder;
+accessible method net/minecraft/client/renderer/RenderType$CompositeState$CompositeStateBuilder setLineState (Lnet/minecraft/client/renderer/RenderStateShard$LineStateShard;)Lnet/minecraft/client/renderer/RenderType$CompositeState$CompositeStateBuilder;
+accessible method net/minecraft/client/renderer/RenderType$CompositeState$CompositeStateBuilder createCompositeState (Z)Lnet/minecraft/client/renderer/RenderType$CompositeState;
+accessible field net/minecraft/client/renderer/RenderStateShard LIGHTMAP Lnet/minecraft/client/renderer/RenderStateShard$LightmapStateShard;
+accessible field net/minecraft/client/renderer/RenderStateShard OVERLAY Lnet/minecraft/client/renderer/RenderStateShard$OverlayStateShard;
 accessible class net/minecraft/client/renderer/RenderType$CompositeState
-accessible class net/minecraft/client/renderer/RenderStateShard$ShaderStateShard
+accessible class net/minecraft/client/renderer/RenderType$CompositeState$CompositeStateBuilder
+accessible class net/minecraft/client/renderer/RenderStateShard$EmptyTextureStateShard
 accessible class net/minecraft/client/renderer/RenderStateShard$TextureStateShard
-accessible class net/minecraft/client/renderer/RenderStateShard$TransparencyStateShard
 accessible class net/minecraft/client/renderer/RenderStateShard$LineStateShard
-accessible field net/minecraft/client/renderer/RenderStateShard ADDITIVE_TRANSPARENCY Lnet/minecraft/client/renderer/RenderStateShard$TransparencyStateShard;
-accessible field net/minecraft/client/renderer/RenderStateShard COLOR_DEPTH_WRITE Lnet/minecraft/client/renderer/RenderStateShard$WriteMaskStateShard;
-accessible field net/minecraft/client/renderer/RenderStateShard COLOR_WRITE Lnet/minecraft/client/renderer/RenderStateShard$WriteMaskStateShard;
-accessible field net/minecraft/client/renderer/RenderStateShard CULL Lnet/minecraft/client/renderer/RenderStateShard$CullStateShard;
-accessible field net/minecraft/client/renderer/RenderStateShard NO_CULL Lnet/minecraft/client/renderer/RenderStateShard$CullStateShard;
-accessible field net/minecraft/client/renderer/RenderStateShard ITEM_ENTITY_TARGET Lnet/minecraft/client/renderer/RenderStateShard$OutputStateShard;
-accessible field net/minecraft/client/renderer/RenderStateShard POSITION_COLOR_SHADER Lnet/minecraft/client/renderer/RenderStateShard$ShaderStateShard;
-accessible field net/minecraft/client/renderer/RenderStateShard RENDERTYPE_LINES_SHADER Lnet/minecraft/client/renderer/RenderStateShard$ShaderStateShard;
-accessible field net/minecraft/client/renderer/RenderStateShard VIEW_OFFSET_Z_LAYERING Lnet/minecraft/client/renderer/RenderStateShard$LayeringStateShard;
+accessible class net/minecraft/client/renderer/RenderStateShard$LightmapStateShard
+accessible class net/minecraft/client/renderer/RenderStateShard$OverlayStateShard
 # Fabric only
 accessible method net/minecraft/world/entity/SpawnPlacements register (Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/entity/SpawnPlacementType;Lnet/minecraft/world/level/levelgen/Heightmap$Types;Lnet/minecraft/world/entity/SpawnPlacements$SpawnPredicate;)V
 accessible method net/minecraft/world/level/block/FireBlock getBurnOdds (Lnet/minecraft/world/level/block/state/BlockState;)I
-accessible field net/minecraft/client/renderer/block/model/BlockModel parent Lnet/minecraft/client/renderer/block/model/BlockModel;
