@@ -747,3 +747,8 @@
   (gen_resources.py + the branch's backport step).
 - The PerfScene / tools/perf.sh measuring tools stay on main (1.21.10 APIs); the numbers are in main's MODLOG.
 - 95 GameTests pass.
+
+## 2026-10-20 — tritanium crates visible again
+- `BaseEntityBlock.getRenderShape` is `INVISIBLE` in 1.21.1-1.21.3 (1.21.4+ draws the model) and `TritaniumCrateBlock`
+  had no override, so placed crates were invisible since this branch was made (found by the Fabric port scene). Now
+  `RenderShape.MODEL`; 95 GameTests pass, the scene shot shows all 16 crates.
