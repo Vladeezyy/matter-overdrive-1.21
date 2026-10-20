@@ -56,15 +56,12 @@ public final class FabricObjModels {
     private record ObjModel(ObjFile obj, boolean flipV, Map<String, Boolean> visibility) {}
 
     static void register() {
-        // before baking, not on load: vanilla resolves parents of JSON models (item models of OBJ blocks) as BlockModels
+        // 1.21.4+: a JSON model without elements bakes its parent with its own texture slots, so the OBJ models can
+        // replace their JSON on load and item models with an OBJ parent still work
         PreparableModelLoadingPlugin.register(FabricObjModels::load, (models, context) ->
-                context.modifyModelBeforeBake().register((model, ctx) -> {
-                    // the model or the nearest parent with OBJ geometry (NeoForge: children inherit the custom geometry)
-                    for (BlockModel json = model instanceof BlockModel block ? block : null; json != null; json = json.parent) {
-                        ObjModel obj = models.get(ResourceLocation.tryParse(json.name));
-                        if (obj != null) return new Unbaked((BlockModel) model, obj);
-                    }
-                    return model;
+                context.modifyModelOnLoad().register((model, ctx) -> {
+                    ObjModel obj = models.get(ctx.id());
+                    return obj != null && model instanceof BlockModel json ? new Unbaked(json, obj) : model;
                 }));
     }
 
@@ -168,16 +165,45 @@ public final class FabricObjModels {
     /** The JSON model (textures, display, overrides) with the OBJ geometry */
     private record Unbaked(BlockModel json, ObjModel obj) implements UnbakedModel {
         @Override
-        public void resolveDependencies(UnbakedModel.Resolver resolver) {
+        public void resolveDependencies(net.minecraft.client.resources.model.ResolvableModel.Resolver resolver) {
             this.json.resolveDependencies(resolver);
         }
 
         @Override
-        public BakedModel bake(ModelBaker baker, Function<Material, TextureAtlasSprite> sprites, ModelState state) {
+        public Boolean getAmbientOcclusion() {
+            return this.json.getAmbientOcclusion();
+        }
+
+        @Override
+        public UnbakedModel.GuiLight getGuiLight() {
+            return this.json.getGuiLight();
+        }
+
+        @Override
+        public net.minecraft.client.renderer.block.model.ItemTransforms getTransforms() {
+            return this.json.getTransforms();
+        }
+
+        @Override
+        public net.minecraft.client.renderer.block.model.TextureSlots.Data getTextureSlots() {
+            return this.json.getTextureSlots();
+        }
+
+        @Override
+        public UnbakedModel getParent() {
+            return this.json.getParent();
+        }
+
+        @Override
+        public BakedModel bake(net.minecraft.client.renderer.block.model.TextureSlots slots, ModelBaker baker, ModelState state, boolean ambientOcclusion,
+                               boolean usesBlockLight, net.minecraft.client.renderer.block.model.ItemTransforms transforms) {
             ObjFile file = this.obj.obj();
             Map<String, TextureAtlasSprite> materialSprites = new HashMap<>();
-            Function<String, TextureAtlasSprite> spriteOf = material -> materialSprites.computeIfAbsent(material,
-                    m -> sprites.apply(this.json.getMaterial(file.materialTextures().getOrDefault(m, "#texture"))));
+            Function<String, TextureAtlasSprite> spriteOf = material -> materialSprites.computeIfAbsent(material, m -> {
+                String slot = file.materialTextures().getOrDefault(m, "#texture");
+                Material texture = slots.getMaterial(slot.startsWith("#") ? slot.substring(1) : slot);
+                return texture == null ? baker.sprites().reportMissingReference(slot) : baker.sprites().get(texture);
+            });
             // the block state's rotation turns the model about the block's centre
             Matrix4f transform = new Matrix4f();
             if (!state.getRotation().equals(com.mojang.math.Transformation.identity())) {
@@ -196,9 +222,9 @@ public final class FabricObjModels {
                     this.quad(file, face, corners, sprite, tint, transform, unculled, culled);
                 }
             }
-            // 1.21.2+: item overrides are the item model's (ItemModel), not the baked block model's
-            return new SimpleBakedModel(unculled, culled, this.json.hasAmbientOcclusion(), this.json.getGuiLight().lightLikeBlock(), true,
-                    sprites.apply(this.json.getMaterial("particle")), this.json.getTransforms());
+            Material particle = slots.getMaterial("particle");
+            return new SimpleBakedModel(unculled, culled, ambientOcclusion, usesBlockLight, true,
+                    particle == null ? baker.sprites().reportMissingReference("particle") : baker.sprites().get(particle), transforms);
         }
 
         private void quad(ObjFile file, Face face, int[] corners, TextureAtlasSprite sprite, int tint, Matrix4f transform,
