@@ -768,3 +768,4 @@
 - Tritanium crates: `BaseEntityBlock.getRenderShape` is `INVISIBLE` here too, fixed with `RenderShape.MODEL` (released as 1.0.2 for 1.21.1 and 1.21.3).
 - Tests: NeoForge 95/95, Fabric 100/100 GameTests; scene (`:fabric:runScene` / `:neoforge:runScene`, world: a 1.21.3 flat creative `mo_scene` made by `:fabric:runServer`) on both loaders.
 - Not done: MSPT/FPS against vanilla on Fabric, a run of the jars outside dev, release pages.
+- Fabric armor: `ArmorRenderer.renderPart` draws the shared armor model without `setupAnim`, so on a moving player the armor stayed in the default pose (skin over the armor in the scene). `model.setupAnim(state)` first, as vanilla's armor layer.

@@ -90,8 +90,13 @@ public final class MatterOverdriveFabricClient implements ClientModInitializer {
                 ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "block/matter_plasma_still"),
                 ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "block/matter_plasma_flowing")));
         // 1.7.10 ModelTritaniumArmor with the layer textures of TritaniumArmorItem.getArmorTexture
-        ArmorRenderer.register((pose, buffers, stack, entity, slot, light, contextModel) -> ArmorRenderer.renderPart(pose, buffers, light, stack,
-                        TritaniumArmorModel.armorModel(stack), slot == EquipmentSlot.FEET ? TritaniumArmorModel.LAYER_2 : TritaniumArmorModel.LAYER_1),
+        // as vanilla's armor layer and NeoForge: the shared armor model poses itself from the render state first
+        ArmorRenderer.register((pose, buffers, stack, entity, slot, light, contextModel) -> {
+                    var model = TritaniumArmorModel.armorModel(stack);
+                    model.setupAnim(entity);
+                    ArmorRenderer.renderPart(pose, buffers, light, stack, model,
+                            slot == EquipmentSlot.FEET ? TritaniumArmorModel.LAYER_2 : TritaniumArmorModel.LAYER_1);
+                },
                 MOItems.TRITANIUM_HELMET.get(), MOItems.TRITANIUM_CHESTPLATE.get(), MOItems.TRITANIUM_LEGGINGS.get(), MOItems.TRITANIUM_BOOTS.get());
 
         ClientTickEvents.START_CLIENT_TICK.register(client -> MOClient.onClientTickStart());
