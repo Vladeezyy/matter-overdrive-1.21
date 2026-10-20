@@ -264,8 +264,8 @@ public final class MatterRegistry {
         for (Holder<Item> holder : ingredient.items()) {
             Integer value = values.get(holder.value());
             if (value == null || value <= 0) continue;
-            ItemStack remainder = matteroverdrive.platform.Platform.INSTANCE.craftingRemainder(alternative);
-            // wait for the returned container's value (1.21.1 lists the cake before the bucket)
+            ItemStack remainder = matteroverdrive.platform.Platform.INSTANCE.craftingRemainder(holder.value().getDefaultInstance());
+            // wait for the returned container's value (recipe order varies between versions: the cake before the bucket)
             if (!remainder.isEmpty() && !values.containsKey(remainder.getItem())) continue;
             int net = value - (remainder.isEmpty() ? 0 : values.getOrDefault(remainder.getItem(), 0) * remainder.getCount());
             if (net > 0 && (best == 0 || net < best)) best = net;
