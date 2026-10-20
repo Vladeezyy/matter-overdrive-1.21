@@ -722,3 +722,8 @@
 - Fabric armor on 1.21.10: `ArmorRenderer.submitTransformCopyingModel(..., light, overlay, outlineColor, crumbling)` — `-1` there is a white outline colour (the armor was drawn white), and copying the context model's transforms tilted the armor stands' sleeves. Now `collector.submitModel(model, state, pose, armorCutoutNoCull(texture), light, NO_OVERLAY, state.outlineColor, null)`, as vanilla's armor layer: the armor model poses itself from the render state.
 - Tests: NeoForge 101/101, Fabric 101/101 GameTests; scene (`:fabric:runScene` / `:neoforge:runScene`, world: a 1.21.10 flat creative `mo_scene` made by `:fabric:runServer`) on both loaders.
 - Not done: MSPT/FPS against vanilla on Fabric, a run of the jars outside dev, release pages.
+
+### Release preparation (Fabric 1.0.2)
+- The release jar ships without GameTests: the `fabric-gametest` entrypoint made Fabric API scan the test classes whenever a world opened, and in production that scan failed (`AnnotationFormatError ... GameTest.rotation()`), so the world hung on "Preparing resources". `jar` excludes the test classes and test instances and drops the entrypoint line; dev runs keep the tests.
+- `fabric-api` dependency `>=` the version the jar is built against.
+- Checked outside dev: the release jar on the official Fabric server launcher (world generated, clean stop) and `:fabric:prodScene` (Loom `ClientProductionRunTask`: the scripted scene on the release jar in a production client): 142/142 shots.
