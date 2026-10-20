@@ -58,11 +58,15 @@ public final class FabricObjModels {
     private record ObjModel(ObjFile obj, boolean flipV, Map<String, Boolean> visibility) {}
 
     static void register() {
+        // before baking, not on load: vanilla resolves parents of JSON models (item models of OBJ blocks) as BlockModels
         PreparableModelLoadingPlugin.register(FabricObjModels::load, (models, context) ->
-                context.modifyModelOnLoad().register((model, ctx) -> {
-                    ResourceLocation id = ctx.resourceId();
-                    ObjModel obj = id == null ? null : models.get(id);
-                    return obj != null && model instanceof BlockModel json ? new Unbaked(json, obj) : model;
+                context.modifyModelBeforeBake().register((model, ctx) -> {
+                    // the model or the nearest parent with OBJ geometry (NeoForge: children inherit the custom geometry)
+                    for (BlockModel json = model instanceof BlockModel block ? block : null; json != null; json = json.parent) {
+                        ObjModel obj = models.get(ResourceLocation.tryParse(json.name));
+                        if (obj != null) return new Unbaked((BlockModel) model, obj);
+                    }
+                    return model;
                 }));
     }
 

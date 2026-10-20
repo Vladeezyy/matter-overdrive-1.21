@@ -1,11 +1,13 @@
-# Matter Overdrive for Minecraft 1.21.1 (NeoForge)
+# Matter Overdrive for Minecraft 1.21.1 (NeoForge and Fabric)
 
 ![Matter Overdrive](docs/modrinth/banner.png)
 
 An unofficial port of [Matter Overdrive](https://github.com/simeonradivoev/MatterOverdrive) by Simeon Radivoev
-from Minecraft 1.7.10 to **Minecraft 1.21.1** on **NeoForge 21.1**.
+from Minecraft 1.7.10 to **Minecraft 1.21.1** on **NeoForge 21.1** and **Fabric** (Fabric API; Team Reborn Energy for
+FE is included in the jar).
 
-This is the `1.21.1` branch; the Minecraft 1.21.10 build lives on `main`. Both builds share the game code: the
+This branch builds both loaders from one `common` module (all game code, compiled on vanilla) plus thin `neoforge/`
+and `fabric/` modules; the Minecraft 1.21.10 build lives on `main`. Both builds share the game code: the
 1.21.10 APIs the code is written against are re-created for 1.21.1 in `matteroverdrive.compat`, and
 `tools/backport_1_21_1.py` converts the generated resources.
 
@@ -36,12 +38,13 @@ difference from 1.7.10.
 ## Building
 Requires JDK 21.
 ```bash
-./gradlew build              # jar in build/libs/
-./gradlew runClient          # dev client
-./gradlew runGameTestServer  # headless in-game tests
-./gradlew runScene           # scripted scene: screenshots of the machines and features to run/screenshots/
+./gradlew build                        # jars in neoforge/build/libs/ and fabric/build/libs/
+./gradlew :neoforge:runClient          # dev client (:fabric:runClient for Fabric)
+./gradlew :neoforge:runGameTestServer  # headless in-game tests (:fabric:runGametest)
+./gradlew :neoforge:runScene           # scripted scene: screenshots to <loader>/run/screenshots/ (:fabric:runScene)
 ```
-`runScene` needs a world named `mo_scene` in `run/saves/` (any copy of a dev world).
+`runScene` needs a 1.21.1 world named `mo_scene` in `<loader>/run/saves/` (a flat creative world made by the
+dedicated server works).
 Resources for simple content are generated from the original 1.7.10 assets by `tools/gen_resources.py`, then
 converted for 1.21.1 by `tools/backport_1_21_1.py` (see MODLOG.md for the commands).
 

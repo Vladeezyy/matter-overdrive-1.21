@@ -46,6 +46,12 @@ public class TritaniumCrateBlock extends BaseEntityBlock {
         return CODEC;
     }
 
+    /** 1.21.1 BaseEntityBlock is invisible by default (1.21.2+ draws the model) */
+    @Override
+    protected net.minecraft.world.level.block.RenderShape getRenderShape(BlockState state) {
+        return net.minecraft.world.level.block.RenderShape.MODEL;
+    }
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(HorizontalDirectionalBlock.FACING);

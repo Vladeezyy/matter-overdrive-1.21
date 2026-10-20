@@ -747,3 +747,61 @@
   (gen_resources.py + the branch's backport step).
 - The PerfScene / tools/perf.sh measuring tools stay on main (1.21.10 APIs); the numbers are in main's MODLOG.
 - 95 GameTests pass.
+
+## 2026-10-20 — Fabric 1.21.1 (branch `fabric-1.21.1`)
+- User: Matter Overdrive on Fabric 1.21.1 too. Same layout as our other multiloader mods (Rats, Natura): `common/`
+  (all game code, compiled on vanilla 1.21.1 through NeoForm with the NeoForge AT), `neoforge/` and `fabric/` (loader
+  glue), `buildSrc/multiloader-*.gradle`. One version, two jars: `matteroverdrive-neoforge-…jar`,
+  `matteroverdrive-fabric-…jar`.
+- **Common layer** (`matteroverdrive.platform`): `Platform` (ServiceLoader) for registration, menus, network, player
+  data, storages and NeoForge's data hooks; `Registrar` / `RegistryEntry` instead of DeferredRegister; NeoForge's
+  transfer interfaces re-created under `platform.transfer` (IEnergyStorage, IItemHandler, IFluidHandler(Item),
+  ItemStackHandler, FluidTank, FluidStack in mB…); `PlayerData` instead of attachment types; NeoForge events became
+  plain static handlers (`MatterEvents`, `QuestEvents`, `Android`, `GalaxyServer`, `VillageHouses`) that each loader
+  calls; `client/MOClient` is the client hub, `ClientPlatform` the client service.
+- **NeoForge module**: the same behaviour as before the split (capabilities wrap the common handlers, attachment types
+  with NeoForge's sync, the `matter` data map, biome/loot modifiers as data). 95/95 GameTests.
+- **Fabric module** (`matteroverdrive.fabric`):
+  - Registration in NeoForge's order (attributes, components, armor materials, then `BuiltInRegistries.REGISTRY`
+    order), as in Rats.
+  - Energy: Team Reborn Energy 4.1.0, shipped inside the jar (`include`). Fluids: Fabric transfer API, 81 droplets per mB.
+  - The mod's storages for other mods: adapters that only simulate inside a transaction and keep the moved amount as
+    pending in a `SnapshotParticipant`; the common handler does the real move in `onFinalCommit`. One adapter per block
+    entity and kind (weak map), so two lookups in one transaction share the pending amounts. Items with energy or
+    matter (batteries, weapons, matter containers) are exchanged for their changed copy through the
+    `ContainerItemContext`. Between the mod's own blocks nothing changes: the common handlers are used directly.
+  - Other mods' storages for the mod: one transaction per call (`FabricTransfer.Energy` / `SlottedItems` / `Fluids`).
+  - Player data: Fabric data attachments (persistent, copied on death) + the mod's `player_data` payload where NeoForge
+    syncs attachments (join, respawn, dimension change, start of tracking, explicit sync).
+  - The `matter` data map: own reload listener reading the same `data_maps/item/matter.json` (replace / remove,
+    tags resolved on first use). Biome modifiers: the NeoForge JSON read from the jar (`neoforge:and` / `not` / tags /
+    ids). Loot `neoforge:add_table`: `LootTableEvents.MODIFY` adds a pool with the table as a nested entry.
+  - Events without a Fabric API: mixins on ItemEntity.playerTouch (pickup), AnvilMenu.createResult, ResultSlot
+    (crafted), BlockItem.place (before the stack shrinks), Player.tick, LivingEntity jump / fall / hurt (`@WrapMethod`),
+    ServerLevel.save (galaxy), EnergyWeaponItem as `FabricItem` (no re-equip bob). Player attributes via
+    `FabricDefaultAttributeRegistry` (a mixin into `Player.createAttributes` runs before the mod registers them).
+  - Client: `FabricObjModels` reads NeoForge's `neoforge:obj` JSON + .obj/.mtl (groups, visibility, flip_v,
+    `neoforge_TintIndex`, automatic culling) and bakes plain `SimpleBakedModel`s; applied before bake, walking the
+    `BlockModel` parent chain, so item models with an OBJ parent inherit it (on load it crashed: "BlockModel parent has
+    to be a block model"). Render layers from the models' `render_type`, matter plasma via `SimpleFluidRenderHandler`,
+    tritanium armor via `ArmorRenderer`, HUD via `HudRenderCallback`, shield after entities. Client mixins: attack key
+    while a weapon is used, FOV zoom, arm pose, first person hand transform and beam, player render (skin overlay,
+    beam), vanilla HUD parts the android HUD replaces.
+- Tests: Fabric runs the same 95 GameTests (`fabric-gametest` entrypoint on `MOGameTests`) plus 5 Fabric-only ones
+  (`FabricTransferTests`: TR energy with aborted / nested / committed transactions, items into a machine, fluid into a
+  pipe, a battery charged through `EnergyStorage.ITEM`, a vanilla chest seen as a handler): 100/100.
+- Scene on Fabric (`:fabric:runScene`, world: a 1.21.1 flat creative `fabric/run/saves/mo_scene` made by
+  `:fabric:runServer`; the old `mo_scene` was last played in 1.21.10 and the 1.21.1 client stops on the "downgrade"
+  screen): all 142 shots, compared with NeoForge where it mattered.
+- **Fixed on the way (also wrong in the released 1.21.1 NeoForge build 1.0.1):** tritanium crates were invisible —
+  1.21.1 `BaseEntityBlock.getRenderShape` is `INVISIBLE` (1.21.2+ draws the model), and `TritaniumCrateBlock` had no
+  override. Now `RenderShape.MODEL`.
+- Fabric pitfall: at `WorldRenderEvents.AFTER_ENTITIES` (and up to the end of the translucent pass) the camera rotation
+  is already in `RenderSystem.getModelViewStack()`; a pose built from `context.positionMatrix()` rotates twice (the
+  android shield vanished behind the camera in third person front view). The shield gets an identity `PoseStack`.
+- Jars: `neoforge/build/libs/matteroverdrive-neoforge-1.0.1+1.21.1.jar`, `fabric/build/libs/matteroverdrive-fabric-1.0.1+1.21.1.jar`
+  (TR Energy nested in `META-INF/jars`; the mixins remapped to intermediary by Loom, no refmap needed).
+  NeoForge 95/95, Fabric 100/100 GameTests after the fixes.
+- Not done: MSPT/FPS measurement against vanilla on Fabric (the game logic is the same common code; the Fabric layer adds
+  event hooks and transfer adapters used only by other mods' pipes), a run of the jar on a clean Fabric server/client
+  outside dev, release pages.
