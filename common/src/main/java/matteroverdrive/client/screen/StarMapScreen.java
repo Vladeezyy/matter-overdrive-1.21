@@ -310,7 +310,7 @@ public class StarMapScreen extends AbstractContainerScreen<StarMapMenu> {
     public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
         // 1.7.10 drawWorldBackground: black, then the hologram in perspective
         g.fill(0, 0, width, height, 0xFF000000);
-        g.submitPictureInPictureRenderState(new StarMapPipRenderer.State(starMap, partialTick, 0, 0, width, height));
+        g.guiRenderState.submitPicturesInPictureState(new StarMapPipRenderer.State(starMap, partialTick, 0, 0, width, height));
         // the hologram texture is blitted at the end of its layer: everything else goes above it
         g.nextStratum();
         renderBg(g, partialTick, mouseX, mouseY);

@@ -11,7 +11,7 @@ import net.minecraft.world.item.ItemStack;
  * Item slots stored in a list. Saves as {@code {Items: [{Slot, ...stack}], Size}}, the layout NeoForge's
  * {@code ItemStackHandler} used, so block entities saved by the NeoForge-only build load the same.
  */
-public class ItemStackHandler implements IItemHandlerModifiable {
+public class ItemStackHandler implements IItemHandlerModifiable, matteroverdrive.platform.ValueIOSerializable {
     protected NonNullList<ItemStack> stacks;
 
     public ItemStackHandler() {
@@ -120,31 +120,21 @@ public class ItemStackHandler implements IItemHandlerModifiable {
         return true;
     }
 
-    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
-        ListTag items = new ListTag();
+    @Override
+    public void serialize(net.minecraft.world.level.storage.ValueOutput output) {
+        var items = output.list("Items", net.minecraft.world.ItemStackWithSlot.CODEC);
         for (int i = 0; i < this.stacks.size(); i++) {
-            if (!this.stacks.get(i).isEmpty()) {
-                CompoundTag item = new CompoundTag();
-                item.putInt("Slot", i);
-                items.add(this.stacks.get(i).save(provider, item));
-            }
+            if (!this.stacks.get(i).isEmpty()) items.add(new net.minecraft.world.ItemStackWithSlot(i, this.stacks.get(i)));
         }
-        CompoundTag tag = new CompoundTag();
-        tag.put("Items", items);
-        tag.putInt("Size", this.stacks.size());
-        return tag;
+        output.putInt("Size", this.stacks.size());
     }
 
-    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
-        this.setSize(tag.getIntOr("Size", this.stacks.size()));
-        ListTag items = tag.getListOrEmpty("Items");
-        for (int i = 0; i < items.size(); i++) {
-            CompoundTag item = items.getCompoundOrEmpty(i);
-            int slot = item.getIntOr("Slot", -1);
-            if (slot >= 0 && slot < this.stacks.size()) {
-                ItemStack.parse(provider, item).ifPresent(stack -> this.stacks.set(slot, stack));
-            }
-        }
+    @Override
+    public void deserialize(net.minecraft.world.level.storage.ValueInput input) {
+        this.setSize(input.getIntOr("Size", this.stacks.size()));
+        input.listOrEmpty("Items", net.minecraft.world.ItemStackWithSlot.CODEC).forEach(slot -> {
+            if (slot.isValidInContainer(this.stacks.size())) this.stacks.set(slot.slot(), slot.stack());
+        });
         this.onLoad();
     }
 
