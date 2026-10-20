@@ -46,3 +46,7 @@ _original/
 
 ### Local notes ###
 CLAUDE.md
+
+# build and test logs, test run dirs
+/build-*.log
+run-gametest/
