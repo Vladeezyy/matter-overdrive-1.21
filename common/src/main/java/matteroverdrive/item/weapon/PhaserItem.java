@@ -150,7 +150,7 @@ public class PhaserItem extends EnergyWeaponItem {
         HitResult hit = trace(level, player, getRange(phaser));
         int power = getLevel(phaser);
         if (hit instanceof EntityHitResult eh && eh.getEntity() instanceof LivingEntity target) {
-            if (target instanceof Player && !level.getServer().isPvpAllowed()) return;
+            if (target instanceof Player && !((net.minecraft.server.level.ServerLevel) level).isPvpAllowed()) return;
             float damage = getDamage(phaser, player);
             if (damage > 0) {
                 Vec3 motion = target.getDeltaMovement();

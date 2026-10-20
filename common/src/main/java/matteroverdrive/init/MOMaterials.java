@@ -5,7 +5,7 @@ import java.util.Map;
 import matteroverdrive.MatterOverdrive;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
@@ -32,11 +32,11 @@ public final class MOMaterials {
             20, SoundEvents.ARMOR_EQUIP_IRON, 0f, 0f, TRITANIUM_REPAIR, TRITANIUM_ASSET);
 
     /** 1.7.10 Tritanium_Armor2 layers: the boots use layer 2, everything else layer 1 (TritaniumArmorItem.getArmorTexture). */
-    public static final net.minecraft.resources.ResourceLocation ARMOR_LAYER_1 = net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/entity/equipment/humanoid/tritanium.png");
-    public static final net.minecraft.resources.ResourceLocation ARMOR_LAYER_2 = net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/entity/equipment/humanoid_leggings/tritanium.png");
+    public static final net.minecraft.resources.Identifier ARMOR_LAYER_1 = net.minecraft.resources.Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/entity/equipment/humanoid/tritanium.png");
+    public static final net.minecraft.resources.Identifier ARMOR_LAYER_2 = net.minecraft.resources.Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/entity/equipment/humanoid_leggings/tritanium.png");
 
-    private static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, path);
+    private static Identifier id(String path) {
+        return Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, path);
     }
 
     private MOMaterials() {}

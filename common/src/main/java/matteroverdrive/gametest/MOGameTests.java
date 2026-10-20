@@ -1,5 +1,7 @@
 package matteroverdrive.gametest;
 
+import com.mojang.serialization.MapCodec;
+
 import matteroverdrive.platform.Registrar;
 
 import java.util.HashMap;
@@ -21,7 +23,7 @@ import net.minecraft.gametest.framework.TestEnvironmentDefinition;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
@@ -48,6 +50,12 @@ public final class MOGameTests {
      * Tests in one environment share a world and run together, so each time of day gets its own environment.
      */
     public record Spec(Consumer<GameTestHelper> body, int maxTicks, boolean skyAccess, int timeOfDay) {}
+
+    private static final Registrar<MapCodec<? extends net.minecraft.gametest.framework.TestEnvironmentDefinition<?>>> ENVIRONMENTS =
+            Registrar.create(Registries.TEST_ENVIRONMENT_DEFINITION_TYPE, MatterOverdrive.MODID);
+    static {
+        ENVIRONMENTS.register("time_of_day", () -> TimeOfDayEnvironment.CODEC);
+    }
 
     private static final Map<String, Spec> TESTS = new LinkedHashMap<>();
 
@@ -94,6 +102,7 @@ public final class MOGameTests {
 
     /** The test function registry's entries (registered with the mod's other entries) */
     public static Registrar<Consumer<GameTestHelper>> functions() {
+        ENVIRONMENTS.getEntries();
         return FUNCTIONS;
     }
 
@@ -172,8 +181,8 @@ public final class MOGameTests {
         return n;
     }
 
-    public static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, path);
+    public static Identifier id(String path) {
+        return Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, path);
     }
 
     /** NeoForge registers this class, Fabric's gametest entrypoint points to it (it needs a public constructor) */

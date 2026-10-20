@@ -3,7 +3,7 @@ package matteroverdrive.client.screen;
 import matteroverdrive.MatterOverdrive;
 import matteroverdrive.block.entity.HoloSignBlockEntity;
 import matteroverdrive.network.HoloSignPayload;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineEditBox;
 import net.minecraft.client.gui.screens.Screen;
@@ -38,9 +38,9 @@ public class HoloSignScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        super.render(g, mouseX, mouseY, partialTick);
-        g.drawCenteredString(font, title, width / 2, height / 2 - 85, 0xFFFFFFFF);
+    public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(g, mouseX, mouseY, partialTick);
+        g.centeredText(font, title, width / 2, height / 2 - 85, 0xFFFFFFFF);
     }
 
     @Override

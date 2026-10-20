@@ -10,7 +10,7 @@ import org.w3c.dom.Element;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FontDescription;
 import net.minecraft.world.item.ItemStack;
@@ -29,13 +29,13 @@ public abstract class GuideElement {
 
     /** Everything an element needs while drawing: links are collected for the screen's mouse clicks. */
     public static final class Context {
-        public final GuiGraphics g;
+        public final GuiGraphicsExtractor g;
         public final List<Link> links = new ArrayList<>();
         public final GuideNavigator navigator;
         public int mouseX, mouseY;
         @Nullable public ItemStack hovered;
 
-        public Context(GuiGraphics g, GuideNavigator navigator) {
+        public Context(GuiGraphicsExtractor g, GuideNavigator navigator) {
             this.g = g;
             this.navigator = navigator;
         }
@@ -189,7 +189,7 @@ public abstract class GuideElement {
         ctx.g.pose().pushMatrix();
         ctx.g.pose().translate(x, y);
         ctx.g.pose().scale(scale, scale);
-        ctx.g.renderItem(stack, 0, 0);
+        ctx.g.item(stack, 0, 0);
         ctx.g.pose().popMatrix();
         int size = (int) (16 * scale);
         if (ctx.mouseX >= x && ctx.mouseX < x + size && ctx.mouseY >= y && ctx.mouseY < y + size) ctx.hovered = stack;

@@ -13,9 +13,9 @@ import matteroverdrive.item.weapon.EnergyWeaponItem;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
@@ -37,16 +37,16 @@ public final class AndroidHud {
     private static final String[] TRANSFORM_LINES = {"0", "1", "2", "3", "4"};
 
     /** Draws a whole texture of srcW x srcH scaled to w x h. */
-    static void icon(GuiGraphics g, ResourceLocation tex, int x, int y, int w, int h, int srcW, int srcH, int color) {
+    static void icon(GuiGraphicsExtractor g, Identifier tex, int x, int y, int w, int h, int srcW, int srcH, int color) {
         g.blit(RenderPipelines.GUI_TEXTURED, tex, x, y, 0, 0, w, h, srcW, srcH, srcW, srcH, color);
     }
 
-    private static ResourceLocation elem(String name) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/gui/elements/" + name + ".png");
+    private static Identifier elem(String name) {
+        return Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/gui/elements/" + name + ".png");
     }
 
-    private static ResourceLocation gui(String name) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/gui/" + name + ".png");
+    private static Identifier gui(String name) {
+        return Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/gui/" + name + ".png");
     }
 
     /** 1.7.10 hideVanillaHudElements, and no player list while the ability wheel (same key) is open. */
@@ -60,7 +60,7 @@ public final class AndroidHud {
         return layer != VanillaLayer.TAB_LIST || Minecraft.getInstance().screen instanceof AbilityWheelScreen;
     }
 
-    public static void render(GuiGraphics g, DeltaTracker delta) {
+    public static void render(GuiGraphicsExtractor g, DeltaTracker delta) {
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
         if (player == null || mc.options.hideGui) return;
@@ -80,7 +80,7 @@ public final class AndroidHud {
 
     // --- top left: health, battery, speed; ammo and heat with a weapon ------------------------------------
 
-    private static void renderStats(GuiGraphics g, Font font, Player player, AndroidData data) {
+    private static void renderStats(GuiGraphicsExtractor g, Font font, Player player, AndroidData data) {
         int x = 12, y = 12;
         g.blit(RenderPipelines.GUI_TEXTURED, elem("android_bg_element"), x, y, 0, 0, 174, 11, 174, 11, BASE);
         y += 10;
@@ -106,25 +106,25 @@ public final class AndroidHud {
         }
     }
 
-    private static int iconWithPercent(GuiGraphics g, Font font, String icon, double amount, int x, int y, int iconOffsetY, int from, int to, int size) {
+    private static int iconWithPercent(GuiGraphicsExtractor g, Font font, String icon, double amount, int x, int y, int iconOffsetY, int from, int to, int size) {
         return iconWithInfo(g, font, icon, Math.round(amount * 100) + "%", lerp(from, to, (float) Mth.clamp(amount, 0, 1)), x, y, iconOffsetY, size);
     }
 
-    private static int iconWithInfo(GuiGraphics g, Font font, String icon, String info, int color, int x, int y, int iconOffsetY, int size) {
+    private static int iconWithInfo(GuiGraphicsExtractor g, Font font, String icon, String info, int color, int x, int y, int iconOffsetY, int size) {
         int c = ARGB.color(255, color);
         int src = icon.equals("battery") ? 16 : 18;
         icon(g, elem(icon), x, y + iconOffsetY, size, size, src, src, c);
-        g.drawString(font, info, x + size + 2, y + size / 2 - font.lineHeight / 2 + iconOffsetY, c, false);
+        g.text(font, info, x + size + 2, y + size / 2 - font.lineHeight / 2 + iconOffsetY, c, false);
         return font.width(info) + 2 + size + 2;
     }
 
     private static int lerp(int from, int to, float t) {
-        return ARGB.lerp(t, ARGB.color(255, from), ARGB.color(255, to));
+        return ARGB.srgbLerp(t, ARGB.color(255, from), ARGB.color(255, to));
     }
 
     // --- top right: parts and abilities ---------------------------------------------------------------
 
-    private static void renderBionicStats(GuiGraphics g, Font font, Player player, AndroidData data) {
+    private static void renderBionicStats(GuiGraphicsExtractor g, Font font, Player player, AndroidData data) {
         int right = g.guiWidth() - 12;
         int count = 0;
         for (int slot = 0; slot < AndroidData.SLOTS; slot++) {
@@ -132,7 +132,7 @@ public final class AndroidHud {
             if (stack.isEmpty()) continue;
             int[] pos = cell(right, count++);
             icon(g, elem("android_feature_icon_bg"), pos[0], pos[1], 22, 22, 22, 22, ARGB.color(255, BASE));
-            g.renderItem(stack, pos[0] + 3, pos[1] + 3);
+            g.item(stack, pos[0] + 3, pos[1] + 3);
         }
         for (BioticStat stat : BioticStats.all()) {
             int level = data.getUnlockedLevel(stat);
@@ -149,7 +149,7 @@ public final class AndroidHud {
             int delay = stat.getDelay(player, data, level);
             if (delay > 0) {
                 String text = (delay / 20) + "s";
-                g.drawString(font, text, pos[0] + 22 - font.width(text), pos[1] + 22 - font.lineHeight - 1, ARGB.color(255, HOLO), false);
+                g.text(font, text, pos[0] + 22 - font.width(text), pos[1] + 22 - font.lineHeight - 1, ARGB.color(255, HOLO), false);
             }
         }
         g.blit(RenderPipelines.GUI_TEXTURED, elem("android_bg_element"), right - 174, 12, 0, 0, 174, 11, 174, 11, BASE);
@@ -162,7 +162,7 @@ public final class AndroidHud {
 
     // --- bottom left: radar (1.7.10 minimap, without the terrain) -------------------------------------
 
-    private static void renderRadar(GuiGraphics g, Player player) {
+    private static void renderRadar(GuiGraphicsExtractor g, Player player) {
         int size = 64, cx = 12 + size / 2, cy = g.guiHeight() - 40 - size / 2;
         g.fill(cx - size / 2, cy - size / 2, cx + size / 2, cy + size / 2, 0x40000000);
         int edge = ARGB.color(160, HOLO);
@@ -189,26 +189,26 @@ public final class AndroidHud {
 
     // --- glitch and transformation --------------------------------------------------------------------
 
-    private static void renderGlitch(GuiGraphics g) {
+    private static void renderGlitch(GuiGraphicsExtractor g) {
         int u = (int) (RANDOM.nextGaussian() * 64), v = (int) (RANDOM.nextGaussian() * 64);
         g.blit(RenderPipelines.GUI_TEXTURED, gui("glitch"), 0, 0, Math.abs(u), Math.abs(v), g.guiWidth(), g.guiHeight(), 1280 - 128, 720 - 128,
                 1280, 720, ARGB.color(160, 0xFFFFFF));
     }
 
     /** 1.7.10 renderTransformAnimation: typed status lines, a spinner and the percentage. */
-    private static void renderTransformation(GuiGraphics g, Font font, Player player, AndroidData data) {
+    private static void renderTransformation(GuiGraphicsExtractor g, Font font, Player player, AndroidData data) {
         int cx = g.guiWidth() / 2, cy = g.guiHeight() / 2;
         int time = Android.TRANSFORM_TIME - data.getTurning();
         if (time % 40 > 0 && time % 40 < 3) renderGlitch(g);
         String text = typedText(time);
-        g.drawString(font, text, cx - font.width(text) / 2, cy - 28, ARGB.color(255, HOLO), false);
+        g.text(font, text, cx - font.width(text) / 2, cy - 28, ARGB.color(255, HOLO), false);
         g.pose().pushMatrix();
         g.pose().translate(cx, cy);
         g.pose().rotate((float) Math.toRadians(-(player.level().getGameTime() * 10 % 360)));
         icon(g, elem("spinner"), -16, -16, 32, 32, 64, 64, 0xFFFFFFFF);
         g.pose().popMatrix();
         String percent = Math.round(time * 100f / Android.TRANSFORM_TIME) + "%";
-        g.drawString(font, percent, cx - font.width(percent) / 2, cy - 3, ARGB.color(255, HOLO), false);
+        g.text(font, percent, cx - font.width(percent) / 2, cy - 3, ARGB.color(255, HOLO), false);
     }
 
     /** 1.7.10 AnimationTextTyping: each line types in then out at 2 ticks per letter; the last one stays. */

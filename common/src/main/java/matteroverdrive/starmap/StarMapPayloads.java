@@ -10,7 +10,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import matteroverdrive.platform.Platform;
 import matteroverdrive.platform.PacketContext;
@@ -18,8 +18,8 @@ import matteroverdrive.platform.PayloadRegistrar;
 
 /** 1.7.10 PacketUpdateGalaxy, PacketUpdatePlanet, PacketStarLoading, PacketUpdateTravelEvents. */
 public final class StarMapPayloads {
-    private static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, path);
+    private static Identifier id(String path) {
+        return Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, path);
     }
 
     /** The whole galaxy: quadrants, stars (no planets), travel events. */
@@ -109,7 +109,7 @@ public final class StarMapPayloads {
 
     private static void handleCommand(Command command, PacketContext context) {
         if (!(context.player() instanceof ServerPlayer player)) return;
-        if (!player.canInteractWithBlock(command.pos(), 4)
+        if (!player.isWithinBlockInteractionRange(command.pos(), 4)
                 || !(player.level().getBlockEntity(command.pos()) instanceof matteroverdrive.block.entity.StarMapBlockEntity starMap)
                 || !starMap.isUseableByPlayer(player)) return;
         starMap.setZoomLevel(command.zoom());

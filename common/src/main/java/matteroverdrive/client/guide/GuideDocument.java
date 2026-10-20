@@ -18,7 +18,7 @@ import org.w3c.dom.NodeList;
 
 import matteroverdrive.MatterOverdrive;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 
 /**
@@ -59,8 +59,8 @@ public final class GuideDocument {
         return r.isPresent() ? r : manager.getResource(id("guide/en_us/" + entry.file() + ".xml"));
     }
 
-    private static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, path);
+    private static Identifier id(String path) {
+        return Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, path);
     }
 
     /** 1.7.10 loadStyleSheetMap: ".class{rules}" with whitespace and comments removed. */

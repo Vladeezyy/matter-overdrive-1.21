@@ -49,9 +49,9 @@ public class BecomeAndroidLogic implements QuestLogic {
         int[] slots = partSlots(player);
         for (int slot : slots) {
             if (slot < 0) {
-                player.displayClientMessage(Component.literal("<Mad Scientist>").withStyle(ChatFormatting.GOLD).append(
+                player.sendSystemMessage(Component.literal("<Mad Scientist>").withStyle(ChatFormatting.GOLD).append(
                         Component.translatable("entity." + MatterOverdrive.MODID + ".mad_scientist.line.fail." + player.getRandom().nextInt(4))
-                                .withStyle(ChatFormatting.RED)), false);
+                                .withStyle(ChatFormatting.RED)));
                 return;
             }
         }

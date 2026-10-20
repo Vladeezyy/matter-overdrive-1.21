@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 import matteroverdrive.MatterOverdrive;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -97,8 +97,8 @@ public class BionicPartItem extends Item {
         return mods;
     }
 
-    public static ResourceLocation modifierId(int slot, String suffix) {
-        return suffix.isEmpty() ? modifierId(slot) : ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "bionic_part_" + slot + "_" + suffix);
+    public static Identifier modifierId(int slot, String suffix) {
+        return suffix.isEmpty() ? modifierId(slot) : Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "bionic_part_" + slot + "_" + suffix);
     }
 
     public double glitchBonus(ItemStack stack) {
@@ -117,8 +117,8 @@ public class BionicPartItem extends Item {
         return custom != null ? custom.health() : health;
     }
 
-    public static ResourceLocation modifierId(int slot) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "bionic_part_" + slot);
+    public static Identifier modifierId(int slot) {
+        return Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "bionic_part_" + slot);
     }
 
     /** 1.7.10 BionicPart.addDetails: "+n" for additions, "+10%" for operation 1, "50%" (amount + 1) for operation 2. */

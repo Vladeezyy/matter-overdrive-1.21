@@ -63,7 +63,7 @@ final class ContractGameTests {
     /** Kill androids, gather crops (taken on completion), craft anvils, mine diamonds. */
     private static void quests(GameTestHelper helper) {
         ServerPlayer player = AndroidGameTests.player(helper);
-        var random = helper.getLevel().random;
+        var random = helper.getLevel().getRandom();
         // kill androids: counts rogue androids, completes itself
         QuestStack kill = Quests.KILL_ANDROIDS.generate(random);
         QuestEvents.addQuest(player, kill);
@@ -112,7 +112,7 @@ final class ContractGameTests {
     /** G.M.O.: the mad scientist's crate holds its contract and his pad; carrots then potatoes, scanned with that pad. */
     private static void gmo(GameTestHelper helper) {
         ServerPlayer player = AndroidGameTests.player(helper);
-        var contents = matteroverdrive.world.MadScientistCrateProcessor.contents(helper.getLevel().random);
+        var contents = matteroverdrive.world.MadScientistCrateProcessor.contents(helper.getLevel().getRandom());
         QuestStack gmo = ContractItem.getQuest(contents.get(0));
         ItemStack pad = contents.get(1);
         check(helper, gmo != null && gmo.getQuest() == Quests.GMO, "crate contract " + contents.get(0));

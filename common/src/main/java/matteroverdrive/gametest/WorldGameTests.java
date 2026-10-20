@@ -70,7 +70,7 @@ final class WorldGameTests {
                 null, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DIAMOND_PICKAXE));
         check(helper, drops.size() == 1, "drops " + drops);
         var contents = drops.get(0).get(net.minecraft.core.component.DataComponents.CONTAINER);
-        check(helper, contents != null && contents.nonEmptyStream().anyMatch(s -> s.getCount() == 7), "contents not kept: " + contents);
+        check(helper, contents != null && contents.nonEmptyItemCopyStream().anyMatch(s -> s.getCount() == 7), "contents not kept: " + contents);
         helper.succeed();
     }
 
@@ -83,7 +83,7 @@ final class WorldGameTests {
             int[] size = sizes[building.ordinal()];
             check(helper, t.width() == size[0] && t.height() == size[1] && t.depth() == size[2],
                     building + " size " + t.width() + "x" + t.height() + "x" + t.depth());
-            var key = net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("matteroverdrive", building.getSerializedName());
+            var key = net.minecraft.resources.Identifier.fromNamespaceAndPath("matteroverdrive", building.getSerializedName());
             check(helper, structures.get(key).isPresent(), "structure " + key + " missing");
         }
         helper.succeed();

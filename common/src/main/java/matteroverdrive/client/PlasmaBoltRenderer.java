@@ -10,11 +10,11 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 
 /**
@@ -22,7 +22,7 @@ import net.minecraft.util.ARGB;
  * fading out over the bolt's range.
  */
 public class PlasmaBoltRenderer extends EntityRenderer<PlasmaBolt, PlasmaBoltRenderer.State> {
-    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/entity/plasma_fire.png");
+    private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/entity/plasma_fire.png");
 
     public static class State extends EntityRenderState {
         float yRot, xRot, size, life, speed;
@@ -64,7 +64,7 @@ public class PlasmaBoltRenderer extends EntityRenderer<PlasmaBolt, PlasmaBoltRen
         // 1.7.10: length (6 x speed + 10) and width renderSize, both scaled by 0.05625
         float s = state.size * 0.05625f, length = (6 * state.speed + 10) * 0.05625f;
         // additive like 1.7.10 (GL_ONE, GL_ONE): the texture's black background adds nothing
-        collector.submitCustomGeometry(pose, RenderType.energySwirl(TEXTURE, 0, 0), (p, vc) -> {
+        collector.submitCustomGeometry(pose, net.minecraft.client.renderer.rendertype.RenderTypes.energySwirl(TEXTURE, 0, 0), (p, vc) -> {
             for (int i = 0; i < 2; i++) {
                 float a = i == 0 ? s : 0, b = i == 0 ? 0 : s;
                 quad(vc, p, color, -length / 2, a, b, length / 2, -a, -b);

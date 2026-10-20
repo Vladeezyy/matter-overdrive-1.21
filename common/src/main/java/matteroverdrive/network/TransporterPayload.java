@@ -8,7 +8,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import matteroverdrive.platform.PacketContext;
 
@@ -19,7 +19,7 @@ import matteroverdrive.platform.PacketContext;
 public record TransporterPayload(int containerId, Action action, int index, String name, BlockPos pos) implements CustomPacketPayload {
     public enum Action { SELECT, NEW, REMOVE, SET, IMPORT, RESET }
 
-    public static final Type<TransporterPayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "transporter"));
+    public static final Type<TransporterPayload> TYPE = new Type<>(Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "transporter"));
     public static final StreamCodec<RegistryFriendlyByteBuf, TransporterPayload> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.VAR_INT, TransporterPayload::containerId,
             ByteBufCodecs.idMapper(i -> Action.values()[i], Action::ordinal), TransporterPayload::action,

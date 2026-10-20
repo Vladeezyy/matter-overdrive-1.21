@@ -20,7 +20,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageType;
@@ -52,7 +52,7 @@ import net.minecraft.world.phys.Vec3;
  */
 public class GravitationalAnomalyBlockEntity extends BlockEntity {
     public static final ResourceKey<DamageType> BLACK_HOLE = ResourceKey.create(Registries.DAMAGE_TYPE,
-            ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "black_hole"));
+            Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "black_hole"));
     public static final int BLOCK_DESTROY_DELAY = 6;
     public static final int MAX_BLOCKS_PER_HARVEST = 6;
     public static final int MAX_LIQUIDS_PER_HARVEST = 32;

@@ -24,7 +24,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.biome.MobSpawnSettings;
@@ -56,11 +56,11 @@ final class FabricBiomeModifiers {
                 throw new IllegalStateException("Could not read " + file, e);
             }
             String name = file.getFileName().toString().replace(".json", "");
-            apply(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, name), json);
+            apply(Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, name), json);
         }
     }
 
-    private static void apply(ResourceLocation id, JsonObject json) {
+    private static void apply(Identifier id, JsonObject json) {
         if (json.has("neoforge:conditions")) {
             throw new IllegalStateException("Unsupported conditions in " + id);
         }
@@ -70,7 +70,7 @@ final class FabricBiomeModifiers {
             case "neoforge:add_features" -> {
                 GenerationStep.Decoration step = GenerationStep.Decoration.valueOf(json.get("step").getAsString().toUpperCase(java.util.Locale.ROOT));
                 List<ResourceKey<net.minecraft.world.level.levelgen.placement.PlacedFeature>> features = strings(json.get("features")).stream()
-                        .map(f -> ResourceKey.create(Registries.PLACED_FEATURE, ResourceLocation.parse(f))).toList();
+                        .map(f -> ResourceKey.create(Registries.PLACED_FEATURE, Identifier.parse(f))).toList();
                 BiomeModifications.create(id).add(ModificationPhase.ADDITIONS, biomes, context -> {
                     features.forEach(feature -> context.getGenerationSettings().addFeature(step, feature));
                 });
@@ -92,8 +92,8 @@ final class FabricBiomeModifiers {
     }
 
     private static void addSpawn(BiomeModificationContext context, JsonObject spawner) {
-        EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.getValue(ResourceLocation.parse(spawner.get("type").getAsString()));
-        context.getSpawnSettings().addSpawn(type.getCategory(), new MobSpawnSettings.SpawnerData(type,
+        EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.parse(spawner.get("type").getAsString()));
+        context.getMobSpawnSettings().addSpawn(type.getCategory(), new MobSpawnSettings.SpawnerData(type,
                 spawner.get("minCount").getAsInt(), spawner.get("maxCount").getAsInt()), spawner.get("weight").getAsInt());
     }
 
@@ -125,9 +125,9 @@ final class FabricBiomeModifiers {
         }
         String value = biomes.getAsString();
         if (value.startsWith("#")) {
-            return BiomeSelectors.tag(TagKey.create(Registries.BIOME, ResourceLocation.parse(value.substring(1))));
+            return BiomeSelectors.tag(TagKey.create(Registries.BIOME, Identifier.parse(value.substring(1))));
         }
-        return BiomeSelectors.includeByKey(ResourceKey.create(Registries.BIOME, ResourceLocation.parse(value)));
+        return BiomeSelectors.includeByKey(ResourceKey.create(Registries.BIOME, Identifier.parse(value)));
     }
 
     private static List<String> strings(JsonElement element) {

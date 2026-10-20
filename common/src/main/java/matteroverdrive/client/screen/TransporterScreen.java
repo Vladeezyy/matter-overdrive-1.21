@@ -7,14 +7,14 @@ import matteroverdrive.menu.MachineMenu;
 import matteroverdrive.menu.TransporterMenu;
 import matteroverdrive.network.TransporterPayload;
 import matteroverdrive.transport.TransportLocation;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import matteroverdrive.platform.Platform;
 
@@ -26,9 +26,9 @@ import java.util.List;
  * 1.7.10 split list and editor over two pages; here both share the home page.
  */
 public class TransporterScreen extends MachineScreen<TransporterMenu> {
-    private static final ResourceLocation BUTTON = id("button_normal");
-    private static final ResourceLocation BUTTON_OVER = id("button_over");
-    private static final ResourceLocation BUTTON_DARK = id("button_over_dark");
+    private static final Identifier BUTTON = id("button_normal");
+    private static final Identifier BUTTON_OVER = id("button_over");
+    private static final Identifier BUTTON_DARK = id("button_over_dark");
     private static final int LIST_X = 46, LIST_Y = 26, LIST_W = 128, ROW = 11, ROWS = 7;
     private static final int[] NEW = {46, 106, 40, 14}, REMOVE = {90, 106, 50, 14}, IMPORT = {124, 140, 50, 14}, RESET = {124, 158, 50, 14};
     private static final int FIELD_X = 58, NAME_Y = 124, X_Y = 140, ENERGY_X = 184, ENERGY_Y = 36, MATTER_X = 184, MATTER_Y = 92;
@@ -44,8 +44,8 @@ public class TransporterScreen extends MachineScreen<TransporterMenu> {
         super(menu, playerInventory, title);
     }
 
-    private static ResourceLocation id(String sprite) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, sprite);
+    private static Identifier id(String sprite) {
+        return Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, sprite);
     }
 
     private TransporterBlockEntity machine() {
@@ -60,13 +60,13 @@ public class TransporterScreen extends MachineScreen<TransporterMenu> {
         for (int i = 0; i < 3; i++) {
             coords[i] = field(FIELD_X, X_Y + i * 16, 40, Component.literal("XYZ".substring(i, i + 1)));
             coords[i].setMaxLength(9);
-            coords[i].setFilter(s -> s.isEmpty() || s.equals("-") || s.matches("-?\\d+"));
+            ((FilteredEditBox) coords[i]).setFilter(s -> s.isEmpty() || s.equals("-") || s.matches("-?\\d+"));
         }
         shownIndex = -1;
     }
 
     private EditBox field(int x, int y, int w, Component label) {
-        EditBox box = new EditBox(font, leftPos + x + 4, topPos + y + 3, w - 8, 10, label);
+        EditBox box = new FilteredEditBox(font, leftPos + x + 4, topPos + y + 3, w - 8, 10, label);
         box.setBordered(false);
         box.setTextColor(0xFFBFE4E6);
         box.setResponder(s -> edited());
@@ -111,7 +111,7 @@ public class TransporterScreen extends MachineScreen<TransporterMenu> {
     }
 
     @Override
-    protected void renderHome(GuiGraphics g, int x, int y, int mx, int my) {
+    protected void renderHome(GuiGraphicsExtractor g, int x, int y, int mx, int my) {
         boolean home = menu.page == MachineMenu.Page.HOME;
         name.visible = home;
         for (EditBox box : coords) box.visible = home;
@@ -128,8 +128,8 @@ public class TransporterScreen extends MachineScreen<TransporterMenu> {
             String name = l.name().isEmpty() ? "-" : l.name();
             int room = LIST_W - 10 - font.width(c);
             String label = font.width(name) <= room ? name : font.plainSubstrByWidth(name, room - font.width("…")) + "…";
-            g.drawString(font, label, x + LIST_X + 3, ry + 2, valid ? 0xFFFFFFFF : 0xFFE36B6B, false);
-            g.drawString(font, c, x + LIST_X + LIST_W - 3 - font.width(c), ry + 2, 0xFF8B9EA0, false);
+            g.text(font, label, x + LIST_X + 3, ry + 2, valid ? 0xFFFFFFFF : 0xFFE36B6B, false);
+            g.text(font, c, x + LIST_X + LIST_W - 3 - font.width(c), ry + 2, 0xFF8B9EA0, false);
         }
         button(g, x, y, mx, my, NEW, "gui.matteroverdrive.transporter.new", true);
         button(g, x, y, mx, my, REMOVE, "gui.matteroverdrive.transporter.remove", !locations.isEmpty());
@@ -140,11 +140,11 @@ public class TransporterScreen extends MachineScreen<TransporterMenu> {
         int[] mine = {me.getX(), me.getY(), me.getZ()};
         for (int i = 0; i < 3; i++) {
             int fy = y + X_Y + i * 16;
-            g.drawString(font, "XYZ".charAt(i) + ":", x + FIELD_X - 12, fy + 4, 0xFFFFFFFF, false);
+            g.text(font, "XYZ".charAt(i) + ":", x + FIELD_X - 12, fy + 4, 0xFFFFFFFF, false);
             g.blitSprite(RenderPipelines.GUI_TEXTURED, BUTTON_DARK, x + FIELD_X, fy, 40, 16);
             try {
                 int offset = Integer.parseInt(coords[i].getValue()) - mine[i];
-                g.drawString(font, (offset > 0 ? "+" : "") + offset, x + FIELD_X + 44, fy + 4, 0xFF8B9EA0, false);
+                g.text(font, (offset > 0 ? "+" : "") + offset, x + FIELD_X + 44, fy + 4, 0xFF8B9EA0, false);
             } catch (NumberFormatException ignored) {
             }
         }
@@ -153,15 +153,15 @@ public class TransporterScreen extends MachineScreen<TransporterMenu> {
         drawArrow(g, x + ENERGY_X - 4, y + 140, menu.getProgress());
     }
 
-    private void button(GuiGraphics g, int x, int y, int mx, int my, int[] b, String key, boolean enabled) {
+    private void button(GuiGraphicsExtractor g, int x, int y, int mx, int my, int[] b, String key, boolean enabled) {
         boolean over = enabled && in(mx, my, b[0], b[1], b[2], b[3]);
         g.blitSprite(RenderPipelines.GUI_TEXTURED, !enabled ? BUTTON_DARK : over ? BUTTON_OVER : BUTTON, x + b[0], y + b[1], b[2], b[3]);
         Component text = Component.translatable(key);
-        g.drawString(font, text, x + b[0] + (b[2] - font.width(text)) / 2, y + b[1] + (b[3] - 8) / 2, enabled ? 0xFFFFFFFF : 0xFF8B9EA0, false);
+        g.text(font, text, x + b[0] + (b[2] - font.width(text)) / 2, y + b[1] + (b[3] - 8) / 2, enabled ? 0xFFFFFFFF : 0xFF8B9EA0, false);
     }
 
     @Override
-    protected void homeTooltips(GuiGraphics g, int mx, int my, int mouseX, int mouseY) {
+    protected void homeTooltips(GuiGraphicsExtractor g, int mx, int my, int mouseX, int mouseY) {
         energyTooltip(g, mx, my, ENERGY_X, ENERGY_Y, mouseX, mouseY);
         matterTooltip(g, mx, my, MATTER_X, MATTER_Y, mouseX, mouseY);
         if (in(mx, my, IMPORT[0], IMPORT[1], IMPORT[2], IMPORT[3]) && !canImport()

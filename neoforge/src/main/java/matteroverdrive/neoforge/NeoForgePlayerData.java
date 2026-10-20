@@ -10,7 +10,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.IEventBus;
@@ -27,15 +27,15 @@ import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 final class NeoForgePlayerData {
     private NeoForgePlayerData() {}
 
-    record SyncPayload(ResourceLocation data, int entity, byte[] bytes) implements CustomPacketPayload {
-        static final Type<SyncPayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "player_data"));
+    record SyncPayload(Identifier data, int entity, byte[] bytes) implements CustomPacketPayload {
+        static final Type<SyncPayload> TYPE = new Type<>(Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "player_data"));
         static final StreamCodec<FriendlyByteBuf, SyncPayload> CODEC = StreamCodec.of(
                 (buf, payload) -> {
-                    buf.writeResourceLocation(payload.data());
+                    buf.writeIdentifier(payload.data());
                     buf.writeVarInt(payload.entity());
                     buf.writeByteArray(payload.bytes());
                 },
-                buf -> new SyncPayload(buf.readResourceLocation(), buf.readVarInt(), buf.readByteArray()));
+                buf -> new SyncPayload(buf.readIdentifier(), buf.readVarInt(), buf.readByteArray()));
 
         @Override
         public Type<SyncPayload> type() {

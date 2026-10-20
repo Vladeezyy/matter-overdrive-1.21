@@ -66,15 +66,15 @@ public class GravitationalStabilizerBlockEntity extends MachineBlockEntity {
     }
 
     public double getBeamColorR() {
-        return MOMath.noise(0, getBlockPos().getY(), getLevel().getDayTime() * 0.01);
+        return MOMath.noise(0, getBlockPos().getY(), getLevel().getDefaultClockTime() * 0.01);
     }
 
     public double getBeamColorG() {
-        return MOMath.noise(getBlockPos().getX(), 0, getLevel().getDayTime() * 0.01);
+        return MOMath.noise(getBlockPos().getX(), 0, getLevel().getDefaultClockTime() * 0.01);
     }
 
     public double getBeamColorB() {
-        return MOMath.noise(0, 0, getBlockPos().getZ() + getLevel().getDayTime() * 0.01);
+        return MOMath.noise(0, 0, getBlockPos().getZ() + getLevel().getDefaultClockTime() * 0.01);
     }
 
     @Override

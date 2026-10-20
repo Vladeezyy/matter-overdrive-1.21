@@ -5,7 +5,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElement;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorList;
@@ -29,9 +29,9 @@ public final class VillageHouses {
 
     private static void add(Registry<StructureTemplatePool> pools, Registry<StructureProcessorList> processors, String pool, String template,
                             String processorList) {
-        StructureTemplatePool target = pools.getValue(ResourceLocation.withDefaultNamespace(pool));
+        StructureTemplatePool target = pools.getValue(Identifier.withDefaultNamespace(pool));
         Holder<StructureProcessorList> list = processors.get(ResourceKey.create(Registries.PROCESSOR_LIST,
-                ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, processorList))).orElse(null);
+                Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, processorList))).orElse(null);
         if (target == null || list == null) return;
         StructurePoolElement element = StructurePoolElement.legacy(MatterOverdrive.MODID + ":" + template, list)
                 .apply(StructureTemplatePool.Projection.RIGID);

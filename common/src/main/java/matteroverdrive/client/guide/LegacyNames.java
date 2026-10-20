@@ -5,7 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import matteroverdrive.MatterOverdrive;
 import matteroverdrive.init.MOItems;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -24,7 +24,7 @@ public final class LegacyNames {
     /** 1.7.10 GuideElementAbstract.shortCodeToStack: mod (default "mo"), name, damage. */
     public static @Nullable ItemStack stack(String mod, String name, int damage) {
         Item item = switch (name) {
-            case "recycler" -> BuiltInRegistries.ITEM.getValue(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "matter_recycler"));
+            case "recycler" -> BuiltInRegistries.ITEM.getValue(Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "matter_recycler"));
             case "upgrade" -> upgrades()[Math.clamp(damage, 0, 7)];
             case "rouge_android_part" -> new Item[] {MOItems.ROGUE_ANDROID_HEAD.get(), MOItems.ROGUE_ANDROID_ARMS.get(), MOItems.ROGUE_ANDROID_LEGS.get(),
                     MOItems.ROGUE_ANDROID_CHEST.get()}[Math.clamp(damage, 0, 3)];
@@ -32,11 +32,11 @@ public final class LegacyNames {
                     Math.clamp(damage, 0, 2)];
             case "weapon_module_barrel" -> new Item[] {MOItems.BARREL_DAMAGE.get(), MOItems.BARREL_FIRE.get(), MOItems.BARREL_EXPLOSION.get(),
                     MOItems.BARREL_HEAL.get()}[Math.clamp(damage, 0, 3)];
-            case "isolinear_circuit" -> BuiltInRegistries.ITEM.getValue(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID,
+            case "isolinear_circuit" -> BuiltInRegistries.ITEM.getValue(Identifier.fromNamespaceAndPath(MatterOverdrive.MODID,
                     "isolinear_circuit_mk" + (Math.clamp(damage, 0, 3) + 1)));
             default -> {
                 String namespace = mod.equals("mo") ? MatterOverdrive.MODID : mod;
-                ResourceLocation id = ResourceLocation.tryBuild(namespace, name);
+                Identifier id = Identifier.tryBuild(namespace, name);
                 yield id == null ? Items.AIR : BuiltInRegistries.ITEM.getValue(id);
             }
         };

@@ -10,7 +10,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -29,7 +29,7 @@ public final class GuideRecipePayload {
     public static Consumer<Grid> onGrid = g -> {};
 
     public record Request(Item item) implements CustomPacketPayload {
-        public static final Type<Request> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "guide_recipe_request"));
+        public static final Type<Request> TYPE = new Type<>(Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "guide_recipe_request"));
         public static final StreamCodec<RegistryFriendlyByteBuf, Request> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.registry(Registries.ITEM), Request::item, Request::new);
 
@@ -41,7 +41,7 @@ public final class GuideRecipePayload {
 
     /** Nine slots (row by row) of the item's options. */
     public record Grid(Item item, List<List<ItemStack>> slots) implements CustomPacketPayload {
-        public static final Type<Grid> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "guide_recipe"));
+        public static final Type<Grid> TYPE = new Type<>(Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "guide_recipe"));
         public static final StreamCodec<RegistryFriendlyByteBuf, Grid> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.registry(Registries.ITEM), Grid::item,
                 ItemStack.OPTIONAL_LIST_STREAM_CODEC.apply(ByteBufCodecs.list()), Grid::slots, Grid::new);

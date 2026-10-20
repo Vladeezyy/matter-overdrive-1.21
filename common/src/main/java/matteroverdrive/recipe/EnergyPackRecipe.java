@@ -4,10 +4,8 @@ import matteroverdrive.init.MOItems;
 import matteroverdrive.init.MORecipes;
 import matteroverdrive.item.BatteryItem;
 import matteroverdrive.item.weapon.EnergyPackItem;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -18,9 +16,9 @@ import net.minecraft.world.level.Level;
  * stored in the battery (a full battery gives 16).
  */
 public class EnergyPackRecipe extends CustomRecipe {
-    public EnergyPackRecipe(CraftingBookCategory category) {
-        super(category);
-    }
+    public static final EnergyPackRecipe INSTANCE = new EnergyPackRecipe();
+    public static final RecipeSerializer<EnergyPackRecipe> SERIALIZER = new RecipeSerializer<>(
+            com.mojang.serialization.MapCodec.unit(INSTANCE), net.minecraft.network.codec.StreamCodec.of((buf, r) -> {}, buf -> INSTANCE));
 
     private static ItemStack battery(CraftingInput input) {
         ItemStack battery = ItemStack.EMPTY;
@@ -43,7 +41,7 @@ public class EnergyPackRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
+    public ItemStack assemble(CraftingInput input) {
         ItemStack battery = battery(input);
         if (battery.isEmpty()) return ItemStack.EMPTY;
         int packs = ((BatteryItem) battery.getItem()).getEnergy(battery) / EnergyPackItem.ENERGY;

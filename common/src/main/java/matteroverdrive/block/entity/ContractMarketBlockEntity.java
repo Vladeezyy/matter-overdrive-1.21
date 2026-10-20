@@ -52,8 +52,8 @@ public class ContractMarketBlockEntity extends MachineBlockEntity {
 
     /** 1.7.10 generateContract: a duplicate of a contract already in the market means no contract (try again next tick). */
     private void generateContract() {
-        Quest quest = Quests.randomContract(level.random);
-        QuestStack stack = quest.generate(level.random);
+        Quest quest = Quests.randomContract(level.getRandom());
+        QuestStack stack = quest.generate(level.getRandom());
         for (int i = 0; i < inventory.size(); i++) {
             QuestStack other = ContractItem.getQuest(inventory.getStack(i));
             if (other != null && quest.areQuestStacksEqual(stack, other)) return;

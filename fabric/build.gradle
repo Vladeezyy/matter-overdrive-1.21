@@ -1,6 +1,6 @@
 plugins {
     id 'multiloader-loader'
-    id 'fabric-loom'
+    id 'net.fabricmc.fabric-loom'
 }
 
 repositories {
@@ -12,14 +12,12 @@ repositories {
 
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
-    mappings loom.layered {
-        officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-${parchment_minecraft}:${parchment_version}@zip")
-    }
-    modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+    implementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+    // 26.x: the GameTest module is not part of the Fabric API bundle (dev runs only, the release jar has no tests)
+    implementation "net.fabricmc.fabric-api:fabric-gametest-api-v1:${fabric_gametest_version}"
     // FE on Fabric: Team Reborn Energy (the common energy API of Fabric tech mods), shipped inside the jar
-    modApi include("teamreborn:energy:${team_reborn_energy_version}")
+    api include("teamreborn:energy:${team_reborn_energy_version}")
     compileOnly 'io.github.llamalad7:mixinextras-common:0.5.0'
     annotationProcessor 'io.github.llamalad7:mixinextras-common:0.5.0'
 }
@@ -112,7 +110,7 @@ def generateGameTests = tasks.register('generateGameTestInstances') {
                 count++
             }
         }
-        times.each { t -> new File(environments, "time_${t}.json").text = "{\"type\": \"minecraft:time_of_day\", \"time\": ${t}}\n" }
+        times.each { t -> new File(environments, "time_${t}.json").text = "{\"type\": \"${mod_id}:time_of_day\", \"time\": ${t}}\n" }
         if (count < 90) throw new GradleException("Only ${count} game tests found in ${gameTestSources}")
     }
 }
@@ -120,7 +118,7 @@ processResources {
     from(generateGameTests)
 }
 
-// The release jar (remapJar) in a production client with Fabric API: the scripted scene outside dev
+// The release jar (jar) in a production client with Fabric API: the scripted scene outside dev
 // (world: run-prod/saves/mo_scene, a copy of run/saves/mo_scene)
 configurations.maybeCreate('productionRuntimeMods')
 dependencies {

@@ -6,7 +6,7 @@ import matteroverdrive.MatterOverdrive;
 import matteroverdrive.init.MOSounds;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.DamageTypeTags;
@@ -24,8 +24,8 @@ import net.minecraft.world.phys.Vec3;
 
 /** The 1.7.10 biotic stats that do something (data/biostats/*), with their numbers. */
 final class StatImpls {
-    static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, path);
+    static Identifier id(String path) {
+        return Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, path);
     }
 
     static String percent(float value) {

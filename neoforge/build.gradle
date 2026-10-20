@@ -6,11 +6,6 @@ plugins {
 neoForge {
     version = project.findProperty('neo_version')
 
-    parchment {
-        minecraftVersion = parchment_minecraft
-        mappingsVersion = parchment_version
-    }
-
     runs {
         configureEach {
             gameDirectory = project.file('run')

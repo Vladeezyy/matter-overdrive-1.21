@@ -95,9 +95,9 @@ public final class MatterOverdrive {
         event.accept(MOEntities.MAD_SCIENTIST.get(), net.minecraft.world.entity.Mob.createMobAttributes()
                 .add(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED, 0.5).build());
         event.accept(MOEntities.MUTANT_SCIENTIST.get(), matteroverdrive.entity.monster.MutantScientist.createAttributes().build());
-        event.accept(MOEntities.FAILED_PIG.get(), net.minecraft.world.entity.animal.Pig.createAttributes().build());
-        event.accept(MOEntities.FAILED_COW.get(), net.minecraft.world.entity.animal.Cow.createAttributes().build());
-        event.accept(MOEntities.FAILED_CHICKEN.get(), net.minecraft.world.entity.animal.Chicken.createAttributes().build());
+        event.accept(MOEntities.FAILED_PIG.get(), net.minecraft.world.entity.animal.pig.Pig.createAttributes().build());
+        event.accept(MOEntities.FAILED_COW.get(), net.minecraft.world.entity.animal.cow.Cow.createAttributes().build());
+        event.accept(MOEntities.FAILED_CHICKEN.get(), net.minecraft.world.entity.animal.chicken.Chicken.createAttributes().build());
         event.accept(MOEntities.FAILED_SHEEP.get(), net.minecraft.world.entity.animal.sheep.Sheep.createAttributes().build());
     }
 

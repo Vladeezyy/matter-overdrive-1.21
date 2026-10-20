@@ -5,10 +5,10 @@ import java.util.Map;
 import matteroverdrive.MatterOverdrive;
 import matteroverdrive.init.MOItems;
 import matteroverdrive.menu.WeaponStationMenu;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
@@ -21,7 +21,7 @@ import net.minecraft.world.item.ItemStack;
  */
 public class WeaponStationScreen extends MachineScreen<WeaponStationMenu> {
     private static final String[] MODULE_NAMES = {"battery", "color", "barrel", "sights", "other"};
-    private static final ResourceLocation[] HOLO = {tex("holo_battery"), tex("holo_color"), tex("holo_barrel"), tex("holo_sights"), tex("holo_module")};
+    private static final Identifier[] HOLO = {tex("holo_battery"), tex("holo_color"), tex("holo_barrel"), tex("holo_sights"), tex("holo_module")};
     private static final int PREVIEW_X = 92, PREVIEW_Y = 24, PREVIEW_SIZE = 64;
     private static final int GREY = 0xB01E1E1E, HOLO_COLOR = ARGB.color(78 * 2, 0xBFE4E6);
 
@@ -42,13 +42,13 @@ public class WeaponStationScreen extends MachineScreen<WeaponStationMenu> {
     }
 
     @Override
-    protected void renderHome(GuiGraphics g, int x, int y, int mx, int my) {
+    protected void renderHome(GuiGraphicsExtractor g, int x, int y, int mx, int my) {
         ItemStack weapon = menu.getWeapon();
         if (!weapon.isEmpty()) {
             g.pose().pushMatrix();
             g.pose().translate(x + PREVIEW_X, y + PREVIEW_Y);
             g.pose().scale(PREVIEW_SIZE / 16f, PREVIEW_SIZE / 16f);
-            g.renderItem(weapon, 0, 0);
+            g.item(weapon, 0, 0);
             g.pose().popMatrix();
             int[][] points = modulePoints().get(weapon.getItem());
             for (int i = 0; points != null && i < points.length; i++) {
@@ -68,8 +68,8 @@ public class WeaponStationScreen extends MachineScreen<WeaponStationMenu> {
         }
     }
 
-    /** A 1 px line from slot to module, plotted point by point (GuiGraphics has no line primitive). */
-    private static void line(GuiGraphics g, int x0, int y0, int x1, int y1, int color) {
+    /** A 1 px line from slot to module, plotted point by point (GuiGraphicsExtractor has no line primitive). */
+    private static void line(GuiGraphicsExtractor g, int x0, int y0, int x1, int y1, int color) {
         int steps = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0));
         for (int i = 0; i <= steps; i++) {
             int px = x0 + Math.round((x1 - x0) * (i / (float) Math.max(steps, 1)));
@@ -79,7 +79,7 @@ public class WeaponStationScreen extends MachineScreen<WeaponStationMenu> {
     }
 
     @Override
-    protected void homeTooltips(GuiGraphics g, int mx, int my, int mouseX, int mouseY) {
+    protected void homeTooltips(GuiGraphicsExtractor g, int mx, int my, int mouseX, int mouseY) {
         for (Slot slot : menu.slots) {
             if (slot instanceof WeaponStationMenu.ModuleSlot module && slot.isActive() && !slot.hasItem()
                     && in(mx, my, slot.x, slot.y, 16, 16)) {

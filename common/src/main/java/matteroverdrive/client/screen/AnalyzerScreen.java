@@ -1,10 +1,10 @@
 package matteroverdrive.client.screen;
 
 import matteroverdrive.menu.AnalyzerMenu;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 
@@ -13,7 +13,7 @@ import net.minecraft.world.entity.player.Inventory;
  * energy bar at (176, 39).
  */
 public class AnalyzerScreen extends MachineScreen<AnalyzerMenu> {
-    private static final ResourceLocation SCREEN = tex("screen");
+    private static final Identifier SCREEN = tex("screen");
     private static final int SCREEN_X = 49, SCREEN_Y = 36, ENERGY_X = 176, ENERGY_Y = 39;
     private static final int BARS = 26, MARGIN_LEFT = 7, MARGIN_TOP = 8, MAX_HEIGHT = 32;
 
@@ -22,7 +22,7 @@ public class AnalyzerScreen extends MachineScreen<AnalyzerMenu> {
     }
 
     @Override
-    protected void renderHome(GuiGraphics g, int x, int y, int mx, int my) {
+    protected void renderHome(GuiGraphicsExtractor g, int x, int y, int mx, int my) {
         g.blit(RenderPipelines.GUI_TEXTURED, SCREEN, x + SCREEN_X, y + SCREEN_Y, 0, 0, 117, 47, 117, 47);
         int filled = Mth.floor(menu.getProgress() * BARS);
         long seed = menu.getMachine().getBlockPos().asLong();
@@ -38,7 +38,7 @@ public class AnalyzerScreen extends MachineScreen<AnalyzerMenu> {
     }
 
     @Override
-    protected void homeTooltips(GuiGraphics g, int mx, int my, int mouseX, int mouseY) {
+    protected void homeTooltips(GuiGraphicsExtractor g, int mx, int my, int mouseX, int mouseY) {
         energyTooltip(g, mx, my, ENERGY_X, ENERGY_Y, mouseX, mouseY);
     }
 }

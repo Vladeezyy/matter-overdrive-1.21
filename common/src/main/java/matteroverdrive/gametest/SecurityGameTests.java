@@ -101,7 +101,7 @@ final class SecurityGameTests {
     private static void crashLanding(GameTestHelper helper) {
         ServerPlayer player = AndroidGameTests.player(helper);
         BlockPos crate = helper.absolutePos(new BlockPos(5, 1, 5));
-        QuestStack contract = Quests.CRASH_LANDING.generate(helper.getLevel().random);
+        QuestStack contract = Quests.CRASH_LANDING.generate(helper.getLevel().getRandom());
         contract.getData().putIntArray("Pos", new int[] {crate.getX(), crate.getY(), crate.getZ()});
         check(helper, ContractItem.getQuest(ContractItem.of(contract)) != null, "contract");
         QuestEvents.addQuest(player, contract);

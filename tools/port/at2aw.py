@@ -2,7 +2,7 @@
 from the Minecraft jar via javap), then the Fabric-only lines from AW_EXTRA. Prints the result."""
 import re,subprocess,sys
 at,jar,extra=sys.argv[1:4]
-out=['accessWidener v2 named','# generated from neoforge/src/main/resources/META-INF/accesstransformer.cfg by tools/port/at2aw.py']
+out=['accessWidener v2 official','# generated from neoforge/src/main/resources/META-INF/accesstransformer.cfg by tools/port/at2aw.py']
 def javap(cls):
     return subprocess.run(['javap','-s','-p','-cp',jar,cls],capture_output=True,text=True).stdout
 for line in open(at):

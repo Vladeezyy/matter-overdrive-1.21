@@ -50,7 +50,7 @@ public class StarMapMenu extends AbstractContainerMenu {
 
     @Override
     public boolean stillValid(Player player) {
-        return !starMap.isRemoved() && player.canInteractWithBlock(starMap.getBlockPos(), 4) && starMap.isUseableByPlayer(player);
+        return !starMap.isRemoved() && player.isWithinBlockInteractionRange(starMap.getBlockPos(), 4) && starMap.isUseableByPlayer(player);
     }
 
     @Override

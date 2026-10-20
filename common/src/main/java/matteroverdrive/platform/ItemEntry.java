@@ -1,14 +1,14 @@
 package matteroverdrive.platform;
 
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 
 /** A registered item ({@code DeferredItem}): usable wherever an {@link ItemLike} is */
 public class ItemEntry<T extends Item> extends RegistryEntry<Item, T> implements ItemLike {
-    ItemEntry(ResourceLocation id) {
+    ItemEntry(Identifier id) {
         super(Registries.ITEM, id);
     }
 

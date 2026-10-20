@@ -346,7 +346,7 @@ public final class DevScene {
                 BlockPos at = new BlockPos(site.getX(), y, site.getZ());
                 var piece = new matteroverdrive.world.ImageStructurePiece(building, at, 42);
                 piece.postProcess(p.level(), p.level().structureManager(), p.level().getChunkSource().getGenerator(), p.level().getRandom(),
-                        piece.getBoundingBox(), new net.minecraft.world.level.ChunkPos(at), at);
+                        piece.getBoundingBox(), net.minecraft.world.level.ChunkPos.containing(at), at);
                 double cx = at.getX() + t.width() / 2.0, cy = at.getY() + t.height() / 2.0, cz = at.getZ() + t.depth() / 2.0;
                 double size = Math.max(t.width(), t.depth());
                 double ex = cx - size * 0.75, ey = cy + size * 0.55 + 4, ez = cz - size * 0.75;
@@ -380,7 +380,7 @@ public final class DevScene {
             at(t0, mc -> server(mc, p -> {
                 var registry = p.level().registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.STRUCTURE);
                 var holder = registry.getOrThrow(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.STRUCTURE,
-                        net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("matteroverdrive", id)));
+                        net.minecraft.resources.Identifier.fromNamespaceAndPath("matteroverdrive", id)));
                 var result = p.level().getChunkSource().getGenerator().findNearestMapStructure(p.level(),
                         net.minecraft.core.HolderSet.direct(holder), first ? searchFrom : found0[0], 100, false);
                 if (result == null) return;
@@ -390,12 +390,12 @@ public final class DevScene {
             at(t0 + 120, mc -> server(mc, p -> {
                 if (found[0] == null) return;
                 var holder = p.level().registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.STRUCTURE)
-                        .getValue(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("matteroverdrive", id));
+                        .getValue(net.minecraft.resources.Identifier.fromNamespaceAndPath("matteroverdrive", id));
                 var start = p.level().structureManager().getStructureAt(
                         new BlockPos(found[0].getX(), p.level().getMinY() + 1, found[0].getZ()), holder);
                 BlockPos lookup = found[0];
                 if (!start.isValid()) {
-                    for (var s2 : p.level().structureManager().startsForStructure(new net.minecraft.world.level.ChunkPos(lookup), st -> st == holder)) {
+                    for (var s2 : p.level().structureManager().startsForStructure(net.minecraft.world.level.ChunkPos.containing(lookup), st -> st == holder)) {
                         start = s2;
                     }
                 }
@@ -658,13 +658,13 @@ public final class DevScene {
             at(1770 + i * 30, mc -> server(mc, p -> {
                 if (!p.level().getEntities(matteroverdrive.init.MOEntities.MAD_SCIENTIST.get(), e -> e.getX() > origin.getX() + 1000).isEmpty()) return;
                 BlockPos at = origin.offset(2000 + n * 300, 0, 0);
-                p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
+                p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(net.minecraft.server.permissions.LevelBasedPermissionSet.OWNER).withSuppressedOutput(),
                         "forceload add " + (at.getX() - 112) + " " + (at.getZ() - 112) + " " + (at.getX() + 112) + " " + (at.getZ() + 112));
             }));
             at(1786 + i * 30, mc -> server(mc, p -> {
                 if (!p.level().getEntities(matteroverdrive.init.MOEntities.MAD_SCIENTIST.get(), e -> e.getX() > origin.getX() + 1000).isEmpty()) return;
                 BlockPos at = origin.offset(2000 + n * 300, 0, 0);
-                p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4)
+                p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(net.minecraft.server.permissions.LevelBasedPermissionSet.OWNER)
                         .withCallback((ok, result) -> MatterOverdrive.LOGGER.info("[scene] village at {}: {}", at, ok)),
                         "place structure minecraft:village_plains " + at.getX() + " " + at.getY() + " " + at.getZ());
                 MatterOverdrive.LOGGER.info("[scene] scientists loaded: {}", p.level().getEntities(
@@ -696,7 +696,7 @@ public final class DevScene {
         at(2070, mc -> shot(mc, "mad_scientist_house_inside"));
         at(2071, mc -> mc.options.hideGui = false);
         at(2072, mc -> server(mc, p -> {
-            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
+            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(net.minecraft.server.permissions.LevelBasedPermissionSet.OWNER).withSuppressedOutput(),
                     "forceload remove all");
             p.getAbilities().flying = false;
             p.onUpdateAbilities();
@@ -779,7 +779,7 @@ public final class DevScene {
                         matteroverdrive.quest.Quests.ONE_TRUE_LOVE, matteroverdrive.quest.Quests.IS_IT_REALLY_ME,
                         matteroverdrive.quest.Quests.BEAST_BELLY);
                 for (int i = 0; i < quests.size(); i++) {
-                    m.getInventory().setStack(i, matteroverdrive.item.ContractItem.of(quests.get(i).generate(p.level().random)));
+                    m.getInventory().setStack(i, matteroverdrive.item.ContractItem.of(quests.get(i).generate(p.level().getRandom())));
                 }
                 m.addGenerationDelay();
             }
@@ -794,12 +794,12 @@ public final class DevScene {
         at(2320, mc -> shot(mc, "contract_market"));
         at(2321, mc -> server(mc, ServerPlayer::closeContainer));
         at(2324, mc -> server(mc, p -> p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,
-                matteroverdrive.item.ContractItem.of(matteroverdrive.quest.Quests.KILL_ANDROIDS.generate(p.level().random)))));
+                matteroverdrive.item.ContractItem.of(matteroverdrive.quest.Quests.KILL_ANDROIDS.generate(p.level().getRandom())))));
         at(2330, mc -> mc.setScreen(new matteroverdrive.client.quest.ContractScreen(net.minecraft.world.InteractionHand.MAIN_HAND)));
         at(2338, mc -> shot(mc, "contract_screen"));
         at(2339, mc -> mc.setScreen(null));
         at(2342, mc -> server(mc, p -> p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,
-                matteroverdrive.item.ContractItem.of(matteroverdrive.quest.Quests.GMO.generate(p.level().random)))));
+                matteroverdrive.item.ContractItem.of(matteroverdrive.quest.Quests.GMO.generate(p.level().getRandom())))));
         at(2348, mc -> mc.setScreen(new matteroverdrive.client.quest.ContractScreen(net.minecraft.world.InteractionHand.MAIN_HAND)));
         at(2356, mc -> shot(mc, "contract_screen_gmo"));
         at(2357, mc -> mc.setScreen(null));
@@ -842,7 +842,7 @@ public final class DevScene {
             }
             p.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
             BlockPos crate = origin.above(30).offset(6, 0, -6);
-            var contract = matteroverdrive.quest.Quests.CRASH_LANDING.generate(p.level().random);
+            var contract = matteroverdrive.quest.Quests.CRASH_LANDING.generate(p.level().getRandom());
             contract.getData().putIntArray("Pos", new int[] {crate.getX(), crate.getY(), crate.getZ()});
             p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, matteroverdrive.item.ContractItem.of(contract));
         }));
@@ -873,12 +873,12 @@ public final class DevScene {
         }));
         at(2450, mc -> server(mc, p -> {
             BlockPos at = origin.offset(0, 0, 3000);
-            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
+            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(net.minecraft.server.permissions.LevelBasedPermissionSet.OWNER).withSuppressedOutput(),
                     "forceload add " + (at.getX() - 64) + " " + (at.getZ() - 64) + " " + (at.getX() + 64) + " " + (at.getZ() + 64));
         }));
         at(2466, mc -> server(mc, p -> {
             BlockPos at = origin.offset(0, 0, 3000);
-            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4)
+            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(net.minecraft.server.permissions.LevelBasedPermissionSet.OWNER)
                     .withCallback((ok, result) -> MatterOverdrive.LOGGER.info("[scene] crashed ship at {}: {}", at, ok)),
                     "place structure matteroverdrive:crashed_ship " + at.getX() + " " + at.getY() + " " + at.getZ());
         }));
@@ -905,7 +905,7 @@ public final class DevScene {
         at(2510, mc -> shot(mc, "crashed_ship_crate"));
         at(2511, mc -> server(mc, p -> {
             p.closeContainer();
-            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
+            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(net.minecraft.server.permissions.LevelBasedPermissionSet.OWNER).withSuppressedOutput(),
                     "forceload remove all");
             p.getAbilities().flying = false;
             p.onUpdateAbilities();
@@ -926,7 +926,7 @@ public final class DevScene {
             p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
             p.teleportTo(p.level(), base.getX() + 0.5, base.getY(), base.getZ() + 1.5, Set.of(), 180f, -16f, false);
             // the hologram is additive: night shows it like a dark room did in 1.7.10
-            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
+            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(net.minecraft.server.permissions.LevelBasedPermissionSet.OWNER).withSuppressedOutput(),
                     "time set 18000");
         }));
         at(2522, mc -> mc.options.hideGui = true);
@@ -976,7 +976,7 @@ public final class DevScene {
         at(2745, mc -> shot(mc, "star_map_access_denied"));
         at(2746, mc -> server(mc, p -> {
             p.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
-            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
+            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(net.minecraft.server.permissions.LevelBasedPermissionSet.OWNER).withSuppressedOutput(),
                     "time set 6000");
             p.teleportTo(p.level(), origin.getX() + 0.5, origin.getY(), origin.getZ() + 0.5, Set.of(), 180f, 0f, false);
         }));
@@ -1049,7 +1049,7 @@ public final class DevScene {
                 m.setZoomLevel(3);
                 m.sync();
             }
-            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
+            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(net.minecraft.server.permissions.LevelBasedPermissionSet.OWNER).withSuppressedOutput(),
                     "time set 18000");
             p.teleportTo(p.level(), map.getX() + 0.5, map.getY(), map.getZ() + 4.0, Set.of(), 180f, -14f, false);
         }));
@@ -1085,7 +1085,7 @@ public final class DevScene {
         at(2950, mc -> shot(mc, "starmap_screen_fleet"));
         at(2952, mc -> server(mc, p -> {
             p.closeContainer();
-            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
+            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(net.minecraft.server.permissions.LevelBasedPermissionSet.OWNER).withSuppressedOutput(),
                     "time set 6000");
         }));
         // leftovers: legendary weapon and legendary part tooltips
@@ -1302,7 +1302,7 @@ public final class DevScene {
             }
             p.removeEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION);
             p.level().getEntitiesOfClass(net.minecraft.world.entity.decoration.ArmorStand.class, new AABB(origin.above(30)).inflate(8),
-                    e -> e.getTags().contains("mo_scene_armor")).forEach(net.minecraft.world.entity.Entity::discard);
+                    e -> e.entityTags().contains("mo_scene_armor")).forEach(net.minecraft.world.entity.Entity::discard);
         }));
         // leftovers: the stabilizer's beam with its motes, and the anomaly screen on its back (in the clean room)
         at(3285, mc -> {
@@ -1457,7 +1457,7 @@ public final class DevScene {
             galleryAnomaly = a;
             // at sunset: unlit additive beams wash out on a sunlit floor (1.7.10 too); the time (synced to the client every
             // 20 ticks) is picked so the noise gives all three beams some colour
-            level.setDayTime(12612);
+            level.getServer().clockManager().setTotalTicks(level.dimensionType().defaultClock().orElseThrow(), 12612);
             galleryCamera(p, c.offset(2, 0, 4), 0.5, 2.6, 0.5, 160f, 6f);
         }));
         at(3534, mc -> server(mc, p -> {
@@ -1473,7 +1473,7 @@ public final class DevScene {
         at(3535, mc -> shot(mc, "gallery_anomaly"));
         // fusion reactor around an anomaly
         at(3537, mc -> server(mc, p -> {
-            p.level().setDayTime(6000);
+            p.level().getServer().clockManager().setTotalTicks(p.level().dimensionType().defaultClock().orElseThrow(), 6000);
             BlockPos c = gallerySite(p, 120);
             BlockPos controller = c.offset(0, 0, 4);
             buildReactor(p.level(), controller);
@@ -1552,7 +1552,7 @@ public final class DevScene {
             mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT);
             server(mc, p -> {
                 p.level().getEntitiesOfClass(net.minecraft.world.entity.Entity.class, new AABB(galleryA).inflate(20),
-                        e -> e.getTags().contains("mo_gallery")).forEach(net.minecraft.world.entity.Entity::discard);
+                        e -> e.entityTags().contains("mo_gallery")).forEach(net.minecraft.world.entity.Entity::discard);
                 p.setItemSlot(EquipmentSlot.HEAD, new ItemStack(MOItems.TRITANIUM_HELMET.get()));
                 p.setItemSlot(EquipmentSlot.CHEST, new ItemStack(MOItems.TRITANIUM_CHESTPLATE.get()));
                 p.setItemSlot(EquipmentSlot.LEGS, new ItemStack(MOItems.TRITANIUM_LEGGINGS.get()));
@@ -1579,7 +1579,7 @@ public final class DevScene {
             mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
             server(mc, p -> {
                 p.level().getEntitiesOfClass(net.minecraft.world.entity.Entity.class, new AABB(galleryA).inflate(20),
-                        e -> e.getTags().contains("mo_gallery")).forEach(net.minecraft.world.entity.Entity::discard);
+                        e -> e.entityTags().contains("mo_gallery")).forEach(net.minecraft.world.entity.Entity::discard);
                 for (EquipmentSlot slot : new EquipmentSlot[] {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
                     p.setItemSlot(slot, ItemStack.EMPTY);
                 }
@@ -1588,7 +1588,7 @@ public final class DevScene {
                 galleryMap = c.offset(0, 0, -2);
                 p.level().setBlockAndUpdate(galleryMap, MOBlocks.STAR_MAP.get().defaultBlockState());
                 if (p.level().getBlockEntity(galleryMap) instanceof matteroverdrive.block.entity.StarMapBlockEntity m) m.onPlaced(p);
-                p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
+                p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(net.minecraft.server.permissions.LevelBasedPermissionSet.OWNER).withSuppressedOutput(),
                         "time set 18000");
                 galleryCamera(p, c.offset(0, 0, 1), 0.5, 0.0, 0.3, 180f, -22f);
             });
@@ -1603,7 +1603,7 @@ public final class DevScene {
             at(t + 24, mc -> shot(mc, name));
         }
         at(3762, mc -> server(mc, p -> {
-            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
+            p.level().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(net.minecraft.server.permissions.LevelBasedPermissionSet.OWNER).withSuppressedOutput(),
                     "time set 6000");
             p.getAbilities().flying = false;
             p.onUpdateAbilities();
@@ -1630,10 +1630,10 @@ public final class DevScene {
         }
 
         @Override
-        public void render(net.minecraft.client.gui.GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-            super.render(g, mouseX, mouseY, partialTick);
-            g.renderItem(stack, width / 2 - 100, height / 2 - 40);
-            g.renderItemDecorations(font, stack, width / 2 - 100, height / 2 - 40);
+        public void extractRenderState(net.minecraft.client.gui.GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+            super.extractRenderState(g, mouseX, mouseY, partialTick);
+            g.item(stack, width / 2 - 100, height / 2 - 40);
+            g.itemDecorations(font, stack, width / 2 - 100, height / 2 - 40);
             g.setTooltipForNextFrame(font, stack, width / 2 - 80, height / 2 - 40);
         }
 
@@ -1673,8 +1673,8 @@ public final class DevScene {
     /** Machines on a stone floor north of the player, the player facing them; noon, clear sky. */
     private static void build(ServerPlayer player) {
         ServerLevel level = player.level();
-        level.setDayTime(6000);
-        level.setWeatherParameters(6000, 0, false, false);
+        level.getServer().clockManager().setTotalTicks(level.dimensionType().defaultClock().orElseThrow(), 6000);
+        level.getServer().setWeatherParameters(6000, 0, false, false);
         player.setGameMode(GameType.CREATIVE);
         // A fixed spot (the spawn, on the flat world's surface): the player's saved position drifts between runs.
         BlockPos spawn = level.getRespawnData().pos();
@@ -1802,8 +1802,8 @@ public final class DevScene {
     /** Gallery: day or night, clear sky, a plain player (not an android, no effects or armor), flying. */
     private static void galleryReset(ServerPlayer p, long time) {
         ServerLevel level = p.level();
-        level.setDayTime(time);
-        level.setWeatherParameters(6000, 0, false, false);
+        level.getServer().clockManager().setTotalTicks(level.dimensionType().defaultClock().orElseThrow(), time);
+        level.getServer().setWeatherParameters(6000, 0, false, false);
         p.removeAllEffects();
         matteroverdrive.android.Android.setAndroid(p, false);
         for (EquipmentSlot slot : new EquipmentSlot[] {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
@@ -1812,7 +1812,7 @@ public final class DevScene {
         p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
         p.getAbilities().flying = true;
         p.onUpdateAbilities();
-        level.getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4).withSuppressedOutput(),
+        level.getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(net.minecraft.server.permissions.LevelBasedPermissionSet.OWNER).withSuppressedOutput(),
                 "difficulty normal");
     }
 

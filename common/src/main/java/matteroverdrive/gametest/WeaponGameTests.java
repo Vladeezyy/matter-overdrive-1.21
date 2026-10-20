@@ -50,7 +50,7 @@ final class WeaponGameTests {
         helper.assertTrue(rifle.getShootCooldown(legendary) == (int) (rifle.getShootCooldown(plain) * 0.85f),
                 net.minecraft.network.chat.Component.literal("cooldown " + rifle.getShootCooldown(legendary)));
         helper.assertTrue(rifle.getRange(legendary) == rifle.getRange(plain), net.minecraft.network.chat.Component.literal("range " + rifle.getRange(legendary)));
-        var generated = matteroverdrive.item.weapon.WeaponFactory.randomDecorated(helper.getLevel().random, 3, true);
+        var generated = matteroverdrive.item.weapon.WeaponFactory.randomDecorated(helper.getLevel().getRandom(), 3, true);
         helper.assertTrue(generated.has(matteroverdrive.init.MODataComponents.LEGENDARY_WEAPON.get()), net.minecraft.network.chat.Component.literal("no legendary stats"));
         zombie.discard();
         helper.succeed();
@@ -162,11 +162,11 @@ final class WeaponGameTests {
     }
 
     private static void energyPackRecipe(GameTestHelper helper) {
-        EnergyPackRecipe recipe = new EnergyPackRecipe(CraftingBookCategory.MISC);
+        EnergyPackRecipe recipe = EnergyPackRecipe.INSTANCE;
         CraftingInput input = CraftingInput.of(3, 1, List.of(new ItemStack(MOItems.TRITANIUM_PLATE.get()),
                 MOItems.BATTERY.get().charged(), new ItemStack(Items.GUNPOWDER)));
         helper.assertTrue(recipe.matches(input, helper.getLevel()), Component.literal("recipe doesn't match"));
-        ItemStack out = recipe.assemble(input, helper.getLevel().registryAccess());
+        ItemStack out = recipe.assemble(input);
         helper.assertTrue(out.is(MOItems.ENERGY_PACK.get()) && out.getCount() == 16, Component.literal("result " + out));
         CraftingInput empty = CraftingInput.of(3, 1, List.of(new ItemStack(MOItems.TRITANIUM_PLATE.get()),
                 new ItemStack(MOItems.BATTERY.get()), new ItemStack(Items.GUNPOWDER)));

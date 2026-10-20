@@ -10,7 +10,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -29,7 +29,7 @@ public final class ScannerPayloads {
     public static Consumer<Patterns> onPatterns = p -> {};
 
     public record Request(int slot) implements CustomPacketPayload {
-        public static final Type<Request> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "scanner_request"));
+        public static final Type<Request> TYPE = new Type<>(Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "scanner_request"));
         public static final StreamCodec<RegistryFriendlyByteBuf, Request> STREAM_CODEC =
                 StreamCodec.composite(ByteBufCodecs.VAR_INT, Request::slot, Request::new);
 
@@ -40,7 +40,7 @@ public final class ScannerPayloads {
     }
 
     public record Patterns(int slot, boolean online, List<ItemPattern> patterns) implements CustomPacketPayload {
-        public static final Type<Patterns> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "scanner_patterns"));
+        public static final Type<Patterns> TYPE = new Type<>(Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "scanner_patterns"));
         public static final StreamCodec<RegistryFriendlyByteBuf, Patterns> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.VAR_INT, Patterns::slot, ByteBufCodecs.BOOL, Patterns::online,
                 ItemPattern.STREAM_CODEC.apply(ByteBufCodecs.list()), Patterns::patterns, Patterns::new);
@@ -52,7 +52,7 @@ public final class ScannerPayloads {
     }
 
     public record Select(int slot, Holder<Item> item) implements CustomPacketPayload {
-        public static final Type<Select> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "scanner_select"));
+        public static final Type<Select> TYPE = new Type<>(Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "scanner_select"));
         public static final StreamCodec<RegistryFriendlyByteBuf, Select> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.VAR_INT, Select::slot, ByteBufCodecs.holderRegistry(Registries.ITEM), Select::item, Select::new);
 

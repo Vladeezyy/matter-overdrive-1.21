@@ -7,13 +7,13 @@ import matteroverdrive.block.entity.AndroidSpawnerBlockEntity;
 import matteroverdrive.menu.AndroidSpawnerMenu;
 import matteroverdrive.menu.MachineMenu;
 import matteroverdrive.network.AndroidSpawnerPayload;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import matteroverdrive.platform.Platform;
 
@@ -22,9 +22,9 @@ import matteroverdrive.platform.Platform;
  * Config page has the spawn amount / range / delay and the team (1.7.10 config properties).
  */
 public class AndroidSpawnerScreen extends MachineScreen<AndroidSpawnerMenu> {
-    private static final ResourceLocation BUTTON = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "button_normal");
-    private static final ResourceLocation BUTTON_OVER = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "button_over");
-    private static final ResourceLocation BUTTON_DARK = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "button_over_dark");
+    private static final Identifier BUTTON = Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "button_normal");
+    private static final Identifier BUTTON_OVER = Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "button_over");
+    private static final Identifier BUTTON_DARK = Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "button_over_dark");
     private static final int[] KILL_ALL = {64, 60, 60, 20};
     private static final String[] FIELDS = {"spawn_amount", "spawn_range", "spawn_delay", "team"};
     private static final int FIELD_X = 130, FIELD_Y = 80, FIELD_W = 60, ROW = 18;
@@ -45,12 +45,12 @@ public class AndroidSpawnerScreen extends MachineScreen<AndroidSpawnerMenu> {
     protected void init() {
         super.init();
         for (int i = 0; i < fields.length; i++) {
-            EditBox box = new EditBox(font, leftPos + FIELD_X + 4, topPos + FIELD_Y + i * ROW + 3, FIELD_W - 8, 10, Component.literal(FIELDS[i]));
+            EditBox box = new FilteredEditBox(font, leftPos + FIELD_X + 4, topPos + FIELD_Y + i * ROW + 3, FIELD_W - 8, 10, Component.literal(FIELDS[i]));
             box.setBordered(false);
             box.setTextColor(COLOR_TEXT);
             if (i < 3) {
                 box.setMaxLength(6);
-                box.setFilter(s -> s.matches("\\d*"));
+                ((FilteredEditBox) box).setFilter(s -> s.matches("\\d*"));
             } else {
                 box.setMaxLength(AndroidSpawnerBlockEntity.MAX_TEAM_LENGTH);
             }
@@ -90,24 +90,24 @@ public class AndroidSpawnerScreen extends MachineScreen<AndroidSpawnerMenu> {
     }
 
     @Override
-    protected void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         boolean config = menu.page == MachineMenu.Page.CONFIG;
         for (EditBox box : fields) box.visible = config;
         syncFields();
-        super.renderBg(g, partialTick, mouseX, mouseY);
+        super.extractBackground(g, mouseX, mouseY, partialTick);
     }
 
     @Override
-    protected void renderHome(GuiGraphics g, int x, int y, int mx, int my) {
+    protected void renderHome(GuiGraphicsExtractor g, int x, int y, int mx, int my) {
         boolean over = in(mx, my, KILL_ALL[0], KILL_ALL[1], KILL_ALL[2], KILL_ALL[3]);
         g.blitSprite(RenderPipelines.GUI_TEXTURED, over ? BUTTON_OVER : BUTTON, x + KILL_ALL[0], y + KILL_ALL[1], KILL_ALL[2], KILL_ALL[3]);
         Component kill = Component.translatable("gui.matteroverdrive.android_spawner.kill_all");
-        g.drawString(font, kill, x + KILL_ALL[0] + (KILL_ALL[2] - font.width(kill)) / 2, y + KILL_ALL[1] + 6, 0xFFFFFFFF, false);
-        g.drawString(font, menu.getSpawnedCount() + "/" + machine().getMaxSpawnAmount(), x + 130, y + 66, COLOR_TEXT, false);
+        g.text(font, kill, x + KILL_ALL[0] + (KILL_ALL[2] - font.width(kill)) / 2, y + KILL_ALL[1] + 6, 0xFFFFFFFF, false);
+        g.text(font, menu.getSpawnedCount() + "/" + machine().getMaxSpawnAmount(), x + 130, y + 66, COLOR_TEXT, false);
         int delay = machine().getSpawnDelay();
         if (delay > 0 && minecraft.level != null) {
             int ticks = delay - (int) (minecraft.level.getGameTime() % delay);
-            g.drawString(font, Component.translatable("gui.matteroverdrive.android_spawner.next_spawn", formatRemainingTime(ticks / 20f)),
+            g.text(font, Component.translatable("gui.matteroverdrive.android_spawner.next_spawn", formatRemainingTime(ticks / 20f)),
                     x + 54, y + 84, COLOR_TEXT, false);
         }
     }
@@ -120,14 +120,14 @@ public class AndroidSpawnerScreen extends MachineScreen<AndroidSpawnerMenu> {
     }
 
     @Override
-    protected void renderConfigExtra(GuiGraphics g, int x, int y, int mx, int my) {
+    protected void renderConfigExtra(GuiGraphicsExtractor g, int x, int y, int mx, int my) {
         for (int i = 0; i < fields.length; i++) {
             int fy = y + FIELD_Y + i * ROW;
-            g.drawString(font, Component.translatable("gui.matteroverdrive.config." + FIELDS[i]), x + 50, fy + 4, COLOR_TEXT, false);
+            g.text(font, Component.translatable("gui.matteroverdrive.config." + FIELDS[i]), x + 50, fy + 4, COLOR_TEXT, false);
             g.blitSprite(RenderPipelines.GUI_TEXTURED, BUTTON_DARK, x + FIELD_X, fy, FIELD_W, 16);
         }
         if (!machine().isTeamValid()) {
-            g.drawString(font, Component.translatable("gui.matteroverdrive.android_spawner.no_team"), x + 50, y + FIELD_Y + 4 * ROW + 2,
+            g.text(font, Component.translatable("gui.matteroverdrive.android_spawner.no_team"), x + 50, y + FIELD_Y + 4 * ROW + 2,
                     0xFFE36B6B, false);
         }
     }

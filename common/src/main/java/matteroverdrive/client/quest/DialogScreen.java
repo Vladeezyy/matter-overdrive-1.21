@@ -9,12 +9,12 @@ import matteroverdrive.dialog.DialogMessage;
 import matteroverdrive.dialog.DialogNpc;
 import matteroverdrive.dialog.DialogPayloads;
 import matteroverdrive.dialog.DialogRegistry;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Player;
@@ -27,7 +27,7 @@ import matteroverdrive.platform.Platform;
 public class DialogScreen extends Screen {
     private static final int INTERACTION_DELAY = 20;
     private static final int HOLO = 0xFFA9E2FB, HOLO_RED = 0xFFE65014;
-    private static final ResourceLocation SEPARATOR = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID,
+    private static final Identifier SEPARATOR = Identifier.fromNamespaceAndPath(MatterOverdrive.MODID,
             "textures/gui/elements/dialog_separator.png");
     private static final Random RANDOM = new Random();
 
@@ -58,10 +58,10 @@ public class DialogScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) {}
+    public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {}
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+    public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         if (current == null || !npc.getEntity().isAlive()) {
             onClose();
             return;
@@ -72,7 +72,7 @@ public class DialogScreen extends Screen {
         g.fill(0, height - bar - 128, width, height - bar, 0x66000000);
         drawDialog(g, mouseX, mouseY);
         if (lastInteraction > 0) lastInteraction = Math.max(0, lastInteraction - partialTick);
-        super.render(g, mouseX, mouseY, partialTick);
+        super.extractRenderState(g, mouseX, mouseY, partialTick);
     }
 
     private List<DialogMessage> visibleOptions() {
@@ -88,7 +88,7 @@ public class DialogScreen extends Screen {
         return height - height / 8 - 60 + 18 * index - count * 18 / 2;
     }
 
-    private void drawDialog(GuiGraphics g, int mouseX, int mouseY) {
+    private void drawDialog(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         current.setSeed(seed);
         String message = current.getMessageText(npc, player);
         if (!message.isEmpty()) {
@@ -96,7 +96,7 @@ public class DialogScreen extends Screen {
             for (String part : message.split("<br>")) lines.addAll(font.split(Component.literal(part), width / 3));
             for (int i = 0; i < lines.size(); i++) {
                 int y = height - height / 8 - 64 - lines.size() * font.lineHeight / 2 + font.lineHeight * i;
-                g.drawString(font, lines.get(i), width / 2 - font.width(lines.get(i)) - 16, y, HOLO, false);
+                g.text(font, lines.get(i), width / 2 - font.width(lines.get(i)) - 16, y, HOLO, false);
             }
         }
         g.blit(RenderPipelines.GUI_TEXTURED, SEPARATOR, width / 2 - 5, height - height / 8 - 128, 0, 0, 11, 128, 11, 128,
@@ -110,18 +110,18 @@ public class DialogScreen extends Screen {
             int w = font.width(text);
             boolean canInteract = option.canInteract(npc, player);
             String icon = option.getHoloIcon(npc, player);
-            ResourceLocation iconTex = icon == null ? null
-                    : ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/gui/holo/" + icon + ".png");
+            Identifier iconTex = icon == null ? null
+                    : Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/gui/holo/" + icon + ".png");
             if (mouseX > x && mouseX <= x + w && mouseY > y && mouseY <= y + font.lineHeight) {
                 g.fill(x - 2, y - 4, x + w + 8, y + font.lineHeight + 4, 0x66000000);
                 g.fill(x + w + 8, y - 4, x + w + 10, y + font.lineHeight + 4, canInteract ? 0x99FFFFFF : HOLO_RED);
                 if (iconTex != null) g.blit(RenderPipelines.GUI_TEXTURED, iconTex, x - 18, y + font.lineHeight / 2 - 8, 0, 0, 16, 16, 16, 16);
-                g.drawString(font, text, x + 2, y, canInteract ? 0xFFFFFFFF : HOLO_RED, false);
+                g.text(font, text, x + 2, y, canInteract ? 0xFFFFFFFF : HOLO_RED, false);
             } else {
                 if (iconTex != null) {
                     g.blit(RenderPipelines.GUI_TEXTURED, iconTex, x - 18, y + font.lineHeight / 2 - 8, 0, 0, 16, 16, 16, 16, HOLO);
                 }
-                g.drawString(font, text, x, y, canInteract ? HOLO : HOLO_RED, false);
+                g.text(font, text, x, y, canInteract ? HOLO : HOLO_RED, false);
             }
         }
     }

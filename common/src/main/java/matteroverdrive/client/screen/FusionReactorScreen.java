@@ -4,7 +4,7 @@ import java.util.Locale;
 
 import matteroverdrive.block.entity.FusionReactorControllerBlockEntity;
 import matteroverdrive.menu.FusionReactorMenu;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
@@ -21,25 +21,25 @@ public class FusionReactorScreen extends MachineScreen<FusionReactorMenu> {
     }
 
     @Override
-    protected void renderHome(GuiGraphics g, int x, int y, int mx, int my) {
+    protected void renderHome(GuiGraphicsExtractor g, int x, int y, int mx, int my) {
         drawMatter(g, x + MATTER_X, y + BAR_Y);
         drawEnergy(g, x + ENERGY_X, y + BAR_Y);
         FusionReactorControllerBlockEntity reactor = menu.getMachine();
         int line = 0;
         for (String s : reactor.getStatus().split("\n")) {
-            g.drawString(font, s, x + 46, y + 38 + line++ * 10, COLOR_TEXT, false);
+            g.text(font, s, x + 46, y + 38 + line++ * 10, COLOR_TEXT, false);
         }
         int ty = y + 68;
-        g.drawString(font, Component.translatable("gui.matteroverdrive.efficiency", Math.round(reactor.getEnergyEfficiency() * 100)),
+        g.text(font, Component.translatable("gui.matteroverdrive.efficiency", Math.round(reactor.getEnergyEfficiency() * 100)),
                 x + 46, ty, COLOR_TEXT, false);
         if (reactor.isValidStructure()) {
-            g.drawString(font, "+" + reactor.getEnergyPerTick() + " FE/t", x + 46, ty + 10, COLOR_ENERGY, true);
-            g.drawString(font, String.format(Locale.ROOT, "-%.4f kM/t", reactor.getMatterPerTick()), x + 46, ty + 20, COLOR_TEXT, true);
+            g.text(font, "+" + reactor.getEnergyPerTick() + " FE/t", x + 46, ty + 10, COLOR_ENERGY, true);
+            g.text(font, String.format(Locale.ROOT, "-%.4f kM/t", reactor.getMatterPerTick()), x + 46, ty + 20, COLOR_TEXT, true);
         }
     }
 
     @Override
-    protected void homeTooltips(GuiGraphics g, int mx, int my, int mouseX, int mouseY) {
+    protected void homeTooltips(GuiGraphicsExtractor g, int mx, int my, int mouseX, int mouseY) {
         matterTooltip(g, mx, my, MATTER_X, BAR_Y, mouseX, mouseY);
         energyTooltip(g, mx, my, ENERGY_X, BAR_Y, mouseX, mouseY);
     }

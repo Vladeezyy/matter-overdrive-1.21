@@ -98,8 +98,8 @@ public abstract class MachineBlock extends BaseEntityBlock {
 
     /** 1.7.10 "[Matter Overdrive] ..." chat alert naming the machine. */
     public static void alert(Player player, String key, BlockState state) {
-        player.displayClientMessage(net.minecraft.network.chat.Component.literal("[Matter Overdrive] ").withStyle(net.minecraft.ChatFormatting.GOLD)
-                .append(net.minecraft.network.chat.Component.translatable(key, state.getBlock().getName()).withStyle(net.minecraft.ChatFormatting.RED)), false);
+        player.sendSystemMessage(net.minecraft.network.chat.Component.literal("[Matter Overdrive] ").withStyle(net.minecraft.ChatFormatting.GOLD)
+                .append(net.minecraft.network.chat.Component.translatable(key, state.getBlock().getName()).withStyle(net.minecraft.ChatFormatting.RED)));
     }
 
     /** 1.7.10 MachineHelper.canRemoveMachine: only the owner breaks a claimed machine (Fabric asks this before breaking). */

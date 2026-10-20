@@ -47,8 +47,8 @@ final class Holo {
         dx /= len;
         dy /= len;
         dz /= len;
-        vc.addVertex(p, (float) x1, (float) y1, (float) z1).setColor(r(rgb), g(rgb), b(rgb), 1).setNormal(p, dx, dy, dz);
-        vc.addVertex(p, (float) x2, (float) y2, (float) z2).setColor(r(rgb), g(rgb), b(rgb), 1).setNormal(p, dx, dy, dz);
+        vc.addVertex(p, (float) x1, (float) y1, (float) z1).setColor(r(rgb), g(rgb), b(rgb), 1).setNormal(p, dx, dy, dz).setLineWidth(1.0f);
+        vc.addVertex(p, (float) x2, (float) y2, (float) z2).setColor(r(rgb), g(rgb), b(rgb), 1).setNormal(p, dx, dy, dz).setLineWidth(1.0f);
     }
 
     /** GLU Sphere (z axis through the poles) drawn with glPolygonMode(GL_LINE): its slice and stack edges. */

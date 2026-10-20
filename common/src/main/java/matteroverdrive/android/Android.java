@@ -7,7 +7,7 @@ import matteroverdrive.init.MOItems;
 import matteroverdrive.init.MOSounds;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -38,10 +38,10 @@ public final class Android {
     public static final boolean TRANSFORMATION_DEATH = true;
     public static final boolean REMOVE_POTION_EFFECTS = true;
     public static final ResourceKey<DamageType> TRANSFORMATION_DAMAGE = ResourceKey.create(Registries.DAMAGE_TYPE,
-            ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "android_transformation"));
+            Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "android_transformation"));
     public static final ResourceKey<DamageType> SHOCKWAVE_DAMAGE = ResourceKey.create(Registries.DAMAGE_TYPE,
-            ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "android_shockwave"));
-    private static final ResourceLocation OUT_OF_POWER = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "android_out_of_power");
+            Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "android_shockwave"));
+    private static final Identifier OUT_OF_POWER = Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "android_out_of_power");
 
     public static AndroidData get(Player player) {
         return MOAttachments.ANDROID.get(player);
@@ -236,7 +236,7 @@ public final class Android {
     }
 
     private record ResourceLocationKey(net.minecraft.core.Holder<net.minecraft.world.entity.ai.attributes.Attribute> attribute,
-                                       net.minecraft.resources.ResourceLocation id) {}
+                                       net.minecraft.resources.Identifier id) {}
 
     private static final java.util.List<net.minecraft.core.Holder<net.minecraft.world.entity.ai.attributes.Attribute>> PART_ATTRIBUTES = java.util.List.of(
             Attributes.MAX_HEALTH, Attributes.ATTACK_DAMAGE, Attributes.KNOCKBACK_RESISTANCE, Attributes.MOVEMENT_SPEED, MOAttributes.GLITCH_TIME.holder(),

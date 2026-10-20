@@ -11,7 +11,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -106,7 +106,7 @@ final class AnomalyGameTests {
     private static void featurePlaces(GameTestHelper helper) {
         var level = helper.getLevel();
         var feature = level.registryAccess().lookupOrThrow(Registries.CONFIGURED_FEATURE).getOrThrow(ResourceKey.create(
-                Registries.CONFIGURED_FEATURE, ResourceLocation.fromNamespaceAndPath("matteroverdrive", "gravitational_anomaly"))).value();
+                Registries.CONFIGURED_FEATURE, Identifier.fromNamespaceAndPath("matteroverdrive", "gravitational_anomaly"))).value();
         BlockPos pos = helper.absolutePos(CORE);
         helper.assertTrue(feature.place(level, level.getChunkSource().getGenerator(), level.getRandom(), pos),
                 Component.literal("feature refused to place"));

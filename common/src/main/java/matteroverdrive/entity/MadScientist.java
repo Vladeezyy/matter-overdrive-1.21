@@ -44,8 +44,8 @@ import net.minecraft.world.entity.ai.goal.MoveTowardsRestrictionGoal;
 import net.minecraft.world.entity.ai.goal.PanicGoal;
 import net.minecraft.world.entity.ai.goal.TradeWithPlayerGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
-import net.minecraft.world.entity.monster.Zombie;
-import net.minecraft.world.entity.npc.AbstractVillager;
+import net.minecraft.world.entity.monster.zombie.Zombie;
+import net.minecraft.world.entity.npc.villager.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -133,7 +133,7 @@ public class MadScientist extends AbstractVillager implements DialogNpc {
     // --- trades (1.7.10 TradeHandlerMadScientist) ----------------------------------------------------
 
     @Override
-    protected void updateTrades() {
+    protected void updateTrades(ServerLevel level) {
         MerchantOffers offers = getOffers();
         RandomSource r = random;
         sell(offers, r, new ItemStack(MOItems.ROGUE_ANDROID_HEAD.get()), 0.5f, 16 * 2, 8 * 2);

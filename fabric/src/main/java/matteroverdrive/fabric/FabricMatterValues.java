@@ -19,7 +19,7 @@ import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -43,8 +43,8 @@ final class FabricMatterValues {
     static void register() {
         ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
             @Override
-            public ResourceLocation getFabricId() {
-                return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "matter_values");
+            public Identifier getFabricId() {
+                return Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "matter_values");
             }
 
 
@@ -59,7 +59,7 @@ final class FabricMatterValues {
         Map<String, Integer> values = new LinkedHashMap<>();
         List<String> remove = new ArrayList<>();
         for (String namespace : manager.getNamespaces()) {
-            ResourceLocation id = ResourceLocation.fromNamespaceAndPath(namespace, PATH);
+            Identifier id = Identifier.fromNamespaceAndPath(namespace, PATH);
             for (Resource resource : manager.getResourceStack(id)) {
                 try (Reader reader = resource.openAsReader()) {
                     JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
@@ -100,18 +100,18 @@ final class FabricMatterValues {
         // in file order, later entries over earlier ones (as NeoForge resolves them)
         entries.forEach((key, value) -> {
             if (key.startsWith("#")) {
-                TagKey<Item> tag = TagKey.create(Registries.ITEM, ResourceLocation.parse(key.substring(1)));
+                TagKey<Item> tag = TagKey.create(Registries.ITEM, Identifier.parse(key.substring(1)));
                 for (Holder<Item> holder : BuiltInRegistries.ITEM.getTagOrEmpty(tag)) map.put(holder.value(), value);
             } else {
-                BuiltInRegistries.ITEM.getOptional(ResourceLocation.parse(key)).ifPresent(item -> map.put(item, value));
+                BuiltInRegistries.ITEM.getOptional(Identifier.parse(key)).ifPresent(item -> map.put(item, value));
             }
         });
         for (String key : removed) {
             if (key.startsWith("#")) {
-                TagKey<Item> tag = TagKey.create(Registries.ITEM, ResourceLocation.parse(key.substring(1)));
+                TagKey<Item> tag = TagKey.create(Registries.ITEM, Identifier.parse(key.substring(1)));
                 for (Holder<Item> holder : BuiltInRegistries.ITEM.getTagOrEmpty(tag)) map.remove(holder.value());
             } else {
-                BuiltInRegistries.ITEM.getOptional(ResourceLocation.parse(key)).ifPresent(map::remove);
+                BuiltInRegistries.ITEM.getOptional(Identifier.parse(key)).ifPresent(map::remove);
             }
         }
         return map;

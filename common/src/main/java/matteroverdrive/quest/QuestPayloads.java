@@ -7,7 +7,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
@@ -19,7 +19,7 @@ public final class QuestPayloads {
     public enum Action { COMPLETE, ABANDON, ADD }
 
     public record QuestAction(Action action, int index) implements CustomPacketPayload {
-        public static final Type<QuestAction> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "quest_action"));
+        public static final Type<QuestAction> TYPE = new Type<>(Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "quest_action"));
         public static final StreamCodec<RegistryFriendlyByteBuf, QuestAction> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.idMapper(i -> Action.values()[i], Action::ordinal), QuestAction::action, ByteBufCodecs.VAR_INT, QuestAction::index,
                 QuestAction::new);
@@ -31,7 +31,7 @@ public final class QuestPayloads {
     }
 
     public record DataPadState(boolean offhand, DataPadItem.State state) implements CustomPacketPayload {
-        public static final Type<DataPadState> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "data_pad_state"));
+        public static final Type<DataPadState> TYPE = new Type<>(Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "data_pad_state"));
         public static final StreamCodec<RegistryFriendlyByteBuf, DataPadState> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.BOOL, DataPadState::offhand, DataPadItem.State.STREAM_CODEC, DataPadState::state, DataPadState::new);
 

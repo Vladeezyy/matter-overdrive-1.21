@@ -42,7 +42,7 @@ public class AndroidStationBlock extends MachineBlock {
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!Android.isAndroid(player)) {
             if (!level.isClientSide()) {
-                player.displayClientMessage(Component.translatable("alert." + MatterOverdrive.MODID + ".not_android").withStyle(ChatFormatting.RED), true);
+                player.sendOverlayMessage(Component.translatable("alert." + MatterOverdrive.MODID + ".not_android").withStyle(ChatFormatting.RED));
             }
             return InteractionResult.SUCCESS;
         }

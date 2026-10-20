@@ -14,7 +14,7 @@ import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.resources.model.EquipmentClientInfo;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.equipment.Equippable;
@@ -32,8 +32,8 @@ import net.minecraft.core.component.DataComponents;
  * the helmet hides the hat, the chestplate the jacket and sleeves, the leggings and boots the pants.
  */
 public final class TritaniumArmorModel {
-    public static final ResourceLocation LAYER_1 = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/entity/equipment/humanoid/tritanium.png");
-    public static final ResourceLocation LAYER_2 = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/entity/equipment/humanoid_leggings/tritanium.png");
+    public static final Identifier LAYER_1 = Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/entity/equipment/humanoid/tritanium.png");
+    public static final Identifier LAYER_2 = Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/entity/equipment/humanoid_leggings/tritanium.png");
     private static final Map<EquipmentSlot, HumanoidModel<HumanoidRenderState>> MODELS = new EnumMap<>(EquipmentSlot.class);
 
     public static LayerDefinition createLayer(float expand) {
@@ -70,7 +70,8 @@ public final class TritaniumArmorModel {
     public static HumanoidModel<HumanoidRenderState> forSlot(EquipmentSlot slot) {
         return MODELS.computeIfAbsent(slot, s -> {
             HumanoidModel<HumanoidRenderState> model = new HumanoidModel<>(createLayer(s == EquipmentSlot.FEET ? 0.5f : 0).bakeRoot());
-            model.setAllVisible(false);
+            model.allParts().forEach(part -> part.visible = false);   // 26.x: no setAllVisible
+            model.root().visible = true;
             model.head.visible = s == EquipmentSlot.HEAD;
             model.hat.visible = false;   // 1.7.10 bipedHeadwear.isHidden
             model.body.visible = s == EquipmentSlot.CHEST;
@@ -87,7 +88,7 @@ public final class TritaniumArmorModel {
     }
 
     /** 1.7.10 Tritanium_Armor2: the boots use layer 2 (NeoForge getArmorTexture, Fabric ArmorRenderer) */
-    public static ResourceLocation armorTexture(ItemStack stack) {
+    public static Identifier armorTexture(ItemStack stack) {
         return slot(stack) == EquipmentSlot.FEET ? LAYER_2 : LAYER_1;
     }
 

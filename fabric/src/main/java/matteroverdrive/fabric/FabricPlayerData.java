@@ -11,7 +11,7 @@ import matteroverdrive.platform.INBTSerializable;
 import matteroverdrive.platform.PlayerData;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
-import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerEntityLevelChangeEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -25,7 +25,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -36,22 +36,22 @@ import net.minecraft.world.entity.player.Player;
  * NeoForge's attachment sync does (on login, respawn, dimension change, start of tracking, and when the code asks).
  */
 final class FabricPlayerData {
-    private static final Map<ResourceLocation, AttachmentType<?>> TYPES = new HashMap<>();
-    private static final Map<ResourceLocation, PlayerData<?>> DATA = new HashMap<>();
+    private static final Map<Identifier, AttachmentType<?>> TYPES = new HashMap<>();
+    private static final Map<Identifier, PlayerData<?>> DATA = new HashMap<>();
     /** The registries saved data is read and written with (the running server's) */
     static volatile MinecraftServer server;
 
     private FabricPlayerData() {}
 
-    record SyncPayload(ResourceLocation data, int entity, byte[] bytes) implements CustomPacketPayload {
-        static final Type<SyncPayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "player_data"));
+    record SyncPayload(Identifier data, int entity, byte[] bytes) implements CustomPacketPayload {
+        static final Type<SyncPayload> TYPE = new Type<>(Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "player_data"));
         static final StreamCodec<FriendlyByteBuf, SyncPayload> CODEC = StreamCodec.of(
                 (buf, payload) -> {
-                    buf.writeResourceLocation(payload.data());
+                    buf.writeIdentifier(payload.data());
                     buf.writeVarInt(payload.entity());
                     buf.writeByteArray(payload.bytes());
                 },
-                buf -> new SyncPayload(buf.readResourceLocation(), buf.readVarInt(), buf.readByteArray()));
+                buf -> new SyncPayload(buf.readIdentifier(), buf.readVarInt(), buf.readByteArray()));
 
         @Override
         public Type<SyncPayload> type() {
@@ -66,11 +66,11 @@ final class FabricPlayerData {
 
     static void register() {
         for (PlayerData<?> data : matteroverdrive.init.MOAttachments.ALL) attachment(data);
-        PayloadTypeRegistry.playS2C().register(SyncPayload.TYPE, SyncPayload.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(SyncPayload.TYPE, SyncPayload.CODEC);
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, srv) -> syncAll(handler.player, true));
         ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> syncAll(newPlayer, true));
-        ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((player, origin, destination) -> syncAll(player, true));
+        ServerEntityLevelChangeEvents.AFTER_PLAYER_CHANGE_LEVEL.register((player, origin, destination) -> syncAll(player, true));
         EntityTrackingEvents.START_TRACKING.register((tracked, player) -> {
             if (tracked instanceof Player holder) {
                 for (PlayerData<?> data : DATA.values()) send(holder, player, data, true);

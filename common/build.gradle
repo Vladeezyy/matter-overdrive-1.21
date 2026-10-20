@@ -7,10 +7,6 @@ neoForge {
     neoFormVersion = neo_form_version
     // the same access transformer as NeoForge (Fabric: the matching access widener)
     accessTransformers.from(rootProject.file('neoforge/src/main/resources/META-INF/accesstransformer.cfg'))
-    parchment {
-        minecraftVersion = parchment_minecraft
-        mappingsVersion = parchment_version
-    }
 }
 
 repositories {

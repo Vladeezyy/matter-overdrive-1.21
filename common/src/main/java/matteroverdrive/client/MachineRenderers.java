@@ -16,19 +16,19 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
-import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.ModelDebugName;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -40,20 +40,33 @@ import net.minecraft.world.phys.Vec3;
  * and the monitors' holo screens (TileEntityRendererMonitor / PatternMonitor / ContractMarket).
  */
 public final class MachineRenderers {
-    public static final ResourceLocation INSCRIBER_RAIL = id("block/inscriber_rail");
-    public static final ResourceLocation INSCRIBER_HEAD = id("block/inscriber_head");
+    public static final Identifier INSCRIBER_RAIL = id("block/inscriber_rail");
+    public static final Identifier INSCRIBER_HEAD = id("block/inscriber_head");
 
     /** Extra block models the renderers draw (MOClient.extraModels) */
-    public static java.util.List<ResourceLocation> extraModels() {
+    public static java.util.List<Identifier> extraModels() {
         return java.util.List.of(INSCRIBER_RAIL, INSCRIBER_HEAD);
     }
 
-    private static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, path);
+    private static Identifier id(String path) {
+        return Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, path);
     }
 
-    private static BlockStateModel model(ResourceLocation id) {
+    private static BlockStateModel model(Identifier id) {
         return ClientPlatform.INSTANCE.standaloneModel(id);
+    }
+
+    private static final int[] NO_TINTS = new int[0];
+    /** 26.x submits model parts: collected once per baked model (a resource reload bakes new ones) */
+    private static final java.util.Map<BlockStateModel, java.util.List<net.minecraft.client.renderer.block.dispatch.BlockStateModelPart>> PARTS =
+            new java.util.WeakHashMap<>();
+
+    private static java.util.List<net.minecraft.client.renderer.block.dispatch.BlockStateModelPart> parts(BlockStateModel model) {
+        return PARTS.computeIfAbsent(model, m -> {
+            var parts = new java.util.ArrayList<net.minecraft.client.renderer.block.dispatch.BlockStateModelPart>();
+            m.collectParts(net.minecraft.util.RandomSource.create(42), parts);
+            return java.util.List.copyOf(parts);
+        });
     }
 
     /** The block model's facing rotation (blockstate y: north 0, east 90, south 180, west 270) about the block centre. */
@@ -114,10 +127,10 @@ public final class MachineRenderers {
             return facingYaw(facing);
         }
 
-        protected void part(PoseStack pose, SubmitNodeCollector collector, State state, ResourceLocation key) {
+        protected void part(PoseStack pose, SubmitNodeCollector collector, State state, Identifier key) {
             pose.pushPose();
             pose.translate(-0.5, 0, -0.5);   // the OBJ models are shifted to the block corner
-            collector.submitBlockModel(pose, Sheets.cutoutBlockSheet(), model(key), 1, 1, 1, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
+            collector.submitBlockModel(pose, Sheets.cutoutBlockSheet(), parts(model(key)), NO_TINTS, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
             pose.popPose();
         }
     }
@@ -140,7 +153,7 @@ public final class MachineRenderers {
             items.updateForTopItem(state.item, replicator.getInventory().getStack(ReplicatorBlockEntity.OUTPUT), ItemDisplayContext.GROUND,
                     replicator.getLevel(), null, (int) state.seed);
             // the machine is a full opaque block, so its own light is 0: light the item from in front of the opening
-            state.lightCoords = net.minecraft.client.renderer.LevelRenderer.getLightColor(replicator.getLevel(),
+            state.lightCoords = net.minecraft.client.renderer.LevelRenderer.getLightCoords(replicator.getLevel(),
                     replicator.getBlockPos().relative(state.facing));
         }
 
@@ -225,9 +238,9 @@ public final class MachineRenderers {
      * COLOR_HOLO * 0.7 (screen blending), plus the pattern monitor's pattern count.
      */
     public static class Monitor<T extends MachineBlockEntity> extends Base<T> {
-        private static final ResourceLocation GLOW = id("textures/fx/holo_monitor_glow.png");
-        private static final ResourceLocation BACK = id("textures/block/pattern_monitor_holo_back.png");
-        private final ResourceLocation holo;
+        private static final Identifier GLOW = id("textures/fx/holo_monitor_glow.png");
+        private static final Identifier BACK = id("textures/block/pattern_monitor_holo_back.png");
+        private final Identifier holo;
         private final Font font;
 
         public Monitor(BlockEntityRendererProvider.Context context, String holo) {
@@ -242,7 +255,7 @@ public final class MachineRenderers {
             state.count = machine instanceof PatternMonitorBlockEntity monitor ? monitor.getPatternCount() : -1;
         }
 
-        private static void plane(PoseStack pose, SubmitNodeCollector collector, ResourceLocation texture, int rgb) {
+        private static void plane(PoseStack pose, SubmitNodeCollector collector, Identifier texture, int rgb) {
             collector.submitCustomGeometry(pose, HoloRenderTypes.screen(texture), (p, vc) -> {
                 float r = (rgb >> 16 & 255) / 255f, g = (rgb >> 8 & 255) / 255f, b = (rgb & 255) / 255f;
                 vc.addVertex(p, 0, 0, 0).setUv(0, 0).setColor(r, g, b, 1);

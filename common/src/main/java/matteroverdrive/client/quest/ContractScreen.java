@@ -9,12 +9,12 @@ import matteroverdrive.quest.Quest;
 import matteroverdrive.quest.QuestPayloads;
 import matteroverdrive.quest.QuestStack;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
@@ -25,7 +25,7 @@ import matteroverdrive.platform.Platform;
  * objectives and rewards in a scroll area, and "[ Accept ]" (red when it can't be taken).
  */
 public class ContractScreen extends Screen {
-    private static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/gui/contract.png");
+    private static final Identifier BACKGROUND = Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/gui/contract.png");
     private static final int WIDTH = 200, HEIGHT = 225, TEXT = 0xFF505758, TITLE = 0xFF2394E3, ACCEPT = 0xFF279F33, RED = 0xFFE65014;
     private static final int INFO_X = 18, INFO_Y = 68, INFO_W = WIDTH - 18 - 14, INFO_H = 120;
     private final InteractionHand hand;
@@ -55,8 +55,8 @@ public class ContractScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        super.render(g, mouseX, mouseY, partialTick);
+    public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(g, mouseX, mouseY, partialTick);
         QuestStack stack = quest();
         if (stack == null) {
             onClose();
@@ -70,7 +70,7 @@ public class ContractScreen extends Screen {
         g.pose().pushMatrix();
         g.pose().translate(left + 24, top + 30);
         g.pose().scale(scale, scale);
-        g.drawString(font, title, 0, 0, TITLE, false);
+        g.text(font, title, 0, 0, TITLE, false);
         g.pose().popMatrix();
         // info, objectives, rewards
         int w = 165;
@@ -94,13 +94,13 @@ public class ContractScreen extends Screen {
         g.enableScissor(left + INFO_X, top + INFO_Y, left + INFO_X + INFO_W, top + INFO_Y + INFO_H);
         int y = top + INFO_Y - scroll;
         for (FormattedCharSequence line : lines) {
-            g.drawString(font, line, left + INFO_X, y, TEXT, false);
+            g.text(font, line, left + INFO_X, y, TEXT, false);
             y += font.lineHeight;
         }
         for (int i = 0; i < rewards.size(); i++) {
             int rx = left + INFO_X + 8 + i * 20, ry = y + 1;
-            g.renderItem(rewards.get(i), rx, ry);
-            g.renderItemDecorations(font, rewards.get(i), rx, ry);
+            g.item(rewards.get(i), rx, ry);
+            g.itemDecorations(font, rewards.get(i), rx, ry);
             if (in(mouseX, mouseY, rx, ry, 16, 16) && in(mouseX, mouseY, left + INFO_X, top + INFO_Y, INFO_W, INFO_H)) {
                 g.setTooltipForNextFrame(font, rewards.get(i), mouseX, mouseY);
             }
@@ -115,7 +115,7 @@ public class ContractScreen extends Screen {
         Component label = Component.literal("[ ").append(Component.translatable("gui.matteroverdrive.contract.accept")).append(" ]");
         int bx = left + 14, by = top + HEIGHT - 28;
         boolean over = accept && in(mouseX, mouseY, bx, by, 68, 12);
-        g.drawString(font, over ? label.copy().withStyle(ChatFormatting.UNDERLINE) : label, bx + 34 - font.width(label) / 2, by + 2,
+        g.text(font, over ? label.copy().withStyle(ChatFormatting.UNDERLINE) : label, bx + 34 - font.width(label) / 2, by + 2,
                 accept ? ACCEPT : RED, false);
         if (in(mouseX, mouseY, bx, by, 68, 12)) {
             g.setTooltipForNextFrame(font, Component.translatable("gui.matteroverdrive.contract.accept_tooltip"), mouseX, mouseY);

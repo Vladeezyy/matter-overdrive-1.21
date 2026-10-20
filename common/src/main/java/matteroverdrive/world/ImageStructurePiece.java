@@ -13,7 +13,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.RandomizableContainer;
@@ -38,7 +38,7 @@ import java.util.function.Consumer;
  */
 public class ImageStructurePiece extends StructurePiece {
     public static final ResourceKey<LootTable> ANDROID_HOUSE_LOOT = ResourceKey.create(Registries.LOOT_TABLE,
-            ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "chests/android_house"));
+            Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "chests/android_house"));
     /** 1.7.10 MOWorldGenCrashedSpaceShip.holoTexts */
     private static final String[] HOLO_TEXTS = {"Critical\nError", "Contacting\nSection 9", "System\nFailure", "Emergency\nPower\nOffline",
             "System\nReboot\nFailure", "Help Me", "I Need\nWater"};

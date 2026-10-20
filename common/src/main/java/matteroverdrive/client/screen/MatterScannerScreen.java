@@ -5,12 +5,12 @@ import matteroverdrive.item.MatterScannerItem;
 import matteroverdrive.matter.ItemPattern;
 import matteroverdrive.matter.MatterRegistry;
 import matteroverdrive.network.ScannerPayloads;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import matteroverdrive.platform.Platform;
 import org.jetbrains.annotations.Nullable;
@@ -23,8 +23,8 @@ import java.util.List;
  * selected pattern on the right (item, name, matter, progress). Clicking a pattern selects it.
  */
 public class MatterScannerScreen extends Screen {
-    private static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "machine_background");
-    private static final ResourceLocation SLOT = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/gui/elements/slot_big.png");
+    private static final Identifier BACKGROUND = Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "machine_background");
+    private static final Identifier SLOT = Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/gui/elements/slot_big.png");
     private static final int WIDTH = 300, HEIGHT = 230, GRID_X = 34, GRID_Y = 34, CELL = 22, COLS = 5, ROWS = 8, INFO_X = 160;
     private static final int COLOR_TITLE = 0xFF2C3634, COLOR_TEXT = 0xFFBFE4E6, INFO_W = WIDTH - INFO_X - 24;
 
@@ -64,8 +64,8 @@ public class MatterScannerScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        super.render(g, mouseX, mouseY, partialTick);
+    public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(g, mouseX, mouseY, partialTick);
         ItemStack scanner = scanner();
         if (!(scanner.getItem() instanceof MatterScannerItem)) {
             onClose();
@@ -73,12 +73,12 @@ public class MatterScannerScreen extends Screen {
         }
         g.blitSprite(RenderPipelines.GUI_TEXTURED, BACKGROUND, left, top, WIDTH, HEIGHT);
         // the title bar like the machine screens
-        g.drawString(font, title, left + WIDTH / 2 - font.width(title) / 2, top + 7, COLOR_TITLE, false);
+        g.text(font, title, left + WIDTH / 2 - font.width(title) / 2, top + 7, COLOR_TITLE, false);
         Component status = MatterScannerItem.getLink(scanner) == null ? Component.translatable("tooltip.matteroverdrive.scanner.offline")
                 : !received ? Component.literal("...") : online ? Component.translatable("gui.matteroverdrive.scanner.online")
                 : Component.translatable("gui.matteroverdrive.scanner.storage_offline");
         int statusColor = MatterScannerItem.getLink(scanner) != null && online ? 0xFF6BE36B : 0xFFE36B6B;
-        g.drawString(font, status, left + INFO_X, top + GRID_Y - 2, statusColor, false);
+        g.text(font, status, left + INFO_X, top + GRID_Y - 2, statusColor, false);
 
         int first = scroll * COLS;
         ItemPattern hovered = null;
@@ -87,7 +87,7 @@ public class MatterScannerScreen extends Screen {
             g.blit(RenderPipelines.GUI_TEXTURED, SLOT, cx, cy, 0, 0, 22, 22, 22, 22);
             if (first + i >= patterns.size()) continue;
             ItemPattern p = patterns.get(first + i);
-            g.renderItem(p.toStack(), cx + 3, cy + 3);
+            g.item(p.toStack(), cx + 3, cy + 3);
             int w = Math.round(16 * p.progress() / (float) ItemPattern.MAX_PROGRESS);
             g.fill(cx + 3, cy + 19, cx + 3 + w, cy + 20, p.isComplete() ? 0xFF6BE36B : 0xFFE3C46B);
             if (mouseX >= cx && mouseX < cx + CELL && mouseY >= cy && mouseY < cy + CELL) hovered = p;
@@ -100,24 +100,24 @@ public class MatterScannerScreen extends Screen {
             g.pose().pushMatrix();
             g.pose().translate(ix, iy);
             g.pose().scale(3, 3);
-            g.renderItem(stack, 0, 0);
+            g.item(stack, 0, 0);
             g.pose().popMatrix();
             int ty = iy + 56;
             for (var line : font.split(stack.getHoverName(), INFO_W)) {
-                g.drawString(font, line, ix, ty, 0xFFFFFFFF, false);
+                g.text(font, line, ix, ty, 0xFFFFFFFF, false);
                 ty += 10;
             }
             ty += 4;
-            g.drawString(font, Component.translatable("tooltip.matteroverdrive.matter", MatterRegistry.getAnySide(stack.getItem())), ix, ty, COLOR_TEXT, false);
+            g.text(font, Component.translatable("tooltip.matteroverdrive.matter", MatterRegistry.getAnySide(stack.getItem())), ix, ty, COLOR_TEXT, false);
             ty += 12;
-            g.drawString(font, Component.translatable("tooltip.matteroverdrive.scanner.progress", selected.progress()), ix, ty, COLOR_TEXT, false);
+            g.text(font, Component.translatable("tooltip.matteroverdrive.scanner.progress", selected.progress()), ix, ty, COLOR_TEXT, false);
             ty += 12;
             int barW = INFO_W;
             g.fill(ix, ty, ix + barW, ty + 4, 0xFF1E2426);
             g.fill(ix, ty, ix + Math.round(barW * selected.progress() / (float) ItemPattern.MAX_PROGRESS), ty + 4,
                     selected.isComplete() ? 0xFF6BE36B : 0xFFE3C46B);
         } else {
-            g.drawWordWrap(font, Component.translatable("gui.matteroverdrive.scanner.nothing_selected"), ix, iy, INFO_W, COLOR_TEXT, false);
+            g.textWithWordWrap(font, Component.translatable("gui.matteroverdrive.scanner.nothing_selected"), ix, iy, INFO_W, COLOR_TEXT, false);
         }
         if (hovered != null) {
             g.setTooltipForNextFrame(font, Component.translatable("gui.matteroverdrive.pattern", hovered.toStack().getHoverName(), hovered.progress()),
@@ -126,8 +126,8 @@ public class MatterScannerScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        renderTransparentBackground(g);
+    public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+        extractTransparentBackground(g);
     }
 
     private @Nullable ItemPattern patternAt(double mx, double my) {

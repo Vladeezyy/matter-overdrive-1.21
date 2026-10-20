@@ -157,8 +157,8 @@ public final class PerfScene {
     /** A flat stone field 100 blocks east of the spawn, the player above its south edge looking over it. */
     private static void prepareField(ServerPlayer player) {
         ServerLevel level = player.level();
-        level.setDayTime(6000);
-        level.setWeatherParameters(6000, 0, false, false);
+        level.getServer().clockManager().setTotalTicks(level.dimensionType().defaultClock().orElseThrow(), 6000);
+        level.getServer().setWeatherParameters(6000, 0, false, false);
         player.setGameMode(GameType.CREATIVE);
         player.getAbilities().flying = true;
         player.onUpdateAbilities();
@@ -265,7 +265,7 @@ public final class PerfScene {
             // "<block>/idle": the machines get no work (an idle inscriber shows its rail and head at rest)
             boolean idle = id.endsWith("/idle");
             String block = idle ? id.substring(0, id.length() - 5) : id;
-            var key = net.minecraft.resources.ResourceLocation.parse(block.contains(":") ? block : MatterOverdrive.MODID + ":" + block);
+            var key = net.minecraft.resources.Identifier.parse(block.contains(":") ? block : MatterOverdrive.MODID + ":" + block);
             at(t, mc -> server(mc, p -> fillWith(p.level(), net.minecraft.core.registries.BuiltInRegistries.BLOCK.getValue(key), idle)));
             String shotName = "types_" + id.replace("minecraft:", "vanilla_").replace("/", "_");
             // a close look at a few of them (the same spot every run) before measuring
@@ -370,8 +370,8 @@ public final class PerfScene {
     private static void handSteps() {
         at(40, mc -> server(mc, p -> {
             ServerLevel level = p.level();
-            level.setDayTime(6000);
-            level.setWeatherParameters(6000, 0, false, false);
+            level.getServer().clockManager().setTotalTicks(level.dimensionType().defaultClock().orElseThrow(), 6000);
+            level.getServer().setWeatherParameters(6000, 0, false, false);
             p.setGameMode(GameType.CREATIVE);
             BlockPos spawn = level.getRespawnData().pos();
             BlockPos base = new BlockPos(spawn.getX() - 100, 150, spawn.getZ());
@@ -386,7 +386,7 @@ public final class PerfScene {
         int t = 60;
         for (String id : HAND_ITEMS) {
             String name = id.replace("minecraft:", "vanilla_");
-            var key = net.minecraft.resources.ResourceLocation.parse(id.contains(":") ? id : MatterOverdrive.MODID + ":" + id);
+            var key = net.minecraft.resources.Identifier.parse(id.contains(":") ? id : MatterOverdrive.MODID + ":" + id);
             at(t, mc -> server(mc, p -> {
                 ItemStack stack = new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(key));
                 p.getInventory().setItem(0, stack);
@@ -408,7 +408,7 @@ public final class PerfScene {
         // the inventory icons of the same items (the OBJ machines' gui transforms)
         at(t, mc -> server(mc, p -> {
             for (int i = 0; i < HAND_ITEMS.length && i < 36; i++) {
-                var key = net.minecraft.resources.ResourceLocation.parse(HAND_ITEMS[i].contains(":") ? HAND_ITEMS[i] : MatterOverdrive.MODID + ":" + HAND_ITEMS[i]);
+                var key = net.minecraft.resources.Identifier.parse(HAND_ITEMS[i].contains(":") ? HAND_ITEMS[i] : MatterOverdrive.MODID + ":" + HAND_ITEMS[i]);
                 p.getInventory().setItem(i, new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(key)));
             }
         }));

@@ -1,7 +1,7 @@
 package matteroverdrive.client.screen;
 
 import matteroverdrive.menu.ChargingStationMenu;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
@@ -14,12 +14,12 @@ public class ChargingStationScreen extends MachineScreen<ChargingStationMenu> {
     }
 
     @Override
-    protected void renderHome(GuiGraphics g, int x, int y, int mx, int my) {
+    protected void renderHome(GuiGraphicsExtractor g, int x, int y, int mx, int my) {
         drawEnergy(g, x + ENERGY_X, y + ENERGY_Y);
     }
 
     @Override
-    protected void homeTooltips(GuiGraphics g, int mx, int my, int mouseX, int mouseY) {
+    protected void homeTooltips(GuiGraphicsExtractor g, int mx, int my, int mouseX, int mouseY) {
         energyTooltip(g, mx, my, ENERGY_X, ENERGY_Y, mouseX, mouseY);
     }
 }

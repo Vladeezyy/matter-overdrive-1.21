@@ -1,5 +1,7 @@
 package matteroverdrive.neoforge;
 
+import matteroverdrive.init.MOFluids;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import matteroverdrive.MatterOverdrive;
@@ -13,7 +15,7 @@ import matteroverdrive.init.MOItems;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.HumanoidArm;
@@ -56,7 +58,7 @@ public final class MatterOverdriveNeoForgeClient {
                 event.register(matteroverdrive.client.starmap.StarMapPipRenderer.State.class, matteroverdrive.client.starmap.StarMapPipRenderer::new));
         modBus.addListener((net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent event) ->
                 matteroverdrive.client.starmap.HoloRenderTypes.registerPipelines(event::registerPipeline));
-        modBus.addListener((RegisterColorHandlersEvent.Block event) -> MOClient.blockColors((color, block) -> event.register(color, block)));
+        modBus.addListener((RegisterColorHandlersEvent.BlockTintSources event) -> MOClient.blockColors((tints, block) -> event.register(tints, block)));
         modBus.addListener((net.neoforged.neoforge.client.event.RegisterSelectItemModelPropertyEvent event) -> MOClient.registerSelectProperties(event::register));
         modBus.addListener((RegisterMenuScreensEvent event) -> MOClient.registerScreens(new MOClient.Screens() {
             @Override
@@ -83,6 +85,8 @@ public final class MatterOverdriveNeoForgeClient {
             MOClient.registerKeyCategories(event::registerCategory);
             MOClient.registerKeys(event::register);
         });
+        modBus.addListener((net.neoforged.neoforge.client.event.RegisterFluidModelsEvent event) ->
+                event.register(MOClient.matterPlasmaModel(), MOFluids.MATTER_PLASMA.get(), MOFluids.MATTER_PLASMA_FLOWING.get()));
         modBus.addListener((RegisterGuiLayersEvent event) -> {
             event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, MOClient.ANDROID_HUD, AndroidHud::render);
             event.registerAbove(VanillaGuiLayers.CHAT, MOClient.QUEST_HUD, matteroverdrive.client.quest.QuestHud::render);
@@ -99,7 +103,7 @@ public final class MatterOverdriveNeoForgeClient {
         game.addListener((ClientPlayerNetworkEvent.LoggingOut event) -> MOClient.onLoggedOut());
         game.addListener((ItemTooltipEvent event) -> MOClient.onTooltip(event.getItemStack(), event.getToolTip()));
         game.addListener((RenderGuiLayerEvent.Pre event) -> {
-            ResourceLocation name = event.getName();
+            Identifier name = event.getName();
             AndroidHud.VanillaLayer layer = name.equals(VanillaGuiLayers.PLAYER_HEALTH) ? AndroidHud.VanillaLayer.HEALTH
                     : name.equals(VanillaGuiLayers.FOOD_LEVEL) ? AndroidHud.VanillaLayer.FOOD
                     : name.equals(VanillaGuiLayers.AIR_LEVEL) ? AndroidHud.VanillaLayer.AIR
@@ -122,22 +126,11 @@ public final class MatterOverdriveNeoForgeClient {
             }
         });
         game.addListener((RenderHandEvent event) -> PhaserBeamRenderer.renderHand(event.getHand(), event.getPartialTick(), event.getPoseStack(), event.getSubmitNodeCollector()));
-        game.addListener((RenderLevelStageEvent.AfterEntities event) -> ShieldRenderer.renderLevel(event.getPoseStack()));
+        game.addListener((RenderLevelStageEvent.AfterTranslucentFeatures event) -> ShieldRenderer.renderLevel(event.getPoseStack()));
     }
 
     private static void registerClientExtensions(RegisterClientExtensionsEvent event) {
-        // Matter Plasma textures (1.7.10 matter_plasma_still / _flowing), shown by tanks of other mods
-        event.registerFluidType(new IClientFluidTypeExtensions() {
-            @Override
-            public ResourceLocation getStillTexture() {
-                return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "block/matter_plasma_still");
-            }
-
-            @Override
-            public ResourceLocation getFlowingTexture() {
-                return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "block/matter_plasma_flowing");
-            }
-        }, NeoForgePlatform.MATTER_PLASMA_TYPE.get());
+        // Matter Plasma textures (1.7.10 matter_plasma_still / _flowing): 26.x fluid models (RegisterFluidModelsEvent)
         // 1.7.10 ModelTritaniumArmor and its two layer textures
         event.registerItem(new IClientItemExtensions() {
             @Override
@@ -147,8 +140,8 @@ public final class MatterOverdriveNeoForgeClient {
             }
 
             @Override
-            public ResourceLocation getArmorTexture(ItemStack stack, net.minecraft.client.resources.model.EquipmentClientInfo.LayerType type,
-                                                    net.minecraft.client.resources.model.EquipmentClientInfo.Layer layer, ResourceLocation _default) {
+            public Identifier getArmorTexture(ItemStack stack, net.minecraft.client.resources.model.EquipmentClientInfo.LayerType type,
+                                                    net.minecraft.client.resources.model.EquipmentClientInfo.Layer layer, Identifier _default) {
                 return TritaniumArmorModel.armorTexture(stack);
             }
         }, MOItems.TRITANIUM_HELMET.get(), MOItems.TRITANIUM_CHESTPLATE.get(), MOItems.TRITANIUM_LEGGINGS.get(), MOItems.TRITANIUM_BOOTS.get());

@@ -11,13 +11,13 @@ import matteroverdrive.matter.ItemPattern;
 import matteroverdrive.menu.MachineMenu;
 import matteroverdrive.menu.PatternMonitorMenu;
 import matteroverdrive.network.PatternRequestPayload;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
 import matteroverdrive.platform.Platform;
@@ -27,10 +27,10 @@ import matteroverdrive.platform.Platform;
  * one copy to the order (shift: 16, max 64), right click removes; Request sends the order, Refresh reloads.
  */
 public class PatternMonitorScreen extends MachineScreen<PatternMonitorMenu> {
-    private static final ResourceLocation SLOT = tex("slot_big");
-    private static final ResourceLocation REFRESH = tex("refresh");
-    private static final ResourceLocation REQUEST = tex("request");
-    private static final ResourceLocation SEARCH_FIELD = tex("search_field");
+    private static final Identifier SLOT = tex("slot_big");
+    private static final Identifier REFRESH = tex("refresh");
+    private static final Identifier REQUEST = tex("request");
+    private static final Identifier SEARCH_FIELD = tex("search_field");
     private static final int SEARCH_X = 41, SEARCH_Y = 24;
     private static final int GRID_X = 48, GRID_Y = 40, CELL = 22, COLS = 7, ROWS = 5;
     private static final int REFRESH_X = 6, REFRESH_Y = 45, REQUEST_X = 6, REQUEST_Y = 75, BUTTON = 22;
@@ -66,7 +66,7 @@ public class PatternMonitorScreen extends MachineScreen<PatternMonitorMenu> {
     }
 
     @Override
-    protected void renderHome(GuiGraphics g, int x, int y, int mx, int my) {
+    protected void renderHome(GuiGraphicsExtractor g, int x, int y, int mx, int my) {
         search.visible = true;
         g.blit(RenderPipelines.GUI_TEXTURED, SEARCH_FIELD, x + SEARCH_X, y + SEARCH_Y, 0, 0, 166, 14, 166, 14);
         List<ItemPattern> patterns = visible();
@@ -76,11 +76,11 @@ public class PatternMonitorScreen extends MachineScreen<PatternMonitorMenu> {
             g.blit(RenderPipelines.GUI_TEXTURED, SLOT, cx, cy, 0, 0, 22, 22, 22, 22);
             if (first + i >= patterns.size()) continue;
             ItemPattern p = patterns.get(first + i);
-            g.renderItem(p.toStack(), cx + 3, cy + 3);
+            g.item(p.toStack(), cx + 3, cy + 3);
             int amount = order.getOrDefault(p.item().value(), 0);
             if (amount > 0) {
                 String s = Integer.toString(amount);
-                g.drawString(font, s, cx + 20 - font.width(s), cy + 13, 0xFFFFFFFF, true);
+                g.text(font, s, cx + 20 - font.width(s), cy + 13, 0xFFFFFFFF, true);
             }
             // pattern completeness as a thin bar under the item
             int w = Math.round(16 * p.progress() / (float) ItemPattern.MAX_PROGRESS);
@@ -91,18 +91,18 @@ public class PatternMonitorScreen extends MachineScreen<PatternMonitorMenu> {
         g.blit(RenderPipelines.GUI_TEXTURED, REFRESH, x + REFRESH_X, y + REFRESH_Y, overRefresh ? 22 : 0, 0, 22, 22, 44, 22);
         g.blit(RenderPipelines.GUI_TEXTURED, REQUEST, x + REQUEST_X, y + REQUEST_Y, overRequest ? 22 : 0, 0, 22, 22, 44, 22);
         int queued = menu.getClientQueue().stream().mapToInt(Task::count).sum();
-        g.drawString(font, Component.translatable("gui.matteroverdrive.queue", menu.getClientQueue().size(), queued),
+        g.text(font, Component.translatable("gui.matteroverdrive.queue", menu.getClientQueue().size(), queued),
                 x + GRID_X, y + GRID_Y + ROWS * CELL + 2, COLOR_TEXT, false);
     }
 
     @Override
-    protected void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         if (search != null) search.visible = menu.page == MachineMenu.Page.HOME;
-        super.renderBg(g, partialTick, mouseX, mouseY);
+        super.extractBackground(g, mouseX, mouseY, partialTick);
     }
 
     @Override
-    protected void homeTooltips(GuiGraphics g, int mx, int my, int mouseX, int mouseY) {
+    protected void homeTooltips(GuiGraphicsExtractor g, int mx, int my, int mouseX, int mouseY) {
         ItemPattern p = patternAt(mx, my);
         if (p != null) {
             g.setTooltipForNextFrame(font, Component.translatable("gui.matteroverdrive.pattern",

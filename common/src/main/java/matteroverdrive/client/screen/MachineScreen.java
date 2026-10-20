@@ -7,12 +7,12 @@ import matteroverdrive.item.UpgradeItem;
 import matteroverdrive.machine.UpgradeType;
 import matteroverdrive.menu.MachineMenu;
 import matteroverdrive.util.MOText;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 
@@ -23,17 +23,17 @@ import net.minecraft.world.inventory.Slot;
 public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractContainerScreen<M> {
     protected static final int COLOR_TITLE = 0xFF2C3634;          // 1.7.10 Color(44, 54, 52)
     protected static final int COLOR_TEXT = 0xFFBFE4E6;           // COLOR_MATTER
-    private static final ResourceLocation BACKGROUND = id("machine_background");
+    private static final Identifier BACKGROUND = id("machine_background");
 
-    protected static final ResourceLocation ENERGY = tex("energy");
-    protected static final ResourceLocation ARROW = tex("progress_arrow_right");
-    protected static final ResourceLocation MATTER = tex("matter");
-    private static final ResourceLocation SLOT_BIG = tex("slot_big");
-    private static final ResourceLocation SLOT_SMALL = tex("slot_small");
-    private static final ResourceLocation INDICATOR = tex("indicator");
-    private static final ResourceLocation CLOSE = tex("close_button");
-    private static final ResourceLocation PAGE_BUTTON = tex("page_button");
-    private static final ResourceLocation[] PAGE_ICONS = {tex("page_icon_home"), tex("page_icon_upgrades"), tex("page_icon_config")};
+    protected static final Identifier ENERGY = tex("energy");
+    protected static final Identifier ARROW = tex("progress_arrow_right");
+    protected static final Identifier MATTER = tex("matter");
+    private static final Identifier SLOT_BIG = tex("slot_big");
+    private static final Identifier SLOT_SMALL = tex("slot_small");
+    private static final Identifier INDICATOR = tex("indicator");
+    private static final Identifier CLOSE = tex("close_button");
+    private static final Identifier PAGE_BUTTON = tex("page_button");
+    private static final Identifier[] PAGE_ICONS = {tex("page_icon_home"), tex("page_icon_upgrades"), tex("page_icon_config")};
     private static final int[] PAGE_ICON_SIZES = {14, 12, 16};
 
     private static final int CLOSE_Y = 6;
@@ -42,9 +42,7 @@ public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractCo
     private static final int REDSTONE_X = 50, REDSTONE_Y = 50, REDSTONE_W = 140, REDSTONE_H = 20;
 
     protected MachineScreen(M menu, Inventory playerInventory, Component title) {
-        super(menu, playerInventory, title);
-        imageWidth = menu.width();
-        imageHeight = menu.height();
+        super(menu, playerInventory, title, menu.width(), menu.height());
     }
 
     private int closeX() {
@@ -55,12 +53,12 @@ public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractCo
         return imageWidth - 14;
     }
 
-    protected static ResourceLocation tex(String name) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/gui/elements/" + name + ".png");
+    protected static Identifier tex(String name) {
+        return Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/gui/elements/" + name + ".png");
     }
 
-    private static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, path);
+    private static Identifier id(String path) {
+        return Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, path);
     }
 
     private List<MachineMenu.Page> pages() {
@@ -79,14 +77,14 @@ public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractCo
     // --- rendering -------------------------------------------------------------------------------
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        super.render(g, mouseX, mouseY, partialTick);
-        renderTooltip(g, mouseX, mouseY);
+    public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(g, mouseX, mouseY, partialTick);
         renderExtraTooltips(g, mouseX - leftPos, mouseY - topPos, mouseX, mouseY);
     }
 
     @Override
-    protected void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+        super.extractBackground(g, mouseX, mouseY, partialTick);
         int x = leftPos, y = topPos;
         g.blitSprite(RenderPipelines.GUI_TEXTURED, BACKGROUND, x, y, imageWidth, imageHeight);
 
@@ -137,12 +135,12 @@ public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractCo
     }
 
     /** Draws the machine's Home page; x/y are the GUI origin, mx/my the mouse relative to it. */
-    protected abstract void renderHome(GuiGraphics g, int x, int y, int mx, int my);
+    protected abstract void renderHome(GuiGraphicsExtractor g, int x, int y, int mx, int my);
 
     /** Extra tooltips for the Home page; mx/my relative to the GUI origin. */
-    protected void homeTooltips(GuiGraphics g, int mx, int my, int mouseX, int mouseY) {}
+    protected void homeTooltips(GuiGraphicsExtractor g, int mx, int my, int mouseX, int mouseY) {}
 
-    private void renderExtraTooltips(GuiGraphics g, int mx, int my, int mouseX, int mouseY) {
+    private void renderExtraTooltips(GuiGraphicsExtractor g, int mx, int my, int mouseX, int mouseY) {
         List<MachineMenu.Page> pages = pages();
         for (int i = 0; i < pages.size(); i++) {
             if (in(mx, my, pagesX(), PAGES_Y + i * 26, 24, 24)) {
@@ -154,7 +152,7 @@ public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractCo
         }
     }
 
-    private void renderUpgrades(GuiGraphics g, int x, int y) {
+    private void renderUpgrades(GuiGraphicsExtractor g, int x, int y) {
         int line = 0;
         for (UpgradeType type : UpgradeType.values()) {
             if (!menu.getMachine().getAffectedBy().contains(type)) continue;
@@ -162,31 +160,31 @@ public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractCo
             Component text = Math.abs(m - 1) < 1e-6
                     ? Component.literal("0% ").append(Component.translatable(type.translationKey())).withColor(0xFF8B9EA0)
                     : UpgradeItem.describe(type, m);
-            g.drawString(font, text, x + 48, y + 84 + line * 11, 0xFFFFFFFF, false);
+            g.text(font, text, x + 48, y + 84 + line * 11, 0xFFFFFFFF, false);
             line++;
         }
     }
 
-    private void renderConfig(GuiGraphics g, int x, int y, int mx, int my) {
-        g.drawString(font, Component.translatable("gui.matteroverdrive.config.redstone"), x + REDSTONE_X, y + REDSTONE_Y - 12, COLOR_TEXT, false);
+    private void renderConfig(GuiGraphicsExtractor g, int x, int y, int mx, int my) {
+        g.text(font, Component.translatable("gui.matteroverdrive.config.redstone"), x + REDSTONE_X, y + REDSTONE_Y - 12, COLOR_TEXT, false);
         boolean over = in(mx, my, REDSTONE_X, REDSTONE_Y, REDSTONE_W, REDSTONE_H);
         g.fill(x + REDSTONE_X, y + REDSTONE_Y, x + REDSTONE_X + REDSTONE_W, y + REDSTONE_Y + REDSTONE_H, over ? 0xFF4F6669 : 0xFF3E5154);
-        g.submitOutline(x + REDSTONE_X, y + REDSTONE_Y, REDSTONE_W, REDSTONE_H, 0xFF22282A);
+        g.outline(x + REDSTONE_X, y + REDSTONE_Y, REDSTONE_W, REDSTONE_H, 0xFF22282A);
         Component mode = Component.translatable(menu.getRedstoneMode().translationKey());
-        g.drawString(font, mode, x + REDSTONE_X + (REDSTONE_W - font.width(mode)) / 2, y + REDSTONE_Y + 6, 0xFFFFFFFF, false);
+        g.text(font, mode, x + REDSTONE_X + (REDSTONE_W - font.width(mode)) / 2, y + REDSTONE_Y + 6, 0xFFFFFFFF, false);
         if (menu.hasFilterSlot()) {
             // 1.7.10 MatterNetworkConfigPage: the destination filter slot
-            g.drawString(font, Component.translatable("gui.matteroverdrive.config.destination_filter"), x + REDSTONE_X,
+            g.text(font, Component.translatable("gui.matteroverdrive.config.destination_filter"), x + REDSTONE_X,
                     y + MachineMenu.FILTER_Y + 5, COLOR_TEXT, false);
         }
         renderConfigExtra(g, x, y, mx, my);
     }
 
     /** Machine-specific settings below the redstone mode on the Config page (1.7.10 config properties). */
-    protected void renderConfigExtra(GuiGraphics g, int x, int y, int mx, int my) {}
+    protected void renderConfigExtra(GuiGraphicsExtractor g, int x, int y, int mx, int my) {}
 
     /** 1.7.10 MOElementEnergy: 16x42 bar from energy.png (left half empty, right half full). */
-    protected void drawEnergy(GuiGraphics g, int x, int y) {
+    protected void drawEnergy(GuiGraphicsExtractor g, int x, int y) {
         g.blit(RenderPipelines.GUI_TEXTURED, ENERGY, x, y, 0, 0, 16, 42, 32, 64);
         int capacity = menu.getCapacity();
         int h = capacity > 0 ? (int) ((long) menu.getEnergy() * 42 / capacity) : 0;
@@ -195,7 +193,7 @@ public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractCo
         }
     }
 
-    protected void energyTooltip(GuiGraphics g, int mx, int my, int barX, int barY, int mouseX, int mouseY) {
+    protected void energyTooltip(GuiGraphicsExtractor g, int mx, int my, int barX, int barY, int mouseX, int mouseY) {
         if (in(mx, my, barX, barY, 16, 42)) {
             g.setTooltipForNextFrame(font, Component.translatable("tooltip.matteroverdrive.energy_stored",
                     MOText.energy(menu.getEnergy()), MOText.energy(menu.getCapacity())), mouseX, mouseY);
@@ -203,7 +201,7 @@ public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractCo
     }
 
     /** 1.7.10 ElementMatterStored: same 16x42 layout as the energy bar, from matter.png. */
-    protected void drawMatter(GuiGraphics g, int x, int y) {
+    protected void drawMatter(GuiGraphicsExtractor g, int x, int y) {
         g.blit(RenderPipelines.GUI_TEXTURED, MATTER, x, y, 0, 0, 16, 42, 32, 64);
         int capacity = menu.getMatterCapacity();
         int h = capacity > 0 ? (int) ((long) menu.getMatter() * 42 / capacity) : 0;
@@ -212,7 +210,7 @@ public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractCo
         }
     }
 
-    protected void matterTooltip(GuiGraphics g, int mx, int my, int barX, int barY, int mouseX, int mouseY) {
+    protected void matterTooltip(GuiGraphicsExtractor g, int mx, int my, int barX, int barY, int mouseX, int mouseY) {
         if (in(mx, my, barX, barY, 16, 42)) {
             g.setTooltipForNextFrame(font, Component.translatable("tooltip.matteroverdrive.matter_stored",
                     menu.getMatter(), menu.getMatterCapacity()), mouseX, mouseY);
@@ -220,7 +218,7 @@ public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractCo
     }
 
     /** 1.7.10 ElementDualScaled with Progress_Arrow_Right: 24x16, empty frame then full frame. */
-    protected void drawArrow(GuiGraphics g, int x, int y, float progress) {
+    protected void drawArrow(GuiGraphicsExtractor g, int x, int y, float progress) {
         g.blit(RenderPipelines.GUI_TEXTURED, ARROW, x, y, 0, 0, 24, 16, 48, 16);
         int w = Math.round(progress * 24);
         if (w > 0) {
@@ -229,14 +227,14 @@ public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractCo
     }
 
     @Override
-    protected void renderLabels(GuiGraphics g, int mouseX, int mouseY) {
+    protected void extractLabels(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         // the title bar runs from about x = 50 to the close button at 208; long names are cut with an ellipsis
         String text = title.getString();
         int max = 150 + imageWidth - MachineMenu.WIDTH;
         if (font.width(text) > max) {
             text = font.plainSubstrByWidth(text, max - font.width("…")) + "…";
         }
-        g.drawString(font, text, 128 + (imageWidth - MachineMenu.WIDTH) / 2 - font.width(text) / 2, 7, COLOR_TITLE, false);
+        g.text(font, text, 128 + (imageWidth - MachineMenu.WIDTH) / 2 - font.width(text) / 2, 7, COLOR_TITLE, false);
     }
 
     protected static boolean in(double mx, double my, int x, int y, int w, int h) {

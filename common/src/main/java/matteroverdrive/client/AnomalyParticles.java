@@ -7,7 +7,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.SingleQuadParticle;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.data.AtlasIds;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
@@ -52,7 +52,7 @@ public final class AnomalyParticles {
 
         private static TextureAtlasSprite sprite(int index) {
             return Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(AtlasIds.PARTICLES)
-                    .getSprite(ResourceLocation.withDefaultNamespace("generic_" + index));
+                    .getSprite(Identifier.withDefaultNamespace("generic_" + index));
         }
 
         @Override

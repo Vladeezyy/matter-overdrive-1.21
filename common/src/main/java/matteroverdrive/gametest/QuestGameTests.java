@@ -138,17 +138,17 @@ final class QuestGameTests {
         var level = helper.getLevel();
         var pools = level.registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.TEMPLATE_POOL);
         for (String pool : new String[] {"village/plains/houses", "village/desert/houses"}) {
-            var templates = pools.getValue(net.minecraft.resources.ResourceLocation.withDefaultNamespace(pool)).templates;
+            var templates = pools.getValue(net.minecraft.resources.Identifier.withDefaultNamespace(pool)).templates;
             long ours = templates.stream().filter(e -> e.toString().contains("mad_scientist_house")).count();
             check(helper, ours == matteroverdrive.world.VillageHouses.WEIGHT, pool + ": " + ours);
         }
-        var template = level.getStructureManager().get(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(
+        var template = level.getStructureManager().get(net.minecraft.resources.Identifier.fromNamespaceAndPath(
                 matteroverdrive.MatterOverdrive.MODID, "village/mad_scientist_house")).orElseThrow();
         check(helper, template.getSize().equals(new net.minecraft.core.Vec3i(9, 9, 7)), "size " + template.getSize());
         BlockPos origin = helper.absolutePos(new BlockPos(1, 1, 1));
         var settings = new net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings()
                 .addProcessor(matteroverdrive.world.RandomCrateProcessor.INSTANCE).setFinalizeEntities(true);
-        template.placeInWorld(level, origin, origin, settings, level.random, 2);
+        template.placeInWorld(level, origin, origin, settings, level.getRandom(), 2);
         check(helper, level.getBlockState(origin.offset(7, 1, 2)).is(matteroverdrive.init.MOBlocks.INSCRIBER.get()), "no inscriber");
         check(helper, level.getBlockState(origin.offset(1, 3, 5)).is(net.minecraft.world.level.block.Blocks.BOOKSHELF), "no bookshelves");
         check(helper, level.getBlockState(origin.offset(1, 1, 5)).getBlock() instanceof matteroverdrive.block.TritaniumCrateBlock, "no crate");

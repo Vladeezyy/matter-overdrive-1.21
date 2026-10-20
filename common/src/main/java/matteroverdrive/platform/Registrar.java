@@ -2,7 +2,7 @@ package matteroverdrive.platform;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,7 +34,7 @@ public class Registrar<R> {
     }
 
     public <T extends R> RegistryEntry<R, T> register(String name, Supplier<? extends T> factory) {
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(this.modId, name);
+        Identifier id = Identifier.fromNamespaceAndPath(this.modId, name);
         return this.add(new RegistryEntry<>(this.registryKey, id), factory);
     }
 
@@ -79,12 +79,12 @@ public class Registrar<R> {
         }
 
         public <I extends net.minecraft.world.item.Item> ItemEntry<I> register(String name, Supplier<? extends I> factory) {
-            return this.add(new ItemEntry<>(ResourceLocation.fromNamespaceAndPath(this.modId(), name)), factory);
+            return this.add(new ItemEntry<>(Identifier.fromNamespaceAndPath(this.modId(), name)), factory);
         }
 
         public <I extends net.minecraft.world.item.Item> ItemEntry<I> registerItem(String name, Function<net.minecraft.world.item.Item.Properties, ? extends I> factory, net.minecraft.world.item.Item.Properties properties) {
             // 1.21.2+: the properties carry the item's id (as NeoForge's registerItem sets it)
-            ResourceLocation id = ResourceLocation.fromNamespaceAndPath(this.modId(), name);
+            Identifier id = Identifier.fromNamespaceAndPath(this.modId(), name);
             return this.register(name, () -> factory.apply(properties.setId(ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, id))));
         }
 
@@ -120,12 +120,12 @@ public class Registrar<R> {
         }
 
         public <B extends net.minecraft.world.level.block.Block> BlockEntry<B> register(String name, Supplier<? extends B> factory) {
-            return this.add(new BlockEntry<>(ResourceLocation.fromNamespaceAndPath(this.modId(), name)), factory);
+            return this.add(new BlockEntry<>(Identifier.fromNamespaceAndPath(this.modId(), name)), factory);
         }
 
         public <B extends net.minecraft.world.level.block.Block> BlockEntry<B> registerBlock(String name, Function<net.minecraft.world.level.block.state.BlockBehaviour.Properties, ? extends B> factory, net.minecraft.world.level.block.state.BlockBehaviour.Properties properties) {
             // 1.21.2+: the properties carry the block's id
-            ResourceLocation id = ResourceLocation.fromNamespaceAndPath(this.modId(), name);
+            Identifier id = Identifier.fromNamespaceAndPath(this.modId(), name);
             return this.register(name, () -> factory.apply(properties.setId(ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK, id))));
         }
 
@@ -134,8 +134,8 @@ public class Registrar<R> {
         }
     }
 
-    public <T extends R> RegistryEntry<R, T> register(String name, Function<ResourceLocation, ? extends T> factory) {
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(this.modId, name);
+    public <T extends R> RegistryEntry<R, T> register(String name, Function<Identifier, ? extends T> factory) {
+        Identifier id = Identifier.fromNamespaceAndPath(this.modId, name);
         return this.register(name, () -> factory.apply(id));
     }
 

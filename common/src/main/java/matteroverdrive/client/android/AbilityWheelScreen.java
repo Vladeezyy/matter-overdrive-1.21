@@ -9,13 +9,13 @@ import matteroverdrive.android.AndroidData;
 import matteroverdrive.android.BioticStat;
 import matteroverdrive.android.BioticStats;
 import matteroverdrive.network.AndroidPayloads;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.player.Player;
 import matteroverdrive.platform.Platform;
@@ -63,10 +63,10 @@ public class AbilityWheelScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) {}
+    public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {}
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+    public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         int cx = width / 2, cy = height / 2;
         double dx = mouseX - cx, dy = mouseY - cy;
         // 1.7.10: a direction past 20% of the ring picks the slice it points into (slice 0 straight up, clockwise)
@@ -84,12 +84,12 @@ public class AbilityWheelScreen extends Screen {
         }
         if (selected >= 0) {
             Component name = Component.translatable("biotic_stat." + MatterOverdrive.MODID + "." + stats.get(selected).id() + ".name");
-            g.drawCenteredString(font, name, cx, cy - 4, ARGB.color(255, HOLO));
+            g.centeredText(font, name, cx, cy - 4, ARGB.color(255, HOLO));
         }
     }
 
-    private static ResourceLocation tex(String name) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/gui/elements/" + name + ".png");
+    private static Identifier tex(String name) {
+        return Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/gui/elements/" + name + ".png");
     }
 
     private void choose() {

@@ -102,7 +102,7 @@ public final class MatterOverdriveNeoForge {
         // quests
         game.addListener((LivingDeathEvent event) -> QuestEvents.onDeath(event.getEntity(), event.getSource()));
         game.addListener((PlayerEvent.ItemCraftedEvent event) -> QuestEvents.onCrafted(event.getEntity(), event.getCrafting()));
-        game.addListener((BlockEvent.BreakEvent event) -> QuestEvents.onBreak(event.getPlayer(), event.getPos(), event.getState()));
+        game.addListener((net.neoforged.neoforge.event.level.block.BreakBlockEvent event) -> QuestEvents.onBreak(event.getPlayer(), event.getPos(), event.getState()));
         game.addListener((BlockEvent.EntityPlaceEvent event) -> QuestEvents.onPlace(event.getEntity(), event.getPos(), event.getPlacedBlock()));
         game.addListener((PlayerTickEvent.Post event) -> {
             QuestEvents.onPlayerTick(event.getEntity());
@@ -116,22 +116,22 @@ public final class MatterOverdriveNeoForge {
             if (amount < 0) event.setCanceled(true);
             else event.setAmount(amount);
         });
-        game.addListener((LivingDamageEvent.Post event) -> Android.onDamaged(event.getEntity(), event.getNewDamage()));
+        game.addListener((LivingDamageEvent.Post event) -> Android.onDamaged(event.getEntity(), event.getHealthDamage()));
         game.addListener((PlayerEvent.PlayerRespawnEvent event) -> Android.onRespawn(event.getEntity(), event.isEndConquered()));
     }
 
     /** 1.21.5+: a test instance per test (the common test functions), each fixed time of day in its own environment */
     private static void registerGameTests(RegisterGameTestsEvent event) {
-        var id = (java.util.function.Function<String, net.minecraft.resources.ResourceLocation>) matteroverdrive.gametest.MOGameTests::id;
+        var id = (java.util.function.Function<String, net.minecraft.resources.Identifier>) matteroverdrive.gametest.MOGameTests::id;
         var anyTime = event.registerEnvironment(id.apply("default"), new net.minecraft.gametest.framework.TestEnvironmentDefinition.AllOf(java.util.List.of()));
-        java.util.Map<Integer, net.minecraft.core.Holder<net.minecraft.gametest.framework.TestEnvironmentDefinition>> timed = new java.util.HashMap<>();
+        java.util.Map<Integer, net.minecraft.core.Holder<net.minecraft.gametest.framework.TestEnvironmentDefinition<?>>> timed = new java.util.HashMap<>();
         matteroverdrive.gametest.MOGameTests.tests().forEach((name, spec) -> {
             var environment = spec.timeOfDay() < 0 ? anyTime : timed.computeIfAbsent(spec.timeOfDay(),
-                    t -> event.registerEnvironment(id.apply("time_" + t), new net.minecraft.gametest.framework.TestEnvironmentDefinition.TimeOfDay(t)));
+                    t -> event.registerEnvironment(id.apply("time_" + t), new matteroverdrive.gametest.TimeOfDayEnvironment(t)));
             event.registerTest(id.apply(name), new net.minecraft.gametest.framework.FunctionGameTestInstance(
                     net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.TEST_FUNCTION, id.apply(name)),
                     new net.minecraft.gametest.framework.TestData<>(environment, id.apply("gametest_area"), spec.maxTicks(), 0, true,
-                            net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, spec.skyAccess())));
+                            net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, spec.skyAccess(), 0)));
         });
     }
 

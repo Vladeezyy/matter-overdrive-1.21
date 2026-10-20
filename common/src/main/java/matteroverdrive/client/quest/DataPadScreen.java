@@ -15,14 +15,14 @@ import matteroverdrive.quest.Quest;
 import matteroverdrive.quest.QuestPayloads;
 import matteroverdrive.quest.QuestStack;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.InteractionHand;
@@ -39,10 +39,10 @@ public class DataPadScreen extends Screen {
     public static final int WIDTH = 300, HEIGHT = 240;
     private static final int HOLO = 0xFFA9E2FB, HOLO_DIM = ARGB.color(255, ARGB.scaleRGB(0xA9E2FB, 0.5f)), HOLO_GREEN = 0xFF18CF00,
             HOLO_RED = 0xFFE65014;
-    private static final ResourceLocation BACKGROUND = id("data_pad");
-    private static final ResourceLocation BUTTON = id("button_normal"), BUTTON_OVER = id("button_over"), BUTTON_DARK = id("button_over_dark");
-    private static final ResourceLocation CLOSE = tex("textures/gui/elements/close_button.png");
-    private static final ResourceLocation BAND = tex("textures/gui/elements/android_bg_element.png");
+    private static final Identifier BACKGROUND = id("data_pad");
+    private static final Identifier BUTTON = id("button_normal"), BUTTON_OVER = id("button_over"), BUTTON_DARK = id("button_over_dark");
+    private static final Identifier CLOSE = tex("textures/gui/elements/close_button.png");
+    private static final Identifier BAND = tex("textures/gui/elements/android_bg_element.png");
     private static final int LIST_X = 22, LIST_Y = 28, LIST_W = WIDTH - 28 - 44, ROW = 12, ROWS = 6;
     private static final int INFO_X = 22, INFO_Y = 116, INFO_W = WIDTH - 28 - 15, INFO_H = 80;
     private static final int BUTTONS_Y = HEIGHT - 28;
@@ -50,12 +50,12 @@ public class DataPadScreen extends Screen {
             ABANDON_BT = {WIDTH - 48, BUTTONS_Y + 4, 16, 16};
 
     private static final int PAGE_X = 14, PAGE_Y = 14, PAGE_W = WIDTH - 28, PAGE_H = HEIGHT - 14 - 49;
-    private static final ResourceLocation ENTRY_BG = tex("textures/gui/elements/quide_element_bg.png");
-    private static final ResourceLocation CIRCUIT = tex("textures/gui/elements/guide_cuircit_background.png");
-    private static final ResourceLocation GROUP_BG = id("guide_group");
-    private static final ResourceLocation SCROLL_LEFT = tex("textures/gui/elements/scroll_left.png");
-    private static final ResourceLocation SCROLL_RIGHT = tex("textures/gui/elements/scroll_right.png");
-    private static final ResourceLocation RETURN = tex("textures/gui/elements/return_arrow.png");
+    private static final Identifier ENTRY_BG = tex("textures/gui/elements/quide_element_bg.png");
+    private static final Identifier CIRCUIT = tex("textures/gui/elements/guide_cuircit_background.png");
+    private static final Identifier GROUP_BG = id("guide_group");
+    private static final Identifier SCROLL_LEFT = tex("textures/gui/elements/scroll_left.png");
+    private static final Identifier SCROLL_RIGHT = tex("textures/gui/elements/scroll_right.png");
+    private static final Identifier RETURN = tex("textures/gui/elements/return_arrow.png");
     private static final String[] ORDER_ICONS = {"list", "grid", "sort_random"};
     /** 1.7.10 PageGuideEntries: static scroll and search, kept between openings; PageGuideDescription history. */
     private static int entriesScrollX, entriesScrollY;
@@ -78,15 +78,15 @@ public class DataPadScreen extends Screen {
         this.hand = hand;
     }
 
-    private static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, path);
+    private static Identifier id(String path) {
+        return Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, path);
     }
 
-    private static ResourceLocation tex(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, path);
+    private static Identifier tex(String path) {
+        return Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, path);
     }
 
-    private static ResourceLocation holo(String name) {
+    private static Identifier holo(String name) {
         return tex("textures/gui/holo/" + name + ".png");
     }
 
@@ -135,8 +135,8 @@ public class DataPadScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        super.render(g, mouseX, mouseY, partialTick);
+    public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(g, mouseX, mouseY, partialTick);
         if (!(pad().getItem() instanceof DataPadItem)) {
             onClose();
             return;
@@ -228,7 +228,7 @@ public class DataPadScreen extends Screen {
         entriesScrollY = Math.max(Math.min(entriesScrollY, 0), PAGE_H - inner[1]);
     }
 
-    private void renderEntries(GuiGraphics g, int mx, int my, int mouseX, int mouseY) {
+    private void renderEntries(GuiGraphicsExtractor g, int mx, int my, int mouseX, int mouseY) {
         java.util.Map<String, int[]> groups = new java.util.LinkedHashMap<>();
         int[] inner = new int[2];
         List<Placed> placed = placeEntries(groups, inner);
@@ -243,7 +243,7 @@ public class DataPadScreen extends Screen {
                 int[] b = group.getValue();
                 g.blitSprite(RenderPipelines.GUI_TEXTURED, GROUP_BG, px + b[0], py + b[1], b[2] - b[0], b[3] - b[1], 0xFFBFE4E6);
                 Component name = GuideElement.uni(net.minecraft.client.resources.language.I18n.get("guide.matteroverdrive.group." + group.getKey()));
-                g.drawString(font, name, px + (b[0] + b[2]) / 2 - font.width(name) / 2, py + b[1] - 4, 0xFFBFE4E6, false);
+                g.text(font, name, px + (b[0] + b[2]) / 2 - font.width(name) / 2, py + b[1] - 4, 0xFFBFE4E6, false);
             }
         }
         long time = minecraft.level == null ? 0 : minecraft.level.getGameTime();
@@ -252,9 +252,9 @@ public class DataPadScreen extends Screen {
             int ex = px + p.x(), ey = py + p.y();
             g.blit(RenderPipelines.GUI_TEXTURED, ENTRY_BG, ex, ey, 0, 0, 22, 22, 22, 22);
             List<ItemStack> icons = p.entry().icons();
-            if (!icons.isEmpty()) g.renderItem(icons.get((int) (time / 20 % icons.size())), ex + 3, ey + 3);
+            if (!icons.isEmpty()) g.item(icons.get((int) (time / 20 % icons.size())), ex + 3, ey + 3);
             if (state.ordering() == 0) {
-                g.drawString(font, GuideElement.uni(p.entry().getDisplayName()), ex + 26, ey + 6, 0xFFBFE4E6, false);
+                g.text(font, GuideElement.uni(p.entry().getDisplayName()), ex + 26, ey + 6, 0xFFBFE4E6, false);
             }
             if (mx >= p.x() + PAGE_X && my >= p.y() + PAGE_Y && mx < p.x() + PAGE_X + 22 && my < p.y() + PAGE_Y + 22
                     && in(mx, my, PAGE_X, PAGE_Y, PAGE_W, PAGE_H)) {
@@ -269,7 +269,7 @@ public class DataPadScreen extends Screen {
         if (hoveredEntry != null) g.setTooltipForNextFrame(font, Component.literal(hoveredEntry.getDisplayName()), mouseX, mouseY);
     }
 
-    private void circuit(GuiGraphics g, int x, int y, float u, float v, float uw, float vh) {
+    private void circuit(GuiGraphicsExtractor g, int x, int y, float u, float v, float uw, float vh) {
         int size = 1600;
         g.blit(RenderPipelines.GUI_TEXTURED, CIRCUIT, x, y, u * size, v * size, PAGE_W, PAGE_H, (int) (uw * size), (int) (vh * size),
                 size, size, ARGB.color(26, 0xFFFFFF));
@@ -304,7 +304,7 @@ public class DataPadScreen extends Screen {
         }
     }
 
-    private void renderDescription(GuiGraphics g, int mouseX, int mouseY) {
+    private void renderDescription(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         ensureLoaded();
         int px = left + PAGE_X, py = top + PAGE_Y;
         int page = state.guidePage();
@@ -317,7 +317,7 @@ public class DataPadScreen extends Screen {
             if (ctx.hovered != null) g.setTooltipForNextFrame(font, ctx.hovered, mouseX, mouseY);
         } else {
             Component none = GuideElement.uni("No Info...");
-            g.drawString(font, none, px + PAGE_W / 2 - font.width(none) / 2, py + PAGE_H / 2, HOLO_RED, false);
+            g.text(font, none, px + PAGE_W / 2 - font.width(none) / 2, py + PAGE_H / 2, HOLO_RED, false);
         }
         int by = py + PAGE_H - 16;
         int mx = mouseX - left, my = mouseY - top;
@@ -326,7 +326,7 @@ public class DataPadScreen extends Screen {
         arrow(g, RETURN, px + PAGE_W / 2 - 5, by, 11, 11, mx, my);
     }
 
-    private void arrow(GuiGraphics g, ResourceLocation tex, int x, int y, int w, int h, int mx, int my) {
+    private void arrow(GuiGraphicsExtractor g, Identifier tex, int x, int y, int w, int h, int mx, int my) {
         boolean over = in(mx + left, my + top, x, y, w, h);
         g.blit(RenderPipelines.GUI_TEXTURED, tex, x, y, over ? w : 0, 0, w, h, w * 2, h);
     }
@@ -341,7 +341,7 @@ public class DataPadScreen extends Screen {
         }
     }
 
-    private void button(GuiGraphics g, int mx, int my, int[] b, String icon, int iconSize, boolean enabled, int color, int mouseX, int mouseY,
+    private void button(GuiGraphicsExtractor g, int mx, int my, int[] b, String icon, int iconSize, boolean enabled, int color, int mouseX, int mouseY,
                         String tooltip) {
         boolean over = enabled && in(mx, my, b[0], b[1], b[2], b[3]);
         g.blitSprite(RenderPipelines.GUI_TEXTURED, !enabled ? BUTTON_DARK : over ? BUTTON_OVER : BUTTON, left + b[0], top + b[1], b[2], b[3]);
@@ -351,7 +351,7 @@ public class DataPadScreen extends Screen {
         if (in(mx, my, b[0], b[1], b[2], b[3])) g.setTooltipForNextFrame(font, Component.translatable(tooltip), mouseX, mouseY);
     }
 
-    private void renderQuests(GuiGraphics g, int mx, int my, int mouseX, int mouseY) {
+    private void renderQuests(GuiGraphicsExtractor g, int mx, int my, int mouseX, int mouseY) {
         List<QuestStack> quests = quests();
         QuestStack selected = selected();
         // the list (1.7.10 MOElementListBox of ListElementQuest: centred titles, "‣ " on the selected one)
@@ -362,12 +362,12 @@ public class DataPadScreen extends Screen {
             boolean isSelected = stack == selected;
             int ty = top + LIST_Y + i * ROW;
             int tw = font.width(title);
-            if (isSelected) g.drawString(font, "‣ " + title, left + LIST_X + LIST_W / 2 - tw / 2 - 8, ty, HOLO, false);
-            else g.drawString(font, title, left + LIST_X + LIST_W / 2 - tw / 2, ty, HOLO_DIM, false);
+            if (isSelected) g.text(font, "‣ " + title, left + LIST_X + LIST_W / 2 - tw / 2 - 8, ty, HOLO, false);
+            else g.text(font, title, left + LIST_X + LIST_W / 2 - tw / 2, ty, HOLO_DIM, false);
         }
         if (quests.isEmpty()) {
             Component none = Component.translatable("gui.matteroverdrive.quest.none");
-            g.drawString(font, none, left + LIST_X + LIST_W / 2 - font.width(none) / 2, top + LIST_Y, HOLO_DIM, false);
+            g.text(font, none, left + LIST_X + LIST_W / 2 - font.width(none) / 2, top + LIST_Y, HOLO_DIM, false);
         }
         // the band between list and info (1.7.10 android_bg_element at 20% holo)
         g.blit(RenderPipelines.GUI_TEXTURED, BAND, left + 60, top + 102, 0, 0, 174, 11, 174, 11, ARGB.color(51, 0xA9E2FB));
@@ -395,13 +395,13 @@ public class DataPadScreen extends Screen {
         g.enableScissor(left + INFO_X, top + INFO_Y, left + INFO_X + INFO_W, top + INFO_Y + INFO_H);
         int y = top + INFO_Y - scroll;
         for (FormattedCharSequence line : lines) {
-            g.drawString(font, line, left + INFO_X, y, HOLO, false);
+            g.text(font, line, left + INFO_X, y, HOLO, false);
             y += font.lineHeight;
         }
         for (int i = 0; i < rewards.size(); i++) {
             int rx = left + INFO_X + 8 + i * 20, ry = y + 2;
-            g.renderItem(rewards.get(i), rx, ry);
-            g.renderItemDecorations(font, rewards.get(i), rx, ry);
+            g.item(rewards.get(i), rx, ry);
+            g.itemDecorations(font, rewards.get(i), rx, ry);
             if (mouseX >= rx && mouseX < rx + 16 && mouseY >= ry && mouseY < ry + 16 && mouseY >= top + INFO_Y && mouseY < top + INFO_Y + INFO_H) {
                 g.setTooltipForNextFrame(font, rewards.get(i), mouseX, mouseY);
             }

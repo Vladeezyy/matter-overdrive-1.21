@@ -14,7 +14,7 @@ import matteroverdrive.MatterOverdrive;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.Item;
@@ -48,11 +48,11 @@ import net.minecraft.world.item.crafting.SingleRecipeInput;
  */
 public final class MatterRegistry {
     /** The base values: the {@code matteroverdrive:matter} item data map (data/<namespace>/data_maps/item/matter.json) */
-    public static final ResourceLocation MATTER_MAP = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "matter");
+    public static final Identifier MATTER_MAP = Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "matter");
 
     private static final int PASSES = 8;
     /** Items that never get an estimated value (creative / technical blocks; modpacks can add to it). */
-    public static final TagKey<Item> BLACKLIST = TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "matter_blacklist"));
+    public static final TagKey<Item> BLACKLIST = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "matter_blacklist"));
 
     /** Values on the logical server (recomputed after every data load) and the copy the client received. */
     private static @Nullable Map<Item, Integer> serverValues;
@@ -282,7 +282,7 @@ public final class MatterRegistry {
     @SuppressWarnings({"unchecked", "rawtypes"})
     private static ItemStack result(Recipe recipe, MinecraftServer server, Object input) {
         try {
-            return recipe.assemble((net.minecraft.world.item.crafting.RecipeInput) input, server.registryAccess());
+            return recipe.assemble((net.minecraft.world.item.crafting.RecipeInput) input);
         } catch (RuntimeException e) {
             return ItemStack.EMPTY; // special recipes that need a real input
         }

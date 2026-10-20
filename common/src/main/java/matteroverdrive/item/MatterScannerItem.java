@@ -171,7 +171,7 @@ public class MatterScannerItem extends Item {
         } else {
             message = Component.translatable("chat.matteroverdrive.scanner.no_space", name).withStyle(ChatFormatting.RED);
         }
-        player.displayClientMessage(prefix.copy().append(message), false);
+        player.sendSystemMessage(prefix.copy().append(message));
         level.playSound(null, player.getX(), player.getY(), player.getZ(), ok ? MOSounds.SCANNER_SUCCESS.get() : MOSounds.SCANNER_FAIL.get(),
                 SoundSource.PLAYERS, 1, 1);
         if (ok) level.destroyBlock(pos, false, player);

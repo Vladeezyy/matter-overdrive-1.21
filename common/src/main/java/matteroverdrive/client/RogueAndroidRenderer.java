@@ -13,7 +13,7 @@ import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.ArmorModelSet;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -23,7 +23,7 @@ import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.HumanoidArm;
 
@@ -35,8 +35,8 @@ public class RogueAndroidRenderer<T extends RogueAndroid> extends HumanoidMobRen
     public static final ModelLayerLocation MELEE = layer("rogue_android");
     public static final ModelLayerLocation RANGED = layer("ranged_rogue_android");
     public static final ModelLayerLocation VISOR = layer("ranged_rogue_android_visor");
-    private static final ResourceLocation MELEE_TEXTURE = tex("android");
-    private static final ResourceLocation RANGED_TEXTURE = tex("android_ranged");
+    private static final Identifier MELEE_TEXTURE = tex("android");
+    private static final Identifier RANGED_TEXTURE = tex("android_ranged");
     private final boolean ranged;
 
     public static class State extends HumanoidRenderState {
@@ -45,11 +45,11 @@ public class RogueAndroidRenderer<T extends RogueAndroid> extends HumanoidMobRen
     }
 
     private static ModelLayerLocation layer(String name) {
-        return new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, name), "main");
+        return new ModelLayerLocation(Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, name), "main");
     }
 
-    private static ResourceLocation tex(String name) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/entity/" + name + ".png");
+    private static Identifier tex(String name) {
+        return Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/entity/" + name + ".png");
     }
 
     public static LayerDefinition meleeLayer() {
@@ -101,7 +101,7 @@ public class RogueAndroidRenderer<T extends RogueAndroid> extends HumanoidMobRen
     }
 
     @Override
-    public ResourceLocation getTextureLocation(State state) {
+    public Identifier getTextureLocation(State state) {
         return ranged ? RANGED_TEXTURE : MELEE_TEXTURE;
     }
 
@@ -128,7 +128,7 @@ public class RogueAndroidRenderer<T extends RogueAndroid> extends HumanoidMobRen
 
         @Override
         public void submit(PoseStack pose, SubmitNodeCollector collector, int light, State state, float yRot, float xRot) {
-            collector.order(1).submitModel(visor, state, pose, RenderType.entityTranslucentEmissive(RANGED_TEXTURE), 0xF000F0,
+            collector.order(1).submitModel(visor, state, pose, net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucentEmissive(RANGED_TEXTURE), 0xF000F0,
                     OverlayTexture.NO_OVERLAY, ARGB.color(255, state.visorColor), null, state.outlineColor, null);
         }
     }

@@ -2,18 +2,20 @@ package matteroverdrive.client.starmap;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.OptionalDouble;
 
 import com.mojang.blaze3d.pipeline.BlendFunction;
+import com.mojang.blaze3d.pipeline.ColorTargetState;
+import com.mojang.blaze3d.pipeline.DepthStencilState;
+import com.mojang.blaze3d.platform.CompareOp;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 
 import matteroverdrive.MatterOverdrive;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.RenderStateShard;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.rendertype.RenderSetup;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.resources.Identifier;
 
 /**
  * The 1.7.10 holograms drew with glBlendFunc(GL_ONE, GL_ONE), no depth writes and no culling: textured quads (beam,
@@ -21,9 +23,12 @@ import net.minecraft.resources.ResourceLocation;
  * black core sphere writes depth (and adds nothing) so the far side of its wire sphere is hidden.
  */
 public final class HoloRenderTypes {
+    private static final DepthStencilState NO_DEPTH_WRITE = new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, false);
+
     private static RenderPipeline.Builder base(String name) {
-        return RenderPipeline.builder(RenderPipelines.MATRICES_PROJECTION_SNIPPET).withLocation(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID,
-                "pipeline/" + name)).withBlend(BlendFunction.ADDITIVE).withCull(false).withDepthWrite(false);
+        return RenderPipeline.builder(RenderPipelines.MATRICES_PROJECTION_SNIPPET).withLocation(Identifier.fromNamespaceAndPath(MatterOverdrive.MODID,
+                "pipeline/" + name)).withColorTargetState(new ColorTargetState(BlendFunction.ADDITIVE)).withCull(false)
+                .withDepthStencilState(NO_DEPTH_WRITE);
     }
 
     public static final RenderPipeline TEXTURED = base("holo_textured").withVertexShader("core/position_tex_color")
@@ -38,22 +43,21 @@ public final class HoloRenderTypes {
     public static final RenderPipeline TRIANGLES = base("holo_triangles").withVertexShader("core/position_color")
             .withFragmentShader("core/position_color").withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLES).build();
     public static final RenderPipeline DEPTH_QUADS = base("holo_depth_quads").withVertexShader("core/position_color")
-            .withFragmentShader("core/position_color").withDepthWrite(true)
+            .withFragmentShader("core/position_color").withDepthStencilState(DepthStencilState.DEFAULT)
             .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS).build();
     public static final RenderPipeline LINES = RenderPipeline.builder(RenderPipelines.LINES_SNIPPET)
-            .withLocation(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "pipeline/holo_lines"))
-            .withBlend(BlendFunction.ADDITIVE).withDepthWrite(false).build();
+            .withLocation(Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "pipeline/holo_lines"))
+            .withColorTargetState(new ColorTargetState(BlendFunction.ADDITIVE)).withDepthStencilState(NO_DEPTH_WRITE).build();
 
     /** 1.7.10 block screens: glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR). */
-    public static final RenderPipeline SCREEN = base("holo_screen").withBlend(new BlendFunction(
-                    com.mojang.blaze3d.platform.SourceFactor.ONE, com.mojang.blaze3d.platform.DestFactor.ONE_MINUS_SRC_COLOR))
+    public static final RenderPipeline SCREEN = base("holo_screen").withColorTargetState(new ColorTargetState(new BlendFunction(
+                    com.mojang.blaze3d.platform.SourceFactor.ONE, com.mojang.blaze3d.platform.DestFactor.ONE_MINUS_SRC_COLOR)))
             .withVertexShader("core/position_tex_color").withFragmentShader("core/position_tex_color").withSampler("Sampler0")
             .withVertexFormat(DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS).build();
-    private static final Map<ResourceLocation, RenderType> SCREEN_TYPES = new HashMap<>();
+    private static final Map<Identifier, RenderType> SCREEN_TYPES = new HashMap<>();
 
-    public static RenderType screen(ResourceLocation texture) {
-        return SCREEN_TYPES.computeIfAbsent(texture, t -> RenderType.create("mo_holo_screen", 1536, false, true, SCREEN,
-                RenderType.CompositeState.builder().setTextureState(new RenderStateShard.TextureStateShard(t, false)).createCompositeState(false)));
+    public static RenderType screen(Identifier texture) {
+        return SCREEN_TYPES.computeIfAbsent(texture, t -> RenderType.create("mo_holo_screen", RenderSetup.builder(SCREEN).withTexture("Sampler0", t).sortOnUpload().createRenderSetup()));
     }
 
     /** The mod's pipelines (NeoForge's RegisterRenderPipelinesEvent; vanilla compiles unregistered ones on first use) */
@@ -61,26 +65,20 @@ public final class HoloRenderTypes {
         for (RenderPipeline pipeline : new RenderPipeline[] {SCREEN, TEXTURED, TEXTURED_CULL, QUADS, TRIANGLES, DEPTH_QUADS, LINES}) event.accept(pipeline);
     }
 
-    private static final Map<ResourceLocation, RenderType> TEXTURED_TYPES = new HashMap<>();
-    public static final RenderType COLOR_QUADS = RenderType.create("mo_holo_quads", 1536, false, true, QUADS,
-            RenderType.CompositeState.builder().createCompositeState(false));
-    public static final RenderType COLOR_TRIANGLES = RenderType.create("mo_holo_triangles", 1536, false, true, TRIANGLES,
-            RenderType.CompositeState.builder().createCompositeState(false));
-    public static final RenderType DEPTH = RenderType.create("mo_holo_depth", 1536, false, false, DEPTH_QUADS,
-            RenderType.CompositeState.builder().createCompositeState(false));
-    public static final RenderType LINE_TYPE = RenderType.create("mo_holo_lines", 1536, false, false, LINES,
-            RenderType.CompositeState.builder().setLineState(new RenderStateShard.LineStateShard(OptionalDouble.of(1.0))).createCompositeState(false));
+    private static final Map<Identifier, RenderType> TEXTURED_TYPES = new HashMap<>();
+    public static final RenderType COLOR_QUADS = RenderType.create("mo_holo_quads", RenderSetup.builder(QUADS).sortOnUpload().createRenderSetup());
+    public static final RenderType COLOR_TRIANGLES = RenderType.create("mo_holo_triangles", RenderSetup.builder(TRIANGLES).sortOnUpload().createRenderSetup());
+    public static final RenderType DEPTH = RenderType.create("mo_holo_depth", RenderSetup.builder(DEPTH_QUADS).createRenderSetup());
+    public static final RenderType LINE_TYPE = RenderType.create("mo_holo_lines", RenderSetup.builder(LINES).createRenderSetup());
 
-    public static RenderType textured(ResourceLocation texture) {
-        return TEXTURED_TYPES.computeIfAbsent(texture, t -> RenderType.create("mo_holo_textured", 1536, false, true, TEXTURED,
-                RenderType.CompositeState.builder().setTextureState(new RenderStateShard.TextureStateShard(t, false)).createCompositeState(false)));
+    public static RenderType textured(Identifier texture) {
+        return TEXTURED_TYPES.computeIfAbsent(texture, t -> RenderType.create("mo_holo_textured", RenderSetup.builder(TEXTURED).withTexture("Sampler0", t).sortOnUpload().createRenderSetup()));
     }
 
-    private static final Map<ResourceLocation, RenderType> CULLED_TYPES = new HashMap<>();
+    private static final Map<Identifier, RenderType> CULLED_TYPES = new HashMap<>();
 
-    public static RenderType texturedCulled(ResourceLocation texture) {
-        return CULLED_TYPES.computeIfAbsent(texture, t -> RenderType.create("mo_holo_textured_cull", 1536, false, true, TEXTURED_CULL,
-                RenderType.CompositeState.builder().setTextureState(new RenderStateShard.TextureStateShard(t, false)).createCompositeState(false)));
+    public static RenderType texturedCulled(Identifier texture) {
+        return CULLED_TYPES.computeIfAbsent(texture, t -> RenderType.create("mo_holo_textured_cull", RenderSetup.builder(TEXTURED_CULL).withTexture("Sampler0", t).sortOnUpload().createRenderSetup()));
     }
 
     private HoloRenderTypes() {}

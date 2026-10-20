@@ -6,7 +6,7 @@ import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
@@ -14,7 +14,7 @@ import net.minecraft.world.entity.player.Player;
  * Data kept on a player, saved with it, copied on death and synced to clients (NeoForge: an attachment type with a
  * sync handler; Fabric: a data attachment and the mod's own sync payload).
  */
-public record PlayerData<T extends INBTSerializable<CompoundTag>>(ResourceLocation id, Supplier<T> factory, SyncHandler<T> sync) {
+public record PlayerData<T extends INBTSerializable<CompoundTag>>(Identifier id, Supplier<T> factory, SyncHandler<T> sync) {
     /** What goes to which client (the methods of NeoForge's {@code AttachmentSyncHandler}) */
     public interface SyncHandler<T> {
         /** Whether {@code to} gets the data of {@code holder} (the player itself and/or players tracking it) */

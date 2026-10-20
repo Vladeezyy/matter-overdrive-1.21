@@ -23,7 +23,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -48,8 +48,8 @@ public final class GuideElements {
         };
     }
 
-    private static ResourceLocation tex(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, path);
+    private static Identifier tex(String path) {
+        return Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, path);
     }
 
     /** 1.7.10 GuideElementPage: children laid out top to bottom; float:left ones side by side, float:right from the right. */
@@ -224,7 +224,7 @@ public final class GuideElements {
                 int cx = x0 + x;
                 boolean over = chunk.link() != null && ctx.mouseX > cx && ctx.mouseX < cx + chunk.width() && ctx.mouseY > y && ctx.mouseY < y + lh;
                 Component text = over ? uni(chunk.text()).copy().withStyle(ChatFormatting.UNDERLINE) : uni(chunk.text());
-                ctx.g.drawString(font(), text, cx, y, color, false);
+                ctx.g.text(font(), text, cx, y, color, false);
                 if (chunk.link() != null) {
                     GuideEntry target = chunk.link();
                     int page = chunk.page();
@@ -280,14 +280,14 @@ public final class GuideElements {
             ctx.g.pose().pushMatrix();
             ctx.g.pose().translate(x + tx + marginLeft, y + marginTop);
             ctx.g.pose().scale(size, size);
-            ctx.g.drawString(font(), uni(title), 0, 0, color, false);
+            ctx.g.text(font(), uni(title), 0, 0, color, false);
             ctx.g.pose().popMatrix();
         }
     }
 
     /** 1.7.10 GuideElementImage: textures/<src>, scaled down to fit the width. */
     public static final class Image extends GuideElement {
-        ResourceLocation location;
+        Identifier location;
         int imageWidth, imageHeight;
 
         @Override
@@ -337,7 +337,7 @@ public final class GuideElements {
 
     /** 1.7.10 GuideElementRecipe: the crafting grid (asked from the server) on guide_recipe.png. */
     public static final class Recipe extends GuideElement {
-        private static final ResourceLocation BACKGROUND = tex("textures/gui/elements/guide_recipe.png");
+        private static final Identifier BACKGROUND = tex("textures/gui/elements/guide_recipe.png");
         ItemStack output;
 
         @Override
@@ -382,7 +382,7 @@ public final class GuideElements {
         @Override
         public void draw(Context ctx, int x, int y, int width) {
             for (int i = 0; i < details.size(); i++) {
-                ctx.g.drawString(font(), uni(details.get(i)), x + marginLeft, y + marginTop + i * font().lineHeight, color, false);
+                ctx.g.text(font(), uni(details.get(i)), x + marginLeft, y + marginTop + i * font().lineHeight, color, false);
             }
         }
     }
@@ -405,16 +405,16 @@ public final class GuideElements {
         @Override
         public void draw(Context ctx, int x, int y, int width) {
             for (int i = 0; i < lines.size(); i++) {
-                ctx.g.drawString(font(), lines.get(i).copy().withStyle(s -> s.withFont(UNIFORM)), x, y + i * font().lineHeight, color, false);
+                ctx.g.text(font(), lines.get(i).copy().withStyle(s -> s.withFont(UNIFORM)), x, y + i * font().lineHeight, color, false);
             }
         }
     }
 
     /** 1.7.10 InfogramDepth: the ore's depth band on the terrain picture and the ore under the lens. */
     public static final class Depth extends GuideElement {
-        private static final ResourceLocation TERRAIN = tex("textures/gui/elements/guide_info_depth_terrain.png");
-        private static final ResourceLocation STRIPES = tex("textures/gui/elements/guide_info_depth_terrain_stripes.png");
-        private static final ResourceLocation LENS = tex("textures/gui/elements/guide_info_depth_ore_lense.png");
+        private static final Identifier TERRAIN = tex("textures/gui/elements/guide_info_depth_terrain.png");
+        private static final Identifier STRIPES = tex("textures/gui/elements/guide_info_depth_terrain_stripes.png");
+        private static final Identifier LENS = tex("textures/gui/elements/guide_info_depth_ore_lense.png");
         ItemStack stack;
         int minDepth = 0, maxDepth = 64;
 
@@ -431,8 +431,8 @@ public final class GuideElements {
         public void draw(Context ctx, int x, int y, int width) {
             float minPercent = 1 - Math.min(minDepth, 64) / 64f, maxPercent = 1 - Math.min(maxDepth, 64) / 64f;
             var g = ctx.g;
-            if (maxDepth >= 0) g.drawString(font(), uni(maxDepth + "-"), x + 8, y + 8 + (int) (46 * maxPercent), COLOR_HOLO_GREEN, false);
-            if (minDepth > 0) g.drawString(font(), uni(minDepth + "-"), x + 8, y + 8 + (int) (46 * minPercent), COLOR_HOLO_GREEN, false);
+            if (maxDepth >= 0) g.text(font(), uni(maxDepth + "-"), x + 8, y + 8 + (int) (46 * maxPercent), COLOR_HOLO_GREEN, false);
+            if (minDepth > 0) g.text(font(), uni(minDepth + "-"), x + 8, y + 8 + (int) (46 * minPercent), COLOR_HOLO_GREEN, false);
             int tx = x + marginLeft + 20, ty = y + marginTop + 8;
             g.blit(RenderPipelines.GUI_TEXTURED, TERRAIN, tx, ty, 0, 0, 73, 53, 144, 105, 144, 105);
             // 1.7.10 used a stencil: the stripes only between the depths
@@ -446,7 +446,7 @@ public final class GuideElements {
 
     /** 1.7.10 InfogramCreates: "from" turns into "to". */
     public static final class Creates extends GuideElement {
-        private static final ResourceLocation BACKGROUND = tex("textures/gui/elements/guide_info_creates.png");
+        private static final Identifier BACKGROUND = tex("textures/gui/elements/guide_info_creates.png");
         ItemStack from, to;
 
         @Override

@@ -9,10 +9,10 @@ import matteroverdrive.item.weapon.EnergyWeaponItem;
 import matteroverdrive.item.weapon.OmniToolItem;
 import matteroverdrive.item.weapon.PhaserItem;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -24,7 +24,7 @@ import net.minecraft.world.phys.Vec3;
  * (third person, other players) or with the first-person hand.
  */
 public final class PhaserBeamRenderer {
-    private static final ResourceLocation BEAM = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/fx/plasmabeam.png");
+    private static final Identifier BEAM = Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/fx/plasmabeam.png");
     private static final float WIDTH = 0.06f;
 
     /** World-space beam relative to the player's render origin. */
@@ -71,7 +71,7 @@ public final class PhaserBeamRenderer {
         long time = player.level().getGameTime();
         float pulse = 0.5f + (float) (1 + Math.sin(time * 0.5)) * 0.25f;
         int color = ARGB.color(Math.round(255 * pulse), phaser.getColor(player.getUseItem()));
-        RenderType type = RenderType.energySwirl(BEAM, 0, 0);
+        RenderType type = net.minecraft.client.renderer.rendertype.RenderTypes.energySwirl(BEAM, 0, 0);
         collector.submitCustomGeometry(pose, type, (p, vc) -> ribbon(vc, p, start, end, camera, color));
     }
 

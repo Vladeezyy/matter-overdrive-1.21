@@ -2,7 +2,7 @@ package matteroverdrive.client.screen;
 
 import matteroverdrive.menu.ContractMarketMenu;
 import matteroverdrive.menu.MachineMenu;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -25,17 +25,17 @@ public class ContractMarketScreen extends MachineScreen<ContractMarketMenu> {
         return true;
     }
 
-    private GuiGraphics graphicsForSlots;
+    private GuiGraphicsExtractor graphicsForSlots;
 
     @Override
-    protected void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         graphicsForSlots = g;
-        super.renderBg(g, partialTick, mouseX, mouseY);
+        super.extractBackground(g, mouseX, mouseY, partialTick);
     }
 
     @Override
-    protected void renderHome(GuiGraphics g, int x, int y, int mx, int my) {
-        g.drawString(font, Component.translatable("gui.matteroverdrive.contract_market.next_quest",
+    protected void renderHome(GuiGraphicsExtractor g, int x, int y, int mx, int my) {
+        g.text(font, Component.translatable("gui.matteroverdrive.contract_market.next_quest",
                 AndroidSpawnerScreen.formatRemainingTime(menu.getSecondsUntilNextQuest())), x + 64, y + 30, COLOR_GUI_LIGHT, false);
     }
 }

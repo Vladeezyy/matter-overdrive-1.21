@@ -2,7 +2,7 @@ package matteroverdrive.init;
 
 import matteroverdrive.MatterOverdrive;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import matteroverdrive.platform.RegistryEntry;
 import matteroverdrive.platform.Registrar;
@@ -70,7 +70,7 @@ public final class MOSounds {
     public static final RegistryEntry<SoundEvent, SoundEvent> PLASMA_SHOTGUN_CHARGING = sound("plasma_shotgun_charging");
 
     private static RegistryEntry<SoundEvent, SoundEvent> sound(String name) {
-        return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, name)));
+        return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, name)));
     }
 
     private MOSounds() {}

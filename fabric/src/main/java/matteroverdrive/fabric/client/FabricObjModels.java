@@ -21,13 +21,20 @@ import com.google.gson.JsonParser;
 
 import matteroverdrive.MatterOverdrive;
 import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.BlockModel;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.cuboid.CuboidModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import com.mojang.blaze3d.platform.Transparency;
+import net.minecraft.client.model.geom.builders.UVPair;
+import net.minecraft.client.resources.model.ModelDebugName;
+import net.minecraft.client.resources.model.geometry.QuadCollection;
+import net.minecraft.client.resources.model.geometry.UnbakedGeometry;
+import net.minecraft.client.resources.model.sprite.Material;
+import net.minecraft.client.resources.model.sprite.TextureSlots;
 import net.minecraft.client.resources.model.ModelBaker;
-import net.minecraft.client.resources.model.ModelState;
+import net.minecraft.client.renderer.block.dispatch.ModelState;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 
@@ -56,22 +63,22 @@ public final class FabricObjModels {
         PreparableModelLoadingPlugin.register((state, executor) -> load(state.resourceManager(), executor), (models, context) ->
                 context.modifyModelOnLoad().register((model, ctx) -> {
                     ObjModel obj = models.get(ctx.id());
-                    return obj != null && model instanceof BlockModel json ? new BlockModel(new Geometry(obj), json.guiLight(),
+                    return obj != null && model instanceof CuboidModel json ? new CuboidModel(new Geometry(obj), json.guiLight(),
                             json.ambientOcclusion(), json.transforms(), json.textureSlots(), json.parent()) : model;
                 }));
     }
 
     /** Finds the mod's OBJ model JSONs and reads their OBJ files (off the main thread, on each resource reload) */
-    private static CompletableFuture<Map<ResourceLocation, ObjModel>> load(ResourceManager manager, Executor executor) {
+    private static CompletableFuture<Map<Identifier, ObjModel>> load(ResourceManager manager, Executor executor) {
         return CompletableFuture.supplyAsync(() -> {
-            Map<ResourceLocation, ObjModel> models = new HashMap<>();
-            Map<ResourceLocation, ObjFile> files = new HashMap<>();
+            Map<Identifier, ObjModel> models = new HashMap<>();
+            Map<Identifier, ObjFile> files = new HashMap<>();
             var found = manager.listResources("models", id -> id.getNamespace().equals(MatterOverdrive.MODID) && id.getPath().endsWith(".json"));
-            for (Map.Entry<ResourceLocation, Resource> entry : found.entrySet()) {
+            for (Map.Entry<Identifier, Resource> entry : found.entrySet()) {
                 try (Reader reader = entry.getValue().openAsReader()) {
                     JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
                     if (!json.has("loader") || !json.get("loader").getAsString().equals("neoforge:obj")) continue;
-                    ResourceLocation file = ResourceLocation.parse(json.get("model").getAsString());
+                    Identifier file = Identifier.parse(json.get("model").getAsString());
                     ObjFile obj = files.get(file);
                     if (obj == null) {
                         obj = readObj(manager, file);
@@ -84,7 +91,7 @@ public final class FabricObjModels {
                     boolean flipV = json.has("flip_v") && json.get("flip_v").getAsBoolean();
                     // models/block/x.json → block/x, the id vanilla loads the model by
                     String path = entry.getKey().getPath();
-                    ResourceLocation id = entry.getKey().withPath(path.substring("models/".length(), path.length() - ".json".length()));
+                    Identifier id = entry.getKey().withPath(path.substring("models/".length(), path.length() - ".json".length()));
                     models.put(id, new ObjModel(obj, flipV, visibility));
                 } catch (Exception e) {
                     MatterOverdrive.LOGGER.error("Could not load the OBJ model {}", entry.getKey(), e);
@@ -94,7 +101,7 @@ public final class FabricObjModels {
         }, executor);
     }
 
-    private static ObjFile readObj(ResourceManager manager, ResourceLocation file) throws IOException {
+    private static ObjFile readObj(ResourceManager manager, Identifier file) throws IOException {
         List<Vector3f> positions = new ArrayList<>();
         List<float[]> uvs = new ArrayList<>();
         List<Vector3f> normals = new ArrayList<>();
@@ -141,7 +148,7 @@ public final class FabricObjModels {
         return index < 0 ? size + index : index - 1;
     }
 
-    private static void readMtl(ResourceManager manager, ResourceLocation file, Map<String, String> textures, Map<String, Integer> tints) throws IOException {
+    private static void readMtl(ResourceManager manager, Identifier file, Map<String, String> textures, Map<String, Integer> tints) throws IOException {
         try (BufferedReader reader = manager.openAsReader(file)) {
             String material = "";
             String line;
@@ -159,37 +166,42 @@ public final class FabricObjModels {
     }
 
     /** The OBJ geometry, baked with the texture slots of the model that uses it */
-    private record Geometry(ObjModel obj) implements net.minecraft.client.resources.model.UnbakedGeometry {
+    private record Geometry(ObjModel obj) implements UnbakedGeometry {
         @Override
-        public net.minecraft.client.resources.model.QuadCollection bake(net.minecraft.client.renderer.block.model.TextureSlots slots, ModelBaker baker,
-                                                                     ModelState state, net.minecraft.client.resources.model.ModelDebugName name) {
+        public QuadCollection bake(TextureSlots slots, ModelBaker baker, ModelState state, ModelDebugName name) {
             ObjFile file = this.obj.obj();
-            Map<String, TextureAtlasSprite> materialSprites = new HashMap<>();
-            Function<String, TextureAtlasSprite> spriteOf = material -> materialSprites.computeIfAbsent(material, m -> {
+            ModelBaker.Interner interner = baker.interner();
+            Map<String, Material.Baked> materials = new HashMap<>();
+            Function<String, Material.Baked> materialOf = material -> materials.computeIfAbsent(material, m -> {
                 String slot = file.materialTextures().getOrDefault(m, "#texture");
-                return baker.sprites().resolveSlot(slots, slot.startsWith("#") ? slot.substring(1) : slot, name);
+                return baker.materials().resolveSlot(slots, slot.startsWith("#") ? slot.substring(1) : slot, name);
             });
+            Map<String, BakedQuad.MaterialInfo> infos = new HashMap<>();
             // the block state's rotation turns the model about the block's centre
             Matrix4f transform = new Matrix4f();
-            if (!state.transformation().equals(com.mojang.math.Transformation.identity())) {
+            if (!state.transformation().equals(com.mojang.math.Transformation.IDENTITY)) {
                 transform.translate(0.5f, 0.5f, 0.5f).mul(state.transformation().getMatrix()).translate(-0.5f, -0.5f, -0.5f);
             }
-            var quads = new net.minecraft.client.resources.model.QuadCollection.Builder();
+            var quads = new QuadCollection.Builder();
             for (Face face : file.faces()) {
                 if (!this.obj.visibility().getOrDefault(face.group(), true)) continue;
-                TextureAtlasSprite sprite = spriteOf.apply(face.material());
-                int tint = file.materialTints().getOrDefault(face.material(), -1);
+                BakedQuad.MaterialInfo info = infos.computeIfAbsent(face.material(), m -> {
+                    Material.Baked material = materialOf.apply(m);
+                    Transparency transparency = material.forceTranslucent() ? Transparency.TRANSLUCENT
+                            : material.sprite().contents().computeTransparency(0, 0, 1, 1);
+                    return interner.materialInfo(BakedQuad.MaterialInfo.of(material, transparency, file.materialTints().getOrDefault(m, -1), true, 0));
+                });
                 // triangles become quads with a repeated vertex; larger polygons a fan of them
                 for (int start = 1; start + 1 < face.positions().length; start += 2) {
                     int[] corners = start + 2 < face.positions().length ? new int[] {0, start, start + 1, start + 2} : new int[] {0, start, start + 1, start + 1};
-                    this.quad(file, face, corners, sprite, tint, transform, quads);
+                    this.quad(file, face, corners, info, transform, interner, quads);
                 }
             }
             return quads.build();
         }
 
-        private void quad(ObjFile file, Face face, int[] corners, TextureAtlasSprite sprite, int tint, Matrix4f transform,
-                          net.minecraft.client.resources.model.QuadCollection.Builder quads) {
+        private void quad(ObjFile file, Face face, int[] corners, BakedQuad.MaterialInfo info, Matrix4f transform, ModelBaker.Interner interner,
+                          QuadCollection.Builder quads) {
             Vector3f[] points = new Vector3f[4];
             for (int i = 0; i < 4; i++) {
                 Vector4f p = transform.transform(new Vector4f(file.positions().get(face.positions()[corners[i]]), 1));
@@ -198,7 +210,8 @@ public final class FabricObjModels {
             Vector3f faceNormal = new Vector3f(points[1]).sub(points[0]).cross(new Vector3f(points[2]).sub(points[0]));
             if (faceNormal.lengthSquared() < 1.0E-12f) return;
             faceNormal.normalize();
-            int[] data = new int[32];
+            TextureAtlasSprite sprite = info.sprite();
+            long[] uvs = new long[4];
             for (int i = 0; i < 4; i++) {
                 int corner = corners[i];
                 float u = 0;
@@ -208,22 +221,12 @@ public final class FabricObjModels {
                     u = uv[0];
                     v = this.obj.flipV() ? 1 - uv[1] : uv[1];
                 }
-                Vector3f normal = faceNormal;
-                if (face.normals()[corner] >= 0) {
-                    normal = transform.transformDirection(new Vector3f(file.normals().get(face.normals()[corner]))).normalize();
-                }
-                int offset = i * 8;
-                data[offset] = Float.floatToRawIntBits(points[i].x);
-                data[offset + 1] = Float.floatToRawIntBits(points[i].y);
-                data[offset + 2] = Float.floatToRawIntBits(points[i].z);
-                data[offset + 3] = -1;
-                data[offset + 4] = Float.floatToRawIntBits(sprite.getU(u));
-                data[offset + 5] = Float.floatToRawIntBits(sprite.getV(v));
-                data[offset + 6] = 0;
-                data[offset + 7] = ((int) (normal.x * 127) & 0xFF) | ((int) (normal.y * 127) & 0xFF) << 8 | ((int) (normal.z * 127) & 0xFF) << 16;
+                uvs[i] = UVPair.pack(sprite.getU(u), sprite.getV(v));
             }
+            // 26.x quads carry no vertex normals: shading follows the quad's direction
             Direction direction = Direction.getApproximateNearest(faceNormal.x, faceNormal.y, faceNormal.z);
-            BakedQuad quad = new BakedQuad(data, tint, direction, sprite, true, 0);
+            BakedQuad quad = new BakedQuad(interner.vector(points[0]), interner.vector(points[1]), interner.vector(points[2]), interner.vector(points[3]),
+                    uvs[0], uvs[1], uvs[2], uvs[3], direction, info);
             Direction cull = cullFace(points, direction);
             if (cull != null) quads.addCulledFace(cull, quad);
             else quads.addUnculledFace(quad);

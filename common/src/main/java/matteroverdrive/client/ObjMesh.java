@@ -10,7 +10,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import matteroverdrive.MatterOverdrive;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * A triangulated Wavefront OBJ (positions + uvs) drawn as custom geometry, like 1.7.10 IModelCustom.renderAll.
@@ -25,7 +25,7 @@ public final class ObjMesh {
         this.uvs = uvs;
     }
 
-    public static ObjMesh load(ResourceLocation location) {
+    public static ObjMesh load(Identifier location) {
         List<float[]> v = new ArrayList<>(), vt = new ArrayList<>();
         List<Float> pos = new ArrayList<>(), uv = new ArrayList<>();
         try (BufferedReader reader = Minecraft.getInstance().getResourceManager().openAsReader(location)) {

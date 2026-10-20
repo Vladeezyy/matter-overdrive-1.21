@@ -6,13 +6,13 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import matteroverdrive.platform.PacketContext;
 
 /** Client -> server while the attack key is held with an energy weapon: fire if the weapon allows it. */
 public record FireWeaponPayload(boolean zoomed) implements CustomPacketPayload {
-    public static final Type<FireWeaponPayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "fire_weapon"));
+    public static final Type<FireWeaponPayload> TYPE = new Type<>(Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "fire_weapon"));
     public static final StreamCodec<RegistryFriendlyByteBuf, FireWeaponPayload> STREAM_CODEC =
             StreamCodec.composite(ByteBufCodecs.BOOL, FireWeaponPayload::zoomed, FireWeaponPayload::new);
 

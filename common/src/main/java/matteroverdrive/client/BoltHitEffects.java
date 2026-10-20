@@ -12,7 +12,7 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.data.AtlasIds;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
@@ -80,7 +80,7 @@ public final class BoltHitEffects {
 
         private static TextureAtlasSprite sprite(int index) {
             return Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(AtlasIds.PARTICLES)
-                    .getSprite(ResourceLocation.withDefaultNamespace("generic_" + index));
+                    .getSprite(Identifier.withDefaultNamespace("generic_" + index));
         }
 
         @Override
@@ -89,8 +89,8 @@ public final class BoltHitEffects {
         }
 
         @Override
-        public int getLightColor(float partialTick) {
-            int light = super.getLightColor(partialTick);
+        public int getLightCoords(float partialTick) {
+            int light = super.getLightCoords(partialTick);
             return 240 | (light >> 16 & 255) << 16;
         }
 

@@ -45,7 +45,7 @@ final class AndroidGameTests {
         var connection = new net.minecraft.network.Connection(net.minecraft.network.protocol.PacketFlow.SERVERBOUND);
         new io.netty.channel.embedded.EmbeddedChannel(connection);
         helper.getLevel().getServer().getPlayerList().placeNewPlayer(connection, player, cookie);
-        player.setClientLoaded(true);      // players are invulnerable until their client reports it has loaded
+        player.connection.handleAcceptPlayerLoad(new net.minecraft.network.protocol.game.ServerboundPlayerLoadedPacket());      // players are invulnerable until their client reports it has loaded
         net.minecraft.world.level.GameType.SURVIVAL.updatePlayerAbilities(player.getAbilities());   // abilities came from the creative default
         var pos = helper.absolutePos(new BlockPos(6, 1, 1)).getBottomCenter();
         player.snapTo(pos.x, pos.y, pos.z, 0, 0);
@@ -167,7 +167,7 @@ final class AndroidGameTests {
         check(helper, Math.abs(player.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED) - speed * 1.1) < 1e-6, "speed");
         // a rolled legendary part (level 3) is named and has 0..3 per attribute
         ItemStack rolled = new ItemStack(MOItems.ROGUE_ANDROID_HEAD.get());
-        matteroverdrive.entity.monster.RogueAndroid.makeLegendary(rolled, helper.getLevel().random, 3);
+        matteroverdrive.entity.monster.RogueAndroid.makeLegendary(rolled, helper.getLevel().getRandom(), 3);
         var legendary = rolled.get(matteroverdrive.init.MODataComponents.LEGENDARY_PART.get());
         check(helper, legendary != null && legendary.health() <= 3 && legendary.battery() >= -0.09 - 1e-9 && rolled.getHoverName().getString().contains("\u272a"),
                 "rolled " + legendary + " " + rolled.getHoverName().getString());
@@ -236,11 +236,11 @@ final class AndroidGameTests {
         check(helper, Android.get(player).getFlag("Shield"), "shield not up");
         var arrow = net.minecraft.world.entity.EntityType.ARROW.create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         // 2 damage = 512 FE: within the built-in store's 1024 FE per pull, so the hit is blocked outright
-        player.hurtServer(helper.getLevel(), helper.getLevel().damageSources().arrow((net.minecraft.world.entity.projectile.AbstractArrow) arrow, null), 2);
+        player.hurtServer(helper.getLevel(), helper.getLevel().damageSources().arrow((net.minecraft.world.entity.projectile.arrow.AbstractArrow) arrow, null), 2);
         check(helper, player.getHealth() == 20, "arrow got through the shield: " + player.getHealth());
         // 6 damage = 1536 FE: more than one pull, so (1.7.10) only 1024/1536 of it is absorbed
         player.invulnerableTime = 0;
-        player.hurtServer(helper.getLevel(), helper.getLevel().damageSources().arrow((net.minecraft.world.entity.projectile.AbstractArrow) arrow, null), 6);
+        player.hurtServer(helper.getLevel(), helper.getLevel().damageSources().arrow((net.minecraft.world.entity.projectile.arrow.AbstractArrow) arrow, null), 6);
         check(helper, Math.abs(player.getHealth() - 16) < 1e-4, "partial shield: " + player.getHealth());
         var pig = helper.spawnWithNoFreeWill(net.minecraft.world.entity.EntityType.PIG, new BlockPos(6, 1, 3));
         Android.get(player).setActiveStat(BioticStats.SHOCKWAVE.id());

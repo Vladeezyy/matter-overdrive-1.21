@@ -40,7 +40,7 @@ public class SolarPanelBlockEntity extends MachineBlockEntity {
         float time = 0;
         if (level.dimensionType().hasSkyLight()
                 && level.getBrightness(LightLayer.SKY, getBlockPos()) - level.getSkyDarken() >= 15) {
-            time = getTime(level);
+            time = getTime(level, worldPosition);
         }
         chargeAmount = Math.round(CHARGE_AMOUNT * Math.max(0, time));
         boolean active = time > 0.5f;
@@ -52,8 +52,8 @@ public class SolarPanelBlockEntity extends MachineBlockEntity {
     }
 
     /** 1.7.10 getTime(): cosine of the sun angle, flattened towards noon. */
-    private static float getTime(Level level) {
-        float f = level.getSunAngle(1f);
+    private static float getTime(Level level, net.minecraft.core.BlockPos pos) {
+        float f = level.environmentAttributes().getValue(net.minecraft.world.attribute.EnvironmentAttributes.SUN_ANGLE, pos) * ((float) Math.PI / 180f);
         if (f < (float) Math.PI) {
             f += (0f - f) * 0.2f;
         } else {

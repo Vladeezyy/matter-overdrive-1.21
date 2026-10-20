@@ -2,8 +2,8 @@ package matteroverdrive.client;
 
 import java.util.ServiceLoader;
 
-import net.minecraft.client.renderer.block.model.BlockStateModel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.resources.Identifier;
 
 /**
  * What the client code needs from the mod loader (only loaded on a physical client). Each loader module lists its
@@ -14,5 +14,5 @@ public interface ClientPlatform {
             .orElseThrow(() -> new IllegalStateException("No Matter Overdrive client platform for this mod loader"));
 
     /** An extra block model registered with {@link MOClient#extraModels()} (NeoForge "standalone" models, Fabric extra models) */
-    BlockStateModel standaloneModel(ResourceLocation id);
+    BlockStateModel standaloneModel(Identifier id);
 }

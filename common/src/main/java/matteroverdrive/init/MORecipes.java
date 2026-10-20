@@ -3,9 +3,8 @@ package matteroverdrive.init;
 import matteroverdrive.MatterOverdrive;
 import matteroverdrive.recipe.EnergyPackRecipe;
 import matteroverdrive.recipe.InscriberRecipe;
-import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import matteroverdrive.platform.RegistryEntry;
@@ -22,11 +21,11 @@ public final class MORecipes {
                     return MatterOverdrive.MODID + ":inscriber";
                 }
             });
-    public static final RegistryEntry<RecipeSerializer<?>, InscriberRecipe.Serializer> INSCRIBER_SERIALIZER =
-            SERIALIZERS.register("inscriber", InscriberRecipe.Serializer::new);
+    public static final RegistryEntry<RecipeSerializer<?>, RecipeSerializer<InscriberRecipe>> INSCRIBER_SERIALIZER =
+            SERIALIZERS.register("inscriber", () -> InscriberRecipe.SERIALIZER);
 
-    public static final RegistryEntry<RecipeSerializer<?>, CustomRecipe.Serializer<EnergyPackRecipe>> ENERGY_PACK_SERIALIZER =
-            SERIALIZERS.register("energy_pack", () -> new CustomRecipe.Serializer<>(EnergyPackRecipe::new));
+    public static final RegistryEntry<RecipeSerializer<?>, RecipeSerializer<EnergyPackRecipe>> ENERGY_PACK_SERIALIZER =
+            SERIALIZERS.register("energy_pack", () -> EnergyPackRecipe.SERIALIZER);
 
     private MORecipes() {}
 }

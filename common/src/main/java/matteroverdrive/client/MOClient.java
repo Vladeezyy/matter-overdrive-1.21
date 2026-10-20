@@ -16,7 +16,7 @@ import matteroverdrive.client.screen.ReplicatorScreen;
 import matteroverdrive.client.screen.SolarPanelScreen;
 import matteroverdrive.init.MOMenus;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.color.block.BlockColor;
+import net.minecraft.client.color.block.BlockTintSource;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -24,7 +24,7 @@ import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -69,7 +69,7 @@ public final class MOClient {
             var mc = net.minecraft.client.Minecraft.getInstance();
             if (player == mc.player) {
                 mc.getSoundManager().play(net.minecraft.client.resources.sounds.SimpleSoundInstance.forMusic(
-                        matteroverdrive.init.MOSounds.TRANSFORMATION_MUSIC.get(), 1));
+                        matteroverdrive.init.MOSounds.TRANSFORMATION_MUSIC.get()));
             }
         };        AnomalyParticles.setup();
         BoltHitEffects.setup();
@@ -138,17 +138,26 @@ public final class MOClient {
         layers.accept(MutantScientistRenderer.LAYER, HulkingScientistModel::createLayer);    }
 
     /** 1.7.10 BlockDecorative.colorMultiplier / BlockTritaniumCrate.getBlockColor: plates and crate overlays take their dye colour. */
-    public static void blockColors(BiConsumer<BlockColor, Block> event) {
+    public static void blockColors(BiConsumer<java.util.List<BlockTintSource>, Block> event) {
         var colors = net.minecraft.world.item.DyeColor.values();
         for (int i = 0; i < colors.length; i++) {
-            int rgb = colors[i].getTextureDiffuseColor();
-            event.accept((state, level, pos, tint) -> rgb, matteroverdrive.init.MODecorative.COLORED_PLATES.get(i).get());
-            event.accept((state, level, pos, tint) -> tint == 0 ? rgb : -1, matteroverdrive.init.MOBlocks.TRITANIUM_CRATES.get(i).get());
+            // 26.x: one tint source per tint index (the crates' overlay is index 0, the frame is untinted)
+            var tint = java.util.List.of(net.minecraft.client.color.block.BlockTintSources.constant(net.minecraft.util.ARGB.opaque(colors[i].getTextureDiffuseColor())));
+            event.accept(tint, matteroverdrive.init.MODecorative.COLORED_PLATES.get(i).get());
+            event.accept(tint, matteroverdrive.init.MOBlocks.TRITANIUM_CRATES.get(i).get());
         }    }
 
+    /** Matter Plasma's still and flowing textures (1.7.10 matter_plasma_still / _flowing), untinted */
+    public static net.minecraft.client.renderer.block.FluidModel.Unbaked matterPlasmaModel() {
+        return new net.minecraft.client.renderer.block.FluidModel.Unbaked(
+                new net.minecraft.client.resources.model.sprite.Material(Identifier.fromNamespaceAndPath(matteroverdrive.MatterOverdrive.MODID, "block/matter_plasma_still")),
+                new net.minecraft.client.resources.model.sprite.Material(Identifier.fromNamespaceAndPath(matteroverdrive.MatterOverdrive.MODID, "block/matter_plasma_flowing")),
+                null, null);
+    }
+
     /** 1.21.4+: the item model select properties the client item definitions use */
-    public static void registerSelectProperties(BiConsumer<ResourceLocation, net.minecraft.client.renderer.item.properties.select.SelectItemModelProperty.Type<?, ?>> event) {
-        event.accept(ResourceLocation.fromNamespaceAndPath(matteroverdrive.MatterOverdrive.MODID, "barrel"), BarrelProperty.TYPE);
+    public static void registerSelectProperties(BiConsumer<Identifier, net.minecraft.client.renderer.item.properties.select.SelectItemModelProperty.Type<?, ?>> event) {
+        event.accept(Identifier.fromNamespaceAndPath(matteroverdrive.MatterOverdrive.MODID, "barrel"), BarrelProperty.TYPE);
     }
 
     /** 1.21.9+: the mod's key categories (registered before the keys) */
@@ -162,7 +171,7 @@ public final class MOClient {
     }
 
     /** Extra block models the renderers draw */
-    public static List<ResourceLocation> extraModels() {
+    public static List<Identifier> extraModels() {
         return MachineRenderers.extraModels();
     }
 
@@ -195,8 +204,8 @@ public final class MOClient {
     }
 
     /** The HUD layers: the android HUD above the camera overlays, the quest HUD above the chat */
-    public static final ResourceLocation ANDROID_HUD = ResourceLocation.fromNamespaceAndPath(matteroverdrive.MatterOverdrive.MODID, "android_hud");
-    public static final ResourceLocation QUEST_HUD = ResourceLocation.fromNamespaceAndPath(matteroverdrive.MatterOverdrive.MODID, "quest_hud");
+    public static final Identifier ANDROID_HUD = Identifier.fromNamespaceAndPath(matteroverdrive.MatterOverdrive.MODID, "android_hud");
+    public static final Identifier QUEST_HUD = Identifier.fromNamespaceAndPath(matteroverdrive.MatterOverdrive.MODID, "quest_hud");
 
     private MOClient() {}
 }

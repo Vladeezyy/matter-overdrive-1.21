@@ -94,7 +94,7 @@ public class InscriberBlockEntity extends MachineBlockEntity {
     }
 
     private void inscribe(InscriberRecipe recipe) {
-        ItemStack result = recipe.assemble(new InscriberRecipe.Input(inventory.getStack(MAIN), inventory.getStack(SECONDARY)), getLevel().registryAccess());
+        ItemStack result = recipe.assemble(new InscriberRecipe.Input(inventory.getStack(MAIN), inventory.getStack(SECONDARY)));
         ItemStack out = inventory.getStack(OUTPUT);
         if (out.isEmpty()) {
             inventory.setStack(OUTPUT, result);

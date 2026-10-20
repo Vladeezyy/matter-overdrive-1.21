@@ -17,9 +17,9 @@ import matteroverdrive.starmap.Star;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
-import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
+import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.PerspectiveProjectionMatrixBuffer;
+import net.minecraft.client.renderer.ProjectionMatrixBuffer;
 import net.minecraft.util.Mth;
 
 /**
@@ -27,7 +27,7 @@ import net.minecraft.util.Mth;
  * tilted 15 degrees, slowly turning on the galaxy / quadrant / star pages, pulled back to fit the zoomed body.
  */
 public class StarMapPipRenderer extends PictureInPictureRenderer<StarMapPipRenderer.State> {
-    private final PerspectiveProjectionMatrixBuffer projection = new PerspectiveProjectionMatrixBuffer("star map");
+    private final ProjectionMatrixBuffer projection = new ProjectionMatrixBuffer("star map");
 
     public record State(StarMapBlockEntity starMap, float partialTick, int x0, int y0, int x1, int y1, float scale,
                         @Nullable ScreenRectangle scissorArea, @Nullable ScreenRectangle bounds) implements PictureInPictureRenderState {

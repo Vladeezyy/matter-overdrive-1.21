@@ -23,11 +23,11 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -39,10 +39,10 @@ import net.minecraft.world.phys.Vec3;
  * game time here instead of particle entities) and a holo screen on the back lists the anomaly's numbers.
  */
 public class StabilizerRenderer implements BlockEntityRenderer<GravitationalStabilizerBlockEntity, StabilizerRenderer.State> {
-    private static final ResourceLocation BEAM = id("textures/fx/physbeam.png");
-    private static final ResourceLocation MOTE = id("textures/fx/particles_additive.png");
-    private static final ResourceLocation GLOW = id("textures/fx/holo_monitor_glow.png");
-    private static final ResourceLocation BACK = id("textures/block/pattern_monitor_holo_back.png");
+    private static final Identifier BEAM = id("textures/fx/physbeam.png");
+    private static final Identifier MOTE = id("textures/fx/particles_additive.png");
+    private static final Identifier GLOW = id("textures/fx/holo_monitor_glow.png");
+    private static final Identifier BACK = id("textures/block/pattern_monitor_holo_back.png");
     private static final int HOLO = 0xA9E2FB;
     private static final int MOTE_LIFE = 80;
     private final Font font;
@@ -51,8 +51,8 @@ public class StabilizerRenderer implements BlockEntityRenderer<GravitationalStab
         this.font = context.font();
     }
 
-    private static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, path);
+    private static Identifier id(String path) {
+        return Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, path);
     }
 
     public static class State extends BlockEntityRenderState {
@@ -84,7 +84,7 @@ public class StabilizerRenderer implements BlockEntityRenderer<GravitationalStab
         state.pos = stabilizer.getBlockPos();
         state.seed = state.pos.asLong();
         state.gameTime = level.getGameTime();
-        state.dayTime = level.getDayTime();
+        state.dayTime = level.getDefaultClockTime();
         state.partial = partialTick;
         if (!stabilizer.getBlockState().getValue(MachineBlock.ACTIVE)) return;
         BlockPos hit = GravitationalStabilizerBlockEntity.findAnomaly(level, state.pos, state.facing);
@@ -206,7 +206,7 @@ public class StabilizerRenderer implements BlockEntityRenderer<GravitationalStab
         pose.popPose();
     }
 
-    private static void screenPlane(PoseStack pose, SubmitNodeCollector collector, ResourceLocation texture, int rgb, float z) {
+    private static void screenPlane(PoseStack pose, SubmitNodeCollector collector, Identifier texture, int rgb, float z) {
         collector.submitCustomGeometry(pose, HoloRenderTypes.screen(texture), (p, vc) -> {
             vertex(vc, p, new Vec3(-0.5, 0.5, z), 0, 0, rgb);
             vertex(vc, p, new Vec3(-0.5, -0.5, z), 0, 1, rgb);

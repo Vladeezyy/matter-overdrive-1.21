@@ -6,15 +6,15 @@ import com.mojang.math.Axis;
 
 import matteroverdrive.MatterOverdrive;
 import matteroverdrive.block.entity.GravitationalAnomalyBlockEntity;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -25,15 +25,15 @@ import org.jetbrains.annotations.Nullable;
  * anomaly's strength.
  */
 public class AnomalyRenderer implements BlockEntityRenderer<GravitationalAnomalyBlockEntity, AnomalyRenderer.State> {
-    private static final ResourceLocation BLACK = tex("black");
-    private static final ResourceLocation CORE = tex("gravitational_anomaly_core");
-    private static final ResourceLocation GLOW = tex("gravitational_anomaly_glow");
+    private static final Identifier BLACK = tex("black");
+    private static final Identifier CORE = tex("gravitational_anomaly_core");
+    private static final Identifier GLOW = tex("gravitational_anomaly_glow");
     private static final int STACKS = 12, SLICES = 16;
 
     public AnomalyRenderer(BlockEntityRendererProvider.Context context) {}
 
-    private static ResourceLocation tex(String name) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/block/" + name + ".png");
+    private static Identifier tex(String name) {
+        return Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/block/" + name + ".png");
     }
 
     public static class State extends BlockEntityRenderState {
@@ -63,15 +63,15 @@ public class AnomalyRenderer implements BlockEntityRenderer<GravitationalAnomaly
         pose.translate(0.5, 0.5, 0.5);
         float r = state.radius;
         // 1.7.10 sphere.obj has radius 0.5, scaled by the (pulsing) event horizon
-        collector.submitCustomGeometry(pose, RenderType.entityCutoutNoCull(BLACK), (p, vc) -> sphere(vc, p, r * 0.5f));
+        collector.submitCustomGeometry(pose, net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(BLACK), (p, vc) -> sphere(vc, p, r * 0.5f));
         // the glowing plane: twice the sphere, facing the camera, spinning about the view axis
         pose.mulPose(camera.orientation);
         pose.mulPose(Axis.ZP.rotationDegrees(state.spin));
         float half = r;     // a unit plane scaled by 2 x horizon
         // the core is a black disc, the glow a half-transparent white ring; both alpha blended (1.7.10 GL_SRC_ALPHA,
         // GL_ONE_MINUS_SRC_ALPHA) and unlit (lighting disabled)
-        collector.submitCustomGeometry(pose, RenderType.entityTranslucentEmissive(CORE), (p, vc) -> plane(vc, p, half));
-        collector.submitCustomGeometry(pose, RenderType.entityTranslucentEmissive(GLOW), (p, vc) -> plane(vc, p, half));
+        collector.submitCustomGeometry(pose, net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucentEmissive(CORE), (p, vc) -> plane(vc, p, half));
+        collector.submitCustomGeometry(pose, net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucentEmissive(GLOW), (p, vc) -> plane(vc, p, half));
         pose.popPose();
     }
 

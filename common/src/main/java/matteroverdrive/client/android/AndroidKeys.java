@@ -13,7 +13,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
@@ -29,7 +29,7 @@ import matteroverdrive.platform.Platform;
  * aims while X is held and jumps on release.
  */
 public final class AndroidKeys {
-    public static final KeyMapping.Category CATEGORY = new KeyMapping.Category(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "android"));
+    public static final KeyMapping.Category CATEGORY = new KeyMapping.Category(Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "android"));
     public static final KeyMapping ABILITY_USE = new KeyMapping("key." + MatterOverdrive.MODID + ".ability_use", GLFW.GLFW_KEY_X, CATEGORY);
     public static final KeyMapping ABILITY_SWITCH = new KeyMapping("key." + MatterOverdrive.MODID + ".ability_switch", GLFW.GLFW_KEY_TAB, CATEGORY);
     private static boolean teleportHeld;

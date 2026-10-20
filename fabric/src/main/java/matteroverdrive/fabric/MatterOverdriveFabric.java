@@ -19,7 +19,7 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLevelEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -66,12 +66,12 @@ public final class MatterOverdriveFabric implements ModInitializer {
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resources, success) -> MatterEvents.onServerDataLoaded());
         ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS.register((player, joined) -> MatterEvents.onDatapackSync(player.level().getServer(), List.of(player)));
         // galaxy (saving: ServerLevelMixin)
-        ServerWorldEvents.LOAD.register((server, level) -> GalaxyServer.onLevelLoad(level));
+        ServerLevelEvents.LOAD.register((server, level) -> GalaxyServer.onLevelLoad(level));
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
             GalaxyServer.onServerStopped();
             FabricPlayerData.server = null;
         });
-        ServerTickEvents.END_WORLD_TICK.register(GalaxyServer::onLevelTick);
+        ServerTickEvents.END_LEVEL_TICK.register(GalaxyServer::onLevelTick);
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> GalaxyServer.onPlayerJoin(handler.player));
         // quests (crafting and placing: ResultSlotMixin, BlockItemMixin; player ticks: PlayerMixin)
         ServerLivingEntityEvents.AFTER_DEATH.register(QuestEvents::onDeath);
@@ -92,7 +92,7 @@ public final class MatterOverdriveFabric implements ModInitializer {
     private static final class Payloads implements PayloadRegistrar {
         @Override
         public <T extends CustomPacketPayload> PayloadRegistrar playToClient(CustomPacketPayload.Type<T> type, StreamCodec<? super RegistryFriendlyByteBuf, T> codec, BiConsumer<T, PacketContext> handler) {
-            PayloadTypeRegistry.playS2C().register(type, codec);
+            PayloadTypeRegistry.clientboundPlay().register(type, codec);
             CLIENT_PAYLOADS.add(new ClientPayload<>(type, handler));
             return this;
         }
@@ -105,7 +105,7 @@ public final class MatterOverdriveFabric implements ModInitializer {
 
         @Override
         public <T extends CustomPacketPayload> PayloadRegistrar playToServer(CustomPacketPayload.Type<T> type, StreamCodec<? super RegistryFriendlyByteBuf, T> codec, BiConsumer<T, PacketContext> handler) {
-            PayloadTypeRegistry.playC2S().register(type, codec);
+            PayloadTypeRegistry.serverboundPlay().register(type, codec);
             ServerPlayNetworking.registerGlobalReceiver(type, (payload, context) -> handler.accept(payload, new PacketContext() {
                 @Override
                 public Player player() {

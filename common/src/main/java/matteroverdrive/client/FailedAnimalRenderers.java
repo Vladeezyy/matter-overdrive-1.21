@@ -10,13 +10,13 @@ import net.minecraft.client.renderer.entity.state.ChickenRenderState;
 import net.minecraft.client.renderer.entity.state.CowRenderState;
 import net.minecraft.client.renderer.entity.state.PigRenderState;
 import net.minecraft.client.renderer.entity.state.SheepRenderState;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.animal.Chicken;
-import net.minecraft.world.entity.animal.ChickenVariant;
-import net.minecraft.world.entity.animal.Cow;
-import net.minecraft.world.entity.animal.CowVariant;
-import net.minecraft.world.entity.animal.Pig;
-import net.minecraft.world.entity.animal.PigVariant;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.animal.chicken.Chicken;
+import net.minecraft.world.entity.animal.chicken.ChickenVariant;
+import net.minecraft.world.entity.animal.cow.Cow;
+import net.minecraft.world.entity.animal.cow.CowVariant;
+import net.minecraft.world.entity.animal.pig.Pig;
+import net.minecraft.world.entity.animal.pig.PigVariant;
 import net.minecraft.world.entity.variant.ModelAndTexture;
 import net.minecraft.world.entity.variant.SpawnPrioritySelectors;
 
@@ -26,14 +26,19 @@ import net.minecraft.world.entity.variant.SpawnPrioritySelectors;
  * textures are padded to the 64x64 layout of today's models by the resource generator).
  */
 public final class FailedAnimalRenderers {
-    private static final PigVariant PIG = new PigVariant(new ModelAndTexture<>(PigVariant.ModelType.NORMAL, tex("failed_pig")), SpawnPrioritySelectors.EMPTY);
-    private static final CowVariant COW = new CowVariant(new ModelAndTexture<>(CowVariant.ModelType.NORMAL, tex("failed_cow")), SpawnPrioritySelectors.EMPTY);
-    private static final ChickenVariant CHICKEN = new ChickenVariant(new ModelAndTexture<>(ChickenVariant.ModelType.NORMAL, tex("failed_chicken")),
+    private static final PigVariant PIG = new PigVariant(new ModelAndTexture<>(PigVariant.ModelType.NORMAL, tex("failed_pig")), baby("failed_pig"), SpawnPrioritySelectors.EMPTY);
+    private static final CowVariant COW = new CowVariant(new ModelAndTexture<>(CowVariant.ModelType.NORMAL, tex("failed_cow")), baby("failed_cow"), SpawnPrioritySelectors.EMPTY);
+    private static final ChickenVariant CHICKEN = new ChickenVariant(new ModelAndTexture<>(ChickenVariant.ModelType.NORMAL, tex("failed_chicken")), baby("failed_chicken"),
             SpawnPrioritySelectors.EMPTY);
-    private static final ResourceLocation SHEEP = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/entity/failed_sheep.png");
+    private static final Identifier SHEEP = Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/entity/failed_sheep.png");
 
-    private static ResourceLocation tex(String name) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "entity/" + name);
+    /** 26.x: babies have their own texture layout; failed animals are never bred, the adult texture stands in */
+    private static net.minecraft.core.ClientAsset.ResourceTexture baby(String name) {
+        return new net.minecraft.core.ClientAsset.ResourceTexture(tex(name));
+    }
+
+    private static Identifier tex(String name) {
+        return Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "entity/" + name);
     }
 
     public static PigRenderer pig(EntityRendererProvider.Context context) {
@@ -69,7 +74,7 @@ public final class FailedAnimalRenderers {
     public static SheepRenderer sheep(EntityRendererProvider.Context context) {
         return new SheepRenderer(context) {
             @Override
-            public ResourceLocation getTextureLocation(SheepRenderState state) {
+            public Identifier getTextureLocation(SheepRenderState state) {
                 return SHEEP;
             }
         };

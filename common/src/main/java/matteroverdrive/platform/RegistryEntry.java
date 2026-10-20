@@ -4,7 +4,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.function.Supplier;
 
@@ -20,7 +20,7 @@ public class RegistryEntry<R, T extends R> implements Supplier<T> {
     private final ResourceKey<R> key;
     private volatile Holder<R> holder;
 
-    RegistryEntry(ResourceKey<? extends Registry<R>> registryKey, ResourceLocation id) {
+    RegistryEntry(ResourceKey<? extends Registry<R>> registryKey, Identifier id) {
         this.registryKey = registryKey;
         this.key = ResourceKey.create(registryKey, id);
     }
@@ -42,9 +42,9 @@ public class RegistryEntry<R, T extends R> implements Supplier<T> {
     public Holder<R> holder() {
         Holder<R> holder = this.holder;
         if (holder == null) {
-            Registry<R> registry = (Registry<R>) BuiltInRegistries.REGISTRY.getValue(this.registryKey.location());
+            Registry<R> registry = (Registry<R>) BuiltInRegistries.REGISTRY.getValue(this.registryKey.identifier());
             if (registry == null) {
-                throw new IllegalStateException("Registry " + this.registryKey.location() + " does not exist (yet) for " + this.key.location());
+                throw new IllegalStateException("Registry " + this.registryKey.identifier() + " does not exist (yet) for " + this.key.identifier());
             }
             holder = registry.getOrThrow(this.key);
             this.holder = holder;
@@ -53,12 +53,12 @@ public class RegistryEntry<R, T extends R> implements Supplier<T> {
     }
 
     public boolean isBound() {
-        Registry<?> registry = BuiltInRegistries.REGISTRY.getValue(this.registryKey.location());
-        return registry != null && registry.containsKey(this.key.location());
+        Registry<?> registry = BuiltInRegistries.REGISTRY.getValue(this.registryKey.identifier());
+        return registry != null && registry.containsKey(this.key.identifier());
     }
 
-    public ResourceLocation getId() {
-        return this.key.location();
+    public Identifier getId() {
+        return this.key.identifier();
     }
 
     public ResourceKey<R> getKey() {
@@ -72,6 +72,6 @@ public class RegistryEntry<R, T extends R> implements Supplier<T> {
 
     @Override
     public String toString() {
-        return "RegistryEntry[" + this.key.location() + "]";
+        return "RegistryEntry[" + this.key.identifier() + "]";
     }
 }

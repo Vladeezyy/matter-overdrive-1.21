@@ -23,14 +23,14 @@ import matteroverdrive.starmap.ShipItem;
 import matteroverdrive.starmap.SpaceBody;
 import matteroverdrive.starmap.StarMapPayloads;
 import matteroverdrive.starmap.Star;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FontDescription;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -63,12 +63,12 @@ public class StarMapScreen extends AbstractContainerScreen<StarMapMenu> {
         this.page = starMap.getZoomLevel();
     }
 
-    private static ResourceLocation sprite(String name) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, name);
+    private static Identifier sprite(String name) {
+        return Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, name);
     }
 
-    private static ResourceLocation holo(String name) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/gui/holo/" + name + ".png");
+    private static Identifier holo(String name) {
+        return Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/gui/holo/" + name + ".png");
     }
 
     @Override
@@ -307,17 +307,16 @@ public class StarMapScreen extends AbstractContainerScreen<StarMapMenu> {
     // --- rendering -------------------------------------------------------------------------------------
 
     @Override
-    public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+    public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         // 1.7.10 drawWorldBackground: black, then the hologram in perspective
         g.fill(0, 0, width, height, 0xFF000000);
-        g.guiRenderState.submitPicturesInPictureState(new StarMapPipRenderer.State(starMap, partialTick, 0, 0, width, height));
+        g.guiRenderState.addPicturesInPictureState(new StarMapPipRenderer.State(starMap, partialTick, 0, 0, width, height));
         // the hologram texture is blitted at the end of its layer: everything else goes above it
         g.nextStratum();
-        renderBg(g, partialTick, mouseX, mouseY);
+        extractPanels(g, mouseX, mouseY, partialTick);
     }
 
-    @Override
-    protected void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY) {
+    private void extractPanels(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         g.blitSprite(RenderPipelines.GUI_TEXTURED, sprite("star_map"), 0, 0, width, height);
         // the bottom info panel of the selected body (1.7.10 renderGUIInfo at xSize / 1.9, ySize - 16, opacity 0.8)
         Galaxy galaxy = galaxy();
@@ -351,7 +350,7 @@ public class StarMapScreen extends AbstractContainerScreen<StarMapMenu> {
     }
 
     /** 1.7.10 ElementSlotBuilding / ElementSlotShip.drawForeground: time left, or why it can't be built, left of the slot. */
-    private void renderSlotInfo(GuiGraphics g) {
+    private void renderSlotInfo(GuiGraphicsExtractor g) {
         Planet planet = starMap.getPlanet();
         if (planet == null || minecraft.level == null) return;
         for (int i = 0; i < StarMapMenu.SLOTS; i++) {
@@ -363,11 +362,11 @@ public class StarMapScreen extends AbstractContainerScreen<StarMapMenu> {
                 long remaining = buildable.getRemainingBuildTimeTicks(stack, planet, minecraft.level) / 20;
                 if (remaining >= 0) {
                     String time = AndroidSpawnerScreen.formatRemainingTime(remaining);
-                    g.drawString(font, time, slot.x - 3 - font.width(time) - 4, slot.y - 3 + 6, 0xFF000000 | Galaxy.COLOR_HOLO, false);
+                    g.text(font, time, slot.x - 3 - font.width(time) - 4, slot.y - 3 + 6, 0xFF000000 | Galaxy.COLOR_HOLO, false);
                 }
             } else {
                 String text = String.join(". ", info.stream().map(Component::getString).toList());
-                g.drawString(font, text, slot.x - 3 - font.width(text) - 4, slot.y - 3 + 7, 0xFF000000 | Galaxy.COLOR_HOLO_RED, false);
+                g.text(font, text, slot.x - 3 - font.width(text) - 4, slot.y - 3 + 7, 0xFF000000 | Galaxy.COLOR_HOLO_RED, false);
             }
         }
     }
@@ -376,7 +375,7 @@ public class StarMapScreen extends AbstractContainerScreen<StarMapMenu> {
         return (rgb >> 16 & 255) / d << 16 | (rgb >> 8 & 255) / d << 8 | (rgb & 255) / d;
     }
 
-    private void renderPageTabs(GuiGraphics g, int mouseX, int mouseY) {
+    private void renderPageTabs(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         int x = width - 42;
         g.blitSprite(RenderPipelines.GUI_TEXTURED, sprite("right_side_bar_panel_bg_holo"), x, 16, 42, 5 * 26 + 8);
         for (int i = 0; i < 5; i++) {
@@ -396,7 +395,7 @@ public class StarMapScreen extends AbstractContainerScreen<StarMapMenu> {
                 | Mth.clamp((int) ((rgb & 255) * m), 0, 255);
     }
 
-    private void renderList(GuiGraphics g, int mouseX, int mouseY) {
+    private void renderList(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         List<Entry> list = entries();
         if (list.isEmpty()) return;
         int x0 = 16, y0 = 16, h = listHeight();
@@ -411,7 +410,7 @@ public class StarMapScreen extends AbstractContainerScreen<StarMapMenu> {
         g.disableScissor();
     }
 
-    private void renderEntry(GuiGraphics g, Entry entry, int x, int y, int mouseX, int mouseY) {
+    private void renderEntry(GuiGraphicsExtractor g, Entry entry, int x, int y, int mouseX, int mouseY) {
         int color = color(entry);
         float m = multiply(entry);
         boolean selected = isSelected(entry);
@@ -450,22 +449,22 @@ public class StarMapScreen extends AbstractContainerScreen<StarMapMenu> {
         }
     }
 
-    private void drawIcons(GuiGraphics g, Entry entry, int x, int y, int color, float m, int countColor, float countM) {
+    private void drawIcons(GuiGraphicsExtractor g, Entry entry, int x, int y, int color, float m, int countColor, float countM) {
         for (var icon : icons(entry).entrySet()) {
             if (icon.getValue() == 0) continue;
             g.blitSprite(RenderPipelines.GUI_TEXTURED, sprite("holo_list_entry_circle"), x, y, 32, 32, 0xFF000000 | mul(color, m));
             int s = iconSize(icon.getKey());
             g.blit(RenderPipelines.GUI_TEXTURED, holo(icon.getKey()), x + 16 - s / 2, y + 16 - s / 2, 0, 0, s, s, s, s, 0xFF000000 | mul(color, m));
-            if (icon.getValue() > 0) g.drawString(font, String.valueOf(icon.getValue()), x + 16 + 3, y + 16 + 3, 0xFF000000 | mul(countColor, countM), false);
+            if (icon.getValue() > 0) g.text(font, String.valueOf(icon.getValue()), x + 16 + 3, y + 16 + 3, 0xFF000000 | mul(countColor, countM), false);
             x += 32;
         }
     }
 
-    private void drawName(GuiGraphics g, Entry entry, int x, int y, int color, float m) {
+    private void drawName(GuiGraphicsExtractor g, Entry entry, int x, int y, int color, float m) {
         Player player = minecraft.player;
         if (entry.ship() != null) {
-            g.renderItem(entry.ship(), x + 10, y + ENTRY_H / 2 - 8);
-            g.drawString(font, entry.ship().getHoverName(), x + 31, y + 12, 0xFF000000 | mul(color, m), false);
+            g.item(entry.ship(), x + 10, y + ENTRY_H / 2 - 8);
+            g.text(font, entry.ship().getHoverName(), x + 31, y + 12, 0xFF000000 | mul(color, m), false);
             return;
         }
         SpaceBody body = entry.body();
@@ -476,27 +475,26 @@ public class StarMapScreen extends AbstractContainerScreen<StarMapMenu> {
         Component text = Component.literal(name);
         if (!(body instanceof Quadrant) && isCurrent(body)) text = Component.literal("@ ").append(Component.literal(name).withStyle(s -> s.withItalic(true)));
         if (!known) text = text.copy().withStyle(s -> s.withFont(ALT));
-        g.drawString(font, text, x + 16, y + 10, 0xFF000000 | mul(color, m), false);
+        g.text(font, text, x + 16, y + 10, 0xFF000000 | mul(color, m), false);
     }
 
     /** 1.7.10 PagePlanetMenu.drawForeground: the planet's name (at x = height / 2, a 1.7.10 quirk). */
-    private void renderPlanetPage(GuiGraphics g) {
+    private void renderPlanetPage(GuiGraphicsExtractor g) {
         Planet planet = starMap.getPlanet();
         if (planet == null || minecraft.player == null) return;
         int w = font.width(planet.getName());
         boolean known = GalaxyClient.canSeePlanetInfo(planet, minecraft.player) || minecraft.player.getAbilities().instabuild;
         Component name = Component.literal(planet.getName());
         if (!known) name = name.copy().withStyle(s -> s.withFont(ALT));
-        g.drawString(font, name, height / 2 + w / 2 + 12 - w / 2, 16 + 4, 0xFF000000 | planet.getGuiColor(minecraft.player), false);
+        g.text(font, name, height / 2 + w / 2 + 12 - w / 2, 16 + 4, 0xFF000000 | planet.getGuiColor(minecraft.player), false);
     }
 
     @Override
-    protected void renderLabels(GuiGraphics g, int mouseX, int mouseY) {}
+    protected void extractLabels(GuiGraphicsExtractor g, int mouseX, int mouseY) {}
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        super.render(g, mouseX, mouseY, partialTick);
-        renderTooltip(g, mouseX, mouseY);
+    public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(g, mouseX, mouseY, partialTick);
     }
 
     // --- input -------------------------------------------------------------------------------------------
@@ -548,7 +546,7 @@ public class StarMapScreen extends AbstractContainerScreen<StarMapMenu> {
     }
 
     private void click() {
-        minecraft.getSoundManager().play(SimpleSoundInstance.forUI(MOSounds.BUTTON_SOFT.get(), 0.9f + minecraft.level.random.nextFloat() * 0.2f, 0.5f));
+        minecraft.getSoundManager().play(SimpleSoundInstance.forUI(MOSounds.BUTTON_SOFT.get(), 0.9f + minecraft.level.getRandom().nextFloat() * 0.2f, 0.5f));
     }
 
     @Override

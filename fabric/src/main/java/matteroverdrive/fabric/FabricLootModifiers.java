@@ -17,13 +17,13 @@ import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.NestedLootTable;
 
 /**
- * NeoForge's global loot modifiers of the mod (data/neoforge/loot_modifiers/global_loot_modifiers.json, all of type
+ * NeoForge's global loot modifiers of the mod (data/matteroverdrive/loot_modifiers/*.json, all of type
  * neoforge:add_table matched by neoforge:loot_table_id, alone or in minecraft:any_of): on Fabric the matched tables get
  * one more pool that rolls the added table once, which is what add_table does.
  */
@@ -32,15 +32,22 @@ final class FabricLootModifiers {
 
     static void register() {
         var mod = FabricLoader.getInstance().getModContainer(MatterOverdrive.MODID).orElseThrow();
-        JsonObject global = read(mod.findPath("data/neoforge/loot_modifiers/global_loot_modifiers.json").orElseThrow());
+        // 26.x NeoForge loads every file of data/<ns>/loot_modifiers (the global list file is gone)
+        List<Path> files;
+        try (var list = Files.list(mod.findPath("data/" + MatterOverdrive.MODID + "/loot_modifiers").orElseThrow())) {
+            files = list.filter(file -> file.toString().endsWith(".json")).sorted().toList();
+        } catch (IOException e) {
+            throw new IllegalStateException("Could not list the loot modifiers", e);
+        }
         Map<ResourceKey<LootTable>, List<ResourceKey<LootTable>>> added = new HashMap<>();
-        for (JsonElement entry : global.getAsJsonArray("entries")) {
-            ResourceLocation id = ResourceLocation.parse(entry.getAsString());
-            JsonObject json = read(mod.findPath("data/" + id.getNamespace() + "/loot_modifiers/" + id.getPath() + ".json").orElseThrow());
+        for (Path file : files) {
+            String name = file.getFileName().toString();
+            Identifier id = Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, name.substring(0, name.length() - ".json".length()));
+            JsonObject json = read(file);
             if (!json.get("type").getAsString().equals("neoforge:add_table")) {
                 throw new IllegalStateException("Unsupported loot modifier " + id + ": " + json.get("type"));
             }
-            ResourceKey<LootTable> table = ResourceKey.create(Registries.LOOT_TABLE, ResourceLocation.parse(json.get("table").getAsString()));
+            ResourceKey<LootTable> table = ResourceKey.create(Registries.LOOT_TABLE, Identifier.parse(json.get("table").getAsString()));
             for (JsonElement condition : json.getAsJsonArray("conditions")) {
                 collectTables(condition.getAsJsonObject(), id, target -> added.computeIfAbsent(target, key -> new java.util.ArrayList<>()).add(table));
             }
@@ -52,10 +59,10 @@ final class FabricLootModifiers {
         });
     }
 
-    private static void collectTables(JsonObject condition, ResourceLocation id, java.util.function.Consumer<ResourceKey<LootTable>> target) {
+    private static void collectTables(JsonObject condition, Identifier id, java.util.function.Consumer<ResourceKey<LootTable>> target) {
         String type = condition.get("condition").getAsString();
         switch (type) {
-            case "neoforge:loot_table_id" -> target.accept(ResourceKey.create(Registries.LOOT_TABLE, ResourceLocation.parse(condition.get("loot_table_id").getAsString())));
+            case "neoforge:loot_table_id" -> target.accept(ResourceKey.create(Registries.LOOT_TABLE, Identifier.parse(condition.get("loot_table_id").getAsString())));
             case "minecraft:any_of" -> condition.getAsJsonArray("terms").forEach(term -> collectTables(term.getAsJsonObject(), id, target));
             default -> throw new IllegalStateException("Unsupported condition in loot modifier " + id + ": " + type);
         }

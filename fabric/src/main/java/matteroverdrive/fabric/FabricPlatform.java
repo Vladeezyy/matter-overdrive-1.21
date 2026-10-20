@@ -27,13 +27,13 @@ import matteroverdrive.platform.transfer.IFluidHandlerItem;
 import matteroverdrive.platform.transfer.IItemHandler;
 import matteroverdrive.platform.transfer.StorageKind;
 import net.fabricmc.api.EnvType;
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
+import net.fabricmc.fabric.api.menu.v1.ExtendedMenuProvider;
+import net.fabricmc.fabric.api.menu.v1.ExtendedMenuType;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
@@ -51,7 +51,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
@@ -86,7 +86,7 @@ import team.reborn.energy.api.EnergyStorage;
  * for NeoForge's hooks. Entries are queued and registered by {@link #registerAll()} in NeoForge's registry order.
  */
 public final class FabricPlatform implements Platform {
-    private record Pending(ResourceLocation id, Supplier<?> factory) {}
+    private record Pending(Identifier id, Supplier<?> factory) {}
 
     private static final Map<ResourceKey<?>, List<Pending>> PENDING = new LinkedHashMap<>();
     /** Sends a packet to the server; set by the client entry point (the client networking class is client-only) */
@@ -97,19 +97,19 @@ public final class FabricPlatform implements Platform {
     /** Registers the queued entries: attributes, data components, armor materials, then vanilla order, then modded registries */
     @SuppressWarnings({"unchecked", "rawtypes"})
     static void registerAll() {
-        Set<ResourceLocation> order = new LinkedHashSet<>();
-        order.add(Registries.ATTRIBUTE.location());
-        order.add(Registries.DATA_COMPONENT_TYPE.location());
-        List<ResourceLocation> modded = new ArrayList<>();
+        Set<Identifier> order = new LinkedHashSet<>();
+        order.add(Registries.ATTRIBUTE.identifier());
+        order.add(Registries.DATA_COMPONENT_TYPE.identifier());
+        List<Identifier> modded = new ArrayList<>();
         // the registry of registries in registration order (its keySet() has no order)
         for (Registry<?> each : BuiltInRegistries.REGISTRY) {
-            ResourceLocation id = each.key().location();
+            Identifier id = each.key().identifier();
             if (id.getNamespace().equals("minecraft")) order.add(id);
             else modded.add(id);
         }
-        modded.sort(java.util.Comparator.comparing(ResourceLocation::getNamespace).thenComparing(ResourceLocation::getPath));
+        modded.sort(java.util.Comparator.comparing(Identifier::getNamespace).thenComparing(Identifier::getPath));
         order.addAll(modded);
-        for (ResourceLocation registryId : order) {
+        for (Identifier registryId : order) {
             List<Pending> entries = PENDING.remove(ResourceKey.createRegistryKey(registryId));
             if (entries == null) continue;
             Registry registry = BuiltInRegistries.REGISTRY.getValue(registryId);
@@ -136,13 +136,13 @@ public final class FabricPlatform implements Platform {
     // --- registration ---
 
     @Override
-    public <R, T extends R> void register(ResourceKey<? extends Registry<R>> registry, ResourceLocation id, Supplier<? extends T> factory) {
+    public <R, T extends R> void register(ResourceKey<? extends Registry<R>> registry, Identifier id, Supplier<? extends T> factory) {
         PENDING.computeIfAbsent(registry, key -> new ArrayList<>()).add(new Pending(id, factory));
     }
 
     @Override
     public CreativeModeTab.Builder creativeTabBuilder() {
-        return FabricItemGroup.builder();
+        return FabricCreativeModeTab.builder();
     }
 
     @Override
@@ -165,7 +165,7 @@ public final class FabricPlatform implements Platform {
     @Override
     public <T extends AbstractContainerMenu> MenuType<T> menuType(MenuFactory<T> factory) {
         // the extra data travels as bytes and is read back with the client's registries
-        return new ExtendedScreenHandlerType<>((int id, Inventory inventory, byte[] data) ->
+        return new ExtendedMenuType<>((int id, Inventory inventory, byte[] data) ->
                 factory.create(id, inventory, new RegistryFriendlyByteBuf(Unpooled.wrappedBuffer(data), inventory.player.registryAccess())), ByteBufCodecs.BYTE_ARRAY);
     }
 
@@ -175,7 +175,7 @@ public final class FabricPlatform implements Platform {
         extraData.accept(buf);
         byte[] data = new byte[buf.readableBytes()];
         buf.readBytes(data);
-        player.openMenu(new ExtendedScreenHandlerFactory<byte[]>() {
+        player.openMenu(new ExtendedMenuProvider<byte[]>() {
             @Override
             public byte[] getScreenOpeningData(ServerPlayer opener) {
                 return data;
@@ -321,7 +321,8 @@ public final class FabricPlatform implements Platform {
 
     @Override
     public ItemStack craftingRemainder(ItemStack stack) {
-        return stack.getItem().getCraftingRemainder().copy();
+        var remainder = stack.getItem().getCraftingRemainder();
+        return remainder == null ? ItemStack.EMPTY : remainder.create();
     }
 
     @Override

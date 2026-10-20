@@ -28,7 +28,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
@@ -71,7 +71,7 @@ import net.neoforged.neoforge.registries.datamaps.builtin.NeoForgeDataMaps;
 public final class NeoForgePlatform implements Platform {
     /** Deferred registers per registry, filled by the common code before {@link #registerAll} */
     private static final Map<ResourceKey<?>, DeferredRegister<?>> REGISTERS = new LinkedHashMap<>();
-    private static final Map<ResourceLocation, Supplier<AttachmentType<?>>> ATTACHMENTS = new LinkedHashMap<>();
+    private static final Map<Identifier, Supplier<AttachmentType<?>>> ATTACHMENTS = new LinkedHashMap<>();
     private static final java.util.List<Consumer<RegisterSpawnPlacementsEvent>> SPAWN_PLACEMENTS = new java.util.ArrayList<>();
 
     /** Matter Plasma's fluid type (1.7.10 BlockFluidMatterPlasma: water-like, viscosity 8000, light 15) */
@@ -119,7 +119,7 @@ public final class NeoForgePlatform implements Platform {
     // --- registration ---
 
     @Override
-    public <R, T extends R> void register(ResourceKey<? extends Registry<R>> registry, ResourceLocation id, Supplier<? extends T> factory) {
+    public <R, T extends R> void register(ResourceKey<? extends Registry<R>> registry, Identifier id, Supplier<? extends T> factory) {
         registerFor(registry).register(id.getPath(), factory);
     }
 
@@ -179,7 +179,7 @@ public final class NeoForgePlatform implements Platform {
 
     @Override
     public void sendToTrackingChunk(ServerLevel level, BlockPos pos, CustomPacketPayload payload) {
-        PacketDistributor.sendToPlayersTrackingChunk(level, new ChunkPos(pos), payload);
+        PacketDistributor.sendToPlayersTrackingChunk(level, ChunkPos.containing(pos), payload);
     }
 
     @Override
@@ -331,7 +331,8 @@ public final class NeoForgePlatform implements Platform {
 
     @Override
     public ItemStack craftingRemainder(ItemStack stack) {
-        return stack.getItem().getCraftingRemainder(stack);
+        var remainder = stack.getItem().getCraftingRemainder();
+        return remainder == null ? ItemStack.EMPTY : remainder.create();
     }
 
     @Override

@@ -6,13 +6,13 @@ import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /** 1.7.10 EntityRendererMutantScientist: the hulking scientist model, no shadow. */
 public class MutantScientistRenderer extends MobRenderer<MutantScientist, LivingEntityRenderState, HulkingScientistModel> {
     public static final ModelLayerLocation LAYER = new ModelLayerLocation(
-            ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "mutant_scientist"), "main");
-    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID,
+            Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, "mutant_scientist"), "main");
+    private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(MatterOverdrive.MODID,
             "textures/entity/hulking_scientist.png");
 
     public MutantScientistRenderer(EntityRendererProvider.Context context) {
@@ -20,7 +20,7 @@ public class MutantScientistRenderer extends MobRenderer<MutantScientist, Living
     }
 
     @Override
-    public ResourceLocation getTextureLocation(LivingEntityRenderState state) {
+    public Identifier getTextureLocation(LivingEntityRenderState state) {
         return TEXTURE;
     }
 

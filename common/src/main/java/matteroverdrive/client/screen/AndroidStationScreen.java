@@ -12,12 +12,12 @@ import matteroverdrive.init.MOSounds;
 import matteroverdrive.menu.AndroidStationMenu;
 import matteroverdrive.network.UnlockStatPayload;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -31,10 +31,10 @@ import net.minecraft.client.renderer.RenderPipelines;
  * android's part slots either side of a rotating view of the player, and the player's XP.
  */
 public class AndroidStationScreen extends MachineScreen<AndroidStationMenu> {
-    private static final ResourceLocation SLOT_HOLO = tex("slot_holo");
-    private static final ResourceLocation UP_ARROW = tex("up_arrow");
-    private static final ResourceLocation BLACK_CIRCLE = tex("black_circle");
-    private static final ResourceLocation[] PART_ICONS = {tex("android_slot_head"), tex("android_slot_arms"), tex("android_slot_legs"),
+    private static final Identifier SLOT_HOLO = tex("slot_holo");
+    private static final Identifier UP_ARROW = tex("up_arrow");
+    private static final Identifier BLACK_CIRCLE = tex("black_circle");
+    private static final Identifier[] PART_ICONS = {tex("android_slot_head"), tex("android_slot_arms"), tex("android_slot_legs"),
             tex("android_slot_chest"), tex("android_slot_other"), tex("holo_battery")};
     private static final String[] PART_NAMES = {"head", "arms", "legs", "chest", "other", "battery"};
     private static final int HOLO = 0xA9E2FB, HOLO_RED = 0xE65014, MATTER = 0xBFE4E6;
@@ -63,7 +63,7 @@ public class AndroidStationScreen extends MachineScreen<AndroidStationMenu> {
         super(menu, playerInventory, title);
     }
 
-    private static ResourceLocation statIcon(BioticStat stat) {
+    private static Identifier statIcon(BioticStat stat) {
         return tex("biotic_stat_" + stat.id());
     }
 
@@ -77,7 +77,7 @@ public class AndroidStationScreen extends MachineScreen<AndroidStationMenu> {
     }
 
     @Override
-    protected void renderHome(GuiGraphics g, int x, int y, int mx, int my) {
+    protected void renderHome(GuiGraphicsExtractor g, int x, int y, int mx, int my) {
         AndroidData data = Android.get(player());
         for (Cell cell : CELLS) {
             int level = data.getUnlockedLevel(cell.stat);
@@ -92,7 +92,7 @@ public class AndroidStationScreen extends MachineScreen<AndroidStationMenu> {
             }
             if (cell.stat.maxLevel() > 1 && level > 0) {
                 scaled(g, BLACK_CIRCLE, px + 14, py + 14, 10, 18, 0xFFFFFFFF);
-                g.drawString(font, Integer.toString(level), px + 16, py + 16, 0xFFFFFFFF, false);
+                g.text(font, Integer.toString(level), px + 16, py + 16, 0xFFFFFFFF, false);
             }
         }
         // part slots: holo frames, an icon while empty
@@ -105,19 +105,19 @@ public class AndroidStationScreen extends MachineScreen<AndroidStationMenu> {
             }
         }
         // the player, turning with the mouse (1.7.10 turned it with world time)
-        InventoryScreen.renderEntityInInventoryFollowsMouse(g, x + 250, y + 98, x + 310, y + 212, 45, 0.0625f,
+        InventoryScreen.extractEntityInInventoryFollowsMouse(g, x + 250, y + 98, x + 310, y + 212, 45, 0.0625f,
                 x + mx, y + my, player());
         String xp = player().experienceLevel + " XP";
-        g.drawString(font, xp, x + 280 - font.width(xp) / 2, y + imageHeight - 24, 0xFF55FF55, false);
+        g.text(font, xp, x + 280 - font.width(xp) / 2, y + imageHeight - 24, 0xFF55FF55, false);
     }
 
     /** A square texture of src px drawn at size px. */
-    private static void scaled(GuiGraphics g, ResourceLocation tex, int x, int y, int size, int src, int color) {
+    private static void scaled(GuiGraphicsExtractor g, Identifier tex, int x, int y, int size, int src, int color) {
         g.blit(RenderPipelines.GUI_TEXTURED, tex, x, y, 0, 0, size, size, src, src, src, src, color);
     }
 
     /** 1.7.10 up_arrow holo icon, turned towards the stat's root. */
-    private static void arrow(GuiGraphics g, int cx, int cy, int dx, int dy, int color) {
+    private static void arrow(GuiGraphicsExtractor g, int cx, int cy, int dx, int dy, int color) {
         g.pose().pushMatrix();
         g.pose().translate(cx, cy);
         float angle = dx == 1 ? 90 : dx == -1 ? -90 : dy == 1 ? 180 : 0;
@@ -127,7 +127,7 @@ public class AndroidStationScreen extends MachineScreen<AndroidStationMenu> {
     }
 
     @Override
-    protected void homeTooltips(GuiGraphics g, int mx, int my, int mouseX, int mouseY) {
+    protected void homeTooltips(GuiGraphicsExtractor g, int mx, int my, int mouseX, int mouseY) {
         AndroidData data = Android.get(player());
         for (Cell cell : CELLS) {
             if (in(mx, my, cell.px(), cell.py(), 22, 22)) {

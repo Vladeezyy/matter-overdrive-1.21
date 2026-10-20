@@ -27,10 +27,10 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FontDescription;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
@@ -42,8 +42,8 @@ import net.minecraft.world.phys.Vec3;
  * facing the player (snapped to 90 degrees), or "ACCESS DENIED" for players who can't use the map.
  */
 public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, StarMapRenderer.State> {
-    private static final ResourceLocation BEAM = tex("textures/fx/hologram_beam.png");
-    private static final ResourceLocation PARTICLES = tex("textures/particle/particles_additive.png");
+    private static final Identifier BEAM = tex("textures/fx/hologram_beam.png");
+    private static final Identifier PARTICLES = tex("textures/particle/particles_additive.png");
     private static final FontDescription ALT = new FontDescription.Resource(Minecraft.ALT_FONT);
     // 1.7.10 StarMapRendererAbstract icons on the 128 px additive particle sheet
     private static final float[] STAR_ICON = {0, 0, 32 / 128f, 32 / 128f}, SELECTED_ICON = {32 / 128f, 0, 64 / 128f, 32 / 128f},
@@ -54,8 +54,8 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
         this.font = context.font();
     }
 
-    private static ResourceLocation tex(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, path);
+    private static Identifier tex(String path) {
+        return Identifier.fromNamespaceAndPath(MatterOverdrive.MODID, path);
     }
 
     public static class State extends BlockEntityRenderState {
@@ -135,7 +135,7 @@ public class StarMapRenderer implements BlockEntityRenderer<StarMapBlockEntity, 
             return;
         }
         if (galaxy == null) return;
-        Ctx ctx = new Ctx(state, pose, HoloSink.of(collector), font, cam.getYRot(), cam.getXRot(), camera.orientation, mc.player, galaxy);
+        Ctx ctx = new Ctx(state, pose, HoloSink.of(collector), font, cam.yRot(), cam.xRot(), camera.orientation, mc.player, galaxy);
         SpaceBody body = activeBody(state, galaxy);
         Body renderer = body == null ? null : rendererFor(state.zoom, body);
         if (!renderHologram(ctx)) return;
