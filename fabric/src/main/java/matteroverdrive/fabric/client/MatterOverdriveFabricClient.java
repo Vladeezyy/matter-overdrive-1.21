@@ -62,7 +62,8 @@ public final class MatterOverdriveFabricClient implements ClientModInitializer {
         FabricClientHooks.registerNetworking();
         MOClient.init();
         FabricObjModels.register();
-        ModelLoadingPlugin.register(context -> context.addModels(MOClient.extraModels()));
+        ModelLoadingPlugin.register(context -> MOClient.extraModels().forEach(id -> context.addModel(FabricClientPlatform.key(id),
+                net.fabricmc.fabric.api.client.model.loading.v1.SimpleUnbakedExtraModel.blockStateModel(id))));
         MOClient.blockColors(ColorProviderRegistry.BLOCK::register);
         // 1.21.4+: the select properties of the client item definitions (vanilla registers its own the same way)
         MOClient.registerSelectProperties(net.minecraft.client.renderer.item.properties.select.SelectItemModelProperties.ID_MAPPER::put);

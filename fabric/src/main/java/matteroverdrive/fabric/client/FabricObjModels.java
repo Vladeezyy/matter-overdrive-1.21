@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,12 +24,8 @@ import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlu
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
-import net.minecraft.client.resources.model.SimpleBakedModel;
-import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
@@ -56,12 +51,13 @@ public final class FabricObjModels {
     private record ObjModel(ObjFile obj, boolean flipV, Map<String, Boolean> visibility) {}
 
     static void register() {
-        // 1.21.4+: a JSON model without elements bakes its parent with its own texture slots, so the OBJ models can
-        // replace their JSON on load and item models with an OBJ parent still work
+        // 1.21.5+: a JSON model's geometry is its own object; the OBJ models keep the JSON's textures, display and
+        // parent and get the OBJ geometry (children without elements inherit it, as on NeoForge)
         PreparableModelLoadingPlugin.register(FabricObjModels::load, (models, context) ->
                 context.modifyModelOnLoad().register((model, ctx) -> {
                     ObjModel obj = models.get(ctx.id());
-                    return obj != null && model instanceof BlockModel json ? new Unbaked(json, obj) : model;
+                    return obj != null && model instanceof BlockModel json ? new BlockModel(new Geometry(obj), json.guiLight(),
+                            json.ambientOcclusion(), json.transforms(), json.textureSlots(), json.parent()) : model;
                 }));
     }
 
@@ -162,56 +158,23 @@ public final class FabricObjModels {
         }
     }
 
-    /** The JSON model (textures, display, overrides) with the OBJ geometry */
-    private record Unbaked(BlockModel json, ObjModel obj) implements UnbakedModel {
+    /** The OBJ geometry, baked with the texture slots of the model that uses it */
+    private record Geometry(ObjModel obj) implements net.minecraft.client.resources.model.UnbakedGeometry {
         @Override
-        public void resolveDependencies(net.minecraft.client.resources.model.ResolvableModel.Resolver resolver) {
-            this.json.resolveDependencies(resolver);
-        }
-
-        @Override
-        public Boolean getAmbientOcclusion() {
-            return this.json.getAmbientOcclusion();
-        }
-
-        @Override
-        public UnbakedModel.GuiLight getGuiLight() {
-            return this.json.getGuiLight();
-        }
-
-        @Override
-        public net.minecraft.client.renderer.block.model.ItemTransforms getTransforms() {
-            return this.json.getTransforms();
-        }
-
-        @Override
-        public net.minecraft.client.renderer.block.model.TextureSlots.Data getTextureSlots() {
-            return this.json.getTextureSlots();
-        }
-
-        @Override
-        public UnbakedModel getParent() {
-            return this.json.getParent();
-        }
-
-        @Override
-        public BakedModel bake(net.minecraft.client.renderer.block.model.TextureSlots slots, ModelBaker baker, ModelState state, boolean ambientOcclusion,
-                               boolean usesBlockLight, net.minecraft.client.renderer.block.model.ItemTransforms transforms) {
+        public net.minecraft.client.resources.model.QuadCollection bake(net.minecraft.client.renderer.block.model.TextureSlots slots, ModelBaker baker,
+                                                                     ModelState state, net.minecraft.client.resources.model.ModelDebugName name) {
             ObjFile file = this.obj.obj();
             Map<String, TextureAtlasSprite> materialSprites = new HashMap<>();
             Function<String, TextureAtlasSprite> spriteOf = material -> materialSprites.computeIfAbsent(material, m -> {
                 String slot = file.materialTextures().getOrDefault(m, "#texture");
-                Material texture = slots.getMaterial(slot.startsWith("#") ? slot.substring(1) : slot);
-                return texture == null ? baker.sprites().reportMissingReference(slot) : baker.sprites().get(texture);
+                return baker.sprites().resolveSlot(slots, slot.startsWith("#") ? slot.substring(1) : slot, name);
             });
             // the block state's rotation turns the model about the block's centre
             Matrix4f transform = new Matrix4f();
-            if (!state.getRotation().equals(com.mojang.math.Transformation.identity())) {
-                transform.translate(0.5f, 0.5f, 0.5f).mul(state.getRotation().getMatrix()).translate(-0.5f, -0.5f, -0.5f);
+            if (!state.transformation().equals(com.mojang.math.Transformation.identity())) {
+                transform.translate(0.5f, 0.5f, 0.5f).mul(state.transformation().getMatrix()).translate(-0.5f, -0.5f, -0.5f);
             }
-            List<BakedQuad> unculled = new ArrayList<>();
-            Map<Direction, List<BakedQuad>> culled = new EnumMap<>(Direction.class);
-            for (Direction direction : Direction.values()) culled.put(direction, new ArrayList<>());
+            var quads = new net.minecraft.client.resources.model.QuadCollection.Builder();
             for (Face face : file.faces()) {
                 if (!this.obj.visibility().getOrDefault(face.group(), true)) continue;
                 TextureAtlasSprite sprite = spriteOf.apply(face.material());
@@ -219,16 +182,14 @@ public final class FabricObjModels {
                 // triangles become quads with a repeated vertex; larger polygons a fan of them
                 for (int start = 1; start + 1 < face.positions().length; start += 2) {
                     int[] corners = start + 2 < face.positions().length ? new int[] {0, start, start + 1, start + 2} : new int[] {0, start, start + 1, start + 1};
-                    this.quad(file, face, corners, sprite, tint, transform, unculled, culled);
+                    this.quad(file, face, corners, sprite, tint, transform, quads);
                 }
             }
-            Material particle = slots.getMaterial("particle");
-            return new SimpleBakedModel(unculled, culled, ambientOcclusion, usesBlockLight, true,
-                    particle == null ? baker.sprites().reportMissingReference("particle") : baker.sprites().get(particle), transforms);
+            return quads.build();
         }
 
         private void quad(ObjFile file, Face face, int[] corners, TextureAtlasSprite sprite, int tint, Matrix4f transform,
-                          List<BakedQuad> unculled, Map<Direction, List<BakedQuad>> culled) {
+                          net.minecraft.client.resources.model.QuadCollection.Builder quads) {
             Vector3f[] points = new Vector3f[4];
             for (int i = 0; i < 4; i++) {
                 Vector4f p = transform.transform(new Vector4f(file.positions().get(face.positions()[corners[i]]), 1));
@@ -264,8 +225,8 @@ public final class FabricObjModels {
             Direction direction = Direction.getApproximateNearest(faceNormal.x, faceNormal.y, faceNormal.z);
             BakedQuad quad = new BakedQuad(data, tint, direction, sprite, true, 0);
             Direction cull = cullFace(points, direction);
-            if (cull != null) culled.get(cull).add(quad);
-            else unculled.add(quad);
+            if (cull != null) quads.addCulledFace(cull, quad);
+            else quads.addUnculledFace(quad);
         }
 
         /** NeoForge's automatic culling: a quad lying in a face of the block, facing out of it, is hidden by a full neighbour there */

@@ -16,7 +16,7 @@ import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
+import net.fabricmc.fabric.api.gametest.v1.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -30,20 +30,24 @@ import team.reborn.energy.api.EnergyStorage;
 public final class FabricTransferTests {
     private static final String AREA = "matteroverdrive:gametest_area";
 
-    @GameTest(template = AREA)
+    private static void check(GameTestHelper helper, boolean ok, String message) {
+        helper.assertTrue(ok, net.minecraft.network.chat.Component.literal(message));
+    }
+
+    @GameTest(structure = AREA)
     public void machineEnergyTransactions(GameTestHelper helper) {
         BlockPos pos = helper.absolutePos(new BlockPos(1, 1, 1));
         helper.getLevel().setBlockAndUpdate(pos, MOBlocks.DECOMPOSER.get().defaultBlockState());
         DecomposerBlockEntity machine = (DecomposerBlockEntity) helper.getLevel().getBlockEntity(pos);
         EnergyStorage storage = EnergyStorage.SIDED.find(helper.getLevel(), pos, Direction.UP);
-        helper.assertTrue(storage != null, "no TR energy storage on the decomposer");
+        check(helper, storage != null, "no TR energy storage on the decomposer");
         int before = machine.getEnergyHandler(null).getEnergyStored();
         try (Transaction tx = Transaction.openOuter()) {
-            helper.assertTrue(storage.insert(5000, tx) == 5000, "insert did not take 5000");
-            helper.assertTrue(storage.getAmount() == before + 5000, "pending energy not shown");
+            check(helper, storage.insert(5000, tx) == 5000, "insert did not take 5000");
+            check(helper, storage.getAmount() == before + 5000, "pending energy not shown");
             // aborted
         }
-        helper.assertTrue(machine.getEnergyHandler(null).getEnergyStored() == before, "an aborted insert changed the energy");
+        check(helper, machine.getEnergyHandler(null).getEnergyStored() == before, "an aborted insert changed the energy");
         try (Transaction tx = Transaction.openOuter()) {
             try (Transaction nested = tx.openNested()) {
                 storage.insert(1000, nested);
@@ -53,11 +57,11 @@ public final class FabricTransferTests {
             tx.commit();
         }
         int after = machine.getEnergyHandler(null).getEnergyStored();
-        helper.assertTrue(after == before + 3000, "committed 3000 (nested 1000 aborted), got " + (after - before));
+        check(helper, after == before + 3000, "committed 3000 (nested 1000 aborted), got " + (after - before));
         helper.succeed();
     }
 
-    @GameTest(template = AREA)
+    @GameTest(structure = AREA)
     public void machineItemsTransactions(GameTestHelper helper) {
         // the matter table is built on first use (in a game: when a player joins); the input slot takes items with matter
         matteroverdrive.matter.MatterRegistry.values(helper.getLevel().getServer());
@@ -65,63 +69,63 @@ public final class FabricTransferTests {
         helper.getLevel().setBlockAndUpdate(pos, MOBlocks.DECOMPOSER.get().defaultBlockState());
         DecomposerBlockEntity machine = (DecomposerBlockEntity) helper.getLevel().getBlockEntity(pos);
         Storage<ItemVariant> storage = ItemStorage.SIDED.find(helper.getLevel(), pos, Direction.UP);
-        helper.assertTrue(storage != null, "no item storage on the decomposer");
+        check(helper, storage != null, "no item storage on the decomposer");
         try (Transaction tx = Transaction.openOuter()) {
             long inserted = storage.insert(ItemVariant.of(Items.IRON_INGOT), 10, tx);
-            helper.assertTrue(inserted == 10, "inserted " + inserted + " of 10 iron");
+            check(helper, inserted == 10, "inserted " + inserted + " of 10 iron");
             tx.commit();
         }
         ItemStack input = machine.getInventory().getStackInSlot(DecomposerBlockEntity.INPUT);
-        helper.assertTrue(input.is(Items.IRON_INGOT) && input.getCount() == 10, "input slot holds " + input);
+        check(helper, input.is(Items.IRON_INGOT) && input.getCount() == 10, "input slot holds " + input);
         // the output slot only gives, the input only takes
         try (Transaction tx = Transaction.openOuter()) {
-            helper.assertTrue(storage.extract(ItemVariant.of(Items.IRON_INGOT), 10, tx) == 0, "took items out of the input slot");
+            check(helper, storage.extract(ItemVariant.of(Items.IRON_INGOT), 10, tx) == 0, "took items out of the input slot");
         }
         helper.succeed();
     }
 
-    @GameTest(template = AREA)
+    @GameTest(structure = AREA)
     public void pipeFluid(GameTestHelper helper) {
         BlockPos pos = helper.absolutePos(new BlockPos(1, 1, 1));
         helper.getLevel().setBlockAndUpdate(pos, MOBlocks.MATTER_PIPE.get().defaultBlockState());
         MatterPipeBlockEntity pipe = (MatterPipeBlockEntity) helper.getLevel().getBlockEntity(pos);
         Storage<FluidVariant> storage = FluidStorage.SIDED.find(helper.getLevel(), pos, Direction.UP);
-        helper.assertTrue(storage != null, "no fluid storage on the matter pipe");
+        check(helper, storage != null, "no fluid storage on the matter pipe");
         long droplets;
         try (Transaction tx = Transaction.openOuter()) {
             droplets = storage.insert(FluidVariant.of(MOFluids.MATTER_PLASMA.get()), 32 * FabricTransfer.DROPLETS_PER_MB, tx);
             tx.commit();
         }
         int stored = pipe.getTank().getFluidInTank(0).getAmount();
-        helper.assertTrue(droplets > 0 && stored * FabricTransfer.DROPLETS_PER_MB == droplets, "pipe took " + droplets + " droplets, holds " + stored + " mB");
+        check(helper, droplets > 0 && stored * FabricTransfer.DROPLETS_PER_MB == droplets, "pipe took " + droplets + " droplets, holds " + stored + " mB");
         helper.succeed();
     }
 
-    @GameTest(template = AREA)
+    @GameTest(structure = AREA)
     public void batteryItemEnergy(GameTestHelper helper) {
         ItemStack battery = new ItemStack(MOItems.BATTERY.get());
         ContainerItemContext context = FabricTransfer.stackContext(battery);
         EnergyStorage storage = context.find(EnergyStorage.ITEM);
-        helper.assertTrue(storage != null, "no TR energy storage on the battery");
+        check(helper, storage != null, "no TR energy storage on the battery");
         try (Transaction tx = Transaction.openOuter()) {
-            helper.assertTrue(storage.insert(2000, tx) > 0, "the battery took no energy");
+            check(helper, storage.insert(2000, tx) > 0, "the battery took no energy");
             tx.commit();
         }
         ItemStack charged = context.getItemVariant().toStack();
         int energy = MOItems.BATTERY.get().createEnergyHandler(charged).getEnergyStored();
-        helper.assertTrue(energy > 0 && energy == storage.getAmount(), "battery holds " + energy + ", storage says " + storage.getAmount());
+        check(helper, energy > 0 && energy == storage.getAmount(), "battery holds " + energy + ", storage says " + storage.getAmount());
         helper.succeed();
     }
 
-    @GameTest(template = AREA)
+    @GameTest(structure = AREA)
     public void vanillaChestAsHandler(GameTestHelper helper) {
         BlockPos pos = helper.absolutePos(new BlockPos(1, 1, 1));
         helper.getLevel().setBlockAndUpdate(pos, Blocks.CHEST.defaultBlockState());
         IItemHandler handler = Platform.INSTANCE.itemHandler(helper.getLevel(), pos, Direction.UP).orElse(null);
-        helper.assertTrue(handler != null && handler.getSlots() == 27, "the chest is not 27 slots: " + handler);
+        check(helper, handler != null && handler.getSlots() == 27, "the chest is not 27 slots: " + handler);
         ItemStack rest = handler.insertItem(0, new ItemStack(Items.DIAMOND, 5), false);
-        helper.assertTrue(rest.isEmpty() && handler.getStackInSlot(0).getCount() == 5, "the chest did not take 5 diamonds");
-        helper.assertTrue(handler.extractItem(0, 2, true).getCount() == 2 && handler.getStackInSlot(0).getCount() == 5, "simulated extract changed the chest");
+        check(helper, rest.isEmpty() && handler.getStackInSlot(0).getCount() == 5, "the chest did not take 5 diamonds");
+        check(helper, handler.extractItem(0, 2, true).getCount() == 2 && handler.getStackInSlot(0).getCount() == 5, "simulated extract changed the chest");
         helper.succeed();
     }
 }

@@ -93,8 +93,8 @@ final class FabricBiomeModifiers {
 
     private static void addSpawn(BiomeModificationContext context, JsonObject spawner) {
         EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.getValue(ResourceLocation.parse(spawner.get("type").getAsString()));
-        context.getSpawnSettings().addSpawn(type.getCategory(), new MobSpawnSettings.SpawnerData(type, spawner.get("weight").getAsInt(),
-                spawner.get("minCount").getAsInt(), spawner.get("maxCount").getAsInt()));
+        context.getSpawnSettings().addSpawn(type.getCategory(), new MobSpawnSettings.SpawnerData(type,
+                spawner.get("minCount").getAsInt(), spawner.get("maxCount").getAsInt()), spawner.get("weight").getAsInt());
     }
 
     private static Predicate<BiomeSelectionContext> biomes(JsonElement biomes) {
