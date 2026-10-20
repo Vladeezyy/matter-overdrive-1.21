@@ -1,28 +1,35 @@
-# Matter Overdrive for Minecraft 1.21.1 – 1.21.10 (NeoForge)
+# Matter Overdrive for Minecraft 1.21.1 – 26.3 (NeoForge and Fabric)
 
 ![Matter Overdrive](docs/modrinth/banner.png)
 
 An unofficial port of [Matter Overdrive](https://github.com/simeonradivoev/MatterOverdrive) by Simeon Radivoev
-from Minecraft 1.7.10 to **Minecraft 1.21.1 – 1.21.10** on **NeoForge**.
+from Minecraft 1.7.10 to **Minecraft 1.21.1 – 1.21.10 and 26.1.2 – 26.3** on **NeoForge** and **Fabric** (Fabric API;
+Team Reborn Energy for FE is included in the jar).
 
 The port is a rewrite against modern APIs that keeps the original's behaviour, numbers, textures, sounds and
 translations (English and Russian; the port adds Ukrainian, German, Spanish and Portuguese (Brazil), not by native
 speakers). The 1.7.10 source (0.4.2) is the specification.
 
-**Download:** [Modrinth](https://modrinth.com/mod/matter-overdrive-1.21-unofficial-port) ·
+**Download:** [CurseForge](https://www.curseforge.com/minecraft/mc-mods/matter-overdrive-unofficial-port) ·
+[Modrinth](https://modrinth.com/mod/matter-overdrive-1.21-unofficial-port) ·
 [GitHub releases](https://github.com/Vladeezyy/matter-overdrive-1.21/releases)
 
-| Version | Minecraft | NeoForge | Source branch |
-|---|---|---|---|
-| 1.0.1+1.21.10 | 1.21.10 | 21.10.64 or newer | `main` |
-| 1.0.1+1.21.8 | 1.21.8 | 21.8.54 or newer | `1.21.8` |
-| 1.0.1+1.21.5 | 1.21.5 | 21.5.98 or newer | `1.21.5` |
-| 1.0.1+1.21.4 | 1.21.4 | 21.4.158 or newer | `1.21.4` |
-| 1.0.1+1.21.3 | 1.21.3 | 21.3.97 or newer | `1.21.3` |
-| 1.0.1+1.21.1 | 1.21.1 | 21.1.197 or newer | `1.21.1` |
-| 1.0.0 | 1.21.10 | 21.10.64 or newer | first release |
+Version 1.0.2: a NeoForge jar and a Fabric jar for every Minecraft version.
 
-Java 21; install on the server and on every client.
+| Minecraft | NeoForge | Fabric | Java | Source branch |
+|---|---|---|---|---|
+| 26.3 | 26.3.0.94 or newer | Fabric API 0.164.0 or newer | 25 | `mc/26.3` |
+| 26.2 | 26.2.0.93 or newer | Fabric API 0.161.0 or newer | 25 | `mc/26.2` |
+| 26.1.2 | 26.1.2.121 or newer | Fabric API 0.155.3 or newer | 25 | `mc/26.1.2` |
+| 1.21.10 | 21.10.64 or newer | Fabric API 0.138.4 or newer | 21 | `fabric-1.21.10` |
+| 1.21.8 | 21.8.54 or newer | Fabric API 0.136.1 or newer | 21 | `fabric-1.21.8` |
+| 1.21.5 | 21.5.98 or newer | Fabric API 0.128.2 or newer | 21 | `fabric-1.21.5` |
+| 1.21.4 | 21.4.158 or newer | Fabric API 0.119.4 or newer | 21 | `fabric-1.21.4` |
+| 1.21.3 | 21.3.97 or newer | Fabric API 0.114.1 or newer | 21 | `fabric-1.21.3` |
+| 1.21.1 | 21.1.197 or newer | Fabric API 0.116.17 or newer | 21 | `fabric-1.21.1` |
+
+Install on the server and on every client. The `fabric-*` and `mc/26.*` branches build both loaders from one
+`common` module; `main` and the plain `1.21.x` branches are the earlier NeoForge-only code (1.0.0 – 1.0.1).
 
 ## Status
 Everything from the original is ported:
