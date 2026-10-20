@@ -14,7 +14,6 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
 
 /**
  * The 1.7.10 holograms drew with glBlendFunc(GL_ONE, GL_ONE), no depth writes and no culling: textured quads (beam,
@@ -57,14 +56,9 @@ public final class HoloRenderTypes {
                 RenderType.CompositeState.builder().setTextureState(new RenderStateShard.TextureStateShard(t, net.minecraft.util.TriState.FALSE, false)).createCompositeState(false)));
     }
 
-    public static void register(RegisterRenderPipelinesEvent event) {
-        event.registerPipeline(SCREEN);
-        event.registerPipeline(TEXTURED);
-        event.registerPipeline(TEXTURED_CULL);
-        event.registerPipeline(QUADS);
-        event.registerPipeline(TRIANGLES);
-        event.registerPipeline(DEPTH_QUADS);
-        event.registerPipeline(LINES);
+    /** The mod's pipelines (NeoForge's RegisterRenderPipelinesEvent; vanilla compiles unregistered ones on first use) */
+    public static void registerPipelines(java.util.function.Consumer<RenderPipeline> event) {
+        for (RenderPipeline pipeline : new RenderPipeline[] {SCREEN, TEXTURED, TEXTURED_CULL, QUADS, TRIANGLES, DEPTH_QUADS, LINES}) event.accept(pipeline);
     }
 
     private static final Map<ResourceLocation, RenderType> TEXTURED_TYPES = new HashMap<>();

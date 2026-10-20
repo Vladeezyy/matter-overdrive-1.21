@@ -87,7 +87,7 @@ public class EnergyStorage implements IEnergyStorage {
 
     public void deserializeNBT(Tag tag) {
         if (tag instanceof IntTag intTag) {
-            this.energy = intTag.getAsInt();
+            this.energy = intTag.intValue();
         }
     }
 }
