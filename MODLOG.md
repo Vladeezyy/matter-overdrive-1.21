@@ -717,3 +717,4 @@
 - Fabric pitfall: from 1.21.6 the camera rotation is no longer in the model-view stack at `WorldRenderEvents.AFTER_ENTITIES`; it is in `context.matrixStack()`. The identity pose kept from 1.21.1 drew the android shield in screen space (large purple shapes in the scene). Now the shield uses the context's matrices.
 - Tests: NeoForge 96/96, Fabric 101/101 GameTests; scene (`:fabric:runScene` / `:neoforge:runScene`, world: a 1.21.8 flat creative `mo_scene` made by `:fabric:runServer`) on both loaders.
 - Not done: MSPT/FPS against vanilla on Fabric, a run of the jars outside dev, release pages.
+- Fabric armor: `ArmorRenderer.renderPart` draws the shared armor model without `setupAnim`, so on a moving player the armor stayed in the default pose (skin over the armor in the scene). `model.setupAnim(state)` first, as vanilla's armor layer.
