@@ -67,7 +67,7 @@ final class NeoForgePlayerData {
     private static void syncAll(ServerPlayer player) {
         for (PlayerData<?> data : MOAttachments.ALL) {
             send(player, player, data, true);
-            for (ServerPlayer tracking : player.serverLevel().players()) {
+            for (ServerPlayer tracking : player.level().players()) {
                 if (tracking != player) send(player, tracking, data, true);
             }
         }
@@ -75,7 +75,7 @@ final class NeoForgePlayerData {
 
     static <T extends INBTSerializable<CompoundTag>> void sync(ServerPlayer player, PlayerData<T> data) {
         send(player, player, data, false);
-        for (ServerPlayer tracking : player.serverLevel().players()) {
+        for (ServerPlayer tracking : player.level().players()) {
             if (tracking != player) send(player, tracking, data, false);
         }
     }

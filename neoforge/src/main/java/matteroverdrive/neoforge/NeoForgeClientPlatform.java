@@ -15,7 +15,7 @@ public final class NeoForgeClientPlatform implements ClientPlatform {
 
     /** The standalone model key of an extra block model (NeoForge 21.5+ bakes standalone models by key) */
     static StandaloneModelKey<BlockStateModel> key(ResourceLocation id) {
-        return KEYS.computeIfAbsent(id, StandaloneModelKey::new);
+        return KEYS.computeIfAbsent(id, k -> new StandaloneModelKey<>(k::toString));
     }
 
     @Override

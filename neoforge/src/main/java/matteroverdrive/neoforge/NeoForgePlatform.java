@@ -163,7 +163,8 @@ public final class NeoForgePlatform implements Platform {
 
     @Override
     public void sendToServer(CustomPacketPayload payload) {
-        PacketDistributor.sendToServer(payload);
+        // the client's sender (only called on a client)
+        net.neoforged.neoforge.client.network.ClientPacketDistributor.sendToServer(payload);
     }
 
     @Override
@@ -197,7 +198,7 @@ public final class NeoForgePlatform implements Platform {
     }
 
     /** The common data in NeoForge's serializable attachment */
-    static final class SerializableData<T extends INBTSerializable<CompoundTag>> implements net.neoforged.neoforge.common.util.INBTSerializable<CompoundTag> {
+    static final class SerializableData<T extends INBTSerializable<CompoundTag>> implements net.neoforged.neoforge.common.util.ValueIOSerializable {
         final T value;
 
         SerializableData(T value) {
@@ -205,13 +206,13 @@ public final class NeoForgePlatform implements Platform {
         }
 
         @Override
-        public CompoundTag serializeNBT(net.minecraft.core.HolderLookup.Provider provider) {
-            return this.value.serializeNBT(provider);
+        public void serialize(net.minecraft.world.level.storage.ValueOutput output) {
+            ((matteroverdrive.platform.ValueIOSerializable) this.value).serialize(output);
         }
 
         @Override
-        public void deserializeNBT(net.minecraft.core.HolderLookup.Provider provider, CompoundTag tag) {
-            this.value.deserializeNBT(provider, tag);
+        public void deserialize(net.minecraft.world.level.storage.ValueInput input) {
+            ((matteroverdrive.platform.ValueIOSerializable) this.value).deserialize(input);
         }
     }
 
@@ -324,6 +325,12 @@ public final class NeoForgePlatform implements Platform {
     public @Nullable Block nextOxidation(Block block) {
         var next = block.builtInRegistryHolder().getData(NeoForgeDataMaps.OXIDIZABLES);
         return next == null ? null : next.nextOxidationStage();
+    }
+
+    @Override
+    public @Nullable Block stripped(Block block) {
+        var stripped = block.builtInRegistryHolder().getData(NeoForgeDataMaps.STRIPPABLES);
+        return stripped == null ? null : stripped.strippedBlock();
     }
 
     @Override

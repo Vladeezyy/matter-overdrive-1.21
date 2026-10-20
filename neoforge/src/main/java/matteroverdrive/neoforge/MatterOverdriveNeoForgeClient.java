@@ -50,7 +50,10 @@ public final class MatterOverdriveNeoForgeClient {
     public MatterOverdriveNeoForgeClient(IEventBus modBus) {
         modBus.addListener((FMLClientSetupEvent event) -> event.enqueueWork(MOClient::init));
         modBus.addListener((ModelEvent.RegisterStandalone event) -> MOClient.extraModels().forEach(id ->
-                event.register(NeoForgeClientPlatform.key(id), net.neoforged.neoforge.client.model.standalone.StandaloneModelBaker.blockStateModel())));
+                event.register(NeoForgeClientPlatform.key(id), net.neoforged.neoforge.client.model.standalone.SimpleUnbakedStandaloneModel.blockStateModel(id))));
+        // the star map screen's hologram (1.21.6+ GUI: a picture-in-picture renderer)
+        modBus.addListener((net.neoforged.neoforge.client.event.RegisterPictureInPictureRenderersEvent event) ->
+                event.register(matteroverdrive.client.starmap.StarMapPipRenderer.State.class, matteroverdrive.client.starmap.StarMapPipRenderer::new));
         modBus.addListener((net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent event) ->
                 matteroverdrive.client.starmap.HoloRenderTypes.registerPipelines(event::registerPipeline));
         modBus.addListener((RegisterColorHandlersEvent.Block event) -> MOClient.blockColors((color, block) -> event.register(color, block)));
@@ -112,9 +115,7 @@ public final class MatterOverdriveNeoForgeClient {
             }
         });
         game.addListener((RenderHandEvent event) -> PhaserBeamRenderer.renderHand(event.getHand(), event.getPartialTick(), event.getPoseStack(), event.getMultiBufferSource()));
-        game.addListener((RenderLevelStageEvent event) -> {
-            if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_ENTITIES) ShieldRenderer.renderLevel(event.getPoseStack());
-        });
+        game.addListener((RenderLevelStageEvent.AfterEntities event) -> ShieldRenderer.renderLevel(event.getPoseStack()));
     }
 
     private static void registerClientExtensions(RegisterClientExtensionsEvent event) {
