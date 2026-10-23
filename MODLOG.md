@@ -722,3 +722,20 @@
   description rewritten for 1.21.1 – 26.3 and both loaders (local copy `docs/curseforge/cf-description.html`, git-excluded),
   summary updated, banner `docs/modrinth/banner.png` regenerated with the new subtitle.
 - Modrinth not touched in this release step (it already has 1.0.2 for Fabric 1.21.x and NeoForge 1.21.1 / 1.21.3).
+
+## 2026-10-23 — release 1.0.3 (NeoForge fix for 1.21.10 and 26.x)
+- Fix: NeoForge 1.0.2 jars for 1.21.10, 26.1.2, 26.2 and 26.3 crashed on creating or entering a world (star names read
+  through the mod file's content roots, which don't reach into a production jar; reported on CurseForge). Names now come
+  from the classpath; details in the version branches' MODLOG. Fabric and NeoForge 1.21.1 – 1.21.8 were not affected.
+- Checked before the release: all 18 jars on real dedicated servers (NeoForge installer, official Fabric server launcher
+  with the latest Fabric API), a new world each, no errors (Fabric 1.21.1 logs vanilla's harmless "No data fixer
+  registered" for the mod's mobs); GameTests on every branch and loader (NeoForge 95/95/95/96/96/101/101/101/101, Fabric
+  100/100/100/101/101/101/101/101/101 for 1.21.1 … 26.3).
+- GitHub release v1.0.3 (Latest, tag on `mc/26.3`), 18 jars, all built from the multi-loader branches (`fabric-1.21.x`,
+  `mc/26.x`). Notes: `~/Desktop/modrinth-publish/cf-ports/mo/v1.0.3/notes.md`.
+- CurseForge: 18 files 9297704 – 9297739; description got a "What's new in 1.0.3" block (the editor is in Markdown mode).
+- Modrinth: 18 versions `1.0.3+<mc>-<loader>` (26.x on Modrinth for the first time), featured: 1.21.10 and 26.3 of both
+  loaders (1.0.0 / 1.0.1+1.21.10 no longer featured); description: 26.x in the intro and table, "What's new in 1.0.3"
+  (copy in `docs/modrinth/description.md`). Project still in moderation. Upload script:
+  `~/Desktop/modrinth-publish/mo_release.py <version> [--go]`.
+- The CurseForge commenter (DTEofCourse) is answered by the user.

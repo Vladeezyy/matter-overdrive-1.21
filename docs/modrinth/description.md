@@ -2,12 +2,19 @@
 
 **The classic sci-fi technology mod is back.** This is an unofficial port of
 [Matter Overdrive](https://github.com/simeonradivoev/MatterOverdrive) by Simeon Radivoev from Minecraft 1.7.10 to
-**Minecraft 1.21.10 (NeoForge)**: break items down into raw matter and replicate anything you have scanned, turn
+**Minecraft 1.21.1 – 1.21.10 and 26.1.2 – 26.3 (NeoForge and Fabric)**: break items down into raw matter and replicate anything you have scanned, turn
 yourself into an android, fight with phasers and plasma weapons, tame gravitational anomalies and run a galactic
 empire from your star map.
 
 Everything is rebuilt on modern Minecraft, but the original numbers, textures, models, sounds and quirks are kept.
 If you played Matter Overdrive in 2015, it should feel exactly like you remember.
+
+## 🆕 What's new in 1.0.3
+
+- **Fixed: on NeoForge 1.21.10, 26.1.2, 26.2 and 26.3 the game crashed when creating or entering a world** (an error
+  from the galaxy generator). Update to 1.0.3 if you play on one of these versions.
+- **Minecraft 26.1.2, 26.2 and 26.3** files are now on Modrinth too, for NeoForge and Fabric.
+- Fabric and NeoForge 1.21.1 – 1.21.8 were not affected; 1.0.3 changes nothing else there. Worlds from older versions load as they are.
 
 ## ✨ Features
 
@@ -97,9 +104,22 @@ If you played Matter Overdrive in 2015, it should feel exactly like you remember
 
 ## 📦 Compatibility
 
-- Minecraft **1.21.10**, NeoForge **21.10.64** or newer, Java 21.
+- Minecraft **1.21.1 – 1.21.10** (Java 21) and **26.1.2 – 26.3** (Java 25) on NeoForge or Fabric. Pick the file for your Minecraft version and loader:
+
+| Minecraft | NeoForge | Fabric |
+|---|---|---|
+| 26.3 | 26.3.0.94 or newer | Fabric API 0.164.0+, Fabric Loader 0.19.5+ |
+| 26.2 | 26.2.0.93 or newer | Fabric API 0.161.0+, Fabric Loader 0.19.5+ |
+| 26.1.2 | 26.1.2.121 or newer | Fabric API 0.155.3+, Fabric Loader 0.19.5+ |
+| 1.21.10 | 21.10.64 or newer | Fabric API 0.138.4+, Fabric Loader 0.17.3+ |
+| 1.21.8 | 21.8.54 or newer | Fabric API 0.136.1+, Fabric Loader 0.16.14+ |
+| 1.21.5 | 21.5.98 or newer | Fabric API 0.128.2+, Fabric Loader 0.16.14+ |
+| 1.21.4 | 21.4.158 or newer | Fabric API 0.119.4+, Fabric Loader 0.16.14+ |
+| 1.21.3 | 21.3.97 or newer | Fabric API 0.114.1+, Fabric Loader 0.16.14+ |
+| 1.21.1 | 21.1.197 or newer | Fabric API 0.116.17+, Fabric Loader 0.16.14+ |
 - Required on both the client and the server.
-- Energy is standard FE, items, fluids and energy go through NeoForge capabilities, ores and ingots use `c:` tags.
+- Energy is standard FE. On NeoForge items, fluids and energy go through NeoForge capabilities; on Fabric through the
+  Fabric Transfer API and Team Reborn Energy (included in the jar, 1 E = 1 FE). Ores and ingots use `c:` tags.
 
 <details>
 <summary><b>Differences from the 1.7.10 original</b></summary>
@@ -115,7 +135,7 @@ OpenComputers integrations are not ported.
 
 **Is this official?** No. It is a fan port of the GPL-licensed original and is not affiliated with Simeon Radivoev.
 
-**Fabric / Forge / other versions?** NeoForge 1.21.10 only for now.
+**Fabric / Forge / other versions?** NeoForge and Fabric, Minecraft 1.21.1, 1.21.3, 1.21.4, 1.21.5, 1.21.8 and 1.21.10 (1.21.2, 1.21.6 and 1.21.7 never had a stable NeoForge).
 
 **Can I use it in a modpack?** Yes, the mod is GPL-3.0, like the original.
 
@@ -131,7 +151,7 @@ OpenComputers integrations are not ported.
 <summary><b>🇷🇺 На русском</b></summary>
 
 Неофициальный порт легендарного научно-фантастического мода **Matter Overdrive** с Minecraft 1.7.10 на
-**1.21.10 (NeoForge)**. Разбирайте предметы на материю и реплицируйте отсканированное, станьте андроидом, сражайтесь
+**1.21.1 – 1.21.10 (NeoForge и Fabric)**. Разбирайте предметы на материю и реплицируйте отсканированное, станьте андроидом, сражайтесь
 фазерами и плазменным оружием, укрощайте гравитационные аномалии и стройте галактическую империю на звёздной карте.
 Цифры, текстуры, модели, звуки и особенности оригинала сохранены. В игре есть полный гайд (Data Pad: книга +
 изолинейная схема), интерфейс переведён на русский. Автор оригинала — Simeon Radivoev, лицензия GPL-3.0.
