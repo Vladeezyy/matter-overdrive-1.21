@@ -69,10 +69,10 @@ public class StarGen implements SpaceBodyGen<Star> {
     private static String[] starNames, prefixes, suffixes;
 
     private static String read(String file) {
-        try {
-            java.nio.file.Path path = matteroverdrive.platform.Platform.INSTANCE.modFile("assets", MatterOverdrive.MODID, "info", file);
-            if (!java.nio.file.Files.exists(path)) return "";
-            byte[] bytes = java.nio.file.Files.readAllBytes(path);
+        // from the classpath: NeoForge's mod file content roots are no file system in a production jar
+        try (java.io.InputStream in = StarGen.class.getResourceAsStream("/assets/" + MatterOverdrive.MODID + "/info/" + file)) {
+            if (in == null) return "";
+            byte[] bytes = in.readAllBytes();
             // 1.7.10 readTextFile joined the lines without separators
             return new String(bytes, StandardCharsets.UTF_8).replace("\r", "").replace("\n", "");
         } catch (java.io.IOException e) {
