@@ -771,3 +771,13 @@
 
   The working modules cost what the same number of burning furnaces cost (NeoForge +0.09 ms per tick, Fabric +0.33 to
   +0.41 ms, frame rate 91–102 % of the furnaces').
+
+## 2026-10-23 — NeoForge: worlds failed to open with the release jar (1.21.10, 26.x)
+- Reported on CurseForge (NeoForge 26.2: error when entering or creating a world). Reproduced on a NeoForge server with
+  the release jar: `IndexOutOfBoundsException` in `GalaxyGenerator.generateStars` from `GalaxyServer.onLevelLoad`.
+- Cause: `StarGen` read the star name lists through `Platform.modFile`; on NeoForge 21.10+ the mod file's content roots
+  do not reach files inside a production jar (in dev they are folders, so tests passed), the names came back empty.
+  NeoForge jars 1.21.1 – 1.21.8 of 1.0.2 were not affected (checked on servers).
+- Fix: the names are read from the classpath (`getResourceAsStream`, like `BuildingTemplate`).
+- Checked: the NeoForge jar of every version (1.21.1 – 26.3) on a production server, a new world each (no errors, the
+  saved galaxy has real star names); GameTests on 26.2, both loaders.
