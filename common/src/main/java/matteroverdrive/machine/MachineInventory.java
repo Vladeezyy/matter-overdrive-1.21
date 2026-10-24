@@ -80,7 +80,7 @@ public class MachineInventory extends ItemStackHandler {
             if (stacks.get(i).isEmpty()) continue;
             CompoundTag item = new CompoundTag();
             item.putInt("Slot", i);
-            items.add(stacks.get(i).save(output.lookup(), item));
+            items.add(stacks.get(i).save(item));
         }
         output.tag().put("Items", items);
     }
@@ -90,7 +90,7 @@ public class MachineInventory extends ItemStackHandler {
         for (Tag t : input.tag().getList("Items", Tag.TAG_COMPOUND)) {
             CompoundTag item = (CompoundTag) t;
             int slot = item.getInt("Slot");
-            if (slot >= 0 && slot < stacks.size()) stacks.set(slot, ItemStack.parseOptional(input.lookup(), item));
+            if (slot >= 0 && slot < stacks.size()) stacks.set(slot, ItemStack.of(item));
         }
         onLoad();
     }

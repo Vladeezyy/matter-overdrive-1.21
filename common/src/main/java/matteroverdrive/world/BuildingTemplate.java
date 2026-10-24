@@ -57,7 +57,9 @@ public record BuildingTemplate(int width, int depth, int height, List<Entry> ent
                 JsonObject o = e.getAsJsonObject();
                 List<BlockState> states = new ArrayList<>();
                 for (JsonElement s : o.getAsJsonArray("states")) {
-                    states.add(BlockState.CODEC.parse(JsonOps.INSTANCE, s).getOrThrow(msg -> new IllegalStateException(id + ": " + msg)));
+                    states.add(BlockState.CODEC.parse(JsonOps.INSTANCE, s).getOrThrow(false, msg -> {
+                throw new IllegalStateException(id + ": " + msg);
+            }));
                 }
                 List<String> specials = new ArrayList<>();
                 o.getAsJsonArray("specials").forEach(s -> specials.add(s.getAsString()));

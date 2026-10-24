@@ -16,7 +16,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.RandomizableContainer;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
@@ -37,8 +36,8 @@ import java.util.function.Consumer;
  * choices are seeded by the piece and the position, so every chunk agrees with its neighbours.
  */
 public class ImageStructurePiece extends StructurePiece {
-    public static final ResourceKey<LootTable> ANDROID_HOUSE_LOOT = ResourceKey.create(Registries.LOOT_TABLE,
-            ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "chests/android_house"));
+    public static final net.minecraft.resources.ResourceLocation ANDROID_HOUSE_LOOT =
+            new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "chests/android_house");
     /** 1.7.10 MOWorldGenCrashedSpaceShip.holoTexts */
     private static final String[] HOLO_TEXTS = {"Critical\nError", "Contacting\nSection 9", "System\nFailure", "Emergency\nPower\nOffline",
             "System\nReboot\nFailure", "Help Me", "I Need\nWater"};
@@ -109,7 +108,7 @@ public class ImageStructurePiece extends StructurePiece {
             level.getChunk(pos).markPosForPostprocessing(pos);   // pipes and fences connect once the chunk is done
         }
         if (entry.has("crate_loot") && level.getBlockEntity(pos) instanceof TritaniumCrateBlockEntity crate) {
-            RandomizableContainer.setBlockEntityLootTable(level, random, pos, ANDROID_HOUSE_LOOT);
+            net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity.setLootTable(level, random, pos, ANDROID_HOUSE_LOOT);
             // android house: 10 in 200 crates also hold a level 3 legendary weapon
             if (building == Building.ANDROID_HOUSE && random.nextInt(200) < 10) {
                 crate.setItem(0, WeaponFactory.randomDecorated(random, 3, true));
@@ -152,7 +151,7 @@ public class ImageStructurePiece extends StructurePiece {
         T mob = type.create(level.getLevel());
         if (mob == null) return;
         mob.moveTo(x, y, z, level.getRandom().nextFloat() * 360, 0);
-        mob.finalizeSpawn(level, level.getCurrentDifficultyAt(mob.blockPosition()), MobSpawnType.STRUCTURE, null);
+        mob.finalizeSpawn(level, level.getCurrentDifficultyAt(mob.blockPosition()), MobSpawnType.STRUCTURE, null, null);
         setup.accept(mob);
         mob.setPersistenceRequired();
         level.addFreshEntityWithPassengers(mob);

@@ -30,7 +30,7 @@ public final class BarrelProperty {
     public static final ResourceLocation LINKED = id("linked");
 
     private static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, path);
+        return new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, path);
     }
     public static void setup() {
         {
@@ -40,9 +40,9 @@ public final class BarrelProperty {
                                 ? (barrel.getType().ordinal() + 1) / 10f : 0);
             }
             ItemProperties.register(MOItems.SECURITY_PROTOCOL.get(), SECURITY_TYPE, (stack, level, entity, seed) ->
-                    stack.getOrDefault(MODataComponents.SECURITY_TYPE.get(), 0) / 10f);
+                    matteroverdrive.compat.component.Components.getOrDefault(stack, MODataComponents.SECURITY_TYPE.get(), 0) / 10f);
             ItemProperties.register(MOItems.MATTER_SCANNER.get(), LINKED, (stack, level, entity, seed) ->
-                    stack.has(MODataComponents.SCANNER_LINK.get()) ? 1 : 0);
+                    matteroverdrive.compat.component.Components.has(stack, MODataComponents.SCANNER_LINK.get()) ? 1 : 0);
         }
     }
 
@@ -52,7 +52,7 @@ public final class BarrelProperty {
             if (in == null) return;
             JsonObject tints = JsonParser.parseReader(new InputStreamReader(in, StandardCharsets.UTF_8)).getAsJsonObject();
             for (var entry : tints.entrySet()) {
-                Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(entry.getKey()));
+                Item item = BuiltInRegistries.ITEM.get(new net.minecraft.resources.ResourceLocation(entry.getKey()));
                 var layers = entry.getValue().getAsJsonArray();
                 int[] colors = new int[layers.size()];
                 for (int i = 0; i < colors.length; i++) colors[i] = layers.get(i).getAsInt();

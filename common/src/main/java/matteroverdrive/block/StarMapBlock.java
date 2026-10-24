@@ -1,6 +1,5 @@
 package matteroverdrive.block;
 
-import com.mojang.serialization.MapCodec;
 
 import matteroverdrive.block.entity.StarMapBlockEntity;
 import matteroverdrive.init.MOBlockEntities;
@@ -20,30 +19,25 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 /** 1.7.10 BlockStarMap: a 9 px tall table (hardness 20, light 10); sneak-use zooms the hologram. */
 public class StarMapBlock extends MachineBlock {
-    public static final MapCodec<StarMapBlock> CODEC = simpleCodec(StarMapBlock::new);
     private static final VoxelShape SHAPE = Block.box(0, 0, 0, 16, 9, 16);
 
     public StarMapBlock(Properties properties) {
         super(MOBlockEntities.STAR_MAP, properties);
     }
 
-    @Override
-    protected MapCodec<StarMapBlock> codec() {
-        return CODEC;
-    }
 
     @Override
-    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return SHAPE;
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
         if (player.isShiftKeyDown()) {
             if (!level.isClientSide() && level.getBlockEntity(pos) instanceof StarMapBlockEntity starMap) starMap.zoom();
             return InteractionResult.SUCCESS;
         }
-        return super.useWithoutItem(state, level, pos, player, hit);
+        return super.use(state, level, pos, player, hand, hit);
     }
 
     @Override

@@ -7,7 +7,7 @@ import matteroverdrive.block.entity.ReplicatorBlockEntity.Task;
 import matteroverdrive.init.MOMenus;
 import matteroverdrive.machine.MachineInventory;
 import matteroverdrive.matter.ItemPattern;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import matteroverdrive.compat.codec.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ContainerData;
 

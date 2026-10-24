@@ -27,7 +27,7 @@ public class AndroidPillItem extends Item {
     private final Type type;
 
     public AndroidPillItem(Type type, Properties properties) {
-        super(properties.food(new FoodProperties.Builder().nutrition(0).saturationModifier(0).alwaysEdible().build()));
+        super(properties.food(new FoodProperties.Builder().nutrition(0).saturationMod(0).alwaysEat().build()));
         this.type = type;
     }
 
@@ -55,7 +55,7 @@ public class AndroidPillItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, @org.jetbrains.annotations.Nullable net.minecraft.world.level.Level context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
         Consumer<Component> tooltip = tooltipLines::add;
         tooltip.accept(Component.translatable(getDescriptionId() + ".details").withStyle(ChatFormatting.GRAY));
     }

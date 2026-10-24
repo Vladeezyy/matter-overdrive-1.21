@@ -2,7 +2,7 @@ package matteroverdrive.fabric;
 
 import matteroverdrive.platform.PacketContext;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import matteroverdrive.compat.codec.CustomPacketPayload;
 import net.minecraft.world.entity.player.Player;
 
 /** The client half of the Fabric networking (only loaded on a physical client) */

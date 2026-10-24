@@ -26,7 +26,7 @@ import matteroverdrive.platform.Platform;
 public class DialogScreen extends Screen {
     private static final int INTERACTION_DELAY = 20;
     private static final int HOLO = 0xFFA9E2FB, HOLO_RED = 0xFFE65014;
-    private static final ResourceLocation SEPARATOR = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID,
+    private static final ResourceLocation SEPARATOR = new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID,
             "textures/gui/elements/dialog_separator.png");
     private static final Random RANDOM = new Random();
 
@@ -57,7 +57,7 @@ public class DialogScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) {}
+    public void renderBackground(GuiGraphics g) {}
 
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
@@ -110,7 +110,7 @@ public class DialogScreen extends Screen {
             boolean canInteract = option.canInteract(npc, player);
             String icon = option.getHoloIcon(npc, player);
             ResourceLocation iconTex = icon == null ? null
-                    : ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/gui/holo/" + icon + ".png");
+                    : new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "textures/gui/holo/" + icon + ".png");
             if (mouseX > x && mouseX <= x + w && mouseY > y && mouseY <= y + font.lineHeight) {
                 g.fill(x - 2, y - 4, x + w + 8, y + font.lineHeight + 4, 0x66000000);
                 g.fill(x + w + 8, y - 4, x + w + 10, y + font.lineHeight + 4, canInteract ? 0x99FFFFFF : HOLO_RED);

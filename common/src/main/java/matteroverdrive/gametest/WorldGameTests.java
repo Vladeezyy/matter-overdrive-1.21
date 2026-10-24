@@ -62,15 +62,17 @@ final class WorldGameTests {
     private static void tritaniumCrate(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, matteroverdrive.init.MOBlocks.crate(DyeColor.ORANGE).get());
-        var crate = (matteroverdrive.block.entity.TritaniumCrateBlockEntity) helper.<matteroverdrive.block.entity.TritaniumCrateBlockEntity>getBlockEntity(pos);
+        var crate = (matteroverdrive.block.entity.TritaniumCrateBlockEntity) matteroverdrive.compat.GameTests.<matteroverdrive.block.entity.TritaniumCrateBlockEntity>blockEntity(helper, pos);
         check(helper, crate.getContainerSize() == 54, "size " + crate.getContainerSize());
         crate.setItem(53, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DIAMOND, 7));
         BlockPos abs = helper.absolutePos(pos);
         var drops = net.minecraft.world.level.block.Block.getDrops(helper.getLevel().getBlockState(abs), helper.getLevel(), abs, crate,
                 null, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DIAMOND_PICKAXE));
         check(helper, drops.size() == 1, "drops " + drops);
-        var contents = drops.get(0).get(net.minecraft.core.component.DataComponents.CONTAINER);
-        check(helper, contents != null && contents.nonEmptyStream().anyMatch(s -> s.getCount() == 7), "contents not kept: " + contents);
+        var tag = net.minecraft.world.item.BlockItem.getBlockEntityData(drops.get(0));
+        var contents = net.minecraft.core.NonNullList.withSize(54, net.minecraft.world.item.ItemStack.EMPTY);
+        if (tag != null) net.minecraft.world.ContainerHelper.loadAllItems(tag, contents);
+        check(helper, contents.stream().anyMatch(s -> s.getCount() == 7), "contents not kept: " + tag);
         helper.succeed();
     }
 
@@ -83,7 +85,7 @@ final class WorldGameTests {
             int[] size = sizes[building.ordinal()];
             check(helper, t.width() == size[0] && t.height() == size[1] && t.depth() == size[2],
                     building + " size " + t.width() + "x" + t.height() + "x" + t.depth());
-            var key = net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("matteroverdrive", building.getSerializedName());
+            var key = new net.minecraft.resources.ResourceLocation("matteroverdrive", building.getSerializedName());
             check(helper, structures.getOptional(key).isPresent(), "structure " + key + " missing");
         }
         helper.succeed();
@@ -115,7 +117,7 @@ final class WorldGameTests {
         int value = matteroverdrive.matter.MatterHelper.getMatter(server, new net.minecraft.world.item.ItemStack(item));
         check(helper, value > 0, "iron has no matter");
         var decomposer = new net.minecraft.world.item.ItemStack(matteroverdrive.init.MOItems.PORTABLE_DECOMPOSER.get());
-        decomposer.set(matteroverdrive.init.MODataComponents.ENERGY.get(), 100000);
+        matteroverdrive.compat.component.Components.set(decomposer, matteroverdrive.init.MODataComponents.ENERGY.get(), 100000);
         var dirt = new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.COBBLESTONE, 10);
         matteroverdrive.item.PortableDecomposerItem.decompose(server, decomposer, dirt);
         check(helper, dirt.getCount() == 10, "unlisted item decomposed");
@@ -133,11 +135,11 @@ final class WorldGameTests {
     private static void transporter(GameTestHelper helper) {
         BlockPos pos = new BlockPos(1, 1, 1);
         helper.setBlock(pos, matteroverdrive.init.MOBlocks.TRANSPORTER.get());
-        var t = helper.<matteroverdrive.block.entity.TransporterBlockEntity>getBlockEntity(pos);
+        var t = matteroverdrive.compat.GameTests.<matteroverdrive.block.entity.TransporterBlockEntity>blockEntity(helper, pos);
         t.getEnergy().set(100000);
         BlockPos abs = helper.absolutePos(pos);
         var drive = new net.minecraft.world.item.ItemStack(matteroverdrive.init.MOItems.TRANSPORT_FLASH_DRIVE.get());
-        drive.set(matteroverdrive.init.MODataComponents.TRANSPORT_TARGET.get(), abs.offset(10, -1, 0));
+        matteroverdrive.compat.component.Components.set(drive, matteroverdrive.init.MODataComponents.TRANSPORT_TARGET.get(), abs.offset(10, -1, 0));
         t.getInventory().setStack(matteroverdrive.block.entity.TransporterBlockEntity.FLASH_DRIVE, drive);
         check(helper, t.importFromFlashDrive("East") && t.getSelected().pos().equals(abs.offset(10, 0, 0)), "import " + t.getSelected());
         var pig = helper.spawnWithNoFreeWill(EntityType.PIG, pos.above());
@@ -152,7 +154,7 @@ final class WorldGameTests {
     private static void androidSpawner(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, matteroverdrive.init.MOBlocks.ANDROID_SPAWNER.get());
-        var spawner = helper.<matteroverdrive.block.entity.AndroidSpawnerBlockEntity>getBlockEntity(pos);
+        var spawner = matteroverdrive.compat.GameTests.<matteroverdrive.block.entity.AndroidSpawnerBlockEntity>blockEntity(helper, pos);
         var scoreboard = helper.getLevel().getScoreboard();
         String teamName = "mo_spawner_test";
         if (scoreboard.getPlayerTeam(teamName) != null) scoreboard.removePlayerTeam(scoreboard.getPlayerTeam(teamName));
@@ -174,7 +176,7 @@ final class WorldGameTests {
                     check(helper, android.getVisorColor() == 0xCC0000, "visor " + Integer.toHexString(android.getVisorColor()));
                 }
                 var drive = new net.minecraft.world.item.ItemStack(matteroverdrive.init.MOItems.TRANSPORT_FLASH_DRIVE.get());
-                drive.set(matteroverdrive.init.MODataComponents.TRANSPORT_TARGET.get(), abs.offset(5, 0, 5));
+                matteroverdrive.compat.component.Components.set(drive, matteroverdrive.init.MODataComponents.TRANSPORT_TARGET.get(), abs.offset(5, 0, 5));
                 spawner.getInventory().setStack(matteroverdrive.block.entity.AndroidSpawnerBlockEntity.FLASH_DRIVE_SLOT_START, drive);
                 check(helper, net.minecraft.world.phys.Vec3.atLowerCornerOf(abs.offset(5, 0, 5)).equals(androids.get(0).getPathTarget()),
                         "path not updated: " + androids.get(0).getPathTarget());

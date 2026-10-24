@@ -1,6 +1,6 @@
 package matteroverdrive.platform.transfer;
 
-import net.minecraft.core.component.DataComponentType;
+import matteroverdrive.compat.component.DataComponentType;
 import net.minecraft.world.item.ItemStack;
 
 /** Energy kept in an item's data component (NeoForge's {@code ComponentEnergyStorage}) */
@@ -55,7 +55,7 @@ public class ComponentEnergyStorage implements IEnergyStorage {
 
     @Override
     public int getEnergyStored() {
-        int stored = this.parent.getOrDefault(this.energyComponent, 0);
+        int stored = matteroverdrive.compat.component.Components.getOrDefault(this.parent, this.energyComponent, 0);
         return Math.max(0, Math.min(this.capacity, stored));
     }
 
@@ -75,6 +75,6 @@ public class ComponentEnergyStorage implements IEnergyStorage {
     }
 
     protected void setEnergy(int energy) {
-        this.parent.set(this.energyComponent, Math.max(0, Math.min(this.capacity, energy)));
+        matteroverdrive.compat.component.Components.set(this.parent, this.energyComponent, Math.max(0, Math.min(this.capacity, energy)));
     }
 }

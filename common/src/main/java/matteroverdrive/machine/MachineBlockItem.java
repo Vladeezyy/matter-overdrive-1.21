@@ -19,7 +19,7 @@ public class MachineBlockItem extends BlockItem {
 
     /** 1.7.10 hasTagCompound: anything carried with the machine (energy, matter, owner, destinations, a name). */
     public static boolean isConfigured(ItemStack stack) {
-        return !stack.getComponentsPatch().isEmpty();
+        return !stack.getTag().isEmpty();
     }
 
     @Override
@@ -32,8 +32,8 @@ public class MachineBlockItem extends BlockItem {
 
     @Override
     public boolean isBarVisible(ItemStack stack) {
-        MachineStorage storage = stack.get(MODataComponents.MACHINE_STORAGE.get());
-        return stack.has(MODataComponents.ENERGY.get()) && storage != null && storage.maxEnergy() > 0;
+        MachineStorage storage = matteroverdrive.compat.component.Components.get(stack, MODataComponents.MACHINE_STORAGE.get());
+        return matteroverdrive.compat.component.Components.has(stack, MODataComponents.ENERGY.get()) && storage != null && storage.maxEnergy() > 0;
     }
 
     @Override
@@ -47,8 +47,8 @@ public class MachineBlockItem extends BlockItem {
     }
 
     private static float energyFraction(ItemStack stack) {
-        MachineStorage storage = stack.get(MODataComponents.MACHINE_STORAGE.get());
+        MachineStorage storage = matteroverdrive.compat.component.Components.get(stack, MODataComponents.MACHINE_STORAGE.get());
         if (storage == null || storage.maxEnergy() <= 0) return 0;
-        return Mth.clamp(stack.getOrDefault(MODataComponents.ENERGY.get(), 0) / (float) storage.maxEnergy(), 0, 1);
+        return Mth.clamp(matteroverdrive.compat.component.Components.getOrDefault(stack, MODataComponents.ENERGY.get(), 0) / (float) storage.maxEnergy(), 0, 1);
     }
 }

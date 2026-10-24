@@ -22,8 +22,8 @@ import java.util.List;
  * selected pattern on the right (item, name, matter, progress). Clicking a pattern selects it.
  */
 public class MatterScannerScreen extends Screen {
-    private static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "machine_background");
-    private static final ResourceLocation SLOT = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/gui/elements/slot_big.png");
+    private static final ResourceLocation BACKGROUND = new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "machine_background");
+    private static final ResourceLocation SLOT = new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "textures/gui/elements/slot_big.png");
     private static final int WIDTH = 300, HEIGHT = 230, GRID_X = 34, GRID_Y = 34, CELL = 22, COLS = 5, ROWS = 8, INFO_X = 160;
     private static final int COLOR_TITLE = 0xFF2C3634, COLOR_TEXT = 0xFFBFE4E6, INFO_W = WIDTH - INFO_X - 24;
 
@@ -125,8 +125,8 @@ public class MatterScannerScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        renderTransparentBackground(g);
+    public void renderBackground(GuiGraphics g) {
+        renderBackground(g);
     }
 
     private @Nullable ItemPattern patternAt(double mx, double my) {
@@ -149,7 +149,7 @@ public class MatterScannerScreen extends Screen {
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollY) {
         int rows = (patterns.size() + COLS - 1) / COLS;
         scroll = Math.max(0, Math.min(Math.max(0, rows - ROWS), scroll - (int) Math.signum(scrollY)));
         return true;

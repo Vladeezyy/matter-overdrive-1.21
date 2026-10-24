@@ -52,7 +52,7 @@ import net.minecraft.world.phys.Vec3;
  */
 public class GravitationalAnomalyBlockEntity extends matteroverdrive.compat.CompatBlockEntity {
     public static final ResourceKey<DamageType> BLACK_HOLE = ResourceKey.create(Registries.DAMAGE_TYPE,
-            ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "black_hole"));
+            new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "black_hole"));
     public static final int BLOCK_DESTROY_DELAY = 6;
     public static final int MAX_BLOCKS_PER_HARVEST = 6;
     public static final int MAX_LIQUIDS_PER_HARVEST = 32;
@@ -232,7 +232,7 @@ public class GravitationalAnomalyBlockEntity extends matteroverdrive.compat.Comp
             if (living.getHealth() <= strength && !(living instanceof Player)) {
                 living.discard();
             } else {
-                living.hurt(level.damageSources().source(BLACK_HOLE), strength);
+                living.hurt(matteroverdrive.compat.Damage.source(level, BLACK_HOLE), strength);
             }
             // 1.7.10 MOEventGravitationalAnomalyConsume.Post ("The belly of the beast")
             if (living instanceof Player player) {
@@ -339,8 +339,8 @@ public class GravitationalAnomalyBlockEntity extends matteroverdrive.compat.Comp
     }
 
     @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        return saveCustomOnly(registries);
+    public CompoundTag getUpdateTag() {
+        return saveWithoutMetadata();
     }
 
     /** For the anomaly's tooltip when scanned (1.7.10 addInfo). */

@@ -14,7 +14,7 @@ public final class MOStructures {
     public static final Registrar<StructureType<?>> TYPES = Registrar.create(Registries.STRUCTURE_TYPE, MatterOverdrive.MODID);
     public static final Registrar<StructurePieceType> PIECES = Registrar.create(Registries.STRUCTURE_PIECE, MatterOverdrive.MODID);
 
-    public static final RegistryEntry<StructureType<?>, StructureType<ImageStructure>> IMAGE = TYPES.register("image", () -> () -> ImageStructure.CODEC);
+    public static final RegistryEntry<StructureType<?>, StructureType<ImageStructure>> IMAGE = TYPES.register("image", () -> () -> ImageStructure.CODEC.codec());
     public static final RegistryEntry<StructurePieceType, StructurePieceType> IMAGE_PIECE = PIECES.register("image",
             () -> (StructurePieceType.ContextlessType) ImageStructurePiece::new);
 

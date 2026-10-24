@@ -72,7 +72,7 @@ public class OmniToolItem extends EnergyWeaponItem {
     }
 
     @Override
-    public int getUseDuration(ItemStack stack, LivingEntity entity) {
+    public int getUseDuration(ItemStack stack) {
         return MAX_USE_TIME;
     }
 

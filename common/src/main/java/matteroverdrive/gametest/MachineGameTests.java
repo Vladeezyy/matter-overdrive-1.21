@@ -35,7 +35,7 @@ final class MachineGameTests {
     private static void solarGeneratesAtNoon(GameTestHelper helper) {
         helper.setBlock(A, MOBlocks.SOLAR_PANEL.get());
         helper.runAfterDelay(20, () -> {
-            SolarPanelBlockEntity panel = helper.<SolarPanelBlockEntity>getBlockEntity(A);
+            SolarPanelBlockEntity panel = matteroverdrive.compat.GameTests.<SolarPanelBlockEntity>blockEntity(helper, A);
             // 1.7.10: round(16 * cos(0)) = 16 FE/t at noon
             helper.assertTrue(panel.getChargeAmount() == SolarPanelBlockEntity.CHARGE_AMOUNT,
                     "charge at noon was " + panel.getChargeAmount());
@@ -48,7 +48,7 @@ final class MachineGameTests {
     private static void solarIdleAtNight(GameTestHelper helper) {
         helper.setBlock(A, MOBlocks.SOLAR_PANEL.get());
         helper.runAfterDelay(20, () -> {
-            SolarPanelBlockEntity panel = helper.<SolarPanelBlockEntity>getBlockEntity(A);
+            SolarPanelBlockEntity panel = matteroverdrive.compat.GameTests.<SolarPanelBlockEntity>blockEntity(helper, A);
             helper.assertTrue(panel.getEnergy().getEnergy() == 0, "panel generated at midnight");
             helper.succeed();
         });
@@ -57,9 +57,9 @@ final class MachineGameTests {
     private static void solarPowersNeighbour(GameTestHelper helper) {
         helper.setBlock(A, MOBlocks.SOLAR_PANEL.get());
         helper.setBlock(B, MOBlocks.INSCRIBER.get());
-        helper.<SolarPanelBlockEntity>getBlockEntity(A).getEnergy().set(10000);
+        matteroverdrive.compat.GameTests.<SolarPanelBlockEntity>blockEntity(helper, A).getEnergy().set(10000);
         helper.runAfterDelay(5, () -> {
-            int received = helper.<InscriberBlockEntity>getBlockEntity(B).getEnergy().getEnergy();
+            int received = matteroverdrive.compat.GameTests.<InscriberBlockEntity>blockEntity(helper, B).getEnergy().getEnergy();
             helper.assertTrue(received > 0, "inscriber received no energy from the panel");
             helper.succeed();
         });
@@ -67,7 +67,7 @@ final class MachineGameTests {
 
     private static void inscriberMakesMk2(GameTestHelper helper) {
         helper.setBlock(A, MOBlocks.INSCRIBER.get());
-        InscriberBlockEntity inscriber = helper.<InscriberBlockEntity>getBlockEntity(A);
+        InscriberBlockEntity inscriber = matteroverdrive.compat.GameTests.<InscriberBlockEntity>blockEntity(helper, A);
         inscriber.getEnergy().set(inscriber.getEnergy().getCapacity());
         inscriber.getInventory().setStack(InscriberBlockEntity.MAIN, new ItemStack(MOItems.ISOLINEAR_CIRCUIT_MK1.get(), 2));
         inscriber.getInventory().setStack(InscriberBlockEntity.SECONDARY, new ItemStack(Items.GOLD_INGOT, 2));
@@ -87,7 +87,7 @@ final class MachineGameTests {
 
     private static void inscriberNeedsEnergy(GameTestHelper helper) {
         helper.setBlock(A, MOBlocks.INSCRIBER.get());
-        InscriberBlockEntity inscriber = helper.<InscriberBlockEntity>getBlockEntity(A);
+        InscriberBlockEntity inscriber = matteroverdrive.compat.GameTests.<InscriberBlockEntity>blockEntity(helper, A);
         inscriber.getInventory().setStack(InscriberBlockEntity.MAIN, new ItemStack(MOItems.ISOLINEAR_CIRCUIT_MK1.get()));
         inscriber.getInventory().setStack(InscriberBlockEntity.SECONDARY, new ItemStack(Items.GOLD_INGOT));
         helper.runAfterDelay(20, () -> {
@@ -99,14 +99,14 @@ final class MachineGameTests {
 
     private static void batteryChargesMachine(GameTestHelper helper) {
         helper.setBlock(A, MOBlocks.INSCRIBER.get());
-        InscriberBlockEntity inscriber = helper.<InscriberBlockEntity>getBlockEntity(A);
+        InscriberBlockEntity inscriber = matteroverdrive.compat.GameTests.<InscriberBlockEntity>blockEntity(helper, A);
         ItemStack battery = MOItems.BATTERY.get().charged();
         inscriber.getInventory().setStack(inscriber.getBatterySlot(), battery);
         helper.runAfterDelay(10, () -> {
             int energy = inscriber.getEnergy().getEnergy();
             // inscriber accepts 256 FE/t; the battery gives up to 800 FE/t
             helper.assertTrue(energy >= 256 * 9 && energy <= 256 * 11, "energy after 10 ticks: " + energy);
-            int left = inscriber.getInventory().getStack(inscriber.getBatterySlot()).getOrDefault(MODataComponents.ENERGY.get(), 0);
+            int left = matteroverdrive.compat.component.Components.getOrDefault(inscriber.getInventory().getStack(inscriber.getBatterySlot()), MODataComponents.ENERGY.get(), 0);
             helper.assertTrue(left == (1 << 19) - energy, "battery holds " + left + ", machine " + energy);
             helper.succeed();
         });
@@ -114,7 +114,7 @@ final class MachineGameTests {
 
     private static void upgradeMultipliers(GameTestHelper helper) {
         helper.setBlock(A, MOBlocks.INSCRIBER.get());
-        InscriberBlockEntity inscriber = helper.<InscriberBlockEntity>getBlockEntity(A);
+        InscriberBlockEntity inscriber = matteroverdrive.compat.GameTests.<InscriberBlockEntity>blockEntity(helper, A);
         List<Integer> upgradeSlots = new java.util.ArrayList<>();
         for (int i = 0; i < inscriber.getInventory().size(); i++) {
             if (inscriber.getInventory().spec(i).role() == matteroverdrive.machine.MachineInventory.Role.UPGRADE) upgradeSlots.add(i);
@@ -137,13 +137,13 @@ final class MachineGameTests {
 
     private static void dropKeepsEnergy(GameTestHelper helper) {
         helper.setBlock(A, MOBlocks.INSCRIBER.get());
-        InscriberBlockEntity inscriber = helper.<InscriberBlockEntity>getBlockEntity(A);
+        InscriberBlockEntity inscriber = matteroverdrive.compat.GameTests.<InscriberBlockEntity>blockEntity(helper, A);
         inscriber.getEnergy().set(12345);
         BlockPos abs = helper.absolutePos(A);
         List<ItemStack> drops = Block.getDrops(helper.getLevel().getBlockState(abs), helper.getLevel(), abs, inscriber, null,
                 new ItemStack(Items.IRON_PICKAXE));
         helper.assertTrue(drops.size() == 1 && drops.get(0).is(MOItems.INSCRIBER.get()), "drops: " + drops);
-        Integer energy = drops.get(0).get(MODataComponents.ENERGY.get());
+        Integer energy = matteroverdrive.compat.component.Components.get(drops.get(0), MODataComponents.ENERGY.get());
         helper.assertTrue(energy != null && energy == 12345, "dropped energy " + energy);
         helper.succeed();
     }
@@ -151,26 +151,26 @@ final class MachineGameTests {
     /** 1.7.10 writeToDropItem / readFromPlaceItem: energy (with its capacity), matter and the owner go with the item. */
     private static void itemKeepsMatterAndOwner(GameTestHelper helper) {
         helper.setBlock(A, MOBlocks.REPLICATOR.get());
-        var replicator = helper.<matteroverdrive.block.entity.ReplicatorBlockEntity>getBlockEntity(A);
+        var replicator = matteroverdrive.compat.GameTests.<matteroverdrive.block.entity.ReplicatorBlockEntity>blockEntity(helper, A);
         replicator.getEnergy().set(5000);
         replicator.getMatterTank().setMatter(321);
         java.util.UUID owner = java.util.UUID.randomUUID();
         ItemStack protocol = new ItemStack(MOItems.SECURITY_PROTOCOL.get());
-        protocol.set(MODataComponents.SECURITY_OWNER.get(), owner);
+        matteroverdrive.compat.component.Components.set(protocol, MODataComponents.SECURITY_OWNER.get(), owner);
         helper.assertTrue(replicator.claim(protocol), "claim");
         BlockPos abs = helper.absolutePos(A);
         List<ItemStack> drops = Block.getDrops(helper.getLevel().getBlockState(abs), helper.getLevel(), abs, replicator, null,
                 new ItemStack(Items.IRON_PICKAXE));
         helper.assertTrue(drops.size() == 1, "drops: " + drops);
         ItemStack item = drops.get(0);
-        var storage = item.get(MODataComponents.MACHINE_STORAGE.get());
+        var storage = matteroverdrive.compat.component.Components.get(item, MODataComponents.MACHINE_STORAGE.get());
         helper.assertTrue(item.getItem() instanceof matteroverdrive.machine.MachineBlockItem && storage != null
                 && storage.maxEnergy() == replicator.getEnergy().getCapacity() && storage.matter() == 321
-                && storage.maxMatter() == replicator.getMatterTank().getCapacity() && owner.equals(item.get(MODataComponents.SECURITY_OWNER.get()))
+                && storage.maxMatter() == replicator.getMatterTank().getCapacity() && owner.equals(matteroverdrive.compat.component.Components.get(item, MODataComponents.SECURITY_OWNER.get()))
                 && matteroverdrive.machine.MachineBlockItem.isConfigured(item) && item.isBarVisible(),
-                "item " + item.getComponentsPatch());
+                "item " + item.getTag());
         helper.setBlock(B, MOBlocks.REPLICATOR.get());
-        var placed = helper.<matteroverdrive.block.entity.ReplicatorBlockEntity>getBlockEntity(B);
+        var placed = matteroverdrive.compat.GameTests.<matteroverdrive.block.entity.ReplicatorBlockEntity>blockEntity(helper, B);
         placed.applyComponentsFromItemStack(item);
         helper.assertTrue(placed.getEnergy().getEnergy() == 5000 && placed.getMatterTank().getMatter() == 321 && owner.equals(placed.getOwner()),
                 "placed " + placed.getEnergy().getEnergy() + " FE, " + placed.getMatterTank().getMatter() + " kM, " + placed.getOwner());

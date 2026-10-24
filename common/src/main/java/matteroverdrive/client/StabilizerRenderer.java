@@ -51,7 +51,7 @@ public class StabilizerRenderer implements matteroverdrive.compat.render.StateBl
     }
 
     private static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, path);
+        return new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, path);
     }
 
     public static class State extends BlockEntityRenderState {
@@ -215,7 +215,7 @@ public class StabilizerRenderer implements matteroverdrive.compat.render.StateBl
     }
 
     private static void vertex(VertexConsumer vc, PoseStack.Pose pose, Vec3 at, float u, float v, int rgb) {
-        vc.addVertex(pose, (float) at.x, (float) at.y, (float) at.z).setUv(u, v).setColor(0xFF000000 | rgb);
+        matteroverdrive.compat.render.Vertex.of(vc, pose, (float) at.x, (float) at.y, (float) at.z).setUv(u, v).setColor(0xFF000000 | rgb).end();
     }
 
     /** glColor3d clamps to 0..1: a negative noise channel adds nothing. */

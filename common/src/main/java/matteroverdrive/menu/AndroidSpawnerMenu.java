@@ -4,7 +4,7 @@ import matteroverdrive.block.entity.AndroidSpawnerBlockEntity;
 import matteroverdrive.init.MOMenus;
 import matteroverdrive.machine.MachineBlockEntity;
 import matteroverdrive.machine.MachineInventory;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import matteroverdrive.compat.codec.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ContainerData;

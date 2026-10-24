@@ -29,7 +29,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.ItemContainerContents;
+import matteroverdrive.compat.component.ItemContainerContents;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import matteroverdrive.platform.transfer.ComponentEnergyStorage;
@@ -69,7 +69,7 @@ public abstract class EnergyWeaponItem extends Item {
     /** The installed modules, indexed by {@link WeaponModule} slot (empty stacks where nothing is installed). */
     public static NonNullList<ItemStack> getModuleSlots(ItemStack weapon) {
         NonNullList<ItemStack> slots = NonNullList.withSize(WeaponModule.SLOTS, ItemStack.EMPTY);
-        weapon.getOrDefault(MODataComponents.WEAPON_MODULES.get(), ItemContainerContents.EMPTY).copyInto(slots);
+        matteroverdrive.compat.component.Components.getOrDefault(weapon, MODataComponents.WEAPON_MODULES.get(), ItemContainerContents.EMPTY).copyInto(slots);
         return slots;
     }
 
@@ -88,7 +88,7 @@ public abstract class EnergyWeaponItem extends Item {
     public static void setModule(ItemStack weapon, int slot, ItemStack module) {
         NonNullList<ItemStack> slots = getModuleSlots(weapon);
         slots.set(slot, module.copy());
-        weapon.set(MODataComponents.WEAPON_MODULES.get(), ItemContainerContents.fromItems(slots));
+        matteroverdrive.compat.component.Components.set(weapon, MODataComponents.WEAPON_MODULES.get(), ItemContainerContents.fromItems(slots));
     }
 
     /** 1.7.10 supportsModule(slot, weapon): which module slots this weapon has. */
@@ -203,18 +203,18 @@ public abstract class EnergyWeaponItem extends Item {
     public static int getEnergy(ItemStack weapon) {
         ItemStack battery = getModule(weapon, WeaponModule.SLOT_BATTERY);
         if (battery.getItem() instanceof BatteryItem b) return b.getEnergy(battery);
-        return weapon.getOrDefault(MODataComponents.ENERGY.get(), 0);
+        return matteroverdrive.compat.component.Components.getOrDefault(weapon, MODataComponents.ENERGY.get(), 0);
     }
 
     public static void setEnergy(ItemStack weapon, int energy) {
         ItemStack battery = getModule(weapon, WeaponModule.SLOT_BATTERY);
         if (battery.getItem() instanceof BatteryItem b) {
             if (b.isCreative()) return;
-            battery.set(MODataComponents.ENERGY.get(), Mth.clamp(energy, 0, b.getCapacity()));
+            matteroverdrive.compat.component.Components.set(battery, MODataComponents.ENERGY.get(), Mth.clamp(energy, 0, b.getCapacity()));
             setModule(weapon, WeaponModule.SLOT_BATTERY, battery);
             return;
         }
-        weapon.set(MODataComponents.ENERGY.get(), Mth.clamp(energy, 0, CAPACITY));
+        matteroverdrive.compat.component.Components.set(weapon, MODataComponents.ENERGY.get(), Mth.clamp(energy, 0, CAPACITY));
     }
 
     public static int getCapacity(ItemStack weapon) {
@@ -223,15 +223,15 @@ public abstract class EnergyWeaponItem extends Item {
     }
 
     public static float getHeat(ItemStack weapon) {
-        return weapon.getOrDefault(MODataComponents.HEAT.get(), 0f);
+        return matteroverdrive.compat.component.Components.getOrDefault(weapon, MODataComponents.HEAT.get(), 0f);
     }
 
     public static void setHeat(ItemStack weapon, float heat) {
-        weapon.set(MODataComponents.HEAT.get(), Math.max(0, heat));
+        matteroverdrive.compat.component.Components.set(weapon, MODataComponents.HEAT.get(), Math.max(0, heat));
     }
 
     public static boolean isOverheated(ItemStack weapon) {
-        return weapon.getOrDefault(MODataComponents.OVERHEATED.get(), false);
+        return matteroverdrive.compat.component.Components.getOrDefault(weapon, MODataComponents.OVERHEATED.get(), false);
     }
 
     public boolean canFire(ItemStack weapon) {
@@ -249,7 +249,7 @@ public abstract class EnergyWeaponItem extends Item {
             setHeat(stack, cooled < 0.001f ? 0 : cooled);
         }
         if (isOverheated(stack) && getHeat(stack) < 2) {
-            stack.set(MODataComponents.OVERHEATED.get(), false);
+            matteroverdrive.compat.component.Components.set(stack, MODataComponents.OVERHEATED.get(), false);
         }
     }
 
@@ -262,7 +262,7 @@ public abstract class EnergyWeaponItem extends Item {
                 level.playSound(null, shooter.getX(), shooter.getY(), shooter.getZ(), MOSounds.OVERHEAT.get(), SoundSource.PLAYERS, 1, 1);
                 return;
             }
-            weapon.set(MODataComponents.OVERHEATED.get(), true);
+            matteroverdrive.compat.component.Components.set(weapon, MODataComponents.OVERHEATED.get(), true);
             level.playSound(null, shooter.getX(), shooter.getY(), shooter.getZ(), MOSounds.OVERHEAT.get(), SoundSource.PLAYERS, 1, 1);
             level.playSound(null, shooter.getX(), shooter.getY(), shooter.getZ(), MOSounds.OVERHEAT_ALARM.get(), SoundSource.PLAYERS, 1, 1);
         }
@@ -326,7 +326,7 @@ public abstract class EnergyWeaponItem extends Item {
     }
 
     @Override
-    public int getUseDuration(ItemStack stack, LivingEntity entity) {
+    public int getUseDuration(ItemStack stack) {
         return 72000;
     }
 
@@ -359,7 +359,7 @@ public abstract class EnergyWeaponItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack weapon, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+    public void appendHoverText(ItemStack weapon, @org.jetbrains.annotations.Nullable net.minecraft.world.level.Level context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
         Consumer<Component> tooltip = tooltipLines::add;
         tooltip.accept(Component.translatable("tooltip.matteroverdrive.energy_stored", MOText.energy(getEnergy(weapon)),
                 MOText.energy(getCapacity(weapon))).withStyle(ChatFormatting.YELLOW));

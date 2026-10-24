@@ -26,17 +26,17 @@ public class MatterDustItem extends Item {
     }
 
     public static int getMatter(ItemStack stack) {
-        return stack.getOrDefault(MODataComponents.MATTER.get(), 0);
+        return matteroverdrive.compat.component.Components.getOrDefault(stack, MODataComponents.MATTER.get(), 0);
     }
 
     public static ItemStack withMatter(Item dust, int matter) {
         ItemStack stack = new ItemStack(dust);
-        stack.set(MODataComponents.MATTER.get(), matter);
+        matteroverdrive.compat.component.Components.set(stack, MODataComponents.MATTER.get(), matter);
         return stack;
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, @org.jetbrains.annotations.Nullable net.minecraft.world.level.Level context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
         Consumer<Component> tooltip = tooltipLines::add;
         int matter = getMatter(stack);
         if (matter > 0) {

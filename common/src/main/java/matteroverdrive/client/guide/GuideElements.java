@@ -48,7 +48,7 @@ public final class GuideElements {
     }
 
     private static ResourceLocation tex(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, path);
+        return new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, path);
     }
 
     /** 1.7.10 GuideElementPage: children laid out top to bottom; float:left ones side by side, float:right from the right. */
@@ -395,7 +395,7 @@ public final class GuideElements {
             ItemStack stack = element.hasAttribute("item") ? shortcodeStack(decodeShortcode(element.getAttribute("item"))) : entry.icon();
             var mc = Minecraft.getInstance();
             if (stack != null && mc.level != null) {
-                List<Component> all = stack.getTooltipLines(Item.TooltipContext.of(mc.level), mc.player, TooltipFlag.NORMAL);
+                List<Component> all = stack.getTooltipLines(mc.player, TooltipFlag.NORMAL);
                 lines = all.size() > 1 ? all.subList(1, all.size()) : List.of();
             }
             this.height = lines.size() * font().lineHeight;

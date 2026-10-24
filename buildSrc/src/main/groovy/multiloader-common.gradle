@@ -57,7 +57,7 @@ processResources {
             'mod_issues'             : mod_issues,
             'minecraft_version'      : minecraft_version,
             'minecraft_version_range': minecraft_version_range,
-            'neo_version_range'      : neo_version_range,
+            'forge_version_range'    : forge_version_range,
             'fabric_loader_version'  : fabric_loader_version,
             'fabric_version'         : fabric_version,
             'mod_name'               : mod_name,
@@ -67,7 +67,7 @@ processResources {
             'mod_credits'            : mod_credits,
             'java_version'           : java_version,
     ]
-    filesMatching(['fabric.mod.json', 'META-INF/neoforge.mods.toml', '*.mixins.json']) {
+    filesMatching(['fabric.mod.json', 'META-INF/mods.toml', '*.mixins.json']) {
         expand expandProps
     }
     inputs.properties(expandProps)

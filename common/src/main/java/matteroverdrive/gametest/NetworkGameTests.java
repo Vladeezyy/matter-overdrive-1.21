@@ -44,7 +44,7 @@ final class NetworkGameTests {
 
     private static PatternStorageBlockEntity storage(GameTestHelper helper, BlockPos pos, Item patternItem, int progress) {
         helper.setBlock(pos, MOBlocks.PATTERN_STORAGE.get());
-        PatternStorageBlockEntity s = helper.<PatternStorageBlockEntity>getBlockEntity(pos);
+        PatternStorageBlockEntity s = matteroverdrive.compat.GameTests.<PatternStorageBlockEntity>blockEntity(helper, pos);
         s.getEnergy().set(1000);
         ItemStack drive = new ItemStack(MOItems.PATTERN_DRIVE.get());
         if (patternItem != null) MOItems.PATTERN_DRIVE.get().addProgress(drive, patternItem, progress);
@@ -63,11 +63,11 @@ final class NetworkGameTests {
         helper.setBlock(new BlockPos(3, 1, 1), MOBlocks.PATTERN_MONITOR.get());
         pipes(helper, 1, 4, 4);
         storage(helper, new BlockPos(5, 1, 1), Items.DIRT, 100);
-        PatternMonitorBlockEntity monitor = helper.<PatternMonitorBlockEntity>getBlockEntity(new BlockPos(3, 1, 1));
+        PatternMonitorBlockEntity monitor = matteroverdrive.compat.GameTests.<PatternMonitorBlockEntity>blockEntity(helper, new BlockPos(3, 1, 1));
         helper.assertTrue(monitor.networkPatterns().size() == 2, "unfiltered " + monitor.networkPatterns());
         // use the drive on the dirt storage (marks it), on a pipe twice (marks and unmarks it)
         ItemStack drive = new ItemStack(MOItems.NETWORK_FLASH_DRIVE.get());
-        var player = helper.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
+        var player = AndroidGameTests.player(helper);
         for (BlockPos rel : List.of(new BlockPos(5, 1, 1), new BlockPos(4, 1, 1), new BlockPos(4, 1, 1))) {
             BlockPos abs = helper.absolutePos(rel);
             player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, drive);
@@ -86,7 +86,7 @@ final class NetworkGameTests {
         helper.setBlock(new BlockPos(1, 1, 1), MOBlocks.ANALYZER.get());
         pipes(helper, 1, 2, 3);
         PatternStorageBlockEntity s = storage(helper, new BlockPos(4, 1, 1), null, 0);
-        AnalyzerBlockEntity a = helper.<AnalyzerBlockEntity>getBlockEntity(new BlockPos(1, 1, 1));
+        AnalyzerBlockEntity a = matteroverdrive.compat.GameTests.<AnalyzerBlockEntity>blockEntity(helper, new BlockPos(1, 1, 1));
         upgrades(a, MOItems.UPGRADE_HYPER_SPEED.get(), 2);   // 80 ticks per item
         a.getEnergy().set(a.getEnergy().getCapacity());
         a.getInventory().setStack(AnalyzerBlockEntity.INPUT, new ItemStack(Items.IRON_INGOT));
@@ -125,8 +125,8 @@ final class NetworkGameTests {
         helper.setBlock(new BlockPos(3, 1, 1), MOBlocks.PATTERN_MONITOR.get());
         pipes(helper, 1, 4, 4);
         helper.setBlock(new BlockPos(5, 1, 1), MOBlocks.REPLICATOR.get());
-        PatternMonitorBlockEntity monitor = helper.<PatternMonitorBlockEntity>getBlockEntity(new BlockPos(3, 1, 1));
-        ReplicatorBlockEntity r = helper.<ReplicatorBlockEntity>getBlockEntity(new BlockPos(5, 1, 1));
+        PatternMonitorBlockEntity monitor = matteroverdrive.compat.GameTests.<PatternMonitorBlockEntity>blockEntity(helper, new BlockPos(3, 1, 1));
+        ReplicatorBlockEntity r = matteroverdrive.compat.GameTests.<ReplicatorBlockEntity>blockEntity(helper, new BlockPos(5, 1, 1));
         r.getEnergy().set(r.getEnergy().getCapacity());
         r.getMatterTank().setMatter(10);
         upgrades(r, MOItems.UPGRADE_FAILSAFE.get(), 2);   // 0.5% -> ~0.13% failure per item
@@ -149,10 +149,10 @@ final class NetworkGameTests {
         pipes(helper, 1, 2, 2);
         helper.setBlock(new BlockPos(3, 1, 1), MOBlocks.PATTERN_MONITOR.get());
         helper.setBlock(new BlockPos(5, 1, 1), MOBlocks.REPLICATOR.get());     // gap at x=4
-        PatternMonitorBlockEntity monitor = helper.<PatternMonitorBlockEntity>getBlockEntity(new BlockPos(3, 1, 1));
+        PatternMonitorBlockEntity monitor = matteroverdrive.compat.GameTests.<PatternMonitorBlockEntity>blockEntity(helper, new BlockPos(3, 1, 1));
         monitor.request(List.of(new Task(monitor.networkPatterns().get(0), 1)));
         helper.runAfterDelay(45, () -> {
-            helper.assertTrue(helper.<ReplicatorBlockEntity>getBlockEntity(new BlockPos(5, 1, 1)).isIdle(),
+            helper.assertTrue(matteroverdrive.compat.GameTests.<ReplicatorBlockEntity>blockEntity(helper, new BlockPos(5, 1, 1)).isIdle(),
                     "task reached an unconnected replicator");
             helper.assertTrue(monitor.getQueue().size() == 1, "request lost");
             helper.succeed();
@@ -161,7 +161,7 @@ final class NetworkGameTests {
 
     private static void replicatorFailChance(GameTestHelper helper) {
         helper.setBlock(new BlockPos(1, 1, 1), MOBlocks.REPLICATOR.get());
-        ReplicatorBlockEntity r = helper.<ReplicatorBlockEntity>getBlockEntity(new BlockPos(1, 1, 1));
+        ReplicatorBlockEntity r = matteroverdrive.compat.GameTests.<ReplicatorBlockEntity>blockEntity(helper, new BlockPos(1, 1, 1));
         var item = Items.DIAMOND.builtInRegistryHolder();
         // 1.7.10: 0.005 * FAIL + (1 - progress) * 0.5 * (1 + FAIL)
         near(helper, r.getFailChance(new ItemPattern(item, 100)), 0.005, "complete pattern");
@@ -172,7 +172,7 @@ final class NetworkGameTests {
     private static void replicatorIrradiates(GameTestHelper helper) {
         storage(helper, new BlockPos(1, 1, 1), Items.COBBLESTONE, 100);
         helper.setBlock(new BlockPos(2, 1, 1), MOBlocks.REPLICATOR.get());
-        ReplicatorBlockEntity r = helper.<ReplicatorBlockEntity>getBlockEntity(new BlockPos(2, 1, 1));
+        ReplicatorBlockEntity r = matteroverdrive.compat.GameTests.<ReplicatorBlockEntity>blockEntity(helper, new BlockPos(2, 1, 1));
         r.getEnergy().set(r.getEnergy().getCapacity());
         r.getMatterTank().setMatter(50);
         r.setTask(new Task(new ItemPattern(Items.COBBLESTONE.builtInRegistryHolder(), 100), 10));

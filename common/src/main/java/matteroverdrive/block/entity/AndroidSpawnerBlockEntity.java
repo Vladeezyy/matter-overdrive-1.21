@@ -139,7 +139,7 @@ public class AndroidSpawnerBlockEntity extends MachineBlockEntity {
         if (server.getDifficulty() == Difficulty.PEACEFUL || !server.noCollision(android) || server.containsAnyLiquid(android.getBoundingBox())) {
             return;
         }
-        android.finalizeSpawn(server, server.getCurrentDifficultyAt(android.blockPosition()), MobSpawnType.SPAWNER, null);
+        android.finalizeSpawn(server, server.getCurrentDifficultyAt(android.blockPosition()), MobSpawnType.SPAWNER, null, null);
         android.setSpawnerPos(pos);
         android.setPersistenceRequired();
         server.levelEvent(2004, pos, 0);

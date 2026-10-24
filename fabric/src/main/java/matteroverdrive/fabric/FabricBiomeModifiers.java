@@ -56,7 +56,7 @@ final class FabricBiomeModifiers {
                 throw new IllegalStateException("Could not read " + file, e);
             }
             String name = file.getFileName().toString().replace(".json", "");
-            apply(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, name), json);
+            apply(new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, name), json);
         }
     }
 
@@ -70,7 +70,7 @@ final class FabricBiomeModifiers {
             case "neoforge:add_features" -> {
                 GenerationStep.Decoration step = GenerationStep.Decoration.valueOf(json.get("step").getAsString().toUpperCase(java.util.Locale.ROOT));
                 List<ResourceKey<net.minecraft.world.level.levelgen.placement.PlacedFeature>> features = strings(json.get("features")).stream()
-                        .map(f -> ResourceKey.create(Registries.PLACED_FEATURE, ResourceLocation.parse(f))).toList();
+                        .map(f -> ResourceKey.create(Registries.PLACED_FEATURE, new net.minecraft.resources.ResourceLocation(f))).toList();
                 BiomeModifications.create(id).add(ModificationPhase.ADDITIONS, biomes, context -> {
                     features.forEach(feature -> context.getGenerationSettings().addFeature(step, feature));
                 });
@@ -92,7 +92,7 @@ final class FabricBiomeModifiers {
     }
 
     private static void addSpawn(BiomeModificationContext context, JsonObject spawner) {
-        EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.parse(spawner.get("type").getAsString()));
+        EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(new net.minecraft.resources.ResourceLocation(spawner.get("type").getAsString()));
         context.getSpawnSettings().addSpawn(type.getCategory(), new MobSpawnSettings.SpawnerData(type, spawner.get("weight").getAsInt(),
                 spawner.get("minCount").getAsInt(), spawner.get("maxCount").getAsInt()));
     }
@@ -125,9 +125,9 @@ final class FabricBiomeModifiers {
         }
         String value = biomes.getAsString();
         if (value.startsWith("#")) {
-            return BiomeSelectors.tag(TagKey.create(Registries.BIOME, ResourceLocation.parse(value.substring(1))));
+            return BiomeSelectors.tag(TagKey.create(Registries.BIOME, new net.minecraft.resources.ResourceLocation(value.substring(1))));
         }
-        return BiomeSelectors.includeByKey(ResourceKey.create(Registries.BIOME, ResourceLocation.parse(value)));
+        return BiomeSelectors.includeByKey(ResourceKey.create(Registries.BIOME, new net.minecraft.resources.ResourceLocation(value)));
     }
 
     private static List<String> strings(JsonElement element) {

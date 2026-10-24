@@ -78,11 +78,11 @@ public class DataPadScreen extends Screen {
     }
 
     private static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, path);
+        return new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, path);
     }
 
     private static ResourceLocation tex(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, path);
+        return new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, path);
     }
 
     private static ResourceLocation holo(String name) {
@@ -113,7 +113,7 @@ public class DataPadScreen extends Screen {
 
     private QuestStack selected() {
         List<QuestStack> quests = quests();
-        return quests.isEmpty() ? null : quests.get(Math.clamp(state.selectedQuest(), 0, quests.size() - 1));
+        return quests.isEmpty() ? null : quests.get(net.minecraft.util.Mth.clamp(state.selectedQuest(), 0, quests.size() - 1));
     }
 
     private void setState(DataPadItem.State next) {
@@ -263,7 +263,7 @@ public class DataPadScreen extends Screen {
         g.disableScissor();
         // search icon and the ordering toggle (1.7.10 ElementStatesHoloIcons)
         matteroverdrive.compat.Gui.blit(g, holo("page_icon_search"), px + 28, py + 3, 0, 0, 10, 10, 16, 16, 16, 16, 0xFFBFE4E6);
-        int ordering = Math.clamp(state.ordering(), 0, 2);
+        int ordering = net.minecraft.util.Mth.clamp(state.ordering(), 0, 2);
         matteroverdrive.compat.Gui.blit(g, holo(ORDER_ICONS[ordering]), px + PAGE_W - 38, py + 2, 0, 0, 16, 16, 16, 16, 16, 16, 0xFFBFE4E6);
         if (hoveredEntry != null) matteroverdrive.compat.Gui.setTooltipForNextFrame(g, font, Component.literal(hoveredEntry.getDisplayName()), mouseX, mouseY);
     }
@@ -390,7 +390,7 @@ public class DataPadScreen extends Screen {
         List<ItemStack> rewards = quest.getRewards(selected, minecraft.player);
         int contentHeight = lines.size() * font.lineHeight + (rewards.isEmpty() ? 0 : 20);
         int maxScroll = Math.max(0, contentHeight - INFO_H);
-        int scroll = Math.clamp(state.scroll(), 0, maxScroll);
+        int scroll = net.minecraft.util.Mth.clamp(state.scroll(), 0, maxScroll);
         g.enableScissor(left + INFO_X, top + INFO_Y, left + INFO_X + INFO_W, top + INFO_Y + INFO_H);
         int y = top + INFO_Y - scroll;
         for (FormattedCharSequence line : lines) {
@@ -436,7 +436,7 @@ public class DataPadScreen extends Screen {
         }
         if (state.page() == DataPadItem.State.PAGE_ENTRIES) {
             if (in(mx, my, PAGE_X + PAGE_W - 38, PAGE_Y + 2, 16, 16)) {
-                setState(state.withOrdering((Math.clamp(state.ordering(), 0, 2) + 1) % 3));
+                setState(state.withOrdering((net.minecraft.util.Mth.clamp(state.ordering(), 0, 2) + 1) % 3));
                 return true;
             }
             GuideEntry entry = entryAt(mx, my);
@@ -528,7 +528,7 @@ public class DataPadScreen extends Screen {
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollY) {
         double mx = mouseX - left, my = mouseY - top;
         if (state.page() == DataPadItem.State.PAGE_ENTRIES) {
             // 1.7.10 onMouseWheel: scrollY += Lerp(scrollX, scrollX + movement, 0.1) (the wheel moved 120 per notch)
@@ -538,16 +538,16 @@ public class DataPadScreen extends Screen {
             clampEntriesScroll(inner);
             return true;
         }
-        if (state.page() != DataPadItem.State.PAGE_QUESTS) return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+        if (state.page() != DataPadItem.State.PAGE_QUESTS) return super.mouseScrolled(mouseX, mouseY, scrollY);
         if (in(mx, my, INFO_X, INFO_Y, INFO_W + 8, INFO_H)) {
             state = state.withQuest(state.selectedQuest(), Math.max(0, state.scroll() - (int) Math.signum(scrollY) * 9));
             return true;
         }
         if (in(mx, my, LIST_X, LIST_Y, LIST_W, ROWS * ROW)) {
-            listScroll = Math.clamp(listScroll - (int) Math.signum(scrollY), 0, Math.max(0, quests().size() - ROWS));
+            listScroll = net.minecraft.util.Mth.clamp(listScroll - (int) Math.signum(scrollY), 0, Math.max(0, quests().size() - ROWS));
             return true;
         }
-        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+        return super.mouseScrolled(mouseX, mouseY, scrollY);
     }
 
     /** 1.7.10 PageActiveQuests.onGuiClose: keeps the info scroll on the pad. */

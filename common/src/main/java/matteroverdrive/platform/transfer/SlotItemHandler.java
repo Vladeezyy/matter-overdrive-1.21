@@ -39,7 +39,7 @@ public class SlotItemHandler extends Slot {
     }
 
     @Override
-    public void setByPlayer(ItemStack newStack, ItemStack oldStack) {
+    public void setByPlayer(ItemStack newStack) {
         ((IItemHandlerModifiable) this.handler).setStackInSlot(this.index, newStack);
         this.setChanged();
     }

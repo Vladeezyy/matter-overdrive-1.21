@@ -80,7 +80,7 @@ public final class FabricObjModels {
                 try (Reader reader = entry.getValue().openAsReader()) {
                     JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
                     if (!json.has("loader") || !json.get("loader").getAsString().equals("neoforge:obj")) continue;
-                    ResourceLocation file = ResourceLocation.parse(json.get("model").getAsString());
+                    ResourceLocation file = new net.minecraft.resources.ResourceLocation(json.get("model").getAsString());
                     ObjFile obj = files.get(file);
                     if (obj == null) {
                         obj = readObj(manager, file);

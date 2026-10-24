@@ -43,7 +43,7 @@ public final class ValueInput {
     public <T> Optional<T> read(String key, Codec<T> codec) {
         Tag value = tag.get(key);
         if (value == null) return Optional.empty();
-        return codec.parse(lookup.createSerializationContext(NbtOps.INSTANCE), value).result();
+        return codec.parse(net.minecraft.resources.RegistryOps.create(NbtOps.INSTANCE, lookup), value).result();
     }
 
     public Optional<ValueInput> child(String key) {
@@ -74,7 +74,7 @@ public final class ValueInput {
         List<T> values = new ArrayList<>();
         Tag list = tag.get(key);
         if (list instanceof ListTag l) {
-            var ops = lookup.createSerializationContext(NbtOps.INSTANCE);
+            var ops = net.minecraft.resources.RegistryOps.create(NbtOps.INSTANCE, lookup);
             for (Tag t : l) codec.parse(ops, t).result().ifPresent(values::add);
         }
         return new TypedInputList<>(values);

@@ -55,7 +55,7 @@ final class SecurityGameTests {
         sneakUse(other, protocol.copy());   // nothing for a plain use
         sneakUse(owner, protocol);
         check(helper, owner.getUUID().equals(SecurityProtocolItem.getOwner(protocol)) && SecurityProtocolItem.getType(protocol) == SecurityProtocolItem.CLAIM,
-                "claim protocol " + protocol.getComponents());
+                "claim protocol " + protocol.getTag());
         sneakUse(other, protocol);          // someone else's protocol doesn't cycle
         check(helper, SecurityProtocolItem.getType(protocol) == SecurityProtocolItem.CLAIM, "cycled by another player");
         sneakUse(owner, protocol);
@@ -67,18 +67,18 @@ final class SecurityGameTests {
 
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, MOBlocks.CONTRACT_MARKET.get());
-        var machine = helper.<ContractMarketBlockEntity>getBlockEntity(pos);
+        var machine = matteroverdrive.compat.GameTests.<ContractMarketBlockEntity>blockEntity(helper, pos);
         check(helper, machine.isUseableByPlayer(other) && machine.canRemove(other), "unclaimed machines are everyone's");
         check(helper, useOn(helper, owner, protocol, pos) && protocol.getCount() == 2 && owner.getUUID().equals(machine.getOwner()), "claim");
         check(helper, !useOn(helper, owner, protocol, pos) && protocol.getCount() == 2, "claimed twice");
         check(helper, machine.isUseableByPlayer(owner) && !machine.isUseableByPlayer(other) && !machine.canRemove(other), "rights");
         // the owner's [Access] protocol anywhere in the inventory lets the other player in (but not break it)
         ItemStack access = protocol.copyWithCount(1);
-        access.set(matteroverdrive.init.MODataComponents.SECURITY_TYPE.get(), SecurityProtocolItem.ACCESS);
+        matteroverdrive.compat.component.Components.set(access, matteroverdrive.init.MODataComponents.SECURITY_TYPE.get(), SecurityProtocolItem.ACCESS);
         other.getInventory().setItem(20, access);
         check(helper, machine.isUseableByPlayer(other) && !machine.canRemove(other), "access protocol");
         // the owner survives a save / load, and goes with the machine's item
-        var saved = machine.saveWithFullMetadata(helper.getLevel().registryAccess());
+        var saved = machine.saveWithFullMetadata();
         check(helper, saved.contains("owner"), "owner not saved " + saved);
         check(helper, owner.getUUID().equals(machine.collectComponents().get(matteroverdrive.init.MODataComponents.SECURITY_OWNER.get())),
                 "owner not on the item");
@@ -87,10 +87,10 @@ final class SecurityGameTests {
         sneakUse(other, foreign);
         sneakUse(other, foreign);
         sneakUse(other, foreign);
-        check(helper, SecurityProtocolItem.getType(foreign) == SecurityProtocolItem.REMOVE, "foreign remove " + foreign.getComponents());
+        check(helper, SecurityProtocolItem.getType(foreign) == SecurityProtocolItem.REMOVE, "foreign remove " + foreign.getTag());
         check(helper, !useOn(helper, other, foreign, pos) && machine.hasOwner(), "removed by someone else");
         ItemStack remove = protocol.copyWithCount(1);
-        remove.set(matteroverdrive.init.MODataComponents.SECURITY_TYPE.get(), SecurityProtocolItem.REMOVE);
+        matteroverdrive.compat.component.Components.set(remove, matteroverdrive.init.MODataComponents.SECURITY_TYPE.get(), SecurityProtocolItem.REMOVE);
         check(helper, useOn(helper, owner, remove, pos) && remove.isEmpty() && !machine.hasOwner(), "remove");
         owner.discard();
         other.discard();

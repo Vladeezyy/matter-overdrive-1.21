@@ -37,7 +37,7 @@ public class KillCreatureLogic extends AbstractLogic {
     }
 
     private Target target(QuestStack stack) {
-        return targets[Math.clamp(tag(stack).getByte("KillType"), 0, targets.length - 1)];
+        return targets[net.minecraft.util.Mth.clamp(tag(stack).getByte("KillType"), 0, targets.length - 1)];
     }
 
     public int getKillCount(QuestStack stack) {

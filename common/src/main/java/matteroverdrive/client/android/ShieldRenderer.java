@@ -41,7 +41,7 @@ public final class ShieldRenderer {
     private static final int HOLO = 0xA9E2FB;
     private static final ResourceLocation SHIELD = fx("shield"), DAMAGE = fx("shield_damage"),
             FORCEFIELD = fx("forcefield_plasma"), PLASMA = fx("forcefield_plasma_2");
-    private static final ResourceLocation GLOW = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/block/gravitational_anomaly_glow.png");
+    private static final ResourceLocation GLOW = new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "textures/block/gravitational_anomaly_glow.png");
     private static final int HIT_TIME = 10;
     private static ObjMesh shieldMesh, sphere;
     /** The own bubble's fade (1.7.10 opacityLerp); other players' bubbles are always at full strength. */
@@ -60,7 +60,7 @@ public final class ShieldRenderer {
     }
 
     private static ResourceLocation fx(String name) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/fx/" + name + ".png");
+        return new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "textures/fx/" + name + ".png");
     }
     public static void setup() {
         AndroidClientHooks.shieldHit = (id, offset) -> HITS.computeIfAbsent(id, k -> new ArrayDeque<>()).add(new Hit(offset));
@@ -96,7 +96,7 @@ public final class ShieldRenderer {
     public static void renderLevel(PoseStack eventPose) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null) return;
-        float partial = mc.getTimer().getGameTimeDeltaPartialTick(false);
+        float partial = mc.getFrameTime();
         Vec3 camera = mc.gameRenderer.getMainCamera().getPosition();
         MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
         PoseStack pose = eventPose;
@@ -122,8 +122,8 @@ public final class ShieldRenderer {
     private static void renderShield(Minecraft mc, PoseStack pose, MultiBufferSource buffers, Player player, Vec3 camera, float partial,
                                      boolean own, float strength) {
         if (shieldMesh == null) {
-            shieldMesh = ObjMesh.load(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "models/fx/shield_sphere.obj"));
-            sphere = ObjMesh.load(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "models/fx/sphere.obj"));
+            shieldMesh = ObjMesh.load(new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "models/fx/shield_sphere.obj"));
+            sphere = ObjMesh.load(new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "models/fx/sphere.obj"));
         }
         double time = mc.level.getDayTime();
         Vec3 pos = player.getPosition(partial);
@@ -180,10 +180,10 @@ public final class ShieldRenderer {
         var vc = buffers.getBuffer(HoloRenderTypes.textured(GLOW));
         int color = holo(0.5f);
         PoseStack.Pose last = pose.last();
-        vc.addVertex(last, 0, 0, 0).setUv(0, 1).setColor(color);
-        vc.addVertex(last, 1, 0, 0).setUv(1, 1).setColor(color);
-        vc.addVertex(last, 1, 1, 0).setUv(1, 0).setColor(color);
-        vc.addVertex(last, 0, 1, 0).setUv(0, 0).setColor(color);
+        matteroverdrive.compat.render.Vertex.of(vc, last, 0, 0, 0).setUv(0, 1).setColor(color).end();
+        matteroverdrive.compat.render.Vertex.of(vc, last, 1, 0, 0).setUv(1, 1).setColor(color).end();
+        matteroverdrive.compat.render.Vertex.of(vc, last, 1, 1, 0).setUv(1, 0).setColor(color).end();
+        matteroverdrive.compat.render.Vertex.of(vc, last, 0, 1, 0).setUv(0, 0).setColor(color).end();
         pose.popPose();
     }
 

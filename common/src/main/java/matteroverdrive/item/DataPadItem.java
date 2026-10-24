@@ -13,10 +13,10 @@ import matteroverdrive.init.MOSounds;
 import matteroverdrive.quest.QuestEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import matteroverdrive.compat.codec.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
+import matteroverdrive.compat.codec.ByteBufCodecs;
+import matteroverdrive.compat.codec.StreamCodec;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -109,11 +109,11 @@ public class DataPadItem extends Item {
     }
 
     public static State getState(ItemStack pad) {
-        return pad.getOrDefault(MODataComponents.DATA_PAD.get(), State.DEFAULT);
+        return matteroverdrive.compat.component.Components.getOrDefault(pad, MODataComponents.DATA_PAD.get(), State.DEFAULT);
     }
 
     public static @Nullable Scan getScan(ItemStack pad) {
-        return pad.get(MODataComponents.DATA_PAD_SCAN.get());
+        return matteroverdrive.compat.component.Components.get(pad, MODataComponents.DATA_PAD_SCAN.get());
     }
 
     public static boolean hasGui(ItemStack pad) {
@@ -144,7 +144,7 @@ public class DataPadItem extends Item {
     }
 
     @Override
-    public int getUseDuration(ItemStack stack, LivingEntity entity) {
+    public int getUseDuration(ItemStack stack) {
         return SCAN_TIME;
     }
 
@@ -177,7 +177,7 @@ public class DataPadItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, @org.jetbrains.annotations.Nullable net.minecraft.world.level.Level context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
         Consumer<Component> tooltip = tooltipLines::add;
         tooltip.accept(Component.translatable("item.matteroverdrive.data_pad.details").withStyle(net.minecraft.ChatFormatting.GRAY));
     }

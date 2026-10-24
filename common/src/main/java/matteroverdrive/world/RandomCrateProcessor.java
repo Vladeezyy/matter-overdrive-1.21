@@ -1,6 +1,5 @@
 package matteroverdrive.world;
 
-import com.mojang.serialization.MapCodec;
 
 import matteroverdrive.block.TritaniumCrateBlock;
 import matteroverdrive.init.MOBlocks;
@@ -18,7 +17,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 /** Gives template tritanium crates a random colour (1.7.10 MadScientistHouse: tritaniumCrate[random.nextInt(16)]). */
 public class RandomCrateProcessor extends StructureProcessor {
     public static final RandomCrateProcessor INSTANCE = new RandomCrateProcessor();
-    public static final MapCodec<RandomCrateProcessor> CODEC = MapCodec.unit(() -> INSTANCE);
+    public static final com.mojang.serialization.Codec<RandomCrateProcessor> CODEC = com.mojang.serialization.Codec.unit(() -> INSTANCE);
 
     @Override
     public StructureTemplate.StructureBlockInfo processBlock(LevelReader level, BlockPos offset, BlockPos pos,

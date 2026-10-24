@@ -38,11 +38,11 @@ public class RogueAndroidRenderer<T extends RogueAndroid> extends HumanoidMobRen
     private final boolean ranged;
 
     private static ModelLayerLocation layer(String name) {
-        return new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, name), "main");
+        return new ModelLayerLocation(new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, name), "main");
     }
 
     private static ResourceLocation tex(String name) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/entity/" + name + ".png");
+        return new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "textures/entity/" + name + ".png");
     }
 
     public static LayerDefinition meleeLayer() {
@@ -117,7 +117,8 @@ public class RogueAndroidRenderer<T extends RogueAndroid> extends HumanoidMobRen
             visor.prepareMobModel(android, limbSwing, limbSwingAmount, partialTick);
             visor.setupAnim(android, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
             visor.renderToBuffer(pose, buffers.getBuffer(RenderType.entityTranslucentEmissive(RANGED_TEXTURE)), 0xF000F0,
-                    OverlayTexture.NO_OVERLAY, ARGB.color(255, android.getVisorColor()));
+                    OverlayTexture.NO_OVERLAY, ARGB.red(android.getVisorColor()) / 255f, ARGB.green(android.getVisorColor()) / 255f,
+                    ARGB.blue(android.getVisorColor()) / 255f, 1f);
         }
     }
 }

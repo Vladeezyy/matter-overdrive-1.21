@@ -50,12 +50,12 @@ public class MatterScannerItem extends Item {
     }
 
     public static @Nullable GlobalPos getLink(ItemStack scanner) {
-        return scanner.get(MODataComponents.SCANNER_LINK.get());
+        return matteroverdrive.compat.component.Components.get(scanner, MODataComponents.SCANNER_LINK.get());
     }
 
     public static void link(ItemStack scanner, Level level, BlockPos pos) {
         GlobalPos link = GlobalPos.of(level.dimension(), pos.immutable());
-        if (!link.equals(getLink(scanner))) scanner.set(MODataComponents.SCANNER_LINK.get(), link);
+        if (!link.equals(getLink(scanner))) matteroverdrive.compat.component.Components.set(scanner, MODataComponents.SCANNER_LINK.get(), link);
     }
 
     /** 1.7.10 getLink: the linked pattern storage, if it is loaded in this level. */
@@ -66,7 +66,7 @@ public class MatterScannerItem extends Item {
     }
 
     public static @Nullable ItemPattern getSelected(ItemStack scanner) {
-        return scanner.get(MODataComponents.SCANNER_SELECTED.get());
+        return matteroverdrive.compat.component.Components.get(scanner, MODataComponents.SCANNER_SELECTED.get());
     }
 
     /** 1.7.10 setSelected: the database's pattern for the item, or a new one at 0%. */
@@ -74,7 +74,7 @@ public class MatterScannerItem extends Item {
         PatternStorageBlockEntity database = getDatabase(level, scanner);
         ItemPattern pattern = database == null ? null
                 : database.getPatterns().stream().filter(p -> p.is(item)).findFirst().orElse(null);
-        scanner.set(MODataComponents.SCANNER_SELECTED.get(), pattern != null ? pattern : new ItemPattern(item.builtInRegistryHolder(), 0));
+        matteroverdrive.compat.component.Components.set(scanner, MODataComponents.SCANNER_SELECTED.get(), pattern != null ? pattern : new ItemPattern(item.builtInRegistryHolder(), 0));
     }
 
     /** 1.7.10 MatterHelper.CanScan: has matter and isn't bedrock or air. */
@@ -102,7 +102,7 @@ public class MatterScannerItem extends Item {
 
     /** 1.7.10 getMaxItemUseDuration: 60 ticks + the selected item's matter. */
     @Override
-    public int getUseDuration(ItemStack scanner, LivingEntity entity) {
+    public int getUseDuration(ItemStack scanner) {
         ItemPattern selected = getSelected(scanner);
         if (selected != null && canScan(selected.toStack())) return SCAN_TIME + MatterRegistry.getAnySide(selected.item().value());
         return 72000;
@@ -165,7 +165,7 @@ public class MatterScannerItem extends Item {
             ItemPattern now = pattern.get();
             message = Component.translatable("chat.matteroverdrive.scanner.added", name, now == null ? PROGRESS_PER_ITEM : now.progress())
                     .withStyle(ChatFormatting.GREEN);
-            if (now != null) scanner.set(MODataComponents.SCANNER_SELECTED.get(), now);
+            if (now != null) matteroverdrive.compat.component.Components.set(scanner, MODataComponents.SCANNER_SELECTED.get(), now);
             ok = true;
         } else {
             message = Component.translatable("chat.matteroverdrive.scanner.no_space", name).withStyle(ChatFormatting.RED);
@@ -178,7 +178,7 @@ public class MatterScannerItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack scanner, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+    public void appendHoverText(ItemStack scanner, @org.jetbrains.annotations.Nullable net.minecraft.world.level.Level context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
         Consumer<Component> tooltip = tooltipLines::add;
         GlobalPos link = getLink(scanner);
         if (link != null) {

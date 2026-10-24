@@ -104,8 +104,7 @@ public class AndroidStationScreen extends MachineScreen<AndroidStationMenu> {
             }
         }
         // the player, turning with the mouse (1.7.10 turned it with world time)
-        InventoryScreen.renderEntityInInventoryFollowsMouse(g, x + 250, y + 98, x + 310, y + 212, 45, 0.0625f,
-                x + mx, y + my, player());
+        InventoryScreen.renderEntityInInventoryFollowsMouse(g, x + 280, y + 205, 45, x + 280 - (x + mx), y + 205 - 75 - (y + my), player());
         String xp = player().experienceLevel + " XP";
         g.drawString(font, xp, x + 280 - font.width(xp) / 2, y + imageHeight - 24, 0xFF55FF55, false);
     }

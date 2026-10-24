@@ -23,7 +23,7 @@ public final class FailedAnimalRenderers {
     private static final ResourceLocation SHEEP = tex("failed_sheep");
 
     private static ResourceLocation tex(String name) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/entity/" + name + ".png");
+        return new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "textures/entity/" + name + ".png");
     }
 
     public static PigRenderer pig(EntityRendererProvider.Context context) {

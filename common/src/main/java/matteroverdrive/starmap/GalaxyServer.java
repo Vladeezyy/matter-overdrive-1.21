@@ -83,7 +83,7 @@ public final class GalaxyServer {
     private static boolean save(MinecraftServer server) {
         if (galaxy == null) return false;
         try {
-            NbtIo.writeCompressed(galaxy.toNBT(server.registryAccess()), file(server));
+            NbtIo.writeCompressed(galaxy.toNBT(server.registryAccess()), file(server).toFile());
             return true;
         } catch (IOException e) {
             MatterOverdrive.LOGGER.error("Galaxy could not be saved", e);
@@ -99,7 +99,7 @@ public final class GalaxyServer {
         long start = System.nanoTime();
         if (Files.isRegularFile(path)) {
             try {
-                CompoundTag tag = NbtIo.readCompressed(path, NbtAccounter.unlimitedHeap());
+                CompoundTag tag = NbtIo.readCompressed(path.toFile());
                 Galaxy loaded = new Galaxy();
                 loaded.readNBT(tag, server.registryAccess());
                 setGalaxy(loaded);
@@ -138,7 +138,7 @@ public final class GalaxyServer {
         tryAndClaimPlanet(player);
         // the client only knows the stars: send it the claimed planets (1.7.10 sent only a newly claimed homeworld)
         for (Planet planet : homePlanets.values()) {
-            send(player, StarMapPayloads.PlanetUpdate.of(planet, player.registryAccess(), true));
+            send(player, StarMapPayloads.PlanetUpdate.of(planet, player.level().registryAccess(), true));
         }
     }
 
@@ -194,7 +194,7 @@ public final class GalaxyServer {
     }
 
     /** Only to clients that know the payload (GameTest mock players don't). */
-    static void send(ServerPlayer player, net.minecraft.network.protocol.common.custom.CustomPacketPayload payload) {
+    static void send(ServerPlayer player, matteroverdrive.compat.codec.CustomPacketPayload payload) {
         if (player.connection != null && matteroverdrive.platform.Platform.INSTANCE.canSend(player, payload.type())) Platform.INSTANCE.sendToPlayer(player, payload);
     }
 

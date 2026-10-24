@@ -16,15 +16,13 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.metadata.gui.GuiSpriteScaling;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * 1.21.1 stand-ins for the 1.21.6+ GuiGraphics calls the screens use: {@code blit(RenderPipelines.GUI_TEXTURED, ...)}
+ * 1.20.1 stand-ins for the 1.21.6+ GuiGraphics calls the screens use: {@code blit(RenderPipelines.GUI_TEXTURED, ...)}
  * (translucent, optionally tinted with an ARGB colour) and the deferred {@code setTooltipForNextFrame}.
  */
 public final class Gui {
@@ -70,58 +68,108 @@ public final class Gui {
         blitSprite(g, sprite, x, y, w, h, -1);
     }
 
+    /**
+     * 1.20.1 has no GUI sprite atlas (1.20.2+): a sprite is its own texture {@code textures/gui/sprites/<path>.png}, and
+     * its {@code gui.scaling} (stretch / tile / nine_slice) is read from the .mcmeta here, once per sprite.
+     */
     public static void blitSprite(GuiGraphics g, ResourceLocation sprite, int x, int y, int w, int h, int color) {
+        SpriteInfo info = SPRITES.computeIfAbsent(sprite, Gui::loadSprite);
         begin(color);
-        TextureAtlasSprite atlasSprite = Minecraft.getInstance().getGuiSprites().getSprite(sprite);
-        if (Minecraft.getInstance().getGuiSprites().getSpriteScaling(atlasSprite) instanceof GuiSpriteScaling.NineSlice nine
-                && nine.border().left() != nine.border().right()) {
-            nineSlice(g, atlasSprite, nine, x, y, w, h);
+        RenderSystem.setShaderTexture(0, info.texture);
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        Matrix4f matrix = g.pose().last().pose();
+        BufferBuilder buffer = Tesselator.getInstance().getBuilder();
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+        int sw = info.width, sh = info.height;
+        if (info.border != null) {
+            int[] border = info.border;
+            int l = Math.min(border[0], w / 2), t = Math.min(border[1], h / 2);
+            int r = Math.min(border[2], w / 2), b = Math.min(border[3], h / 2);
+            int[][] cols = {{x, l, 0, l}, {x + l, w - l - r, l, sw - l - r}, {x + w - r, r, sw - r, r}};
+            int[][] rows = {{y, t, 0, t}, {y + t, h - t - b, t, sh - t - b}, {y + h - b, b, sh - b, b}};
+            for (int[] c : cols) {
+                for (int[] rw : rows) {
+                    tile(buffer, matrix, sw, sh, c[0], rw[0], c[1], rw[1], c[2], rw[2], c[3], rw[3]);
+                }
+            }
+        } else if (info.tile) {
+            tile(buffer, matrix, sw, sh, x, y, w, h, 0, 0, sw, sh);
         } else {
-            g.blitSprite(sprite, x, y, w, h);
+            quad(buffer, matrix, x, y, x + w, y + h, 0, 0, 1, 1);
         }
+        BufferUploader.drawWithShader(buffer.end());
         end();
     }
 
-    /**
-     * 1.21.1's GuiGraphics.blitNineSlicedSprite draws the right edge as wide as the left border,
-     * so sprites with different left / right borders get a stray column. This one draws the nine parts (edges and centre
-     * tiled, 1 px rows / columns as one stretched quad) into a single buffer.
-     */
-    private static void nineSlice(GuiGraphics g, TextureAtlasSprite sprite, GuiSpriteScaling.NineSlice nine, int x, int y, int w, int h) {
-        var border = nine.border();
-        int sw = nine.width(), sh = nine.height();
-        int l = Math.min(border.left(), w / 2), r = Math.min(border.right(), w / 2);
-        int t = Math.min(border.top(), h / 2), b = Math.min(border.bottom(), h / 2);
-        RenderSystem.setShaderTexture(0, sprite.atlasLocation());
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        Matrix4f matrix = g.pose().last().pose();
-        BufferBuilder buffer = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        int[][] cols = {{x, l, 0, l}, {x + l, w - l - r, l, sw - l - r}, {x + w - r, r, sw - r, r}};
-        int[][] rows = {{y, t, 0, t}, {y + t, h - t - b, t, sh - t - b}, {y + h - b, b, sh - b, b}};
-        for (int[] c : cols) {
-            for (int[] rw : rows) {
-                tile(buffer, matrix, sprite, sw, sh, c[0], rw[0], c[1], rw[1], c[2], rw[2], c[3], rw[3]);
+    private static final java.util.Map<ResourceLocation, SpriteInfo> SPRITES = new java.util.concurrent.ConcurrentHashMap<>();
+
+    /** Forgets the sprites' sizes and scaling (resource reload) */
+    public static void clearSprites() {
+        SPRITES.clear();
+    }
+
+    private record SpriteInfo(ResourceLocation texture, int width, int height, int @org.jetbrains.annotations.Nullable [] border, boolean tile) {}
+
+    private static SpriteInfo loadSprite(ResourceLocation sprite) {
+        ResourceLocation texture = new ResourceLocation(sprite.getNamespace(), "textures/gui/sprites/" + sprite.getPath() + ".png");
+        int width = 16, height = 16;
+        int[] border = null;
+        boolean tile = false;
+        var manager = Minecraft.getInstance().getResourceManager();
+        try (var in = manager.open(texture)) {
+            byte[] header = in.readNBytes(24);
+            width = java.nio.ByteBuffer.wrap(header, 16, 4).getInt();
+            height = java.nio.ByteBuffer.wrap(header, 20, 4).getInt();
+        } catch (java.io.IOException | RuntimeException e) {
+            matteroverdrive.MatterOverdrive.LOGGER.warn("Missing GUI sprite {}", texture);
+        }
+        var meta = manager.getResource(new ResourceLocation(texture.getNamespace(), texture.getPath() + ".mcmeta"));
+        if (meta.isPresent()) {
+            try (var reader = meta.get().openAsReader()) {
+                var scaling = com.google.gson.JsonParser.parseReader(reader).getAsJsonObject().getAsJsonObject("gui").getAsJsonObject("scaling");
+                String type = scaling.get("type").getAsString();
+                if (type.equals("nine_slice")) {
+                    width = scaling.get("width").getAsInt();
+                    height = scaling.get("height").getAsInt();
+                    var b = scaling.get("border");
+                    if (b.isJsonPrimitive()) {
+                        int all = b.getAsInt();
+                        border = new int[]{all, all, all, all};
+                    } else {
+                        var o = b.getAsJsonObject();
+                        border = new int[]{o.get("left").getAsInt(), o.get("top").getAsInt(), o.get("right").getAsInt(), o.get("bottom").getAsInt()};
+                    }
+                } else if (type.equals("tile")) {
+                    width = scaling.get("width").getAsInt();
+                    height = scaling.get("height").getAsInt();
+                    tile = true;
+                }
+            } catch (Exception e) {
+                matteroverdrive.MatterOverdrive.LOGGER.warn("Bad GUI sprite metadata {}: {}", texture, e.toString());
             }
         }
-        BufferUploader.drawWithShader(buffer.buildOrThrow());
+        return new SpriteInfo(texture, width, height, border, tile);
+    }
+
+    private static void quad(BufferBuilder buffer, Matrix4f matrix, float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1) {
+        buffer.vertex(matrix, x0, y0, 0).uv(u0, v0).endVertex();
+        buffer.vertex(matrix, x0, y1, 0).uv(u0, v1).endVertex();
+        buffer.vertex(matrix, x1, y1, 0).uv(u1, v1).endVertex();
+        buffer.vertex(matrix, x1, y0, 0).uv(u1, v0).endVertex();
     }
 
     /** Fills w x h at (x, y) with the sprite region (u, v, uw, vh), tiled 1:1 (a 1 px region is stretched). */
-    private static void tile(BufferBuilder buffer, Matrix4f matrix, TextureAtlasSprite sprite, int sw, int sh, int x, int y, int w, int h,
+    private static void tile(BufferBuilder buffer, Matrix4f matrix, int sw, int sh, int x, int y, int w, int h,
                              int u, int v, int uw, int vh) {
         if (w <= 0 || h <= 0 || uw <= 0 || vh <= 0) return;
         int stepX = uw == 1 ? w : uw, stepY = vh == 1 ? h : vh;
         for (int i = 0; i < w; i += stepX) {
             int cw = Math.min(stepX, w - i);
-            float u0 = sprite.getU((float) u / sw), u1 = sprite.getU((float) (u + (uw == 1 ? 1 : cw)) / sw);
+            float u0 = (float) u / sw, u1 = (float) (u + (uw == 1 ? 1 : cw)) / sw;
             for (int k = 0; k < h; k += stepY) {
                 int ch = Math.min(stepY, h - k);
-                float v0 = sprite.getV((float) v / sh), v1 = sprite.getV((float) (v + (vh == 1 ? 1 : ch)) / sh);
-                float x0 = x + i, x1 = x + i + cw, y0 = y + k, y1 = y + k + ch;
-                buffer.addVertex(matrix, x0, y0, 0).setUv(u0, v0);
-                buffer.addVertex(matrix, x0, y1, 0).setUv(u0, v1);
-                buffer.addVertex(matrix, x1, y1, 0).setUv(u1, v1);
-                buffer.addVertex(matrix, x1, y0, 0).setUv(u1, v0);
+                float v0 = (float) v / sh, v1 = (float) (v + (vh == 1 ? 1 : ch)) / sh;
+                quad(buffer, matrix, x + i, y + k, x + i + cw, y + k + ch, u0, v0, u1, v1);
             }
         }
     }

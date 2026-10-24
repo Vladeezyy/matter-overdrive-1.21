@@ -38,15 +38,15 @@ public class PortableDecomposerItem extends Item {
     }
 
     public static int getEnergy(ItemStack stack) {
-        return stack.getOrDefault(MODataComponents.ENERGY.get(), 0);
+        return matteroverdrive.compat.component.Components.getOrDefault(stack, MODataComponents.ENERGY.get(), 0);
     }
 
     public static float getMatter(ItemStack stack) {
-        return stack.getOrDefault(MODataComponents.STORED_MATTER.get(), 0f);
+        return matteroverdrive.compat.component.Components.getOrDefault(stack, MODataComponents.STORED_MATTER.get(), 0f);
     }
 
     public static List<Item> getList(ItemStack stack) {
-        return stack.getOrDefault(MODataComponents.DECOMPOSE_LIST.get(), List.of());
+        return matteroverdrive.compat.component.Components.getOrDefault(stack, MODataComponents.DECOMPOSE_LIST.get(), List.of());
     }
 
     /** 1.7.10 addStackToList (from the anvil): only items that have matter. */
@@ -54,7 +54,7 @@ public class PortableDecomposerItem extends Item {
         if (!MatterHelper.hasMatter(item) || getList(decomposer).contains(item.getItem())) return false;
         List<Item> list = new ArrayList<>(getList(decomposer));
         list.add(item.getItem());
-        decomposer.set(MODataComponents.DECOMPOSE_LIST.get(), List.copyOf(list));
+        matteroverdrive.compat.component.Components.set(decomposer, MODataComponents.DECOMPOSE_LIST.get(), List.copyOf(list));
         return true;
     }
 
@@ -69,8 +69,8 @@ public class PortableDecomposerItem extends Item {
         if (free <= 0 || energy <= energyForItem) return;
         int taken = Math.min(Math.min((int) (free / matterFromItem), item.getCount()), energy / energyForItem);
         if (taken <= 0) return;
-        decomposer.set(MODataComponents.ENERGY.get(), energy - taken * energyForItem);
-        decomposer.set(MODataComponents.STORED_MATTER.get(), getMatter(decomposer) + taken * matterFromItem);
+        matteroverdrive.compat.component.Components.set(decomposer, MODataComponents.ENERGY.get(), energy - taken * energyForItem);
+        matteroverdrive.compat.component.Components.set(decomposer, MODataComponents.STORED_MATTER.get(), getMatter(decomposer) + taken * matterFromItem);
         item.shrink(taken);
     }
 
@@ -86,7 +86,7 @@ public class PortableDecomposerItem extends Item {
         if (amount > 0) {
             filled = tank.fill(new matteroverdrive.platform.transfer.FluidStack(MOFluids.MATTER_PLASMA.get(), amount), matteroverdrive.platform.transfer.IFluidHandler.FluidAction.EXECUTE);
         }
-        decomposer.set(MODataComponents.STORED_MATTER.get(), (float) Math.max(0, amount - filled));
+        matteroverdrive.compat.component.Components.set(decomposer, MODataComponents.STORED_MATTER.get(), (float) Math.max(0, amount - filled));
         return InteractionResult.SUCCESS;
     }
 
@@ -106,7 +106,7 @@ public class PortableDecomposerItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, @org.jetbrains.annotations.Nullable net.minecraft.world.level.Level context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
         Consumer<Component> tooltip = tooltipLines::add;
         tooltip.accept(Component.translatable("item.matteroverdrive.portable_decomposer.details").withStyle(ChatFormatting.GRAY));
         tooltip.accept(Component.translatable("tooltip.matteroverdrive.energy_stored", MOText.energy(getEnergy(stack)), MOText.energy(CAPACITY))

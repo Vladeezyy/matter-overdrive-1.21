@@ -8,7 +8,7 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.TransparentBlock;
+import net.minecraft.world.level.block.GlassBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import matteroverdrive.platform.BlockEntry;
@@ -45,7 +45,7 @@ public final class MODecorative {
             MOBlocks.props(p -> p.mapColor(MapColor.ICE).strength(2, 4).sound(SoundType.METAL).requiresCorrectToolForDrops().lightLevel(s -> 15))));
     public static final BlockEntry<Block> ENGINE_EXHAUST_PLASMA = add(MOBlocks.BLOCKS.registerSimpleBlock("decorative_engine_exhaust_plasma",
             MOBlocks.props(p -> p.mapColor(MapColor.COLOR_LIGHT_BLUE).strength(1, 1).sound(SoundType.WOOL).lightLevel(s -> 15))));
-    public static final BlockEntry<TransparentBlock> FORCE_GLASS = add(MOBlocks.BLOCKS.registerBlock("force_glass", p -> new TransparentBlock(p) {},
+    public static final BlockEntry<GlassBlock> FORCE_GLASS = add(MOBlocks.BLOCKS.registerBlock("force_glass", p -> new GlassBlock(p) {},
             MOBlocks.props(p -> p.mapColor(MapColor.NONE).strength(40, 6).sound(SoundType.GLASS).noOcclusion()
                     .isValidSpawn((s, l, pos, type) -> false).isRedstoneConductor((s, l, pos) -> false)
                     .isSuffocating((s, l, pos) -> false).isViewBlocking((s, l, pos) -> false))));

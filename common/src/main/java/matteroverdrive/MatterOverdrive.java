@@ -25,7 +25,6 @@ public final class MatterOverdrive {
         matteroverdrive.init.MOFluids.FLUIDS.getEntries();
         matteroverdrive.init.MODecorative.init();
         matteroverdrive.init.MOBlocks.BLOCKS.getEntries();
-        matteroverdrive.init.MOMaterials.ARMOR_MATERIALS.getEntries();
         MOItems.ITEMS.getEntries();
         MOBlockEntities.BLOCK_ENTITIES.getEntries();
         matteroverdrive.init.MOMenus.MENUS.getEntries();
@@ -103,7 +102,7 @@ public final class MatterOverdrive {
     /** Rogue androids spawn on the ground like monsters (replaces the default placement) */
     public static void registerSpawnPlacements() {
         for (var type : java.util.List.of(MOEntities.ROGUE_ANDROID.get(), MOEntities.RANGED_ROGUE_ANDROID.get())) {
-            matteroverdrive.platform.Platform.INSTANCE.replaceSpawnPlacement(type, net.minecraft.world.entity.SpawnPlacementTypes.ON_GROUND,
+            matteroverdrive.platform.Platform.INSTANCE.replaceSpawnPlacement(type, net.minecraft.world.entity.SpawnPlacements.Type.ON_GROUND,
                     net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, matteroverdrive.entity.monster.RogueAndroid::checkSpawnRules);
         }
     }

@@ -10,8 +10,8 @@ import net.minecraft.resources.ResourceLocation;
 /** 1.7.10 EntityRendererMutantScientist: the hulking scientist model, no shadow. */
 public class MutantScientistRenderer extends MobRenderer<MutantScientist, HulkingScientistModel> {
     public static final ModelLayerLocation LAYER = new ModelLayerLocation(
-            ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "mutant_scientist"), "main");
-    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID,
+            new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "mutant_scientist"), "main");
+    private static final ResourceLocation TEXTURE = new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID,
             "textures/entity/hulking_scientist.png");
 
     public MutantScientistRenderer(EntityRendererProvider.Context context) {

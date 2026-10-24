@@ -22,7 +22,7 @@ import matteroverdrive.compat.ARGB;
  * fading out over the bolt's range.
  */
 public class PlasmaBoltRenderer extends matteroverdrive.compat.render.StateEntityRenderer<PlasmaBolt, PlasmaBoltRenderer.State> {
-    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/entity/plasma_fire.png");
+    private static final ResourceLocation TEXTURE = new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "textures/entity/plasma_fire.png");
 
     public static class State extends EntityRenderState {
         float yRot, xRot, size, life, speed;
@@ -87,6 +87,6 @@ public class PlasmaBoltRenderer extends matteroverdrive.compat.render.StateEntit
     }
 
     private static void vertex(VertexConsumer vc, PoseStack.Pose p, int color, float x, float y, float z, float u, float v) {
-        vc.addVertex(p, x, y, z).setColor(color).setUv(u, v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(0xF000F0).setNormal(p, 0, 1, 0);
+        matteroverdrive.compat.render.Vertex.of(vc, p, x, y, z).setColor(color).setUv(u, v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(0xF000F0).setNormal(p, 0, 1, 0).end();
     }
 }

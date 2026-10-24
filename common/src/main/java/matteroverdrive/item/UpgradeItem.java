@@ -24,7 +24,7 @@ public class UpgradeItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, @org.jetbrains.annotations.Nullable net.minecraft.world.level.Level context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
         Consumer<Component> tooltip = tooltipLines::add;
         upgrades.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach(e -> tooltip.accept(describe(e.getKey(), e.getValue())));
     }

@@ -20,21 +20,21 @@ public class TransportFlashDriveItem extends Item {
     }
 
     public static @Nullable BlockPos getTarget(ItemStack stack) {
-        return stack.get(MODataComponents.TRANSPORT_TARGET.get());
+        return matteroverdrive.compat.component.Components.get(stack, MODataComponents.TRANSPORT_TARGET.get());
     }
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
         if (context.getLevel().getBlockState(context.getClickedPos()).isAir()) {
-            context.getItemInHand().remove(MODataComponents.TRANSPORT_TARGET.get());
+            matteroverdrive.compat.component.Components.remove(context.getItemInHand(), MODataComponents.TRANSPORT_TARGET.get());
             return InteractionResult.PASS;
         }
-        context.getItemInHand().set(MODataComponents.TRANSPORT_TARGET.get(), context.getClickedPos().immutable());
+        matteroverdrive.compat.component.Components.set(context.getItemInHand(), MODataComponents.TRANSPORT_TARGET.get(), context.getClickedPos().immutable());
         return InteractionResult.SUCCESS;
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, @org.jetbrains.annotations.Nullable net.minecraft.world.level.Level context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
         Consumer<Component> tooltip = tooltipLines::add;
         tooltip.accept(Component.translatable("item.matteroverdrive.transport_flash_drive.details").withStyle(ChatFormatting.GRAY));
         BlockPos target = getTarget(stack);

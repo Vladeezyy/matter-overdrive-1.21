@@ -35,12 +35,12 @@ final class FabricLootModifiers {
         JsonObject global = read(mod.findPath("data/neoforge/loot_modifiers/global_loot_modifiers.json").orElseThrow());
         Map<ResourceKey<LootTable>, List<ResourceKey<LootTable>>> added = new HashMap<>();
         for (JsonElement entry : global.getAsJsonArray("entries")) {
-            ResourceLocation id = ResourceLocation.parse(entry.getAsString());
+            ResourceLocation id = new net.minecraft.resources.ResourceLocation(entry.getAsString());
             JsonObject json = read(mod.findPath("data/" + id.getNamespace() + "/loot_modifiers/" + id.getPath() + ".json").orElseThrow());
             if (!json.get("type").getAsString().equals("neoforge:add_table")) {
                 throw new IllegalStateException("Unsupported loot modifier " + id + ": " + json.get("type"));
             }
-            ResourceKey<LootTable> table = ResourceKey.create(Registries.LOOT_TABLE, ResourceLocation.parse(json.get("table").getAsString()));
+            ResourceKey<LootTable> table = ResourceKey.create(Registries.LOOT_TABLE, new net.minecraft.resources.ResourceLocation(json.get("table").getAsString()));
             for (JsonElement condition : json.getAsJsonArray("conditions")) {
                 collectTables(condition.getAsJsonObject(), id, target -> added.computeIfAbsent(target, key -> new java.util.ArrayList<>()).add(table));
             }
@@ -55,7 +55,7 @@ final class FabricLootModifiers {
     private static void collectTables(JsonObject condition, ResourceLocation id, java.util.function.Consumer<ResourceKey<LootTable>> target) {
         String type = condition.get("condition").getAsString();
         switch (type) {
-            case "neoforge:loot_table_id" -> target.accept(ResourceKey.create(Registries.LOOT_TABLE, ResourceLocation.parse(condition.get("loot_table_id").getAsString())));
+            case "neoforge:loot_table_id" -> target.accept(ResourceKey.create(Registries.LOOT_TABLE, new net.minecraft.resources.ResourceLocation(condition.get("loot_table_id").getAsString())));
             case "minecraft:any_of" -> condition.getAsJsonArray("terms").forEach(term -> collectTables(term.getAsJsonObject(), id, target));
             default -> throw new IllegalStateException("Unsupported condition in loot modifier " + id + ": " + type);
         }

@@ -59,7 +59,7 @@ public class MatterContainerItem extends Item {
             level.setBlock(target, MOBlocks.MATTER_PLASMA.get().defaultBlockState(), Block.UPDATE_ALL_IMMEDIATE);
         }
         level.playSound(player, target, SoundEvents.BUCKET_EMPTY, SoundSource.BLOCKS, 1, 1);
-        ItemStack result = player.hasInfiniteMaterials() ? stack
+        ItemStack result = player.getAbilities().instabuild ? stack
                 : ItemUtils.createFilledResult(stack, player, new ItemStack(MOItems.MATTER_CONTAINER.get()));
         return net.minecraft.world.InteractionResultHolder.success(result);
     }
@@ -104,7 +104,7 @@ public class MatterContainerItem extends Item {
         @Override
         public int fill(FluidStack resource, FluidAction action) {
             if (container.getCount() != 1 || full() || !isFluidValid(0, resource) || resource.getAmount() < CAPACITY) return 0;
-            if (action.execute()) container = container.transmuteCopy(MOItems.MATTER_CONTAINER_FULL.get(), 1);
+            if (action.execute()) container = matteroverdrive.compat.Stacks.transmuteCopy(container, MOItems.MATTER_CONTAINER_FULL.get(), 1);
             return CAPACITY;
         }
 
@@ -116,7 +116,7 @@ public class MatterContainerItem extends Item {
         @Override
         public FluidStack drain(int maxDrain, FluidAction action) {
             if (container.getCount() != 1 || !full() || maxDrain < CAPACITY) return FluidStack.EMPTY;
-            if (action.execute()) container = container.transmuteCopy(MOItems.MATTER_CONTAINER.get(), 1);
+            if (action.execute()) container = matteroverdrive.compat.Stacks.transmuteCopy(container, MOItems.MATTER_CONTAINER.get(), 1);
             return new FluidStack(MOFluids.MATTER_PLASMA.get(), CAPACITY);
         }
     }

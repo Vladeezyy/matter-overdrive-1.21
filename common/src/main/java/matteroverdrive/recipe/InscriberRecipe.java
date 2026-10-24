@@ -1,38 +1,39 @@
 package matteroverdrive.recipe;
 
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.google.gson.JsonObject;
 
 import matteroverdrive.init.MORecipes;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.util.ExtraCodecs;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.Level;
 
 /**
  * 1.7.10 InscriberRecipe: one main and one secondary item become the result, costing {@code energy} FE over
- * {@code time} ticks. Defined in {@code data/<ns>/recipe/*.json} with type {@code matteroverdrive:inscriber}.
+ * {@code time} ticks. Defined in {@code data/<ns>/recipes/*.json} with type {@code matteroverdrive:inscriber}.
  */
-public record InscriberRecipe(Ingredient main, Ingredient secondary, ItemStack result, int energy, int time)
+public record InscriberRecipe(ResourceLocation id, Ingredient main, Ingredient secondary, ItemStack result, int energy, int time)
         implements Recipe<InscriberRecipe.Input> {
 
-    public record Input(ItemStack main, ItemStack secondary) implements RecipeInput {
-        @Override
-        public ItemStack getItem(int index) {
-            return index == 0 ? main : secondary;
+    public static final class Input extends SimpleContainer {
+        public Input(ItemStack main, ItemStack secondary) {
+            super(main, secondary);
         }
 
-        @Override
-        public int size() {
-            return 2;
+        public ItemStack main() {
+            return getItem(0);
+        }
+
+        public ItemStack secondary() {
+            return getItem(1);
         }
     }
 
@@ -42,13 +43,18 @@ public record InscriberRecipe(Ingredient main, Ingredient secondary, ItemStack r
     }
 
     @Override
-    public ItemStack assemble(Input input, HolderLookup.Provider registries) {
+    public ItemStack assemble(Input input, RegistryAccess registries) {
         return result.copy();
     }
 
     @Override
     public boolean isSpecial() {
         return true;
+    }
+
+    @Override
+    public ResourceLocation getId() {
+        return id;
     }
 
     @Override
@@ -67,7 +73,7 @@ public record InscriberRecipe(Ingredient main, Ingredient secondary, ItemStack r
     }
 
     @Override
-    public ItemStack getResultItem(HolderLookup.Provider registries) {
+    public ItemStack getResultItem(RegistryAccess registries) {
         return result;
     }
 
@@ -77,30 +83,26 @@ public record InscriberRecipe(Ingredient main, Ingredient secondary, ItemStack r
     }
 
     public static final class Serializer implements RecipeSerializer<InscriberRecipe> {
-        private static final MapCodec<InscriberRecipe> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-                Ingredient.CODEC.fieldOf("main").forGetter(InscriberRecipe::main),
-                Ingredient.CODEC.fieldOf("secondary").forGetter(InscriberRecipe::secondary),
-                ItemStack.STRICT_CODEC.fieldOf("result").forGetter(InscriberRecipe::result),
-                ExtraCodecs.POSITIVE_INT.fieldOf("energy").forGetter(InscriberRecipe::energy),
-                ExtraCodecs.POSITIVE_INT.fieldOf("time").forGetter(InscriberRecipe::time)
-        ).apply(i, InscriberRecipe::new));
-
-        private static final StreamCodec<RegistryFriendlyByteBuf, InscriberRecipe> STREAM_CODEC = StreamCodec.composite(
-                Ingredient.CONTENTS_STREAM_CODEC, InscriberRecipe::main,
-                Ingredient.CONTENTS_STREAM_CODEC, InscriberRecipe::secondary,
-                ItemStack.STREAM_CODEC, InscriberRecipe::result,
-                ByteBufCodecs.VAR_INT, InscriberRecipe::energy,
-                ByteBufCodecs.VAR_INT, InscriberRecipe::time,
-                InscriberRecipe::new);
-
         @Override
-        public MapCodec<InscriberRecipe> codec() {
-            return CODEC;
+        public InscriberRecipe fromJson(ResourceLocation id, JsonObject json) {
+            int energy = GsonHelper.getAsInt(json, "energy"), time = GsonHelper.getAsInt(json, "time");
+            if (energy <= 0 || time <= 0) throw new com.google.gson.JsonSyntaxException("energy and time must be positive");
+            return new InscriberRecipe(id, Ingredient.fromJson(json.get("main"), false), Ingredient.fromJson(json.get("secondary"), false),
+                    ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "result")), energy, time);
         }
 
         @Override
-        public StreamCodec<RegistryFriendlyByteBuf, InscriberRecipe> streamCodec() {
-            return STREAM_CODEC;
+        public InscriberRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {
+            return new InscriberRecipe(id, Ingredient.fromNetwork(buf), Ingredient.fromNetwork(buf), buf.readItem(), buf.readVarInt(), buf.readVarInt());
+        }
+
+        @Override
+        public void toNetwork(FriendlyByteBuf buf, InscriberRecipe recipe) {
+            recipe.main.toNetwork(buf);
+            recipe.secondary.toNetwork(buf);
+            buf.writeItem(recipe.result);
+            buf.writeVarInt(recipe.energy);
+            buf.writeVarInt(recipe.time);
         }
     }
 }

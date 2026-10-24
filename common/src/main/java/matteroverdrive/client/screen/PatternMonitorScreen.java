@@ -47,7 +47,7 @@ public class PatternMonitorScreen extends MachineScreen<PatternMonitorMenu> {
         super.init();
         // 1.7.10 MOElementTextField: text over the search_field texture at (41, 26, 167x14)
         search = new EditBox(font, leftPos + SEARCH_X + 16, topPos + SEARCH_Y + 3, 145, 10, Component.translatable("gui.matteroverdrive.search"));
-        search.setHint(Component.translatable("gui.matteroverdrive.search").withColor(0xFF8B9EA0));
+        search.setHint(Component.translatable("gui.matteroverdrive.search").withStyle(s -> s.withColor(0x8B9EA0)));
         search.setBordered(false);
         search.setTextColor(0xFFBFE4E6);
         addRenderableWidget(search);
@@ -152,7 +152,7 @@ public class PatternMonitorScreen extends MachineScreen<PatternMonitorMenu> {
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollY) {
         int rows = (visible().size() + COLS - 1) / COLS;
         scroll = Math.max(0, Math.min(Math.max(0, rows - ROWS), scroll - (int) Math.signum(scrollY)));
         return true;

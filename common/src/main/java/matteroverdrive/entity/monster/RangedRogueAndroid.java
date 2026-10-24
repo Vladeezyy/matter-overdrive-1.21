@@ -86,16 +86,16 @@ public class RangedRogueAndroid extends RogueAndroid implements RangedAttackMob,
     }
 
     @Override
-    protected void dropCustomDeathLoot(ServerLevel level, DamageSource source, boolean recentlyHit) {
+    protected void dropCustomDeathLoot(DamageSource source, int looting, boolean recentlyHit) {
         // the weapon only drops by the 1.7.10 rule below, not by the vanilla 8.5% equipment drop
         ItemStack weapon = getMainHandItem();
         setItemSlot(EquipmentSlot.MAINHAND, ItemStack.EMPTY);
-        super.dropCustomDeathLoot(level, source, recentlyHit);
+        super.dropCustomDeathLoot(source, looting, recentlyHit);
         setItemSlot(EquipmentSlot.MAINHAND, weapon);
-        float looting = MeleeRogueAndroid.lootingBonus(level, source);
-        int packs = random.nextInt(2 + (int) (looting * 10));
+        float bonus = MeleeRogueAndroid.lootingBonus(looting);
+        int packs = random.nextInt(2 + (int) (bonus * 10));
         for (int i = 0; i < packs; i++) spawnAtLocation(new ItemStack(MOItems.ENERGY_PACK.get()));
-        if (recentlyHit && (random.nextFloat() < 0.15f + looting || isLegendary())) spawnAtLocation(randomPart());
-        if (recentlyHit && (random.nextInt(400) - looting * 10 < 5 || isLegendary())) spawnAtLocation(getMainHandItem().copy());
+        if (recentlyHit && (random.nextFloat() < 0.15f + bonus || isLegendary())) spawnAtLocation(randomPart());
+        if (recentlyHit && (random.nextInt(400) - bonus * 10 < 5 || isLegendary())) spawnAtLocation(getMainHandItem().copy());
     }
 }

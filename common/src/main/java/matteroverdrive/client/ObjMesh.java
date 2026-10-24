@@ -67,7 +67,7 @@ public final class ObjMesh {
         for (int tri = 0; tri < positions.length / 9; tri++) {
             for (int corner = 0; corner < 4; corner++) {
                 int i = tri * 3 + Math.min(corner, 2);
-                vc.addVertex(pose, positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2]).setUv(uvs[i * 2], uvs[i * 2 + 1]).setColor(color);
+                matteroverdrive.compat.render.Vertex.of(vc, pose, positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2]).setUv(uvs[i * 2], uvs[i * 2 + 1]).setColor(color).end();
             }
         }
     }

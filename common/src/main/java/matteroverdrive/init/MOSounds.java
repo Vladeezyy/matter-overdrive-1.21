@@ -70,7 +70,7 @@ public final class MOSounds {
     public static final RegistryEntry<SoundEvent, SoundEvent> PLASMA_SHOTGUN_CHARGING = sound("plasma_shotgun_charging");
 
     private static RegistryEntry<SoundEvent, SoundEvent> sound(String name) {
-        return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, name)));
+        return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, name)));
     }
 
     private MOSounds() {}

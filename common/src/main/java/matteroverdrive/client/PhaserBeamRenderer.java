@@ -24,7 +24,7 @@ import net.minecraft.world.phys.Vec3;
  * (third person, other players) or with the first-person hand.
  */
 public final class PhaserBeamRenderer {
-    private static final ResourceLocation BEAM = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/fx/plasmabeam.png");
+    private static final ResourceLocation BEAM = new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "textures/fx/plasmabeam.png");
     private static final float WIDTH = 0.06f;
 
     /** World-space beam relative to the player's render origin. */
@@ -87,8 +87,8 @@ public final class PhaserBeamRenderer {
     }
 
     private static void vertex(VertexConsumer vc, PoseStack.Pose pose, Vec3 p, int color, float u, float v) {
-        vc.addVertex(pose, (float) p.x, (float) p.y, (float) p.z).setColor(color).setUv(u, v)
-                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(0xF000F0).setNormal(pose, 0, 1, 0);
+        matteroverdrive.compat.render.Vertex.of(vc, pose, (float) p.x, (float) p.y, (float) p.z).setColor(color).setUv(u, v)
+                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(0xF000F0).setNormal(pose, 0, 1, 0).end();
     }
 
     private PhaserBeamRenderer() {}

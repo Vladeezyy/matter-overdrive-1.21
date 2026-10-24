@@ -22,6 +22,6 @@ public abstract class RandomItemLogic extends AbstractLogic {
     }
 
     public ItemStack getItem(QuestStack stack) {
-        return items.get(Math.clamp(tag(stack).getByte("ItemType"), 0, items.size() - 1)).get();
+        return items.get(net.minecraft.util.Mth.clamp(tag(stack).getByte("ItemType"), 0, items.size() - 1)).get();
     }
 }

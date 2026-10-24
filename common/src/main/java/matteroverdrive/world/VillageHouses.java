@@ -29,9 +29,9 @@ public final class VillageHouses {
 
     private static void add(Registry<StructureTemplatePool> pools, Registry<StructureProcessorList> processors, String pool, String template,
                             String processorList) {
-        StructureTemplatePool target = pools.get(ResourceLocation.withDefaultNamespace(pool));
+        StructureTemplatePool target = pools.get(new net.minecraft.resources.ResourceLocation(pool));
         Holder<StructureProcessorList> list = processors.getHolder(ResourceKey.create(Registries.PROCESSOR_LIST,
-                ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, processorList))).orElse(null);
+                new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, processorList))).orElse(null);
         if (target == null || list == null) return;
         StructurePoolElement element = StructurePoolElement.legacy(MatterOverdrive.MODID + ":" + template, list)
                 .apply(StructureTemplatePool.Projection.RIGID);

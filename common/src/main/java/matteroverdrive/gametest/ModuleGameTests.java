@@ -32,7 +32,7 @@ final class ModuleGameTests {
 
     private static ServerPlayer player(GameTestHelper helper) {
         ServerPlayer player = helper.makeMockServerPlayerInLevel();
-        var pos = helper.absolutePos(new BlockPos(6, 1, 1)).getBottomCenter();
+        var pos = helper.absolutePos(new BlockPos(6, 1, 1)).getCenter().subtract(0, 0.5, 0);
         player.moveTo(pos.x, pos.y, pos.z, 0, 0);
         return player;
     }
@@ -103,7 +103,7 @@ final class ModuleGameTests {
         check(helper, inserted == 100, "inserted " + inserted);
         ItemStack battery = EnergyWeaponItem.getModule(rifle, WeaponModule.SLOT_BATTERY);
         check(helper, MOItems.HC_BATTERY.get().getEnergy(battery) == 100, "battery holds " + MOItems.HC_BATTERY.get().getEnergy(battery));
-        check(helper, !rifle.has(matteroverdrive.init.MODataComponents.ENERGY.get()), "weapon stored the energy itself");
+        check(helper, !matteroverdrive.compat.component.Components.has(rifle, matteroverdrive.init.MODataComponents.ENERGY.get()), "weapon stored the energy itself");
         EnergyWeaponItem.setEnergy(rifle, 5000);
         ServerPlayer player = player(helper);
         player.setItemSlot(EquipmentSlot.MAINHAND, rifle);
@@ -131,7 +131,7 @@ final class ModuleGameTests {
     private static void station(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, MOBlocks.WEAPON_STATION.get());
-        var station = (WeaponStationBlockEntity) helper.<WeaponStationBlockEntity>getBlockEntity(pos);
+        var station = (WeaponStationBlockEntity) matteroverdrive.compat.GameTests.<WeaponStationBlockEntity>blockEntity(helper, pos);
         station.getInventory().setStack(WeaponStationBlockEntity.WEAPON, new ItemStack(MOItems.PHASER_RIFLE.get()));
         ServerPlayer player = player(helper);
         var menu = new WeaponStationMenu(1, player.getInventory(), station, new net.minecraft.world.inventory.SimpleContainerData(11));

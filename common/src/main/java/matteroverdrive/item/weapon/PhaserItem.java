@@ -46,7 +46,7 @@ public class PhaserItem extends EnergyWeaponItem {
     }
 
     public static int getLevel(ItemStack phaser) {
-        return phaser.getOrDefault(MODataComponents.PHASER_LEVEL.get(), 0);
+        return matteroverdrive.compat.component.Components.getOrDefault(phaser, MODataComponents.PHASER_LEVEL.get(), 0);
     }
 
     public static boolean isKillMode(ItemStack phaser) {
@@ -103,7 +103,7 @@ public class PhaserItem extends EnergyWeaponItem {
     public net.minecraft.world.InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack phaser = player.getItemInHand(hand);
         if (player.isShiftKeyDown()) {
-            phaser.set(MODataComponents.PHASER_LEVEL.get(), (getLevel(phaser) + 1) % MAX_LEVEL);
+            matteroverdrive.compat.component.Components.set(phaser, MODataComponents.PHASER_LEVEL.get(), (getLevel(phaser) + 1) % MAX_LEVEL);
             level.playSound(null, player.getX(), player.getY(), player.getZ(), MOSounds.PHASER_SWITCH_MODE.get(), SoundSource.PLAYERS, 1, 1);
             return net.minecraft.world.InteractionResultHolder.success(player.getItemInHand(hand));
         }
@@ -127,7 +127,7 @@ public class PhaserItem extends EnergyWeaponItem {
         setEnergy(phaser, getEnergy(phaser) - getEnergyUse(phaser));
         int levelBonus = (getLevel(phaser) + 1) / MAX_LEVEL;
         addHeatAfterShot(phaser, server, player, (getHeat(phaser) + 1) * (1.1f + 0.05f * levelBonus));
-        int used = getUseDuration(phaser, user) - remaining;
+        int used = getUseDuration(phaser) - remaining;
         if (used % 10 == 0) {
             server.playSound(null, player.getX(), player.getY(), player.getZ(), MOSounds.PHASER_BEAM.get(), SoundSource.PLAYERS, 0.6f, 1);
         }
@@ -153,7 +153,7 @@ public class PhaserItem extends EnergyWeaponItem {
             float damage = getDamage(phaser, player);
             if (damage > 0) {
                 Vec3 motion = target.getDeltaMovement();
-                target.hurt(level.damageSources().source(matteroverdrive.entity.PlasmaBolt.PLASMA, player), damage);
+                target.hurt(matteroverdrive.compat.Damage.source(level, matteroverdrive.entity.PlasmaBolt.PLASMA, player), damage);
                 target.setDeltaMovement(motion);
             }
             int stun = getStunTime(phaser);
@@ -163,7 +163,7 @@ public class PhaserItem extends EnergyWeaponItem {
                 // 1.7.10 also gave jump boost -10 (no jumping); 1.21 effect levels can't be negative, slowness 100 pins them anyway
             }
             if (hasStat(WeaponStat.FIRE_DAMAGE, phaser) && isKillMode(phaser)) {
-                target.igniteForSeconds(Math.round(modifyStat(WeaponStat.FIRE_DAMAGE, phaser, 0) * power));
+                target.setSecondsOnFire((int) (Math.round(modifyStat(WeaponStat.FIRE_DAMAGE, phaser, 0) * power)));
             } else if (hasStat(WeaponStat.HEAL, phaser)) {
                 target.heal(modifyStat(WeaponStat.HEAL, phaser, 0) * power);
             }
@@ -182,7 +182,7 @@ public class PhaserItem extends EnergyWeaponItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack weapon, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+    public void appendHoverText(ItemStack weapon, @org.jetbrains.annotations.Nullable net.minecraft.world.level.Level context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
         Consumer<Component> tooltip = tooltipLines::add;
         int level = getLevel(weapon);
         tooltip.accept(Component.translatable(isKillMode(weapon) ? "tooltip.matteroverdrive.phaser.kill" : "tooltip.matteroverdrive.phaser.stun",

@@ -37,7 +37,7 @@ public final class MOBlocks {
             MOBlocks.props(p -> p.mapColor(MapColor.STONE).strength(8f, 5f).requiresCorrectToolForDrops()));
     // Drops a dilithium crystal and 2-5 xp, like the 1.7.10 DilithiumOre (drop itself lives in the loot table).
     public static final BlockEntry<DropExperienceBlock> DILITHIUM_ORE = BLOCKS.registerBlock("dilithium_ore",
-            p -> new DropExperienceBlock(UniformInt.of(2, 5), p),
+            p -> new DropExperienceBlock(p, UniformInt.of(2, 5)),
             MOBlocks.props(p -> p.mapColor(MapColor.STONE).strength(4f, 5f).requiresCorrectToolForDrops()));
     public static final BlockEntry<Block> TRITANIUM_BLOCK = BLOCKS.registerSimpleBlock("tritanium_block",
             MOBlocks.props(p -> p.mapColor(MapColor.METAL).strength(15f, 10f).sound(SoundType.METAL).requiresCorrectToolForDrops()));

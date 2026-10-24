@@ -128,7 +128,7 @@ public final class DevScene {
         at(448, mc -> server(mc, p -> {
             ItemStack phaser = new ItemStack(MOItems.PHASER.get());
             matteroverdrive.item.weapon.EnergyWeaponItem.setEnergy(phaser, 32000);
-            phaser.set(matteroverdrive.init.MODataComponents.PHASER_LEVEL.get(), 4);
+            matteroverdrive.compat.component.Components.set(phaser, matteroverdrive.init.MODataComponents.PHASER_LEVEL.get(), 4);
             p.getInventory().setItem(0, phaser);
             p.teleportTo(p.serverLevel(), p.getX(), p.getY(), p.getZ(), Set.of(), 180f, 25f);
         }));
@@ -267,7 +267,7 @@ public final class DevScene {
                     var android = type.create(p.serverLevel());
                     android.moveTo(origin.getX() - 4.5 + i * 3 + (ranged ? 1.2 : 0), origin.getY(), origin.getZ() - 8.5, 0, 0);
                     android.finalizeSpawn(p.serverLevel(), p.serverLevel().getCurrentDifficultyAt(android.blockPosition()),
-                            net.minecraft.world.entity.MobSpawnType.COMMAND, null);
+                            net.minecraft.world.entity.MobSpawnType.COMMAND, null, null);
                     android.setup(spec[i][0], spec[i][1] == 1);
                     android.setNoAi(true);
                     android.setYRot(0);
@@ -380,7 +380,7 @@ public final class DevScene {
             at(t0, mc -> server(mc, p -> {
                 var registry = p.serverLevel().registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.STRUCTURE);
                 var holder = registry.getOrThrow(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.STRUCTURE,
-                        net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("matteroverdrive", id)));
+                        new net.minecraft.resources.ResourceLocation("matteroverdrive", id)));
                 var result = p.serverLevel().getChunkSource().getGenerator().findNearestMapStructure(p.serverLevel(),
                         net.minecraft.core.HolderSet.direct(holder), first ? searchFrom : found0[0], 100, false);
                 if (result == null) return;
@@ -390,7 +390,7 @@ public final class DevScene {
             at(t0 + 120, mc -> server(mc, p -> {
                 if (found[0] == null) return;
                 var holder = p.serverLevel().registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.STRUCTURE)
-                        .get(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("matteroverdrive", id));
+                        .get(new net.minecraft.resources.ResourceLocation("matteroverdrive", id));
                 var start = p.serverLevel().structureManager().getStructureAt(
                         new BlockPos(found[0].getX(), p.serverLevel().getMinBuildHeight() + 1, found[0].getZ()), holder);
                 BlockPos lookup = found[0];
@@ -411,7 +411,7 @@ public final class DevScene {
                 for (BlockPos pos : BlockPos.betweenClosed(box.minX(), box.minY(), box.minZ(), box.maxX(), box.maxY(), box.maxZ())) {
                     if (p.serverLevel().getBlockEntity(pos) instanceof matteroverdrive.block.entity.TritaniumCrateBlockEntity crate) {
                         crates++;
-                        if (crate.getLootTable() != null || !crate.isEmpty()) lootCrates++;
+                        if (crate.saveWithoutMetadata().contains("LootTable") || !crate.isEmpty()) lootCrates++;
                     }
                 }
                 MatterOverdrive.LOGGER.info("[scene] {} at {}: androids {}, mutants {}, crates {} (with loot {})", id, box, androids, mutants, crates, lootCrates);
@@ -476,7 +476,7 @@ public final class DevScene {
             p.serverLevel().setBlockAndUpdate(base.offset(1, 0, -4), MOBlocks.MICROWAVE.get().defaultBlockState()
                     .setValue(net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING, Direction.EAST));
             ItemStack decomposer = new ItemStack(MOItems.PORTABLE_DECOMPOSER.get());
-            decomposer.set(matteroverdrive.init.MODataComponents.ENERGY.get(), 90000);
+            matteroverdrive.compat.component.Components.set(decomposer, matteroverdrive.init.MODataComponents.ENERGY.get(), 90000);
             p.getInventory().setItem(0, decomposer);
             p.teleportTo(p.serverLevel(), base.getX() + 0.5, base.getY(), base.getZ() - 1.0, Set.of(), 180f, 40f);
         }));
@@ -523,7 +523,7 @@ public final class DevScene {
                 t.setSelected("Roof", base.offset(3, 6, -4));
                 t.select(0);
                 ItemStack drive = new ItemStack(MOItems.TRANSPORT_FLASH_DRIVE.get());
-                drive.set(matteroverdrive.init.MODataComponents.TRANSPORT_TARGET.get(), base.offset(4, -1, -9));
+                matteroverdrive.compat.component.Components.set(drive, matteroverdrive.init.MODataComponents.TRANSPORT_TARGET.get(), base.offset(4, -1, -9));
                 t.getInventory().setStack(matteroverdrive.block.entity.TransporterBlockEntity.FLASH_DRIVE, drive);
             }
         }));
@@ -559,7 +559,7 @@ public final class DevScene {
                 s.getInventory().setStack(matteroverdrive.block.entity.AndroidSpawnerBlockEntity.COLOR_MODULE_SLOT,
                         new ItemStack(MOItems.COLOR_MODULES.get(0).get()));
                 ItemStack drive = new ItemStack(MOItems.TRANSPORT_FLASH_DRIVE.get());
-                drive.set(matteroverdrive.init.MODataComponents.TRANSPORT_TARGET.get(), base.offset(3, -1, -6));
+                matteroverdrive.compat.component.Components.set(drive, matteroverdrive.init.MODataComponents.TRANSPORT_TARGET.get(), base.offset(3, -1, -6));
                 s.getInventory().setStack(matteroverdrive.block.entity.AndroidSpawnerBlockEntity.FLASH_DRIVE_SLOT_START, drive);
                 s.setConfig(4, 4, 0, "rogues");
             }
@@ -665,7 +665,7 @@ public final class DevScene {
                 if (!p.serverLevel().getEntities(matteroverdrive.init.MOEntities.MAD_SCIENTIST.get(), e -> e.getX() > origin.getX() + 1000).isEmpty()) return;
                 BlockPos at = origin.offset(2000 + n * 300, 0, 0);
                 p.serverLevel().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4)
-                        .withCallback((ok, result) -> MatterOverdrive.LOGGER.info("[scene] village at {}: {}", at, ok)),
+                        .withCallback((context, ok, result) -> MatterOverdrive.LOGGER.info("[scene] village at {}: {}", at, ok)),
                         "place structure minecraft:village_plains " + at.getX() + " " + at.getY() + " " + at.getZ());
                 MatterOverdrive.LOGGER.info("[scene] scientists loaded: {}", p.serverLevel().getEntities(
                         matteroverdrive.init.MOEntities.MAD_SCIENTIST.get(), e -> e.getX() > origin.getX() + 1000).size());
@@ -717,47 +717,47 @@ public final class DevScene {
         }));
         // close first: the closing screen sends its own state, which would overwrite the next one
         at(2082, mc -> mc.setScreen(null));
-        at(2088, mc -> server(mc, p -> p.getMainHandItem().set(matteroverdrive.init.MODataComponents.DATA_PAD.get(),
+        at(2088, mc -> server(mc, p -> matteroverdrive.compat.component.Components.set(p.getMainHandItem(), matteroverdrive.init.MODataComponents.DATA_PAD.get(),
                 matteroverdrive.item.DataPadItem.State.DEFAULT)));
         at(2094, mc -> mc.setScreen(new matteroverdrive.client.quest.DataPadScreen(net.minecraft.world.InteractionHand.MAIN_HAND)));
         at(2102, mc -> shot(mc, "data_pad_guide"));
         at(2106, mc -> mc.setScreen(null));
-        at(2112, mc -> server(mc, p -> p.getMainHandItem().set(matteroverdrive.init.MODataComponents.DATA_PAD.get(),
+        at(2112, mc -> server(mc, p -> matteroverdrive.compat.component.Components.set(p.getMainHandItem(), matteroverdrive.init.MODataComponents.DATA_PAD.get(),
                 matteroverdrive.item.DataPadItem.State.DEFAULT.withOrdering(0))));
         at(2118, mc -> mc.setScreen(new matteroverdrive.client.quest.DataPadScreen(net.minecraft.world.InteractionHand.MAIN_HAND)));
         at(2126, mc -> shot(mc, "data_pad_guide_list"));
         at(2130, mc -> mc.setScreen(null));
-        at(2136, mc -> server(mc, p -> p.getMainHandItem().set(matteroverdrive.init.MODataComponents.DATA_PAD.get(),
+        at(2136, mc -> server(mc, p -> matteroverdrive.compat.component.Components.set(p.getMainHandItem(), matteroverdrive.init.MODataComponents.DATA_PAD.get(),
                 matteroverdrive.item.DataPadItem.State.DEFAULT.withPage(1).withGuide("tile.decomposer", 0))));
         at(2142, mc -> mc.setScreen(new matteroverdrive.client.quest.DataPadScreen(net.minecraft.world.InteractionHand.MAIN_HAND)));
         at(2150, mc -> shot(mc, "data_pad_guide_decomposer"));
         at(2154, mc -> mc.setScreen(null));
-        at(2160, mc -> server(mc, p -> p.getMainHandItem().set(matteroverdrive.init.MODataComponents.DATA_PAD.get(),
+        at(2160, mc -> server(mc, p -> matteroverdrive.compat.component.Components.set(p.getMainHandItem(), matteroverdrive.init.MODataComponents.DATA_PAD.get(),
                 matteroverdrive.item.DataPadItem.State.DEFAULT.withPage(1).withGuide("tile.decomposer", 1))));
         at(2166, mc -> mc.setScreen(new matteroverdrive.client.quest.DataPadScreen(net.minecraft.world.InteractionHand.MAIN_HAND)));
         at(2174, mc -> shot(mc, "data_pad_guide_decomposer_2"));
         at(2178, mc -> mc.setScreen(null));
-        at(2184, mc -> server(mc, p -> p.getMainHandItem().set(matteroverdrive.init.MODataComponents.DATA_PAD.get(),
+        at(2184, mc -> server(mc, p -> matteroverdrive.compat.component.Components.set(p.getMainHandItem(), matteroverdrive.init.MODataComponents.DATA_PAD.get(),
                 matteroverdrive.item.DataPadItem.State.DEFAULT.withPage(1).withGuide("tile.decomposer", 2))));
         at(2190, mc -> mc.setScreen(new matteroverdrive.client.quest.DataPadScreen(net.minecraft.world.InteractionHand.MAIN_HAND)));
         at(2198, mc -> shot(mc, "data_pad_guide_recipe"));
         at(2202, mc -> mc.setScreen(null));
-        at(2208, mc -> server(mc, p -> p.getMainHandItem().set(matteroverdrive.init.MODataComponents.DATA_PAD.get(),
+        at(2208, mc -> server(mc, p -> matteroverdrive.compat.component.Components.set(p.getMainHandItem(), matteroverdrive.init.MODataComponents.DATA_PAD.get(),
                 matteroverdrive.item.DataPadItem.State.DEFAULT.withPage(1).withGuide("tile.dilithium_ore", 0))));
         at(2214, mc -> mc.setScreen(new matteroverdrive.client.quest.DataPadScreen(net.minecraft.world.InteractionHand.MAIN_HAND)));
         at(2222, mc -> shot(mc, "data_pad_guide_ore"));
         at(2226, mc -> mc.setScreen(null));
-        at(2232, mc -> server(mc, p -> p.getMainHandItem().set(matteroverdrive.init.MODataComponents.DATA_PAD.get(),
+        at(2232, mc -> server(mc, p -> matteroverdrive.compat.component.Components.set(p.getMainHandItem(), matteroverdrive.init.MODataComponents.DATA_PAD.get(),
                 matteroverdrive.item.DataPadItem.State.DEFAULT.withCategory("weapons"))));
         at(2238, mc -> mc.setScreen(new matteroverdrive.client.quest.DataPadScreen(net.minecraft.world.InteractionHand.MAIN_HAND)));
         at(2246, mc -> shot(mc, "data_pad_guide_weapons"));
         at(2250, mc -> mc.setScreen(null));
-        at(2256, mc -> server(mc, p -> p.getMainHandItem().set(matteroverdrive.init.MODataComponents.DATA_PAD.get(),
+        at(2256, mc -> server(mc, p -> matteroverdrive.compat.component.Components.set(p.getMainHandItem(), matteroverdrive.init.MODataComponents.DATA_PAD.get(),
                 matteroverdrive.item.DataPadItem.State.DEFAULT.withPage(2))));
         at(2262, mc -> mc.setScreen(new matteroverdrive.client.quest.DataPadScreen(net.minecraft.world.InteractionHand.MAIN_HAND)));
         at(2270, mc -> shot(mc, "data_pad_quests"));
         at(2274, mc -> mc.setScreen(null));
-        at(2280, mc -> server(mc, p -> p.getMainHandItem().set(matteroverdrive.init.MODataComponents.DATA_PAD.get(),
+        at(2280, mc -> server(mc, p -> matteroverdrive.compat.component.Components.set(p.getMainHandItem(), matteroverdrive.init.MODataComponents.DATA_PAD.get(),
                 matteroverdrive.item.DataPadItem.State.DEFAULT.withPage(2).withQuest(1, 0))));
         at(2286, mc -> mc.setScreen(new matteroverdrive.client.quest.DataPadScreen(net.minecraft.world.InteractionHand.MAIN_HAND)));
         at(2294, mc -> shot(mc, "data_pad_quests_2"));
@@ -813,8 +813,8 @@ public final class DevScene {
             for (int i = 0; i < 4; i++) {
                 ItemStack protocol = new ItemStack(MOItems.SECURITY_PROTOCOL.get(), 16);
                 if (i > 0) {
-                    protocol.set(matteroverdrive.init.MODataComponents.SECURITY_OWNER.get(), p.getUUID());
-                    protocol.set(matteroverdrive.init.MODataComponents.SECURITY_TYPE.get(), i);
+                    matteroverdrive.compat.component.Components.set(protocol, matteroverdrive.init.MODataComponents.SECURITY_OWNER.get(), p.getUUID());
+                    matteroverdrive.compat.component.Components.set(protocol, matteroverdrive.init.MODataComponents.SECURITY_TYPE.get(), i);
                 }
                 p.getInventory().setItem(i, protocol);
             }
@@ -825,11 +825,11 @@ public final class DevScene {
             BlockPos market = origin.above(30).offset(0, 0, -3);
             if (p.serverLevel().getBlockEntity(market) instanceof matteroverdrive.machine.MachineBlockEntity m) {
                 ItemStack foreign = new ItemStack(MOItems.SECURITY_PROTOCOL.get());
-                foreign.set(matteroverdrive.init.MODataComponents.SECURITY_OWNER.get(), STRANGER);
+                matteroverdrive.compat.component.Components.set(foreign, matteroverdrive.init.MODataComponents.SECURITY_OWNER.get(), STRANGER);
                 m.claim(foreign);
             }
             p.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
-            p.serverLevel().getBlockState(market).useWithoutItem(p.serverLevel(), p,
+            p.serverLevel().getBlockState(market).use(p.serverLevel(), p, net.minecraft.world.InteractionHand.MAIN_HAND,
                     new net.minecraft.world.phys.BlockHitResult(market.getCenter(), net.minecraft.core.Direction.SOUTH, market, false));
         }));
         at(2388, mc -> shot(mc, "security_no_rights"));
@@ -837,7 +837,7 @@ public final class DevScene {
             BlockPos market = origin.above(30).offset(0, 0, -3);
             if (p.serverLevel().getBlockEntity(market) instanceof matteroverdrive.machine.MachineBlockEntity m) {
                 ItemStack remove = new ItemStack(MOItems.SECURITY_PROTOCOL.get());
-                remove.set(matteroverdrive.init.MODataComponents.SECURITY_OWNER.get(), STRANGER);
+                matteroverdrive.compat.component.Components.set(remove, matteroverdrive.init.MODataComponents.SECURITY_OWNER.get(), STRANGER);
                 m.unclaim(remove);
             }
             p.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
@@ -859,7 +859,7 @@ public final class DevScene {
         }));
         at(2416, mc -> shot(mc, "crash_landing_completed"));
         at(2420, mc -> server(mc, p -> p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(MOItems.DATA_PAD.get()))));
-        at(2426, mc -> server(mc, p -> p.getMainHandItem().set(matteroverdrive.init.MODataComponents.DATA_PAD.get(),
+        at(2426, mc -> server(mc, p -> matteroverdrive.compat.component.Components.set(p.getMainHandItem(), matteroverdrive.init.MODataComponents.DATA_PAD.get(),
                 matteroverdrive.item.DataPadItem.State.DEFAULT.withPage(2))));
         at(2432, mc -> mc.setScreen(new matteroverdrive.client.quest.DataPadScreen(net.minecraft.world.InteractionHand.MAIN_HAND)));
         at(2440, mc -> shot(mc, "we_must_know_pad"));
@@ -879,7 +879,7 @@ public final class DevScene {
         at(2466, mc -> server(mc, p -> {
             BlockPos at = origin.offset(0, 0, 3000);
             p.serverLevel().getServer().getCommands().performPrefixedCommand(p.createCommandSourceStack().withPermission(4)
-                    .withCallback((ok, result) -> MatterOverdrive.LOGGER.info("[scene] crashed ship at {}: {}", at, ok)),
+                    .withCallback((context, ok, result) -> MatterOverdrive.LOGGER.info("[scene] crashed ship at {}: {}", at, ok)),
                     "place structure matteroverdrive:crashed_ship " + at.getX() + " " + at.getY() + " " + at.getZ());
         }));
         at(2472, mc -> server(mc, p -> {
@@ -899,7 +899,7 @@ public final class DevScene {
         at(2502, mc -> server(mc, p -> {
             if (crashCrate == null) return;
             p.teleportTo(p.serverLevel(), crashCrate.getX() + 0.5, crashCrate.getY() + 1, crashCrate.getZ() + 0.5, Set.of(), 0, 60f);
-            p.serverLevel().getBlockState(crashCrate).useWithoutItem(p.serverLevel(), p,
+            p.serverLevel().getBlockState(crashCrate).use(p.serverLevel(), p, net.minecraft.world.InteractionHand.MAIN_HAND,
                     new net.minecraft.world.phys.BlockHitResult(crashCrate.getCenter(), net.minecraft.core.Direction.UP, crashCrate, false));
         }));
         at(2510, mc -> shot(mc, "crashed_ship_crate"));
@@ -965,10 +965,10 @@ public final class DevScene {
         at(2728, mc -> server(mc, p -> {
             if (!(p.serverLevel().getBlockEntity(origin.above(30).offset(0, 0, -4)) instanceof matteroverdrive.block.entity.StarMapBlockEntity m)) return;
             ItemStack remove = new ItemStack(MOItems.SECURITY_PROTOCOL.get());
-            remove.set(matteroverdrive.init.MODataComponents.SECURITY_OWNER.get(), p.getUUID());
+            matteroverdrive.compat.component.Components.set(remove, matteroverdrive.init.MODataComponents.SECURITY_OWNER.get(), p.getUUID());
             m.unclaim(remove);
             ItemStack claim = new ItemStack(MOItems.SECURITY_PROTOCOL.get());
-            claim.set(matteroverdrive.init.MODataComponents.SECURITY_OWNER.get(), STRANGER);
+            matteroverdrive.compat.component.Components.set(claim, matteroverdrive.init.MODataComponents.SECURITY_OWNER.get(), STRANGER);
             m.claim(claim);
             p.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
             p.teleportTo(p.serverLevel(), origin.getX() + 0.5, origin.getY() + 30, origin.getZ() - 1.5, Set.of(), 180f, 15f);
@@ -986,7 +986,7 @@ public final class DevScene {
             BlockPos map = origin.above(30).offset(0, 0, -4);
             if (!(p.serverLevel().getBlockEntity(map) instanceof matteroverdrive.block.entity.StarMapBlockEntity m)) return;
             ItemStack remove = new ItemStack(MOItems.SECURITY_PROTOCOL.get());
-            remove.set(matteroverdrive.init.MODataComponents.SECURITY_OWNER.get(), STRANGER);
+            matteroverdrive.compat.component.Components.set(remove, matteroverdrive.init.MODataComponents.SECURITY_OWNER.get(), STRANGER);
             m.unclaim(remove);
             m.onPlaced(p);
             p.teleportTo(p.serverLevel(), map.getX() + 0.5, map.getY(), map.getZ() + 2.5, Set.of(), 180f, 10f);
@@ -1092,16 +1092,16 @@ public final class DevScene {
         at(2958, mc -> {
             var rng = net.minecraft.util.RandomSource.create(7);
             ItemStack weapon = matteroverdrive.item.weapon.WeaponFactory.randomDecorated(rng, 3, true);
-            weapon.set(matteroverdrive.init.MODataComponents.LEGENDARY_WEAPON.get(),
+            matteroverdrive.compat.component.Components.set(weapon, matteroverdrive.init.MODataComponents.LEGENDARY_WEAPON.get(),
                     new matteroverdrive.item.weapon.WeaponFactory.Legendary(1.3f, 0.8f, 0.9f, 1.3f));
             mc.setScreen(new TooltipScreen(weapon));
         });
         at(2966, mc -> shot(mc, "legendary_weapon"));
         at(2968, mc -> {
             ItemStack part = new ItemStack(MOItems.ROGUE_ANDROID_ARMS.get());
-            part.set(matteroverdrive.init.MODataComponents.LEGENDARY_PART.get(),
+            matteroverdrive.compat.component.Components.set(part, matteroverdrive.init.MODataComponents.LEGENDARY_PART.get(),
                     new matteroverdrive.item.android.BionicPartItem.Legendary(2, 3, 0.1, 0.2, -0.4, -0.06));
-            part.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME, matteroverdrive.item.weapon.WeaponFactory.legendaryName(part));
+            part.setHoverName(matteroverdrive.item.weapon.WeaponFactory.legendaryName(part));
             mc.setScreen(new TooltipScreen(part));
         });
         at(2976, mc -> shot(mc, "legendary_part"));
@@ -1110,7 +1110,7 @@ public final class DevScene {
         at(2984, mc -> server(mc, p -> {
             if (!(p.serverLevel().getBlockEntity(analyzerPos) instanceof matteroverdrive.machine.MachineBlockEntity m)) return;
             ItemStack drive = new ItemStack(MOItems.NETWORK_FLASH_DRIVE.get());
-            drive.set(matteroverdrive.init.MODataComponents.NETWORK_FILTER.get(), List.of(storagePos, replicatorPos));
+            matteroverdrive.compat.component.Components.set(drive, matteroverdrive.init.MODataComponents.NETWORK_FILTER.get(), List.of(storagePos, replicatorPos));
             var inv = m.getInventory();
             for (int i = 0; i < inv.size(); i++) {
                 if (inv.spec(i).role() == matteroverdrive.machine.MachineInventory.Role.FILTER) inv.setStack(i, drive);
@@ -1204,9 +1204,9 @@ public final class DevScene {
             ItemStack item = new ItemStack(MOItems.REPLICATOR.get());
             if (mc.level.getBlockEntity(replicatorPos) instanceof matteroverdrive.machine.MachineBlockEntity m) {
                 m.getMatterTank().setMatter(600);
-                item.applyComponents(m.collectComponents());
+                m.collectComponents().applyTo(item);
             }
-            item.set(matteroverdrive.init.MODataComponents.SECURITY_OWNER.get(), mc.player.getUUID());
+            matteroverdrive.compat.component.Components.set(item, matteroverdrive.init.MODataComponents.SECURITY_OWNER.get(), mc.player.getUUID());
             mc.setScreen(new TooltipScreen(item));
         });
         at(3190, mc -> shot(mc, "machine_item_tooltip"));
@@ -1359,7 +1359,7 @@ public final class DevScene {
         at(3336, mc -> shot(mc, "shotgun_spread"));
         at(3362, mc -> server(mc, p -> {
             var shotgun = MOItems.PLASMA_SHOTGUN.get();
-            shotgun.release(p.getMainHandItem(), p.serverLevel(), p, shotgun.getUseDuration(p.getMainHandItem(), p) - 25);
+            shotgun.release(p.getMainHandItem(), p.serverLevel(), p, shotgun.getUseDuration(p.getMainHandItem()) - 25);
         }));
         at(3363, mc -> shot(mc, "shotgun_charged"));
         at(3366, mc -> {
@@ -1373,7 +1373,7 @@ public final class DevScene {
         at(3392, mc -> shot(mc, "shotgun_spread_hit"));
         at(3418, mc -> server(mc, p -> {
             var shotgun = MOItems.PLASMA_SHOTGUN.get();
-            shotgun.release(p.getMainHandItem(), p.serverLevel(), p, shotgun.getUseDuration(p.getMainHandItem(), p) - 25);
+            shotgun.release(p.getMainHandItem(), p.serverLevel(), p, shotgun.getUseDuration(p.getMainHandItem()) - 25);
         }));
         at(3420, mc -> shot(mc, "shotgun_charged_hit"));
         at(3421, mc -> server(mc, p -> {
@@ -1527,7 +1527,7 @@ public final class DevScene {
                 matteroverdrive.android.Android.setAndroid(p, false);
                 ItemStack phaser = new ItemStack(MOItems.PHASER.get());
                 matteroverdrive.item.weapon.EnergyWeaponItem.setEnergy(phaser, 32000);
-                phaser.set(matteroverdrive.init.MODataComponents.PHASER_LEVEL.get(), 2);
+                matteroverdrive.compat.component.Components.set(phaser, matteroverdrive.init.MODataComponents.PHASER_LEVEL.get(), 2);
                 p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, phaser);
                 var rogue = matteroverdrive.init.MOEntities.ROGUE_ANDROID.get().create(p.serverLevel());
                 rogue.moveTo(galleryA.getX() + 1.5, galleryA.getY(), galleryA.getZ() + 8.5, 180, 0);
@@ -1610,7 +1610,7 @@ public final class DevScene {
         }));
         at(3764, mc -> mc.options.hideGui = false);
         // matter of modern items: derived (waxed oxidized copper from weathering + the waxing recipe) and estimated ("~")
-        at(3770, mc -> mc.setScreen(new TooltipScreen(new ItemStack(Items.WAXED_OXIDIZED_CHISELED_COPPER))));
+        at(3770, mc -> mc.setScreen(new TooltipScreen(new ItemStack(Items.WAXED_OXIDIZED_CUT_COPPER))));
         at(3778, mc -> shot(mc, "matter_tooltip_copper"));
         at(3779, mc -> mc.setScreen(new TooltipScreen(new ItemStack(Items.NETHERITE_SWORD))));
         at(3787, mc -> shot(mc, "matter_tooltip_netherite"));

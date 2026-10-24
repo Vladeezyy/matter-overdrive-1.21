@@ -51,19 +51,19 @@ public class TritaniumCrateBlockEntity extends RandomizableContainerBlockEntity 
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
         if (!trySaveLootTable(tag)) {
-            ContainerHelper.saveAllItems(tag, items, registries);
+            ContainerHelper.saveAllItems(tag, items);
         }
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    public void load(CompoundTag tag) {
+        super.load(tag);
         items = NonNullList.withSize(SIZE, ItemStack.EMPTY);
         if (!tryLoadLootTable(tag)) {
-            ContainerHelper.loadAllItems(tag, items, registries);
+            ContainerHelper.loadAllItems(tag, items);
         }
     }
 

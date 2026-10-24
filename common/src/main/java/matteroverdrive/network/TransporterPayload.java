@@ -4,10 +4,10 @@ import matteroverdrive.MatterOverdrive;
 import matteroverdrive.block.entity.TransporterBlockEntity;
 import matteroverdrive.menu.TransporterMenu;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import matteroverdrive.compat.codec.RegistryFriendlyByteBuf;
+import matteroverdrive.compat.codec.ByteBufCodecs;
+import matteroverdrive.compat.codec.StreamCodec;
+import matteroverdrive.compat.codec.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import matteroverdrive.platform.PacketContext;
@@ -19,13 +19,13 @@ import matteroverdrive.platform.PacketContext;
 public record TransporterPayload(int containerId, Action action, int index, String name, BlockPos pos) implements CustomPacketPayload {
     public enum Action { SELECT, NEW, REMOVE, SET, IMPORT, RESET }
 
-    public static final Type<TransporterPayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "transporter"));
+    public static final Type<TransporterPayload> TYPE = new Type<>(new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "transporter"));
     public static final StreamCodec<RegistryFriendlyByteBuf, TransporterPayload> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.VAR_INT, TransporterPayload::containerId,
             ByteBufCodecs.idMapper(i -> Action.values()[i], Action::ordinal), TransporterPayload::action,
             ByteBufCodecs.VAR_INT, TransporterPayload::index,
             ByteBufCodecs.stringUtf8(64), TransporterPayload::name,
-            BlockPos.STREAM_CODEC, TransporterPayload::pos, TransporterPayload::new);
+            matteroverdrive.compat.codec.VanillaCodecs.BLOCK_POS, TransporterPayload::pos, TransporterPayload::new);
 
     @Override
     public Type<TransporterPayload> type() {
@@ -43,9 +43,9 @@ public record TransporterPayload(int containerId, Action action, int index, Stri
             case NEW -> t.addLocation(payload.name());
             case REMOVE -> t.removeLocation(payload.index());
             case SET -> t.setSelected(payload.name(), new BlockPos(
-                    Math.clamp(payload.pos().getX(), me.getX() - r, me.getX() + r),
-                    Math.clamp(payload.pos().getY(), me.getY() - r, me.getY() + r),
-                    Math.clamp(payload.pos().getZ(), me.getZ() - r, me.getZ() + r)));
+                    net.minecraft.util.Mth.clamp(payload.pos().getX(), me.getX() - r, me.getX() + r),
+                    net.minecraft.util.Mth.clamp(payload.pos().getY(), me.getY() - r, me.getY() + r),
+                    net.minecraft.util.Mth.clamp(payload.pos().getZ(), me.getZ() - r, me.getZ() + r)));
             case IMPORT -> t.importFromFlashDrive(payload.name());
             case RESET -> t.setSelected(t.getSelected().name(), me);
         }

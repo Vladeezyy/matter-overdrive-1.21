@@ -73,11 +73,11 @@ public abstract class RogueAndroid extends Monster {
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        super.defineSynchedData(builder);
-        builder.define(LEVEL, 0);
-        builder.define(LEGENDARY, false);
-        builder.define(VISOR_COLOR, -1);
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(LEVEL, 0);
+        this.entityData.define(LEGENDARY, false);
+        this.entityData.define(VISOR_COLOR, -1);
     }
 
     public int getAndroidLevel() {
@@ -124,13 +124,13 @@ public abstract class RogueAndroid extends Monster {
 
     @Override
     public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason,
-                                                  @Nullable SpawnGroupData data) {
-        data = super.finalizeSpawn(level, difficulty, reason, data);
+                                                  @Nullable SpawnGroupData data, @Nullable net.minecraft.nbt.CompoundTag tag) {
+        data = super.finalizeSpawn(level, difficulty, reason, data, tag);
         // 1.7.10: |gaussian x (1 + difficulty x 0.25)| clamped to 0..3; legendary 5% per level
         int androidLevel = (int) Mth.clamp(Math.abs(random.nextGaussian() * (1 + level.getDifficulty().getId() * 0.25)), 0, 3);
         setup(androidLevel, random.nextDouble() < 0.05 * androidLevel);
         populateDefaultEquipmentSlots(random, difficulty);
-        populateDefaultEquipmentEnchantments(level, random, difficulty);
+        populateDefaultEquipmentEnchantments(random, difficulty);
         return data;
     }
 
@@ -155,8 +155,8 @@ public abstract class RogueAndroid extends Monster {
     }
 
     @Override
-    public EntityDimensions getDefaultDimensions(Pose pose) {
-        return isLegendary() ? super.getDefaultDimensions(pose).scale(1.5f) : super.getDefaultDimensions(pose);
+    public EntityDimensions getDimensions(Pose pose) {
+        return isLegendary() ? super.getDimensions(pose).scale(1.5f) : super.getDimensions(pose);
     }
 
     @Override
@@ -189,14 +189,14 @@ public abstract class RogueAndroid extends Monster {
 
     /** 1.7.10 addLegendaryAttributesToPart: rolled attributes and the gold "✪ Legendary" name. */
     public static void makeLegendary(ItemStack part, net.minecraft.util.RandomSource random, int level) {
-        part.set(matteroverdrive.init.MODataComponents.LEGENDARY_PART.get(), matteroverdrive.item.android.BionicPartItem.Legendary.roll(random, level));
-        part.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME, matteroverdrive.item.weapon.WeaponFactory.legendaryName(part));
+        matteroverdrive.compat.component.Components.set(part, matteroverdrive.init.MODataComponents.LEGENDARY_PART.get(), matteroverdrive.item.android.BionicPartItem.Legendary.roll(random, level));
+        part.setHoverName(matteroverdrive.item.weapon.WeaponFactory.legendaryName(part));
     }
 
     @Override
     public void addAdditionalSaveData(net.minecraft.nbt.CompoundTag tag) {
         super.addAdditionalSaveData(tag);
-        ValueOutput output = ValueOutput.of(tag, registryAccess());
+        ValueOutput output = ValueOutput.of(tag, level().registryAccess());
         output.putInt("android_level", getAndroidLevel());
         output.putBoolean("legendary", isLegendary());
         if (entityData.get(VISOR_COLOR) >= 0) output.putInt("visor_color", entityData.get(VISOR_COLOR));
@@ -207,7 +207,7 @@ public abstract class RogueAndroid extends Monster {
     @Override
     public void readAdditionalSaveData(net.minecraft.nbt.CompoundTag tag) {
         super.readAdditionalSaveData(tag);
-        ValueInput input = ValueInput.of(tag, registryAccess());
+        ValueInput input = ValueInput.of(tag, level().registryAccess());
         entityData.set(LEVEL, input.getIntOr("android_level", 0));
         entityData.set(LEGENDARY, input.getBooleanOr("legendary", false));
         entityData.set(VISOR_COLOR, input.getIntOr("visor_color", -1));
@@ -305,7 +305,7 @@ public abstract class RogueAndroid extends Monster {
     }
 
     @Override
-    protected void dropCustomDeathLoot(ServerLevel level, DamageSource source, boolean recentlyHit) {
-        super.dropCustomDeathLoot(level, source, recentlyHit);
+    protected void dropCustomDeathLoot(DamageSource source, int looting, boolean recentlyHit) {
+        super.dropCustomDeathLoot(source, looting, recentlyHit);
     }
 }

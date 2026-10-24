@@ -20,7 +20,6 @@ import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.AbstractCookingRecipe;
-import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
@@ -30,8 +29,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.item.crafting.SingleRecipeInput;
 
 /**
  * How much matter an item holds (1.7.10 MatterRegistry). Base values come from the {@code matteroverdrive:matter}
@@ -46,11 +43,11 @@ import net.minecraft.world.item.crafting.SingleRecipeInput;
  */
 public final class MatterRegistry {
     /** The base values: the {@code matteroverdrive:matter} item data map (data/<namespace>/data_maps/item/matter.json) */
-    public static final ResourceLocation MATTER_MAP = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "matter");
+    public static final ResourceLocation MATTER_MAP = new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "matter");
 
     private static final int PASSES = 8;
     /** Items that never get an estimated value (creative / technical blocks; modpacks can add to it). */
-    public static final TagKey<Item> BLACKLIST = TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "matter_blacklist"));
+    public static final TagKey<Item> BLACKLIST = TagKey.create(Registries.ITEM, new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "matter_blacklist"));
 
     /** Values on the logical server (recomputed after every data load) and the copy the client received. */
     private static @Nullable Map<Item, Integer> serverValues;
@@ -120,15 +117,15 @@ public final class MatterRegistry {
         var recipes = server.getRecipeManager().getRecipes();
         for (int pass = 0; pass < PASSES; pass++) {
             int before = values.size();
-            for (RecipeHolder<?> holder : recipes) {
-                if (holder.value() instanceof CraftingRecipe recipe && !recipe.isSpecial()) {
+            for (Recipe<?> holder : recipes) {
+                if (holder instanceof CraftingRecipe recipe && !recipe.isSpecial()) {
                     deriveFromCrafting(recipe, server, values);
                 }
             }
             if (values.size() == before) break;
         }
-        for (RecipeHolder<?> holder : recipes) {
-            if (holder.value() instanceof AbstractCookingRecipe recipe) {
+        for (Recipe<?> holder : recipes) {
+            if (holder instanceof AbstractCookingRecipe recipe) {
                 deriveFromCooking(recipe, server, values);
             }
         }
@@ -137,8 +134,8 @@ public final class MatterRegistry {
         var context = server.registryAccess();
         for (int pass = 0; pass < 16; pass++) {
             int before = values.size();
-            for (RecipeHolder<?> holder : recipes) {
-                Recipe<?> recipe = holder.value();
+            for (Recipe<?> holder : recipes) {
+                Recipe<?> recipe = holder;
                 if (recipe instanceof CraftingRecipe crafting && crafting.isSpecial()) continue;
                 deriveFromAnyRecipe(recipe, context, values);
             }
@@ -159,7 +156,7 @@ public final class MatterRegistry {
     }
 
     /** Any recipe: the sum of its ingredients' cheapest matter, split over the result count. */
-    private static void deriveFromAnyRecipe(Recipe<?> recipe, net.minecraft.core.HolderLookup.Provider context, Map<Item, Integer> values) {
+    private static void deriveFromAnyRecipe(Recipe<?> recipe, net.minecraft.core.RegistryAccess context, Map<Item, Integer> values) {
         List<Ingredient> ingredients;
         ItemStack output;
         try {
@@ -239,7 +236,7 @@ public final class MatterRegistry {
     }
 
     private static void deriveFromCrafting(CraftingRecipe recipe, MinecraftServer server, Map<Item, Integer> values) {
-        ItemStack output = result(recipe, server, CraftingInput.EMPTY);
+        ItemStack output = result(recipe, server);
         if (output.isEmpty() || values.containsKey(output.getItem())) return;
         List<Ingredient> ingredients = ingredients(recipe);
         if (ingredients.isEmpty()) return;
@@ -269,16 +266,16 @@ public final class MatterRegistry {
     }
 
     private static void deriveFromCooking(AbstractCookingRecipe recipe, MinecraftServer server, Map<Item, Integer> values) {
-        ItemStack output = result(recipe, server, new SingleRecipeInput(ItemStack.EMPTY));
+        ItemStack output = result(recipe, server);
         if (output.isEmpty() || values.containsKey(output.getItem())) return;
         int input = recipe.getIngredients().isEmpty() ? 0 : cheapest(recipe.getIngredients().get(0), values);
         if (input > 0) values.put(output.getItem(), Math.max(1, input / output.getCount()));
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    private static ItemStack result(Recipe recipe, MinecraftServer server, Object input) {
+    /** 1.20.1 crafting and cooking recipes assemble their result item regardless of the input */
+    private static ItemStack result(Recipe<?> recipe, MinecraftServer server) {
         try {
-            return recipe.assemble((net.minecraft.world.item.crafting.RecipeInput) input, server.registryAccess());
+            return recipe.getResultItem(server.registryAccess()).copy();
         } catch (RuntimeException e) {
             return ItemStack.EMPTY; // special recipes that need a real input
         }

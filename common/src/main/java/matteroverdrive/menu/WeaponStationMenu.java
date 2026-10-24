@@ -5,7 +5,7 @@ import matteroverdrive.init.MOMenus;
 import matteroverdrive.item.weapon.EnergyWeaponItem;
 import matteroverdrive.item.weapon.WeaponModule;
 import matteroverdrive.machine.MachineInventory;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import matteroverdrive.compat.codec.RegistryFriendlyByteBuf;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;

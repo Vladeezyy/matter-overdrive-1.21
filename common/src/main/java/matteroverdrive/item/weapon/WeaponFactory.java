@@ -3,7 +3,6 @@ package matteroverdrive.item.weapon;
 import matteroverdrive.init.MOItems;
 import matteroverdrive.item.BatteryItem;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
@@ -33,8 +32,8 @@ public final class WeaponFactory {
         }
         EnergyWeaponItem.setEnergy(weapon, EnergyWeaponItem.getCapacity(weapon));
         if (legendary) {
-            weapon.set(DataComponents.CUSTOM_NAME, legendaryName(weapon));
-            weapon.set(matteroverdrive.init.MODataComponents.LEGENDARY_WEAPON.get(), Legendary.roll(random, level));
+            weapon.setHoverName(legendaryName(weapon));
+            matteroverdrive.compat.component.Components.set(weapon, matteroverdrive.init.MODataComponents.LEGENDARY_WEAPON.get(), Legendary.roll(random, level));
         }
         return weapon;
     }
@@ -64,7 +63,7 @@ public final class WeaponFactory {
     }
 
     public static Legendary legendary(ItemStack weapon) {
-        return weapon.getOrDefault(matteroverdrive.init.MODataComponents.LEGENDARY_WEAPON.get(), Legendary.NONE);
+        return matteroverdrive.compat.component.Components.getOrDefault(weapon, matteroverdrive.init.MODataComponents.LEGENDARY_WEAPON.get(), Legendary.NONE);
     }
 
     private WeaponFactory() {}

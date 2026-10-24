@@ -2,7 +2,7 @@ package matteroverdrive.starmap;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import matteroverdrive.compat.codec.RegistryFriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
@@ -47,7 +47,7 @@ public class TravelEvent {
     public void write(RegistryFriendlyByteBuf buf) {
         GalacticPosition.STREAM_CODEC.encode(buf, from);
         GalacticPosition.STREAM_CODEC.encode(buf, to);
-        ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, ship);
+        matteroverdrive.compat.codec.VanillaCodecs.ITEM_STACK_OPTIONAL.encode(buf, ship);
         buf.writeInt(timeLength);
         buf.writeLong(timeStart);
     }
@@ -56,7 +56,7 @@ public class TravelEvent {
         TravelEvent event = new TravelEvent();
         event.from = GalacticPosition.STREAM_CODEC.decode(buf);
         event.to = GalacticPosition.STREAM_CODEC.decode(buf);
-        event.ship = ItemStack.OPTIONAL_STREAM_CODEC.decode(buf);
+        event.ship = matteroverdrive.compat.codec.VanillaCodecs.ITEM_STACK_OPTIONAL.decode(buf);
         event.timeLength = buf.readInt();
         event.timeStart = buf.readLong();
         return event;

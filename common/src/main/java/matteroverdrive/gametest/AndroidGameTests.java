@@ -34,9 +34,8 @@ final class AndroidGameTests {
 
     /** GameTestHelper.makeMockServerPlayerInLevel, but in survival (the vanilla mock is hard-wired to creative). */
     static ServerPlayer player(GameTestHelper helper) {
-        var cookie = net.minecraft.server.network.CommonListenerCookie.createInitial(
-                new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "test-android"), false);
-        ServerPlayer player = new ServerPlayer(helper.getLevel().getServer(), helper.getLevel(), cookie.gameProfile(), cookie.clientInformation()) {
+        ServerPlayer player = new ServerPlayer(helper.getLevel().getServer(), helper.getLevel(),
+                new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "test-android")) {
             @Override
             public boolean isCreative() {
                 return false;
@@ -49,11 +48,11 @@ final class AndroidGameTests {
         };
         var connection = new net.minecraft.network.Connection(net.minecraft.network.protocol.PacketFlow.SERVERBOUND);
         new io.netty.channel.embedded.EmbeddedChannel(connection);
-        helper.getLevel().getServer().getPlayerList().placeNewPlayer(connection, player, cookie);
+        helper.getLevel().getServer().getPlayerList().placeNewPlayer(connection, player);
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
         player.spawnInvulnerableTime = 0;   // players are invulnerable for 3 s after joining
         net.minecraft.world.level.GameType.SURVIVAL.updatePlayerAbilities(player.getAbilities());   // abilities came from the creative default
-        var pos = helper.absolutePos(new BlockPos(6, 1, 1)).getBottomCenter();
+        var pos = helper.absolutePos(new BlockPos(6, 1, 1)).getCenter().subtract(0, 0.5, 0);
         player.moveTo(pos.x, pos.y, pos.z, 0, 0);
         return player;
     }
@@ -139,7 +138,7 @@ final class AndroidGameTests {
     private static void stationParts(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, matteroverdrive.init.MOBlocks.ANDROID_STATION.get());
-        var station = helper.<matteroverdrive.block.entity.AndroidStationBlockEntity>getBlockEntity(pos);
+        var station = matteroverdrive.compat.GameTests.<matteroverdrive.block.entity.AndroidStationBlockEntity>blockEntity(helper, pos);
         ServerPlayer player = player(helper);
         Android.setAndroid(player, true);
         var menu = new matteroverdrive.menu.AndroidStationMenu(1, player.getInventory(), station, new net.minecraft.world.inventory.SimpleContainerData(11));
@@ -161,7 +160,7 @@ final class AndroidGameTests {
         ServerPlayer player = player(helper);
         Android.setAndroid(player, true);
         ItemStack arms = new ItemStack(MOItems.ROGUE_ANDROID_ARMS.get());
-        arms.set(matteroverdrive.init.MODataComponents.LEGENDARY_PART.get(),
+        matteroverdrive.compat.component.Components.set(arms, matteroverdrive.init.MODataComponents.LEGENDARY_PART.get(),
                 new matteroverdrive.item.android.BionicPartItem.Legendary(0, 3, 0.2, 0.1, -0.4, 0));
         Android.get(player).setStack(AndroidData.SLOT_ARMS, arms);
         double speed = player.getAttributeBaseValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED);
@@ -174,7 +173,7 @@ final class AndroidGameTests {
         // a rolled legendary part (level 3) is named and has 0..3 per attribute
         ItemStack rolled = new ItemStack(MOItems.ROGUE_ANDROID_HEAD.get());
         matteroverdrive.entity.monster.RogueAndroid.makeLegendary(rolled, helper.getLevel().random, 3);
-        var legendary = rolled.get(matteroverdrive.init.MODataComponents.LEGENDARY_PART.get());
+        var legendary = matteroverdrive.compat.component.Components.get(rolled, matteroverdrive.init.MODataComponents.LEGENDARY_PART.get());
         check(helper, legendary != null && legendary.health() <= 3 && legendary.battery() >= -0.09 - 1e-9 && rolled.getHoverName().getString().contains("\u272a"),
                 "rolled " + legendary + " " + rolled.getHoverName().getString());
         Android.get(player).setStack(AndroidData.SLOT_ARMS, ItemStack.EMPTY);
@@ -281,7 +280,7 @@ final class AndroidGameTests {
         var state = helper.getBlockState(pos);
         state.getBlock().setPlacedBy(helper.getLevel(), helper.absolutePos(pos), state, null, ItemStack.EMPTY);
         check(helper, helper.getBlockState(pos.above(2)).is(matteroverdrive.init.MOBlocks.CHARGING_STATION.get()), "no top part");
-        var station = helper.<matteroverdrive.block.entity.ChargingStationBlockEntity>getBlockEntity(pos);
+        var station = matteroverdrive.compat.GameTests.<matteroverdrive.block.entity.ChargingStationBlockEntity>blockEntity(helper, pos);
         for (int i = 0; i < 100; i++) station.getEnergyHandler(null).receiveEnergy(512, false);
         ServerPlayer player = player(helper);
         Android.setAndroid(player, true);

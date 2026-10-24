@@ -27,8 +27,8 @@ public final class MachineTooltip {
         if (sceneShift || net.minecraft.client.gui.screens.Screen.hasShiftDown()) {
             String details = stack.getItem().getDescriptionId() + ".details";
             if (I18n.exists(details)) lines.add(Component.translatable(details).withStyle(ChatFormatting.GRAY));
-            MachineStorage storage = stack.get(MODataComponents.MACHINE_STORAGE.get());
-            Integer energy = stack.get(MODataComponents.ENERGY.get());
+            MachineStorage storage = matteroverdrive.compat.component.Components.get(stack, MODataComponents.MACHINE_STORAGE.get());
+            Integer energy = matteroverdrive.compat.component.Components.get(stack, MODataComponents.ENERGY.get());
             if (storage != null && energy != null && storage.maxEnergy() > 0) {
                 lines.add(Component.literal(MOText.compact(energy) + " / " + MOText.compact(storage.maxEnergy()) + " FE").withStyle(ChatFormatting.YELLOW));
                 lines.add(Component.translatable("tooltip.matteroverdrive.send_receive", MOText.compact(storage.energySend()),

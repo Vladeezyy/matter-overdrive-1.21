@@ -44,7 +44,7 @@ public class TransporterScreen extends MachineScreen<TransporterMenu> {
     }
 
     private static ResourceLocation id(String sprite) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, sprite);
+        return new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, sprite);
     }
 
     private TransporterBlockEntity machine() {
@@ -212,7 +212,7 @@ public class TransporterScreen extends MachineScreen<TransporterMenu> {
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollY) {
         scroll = Math.max(0, Math.min(Math.max(0, machine().getLocations().size() - ROWS), scroll - (int) Math.signum(scrollY)));
         return true;
     }

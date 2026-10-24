@@ -49,7 +49,6 @@ import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.trading.ItemCost;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.item.trading.MerchantOffers;
 import net.minecraft.world.level.Level;
@@ -76,9 +75,9 @@ public class MadScientist extends AbstractVillager implements DialogNpc {
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        super.defineSynchedData(builder);
-        builder.define(JUNKIE, false);
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(JUNKIE, false);
     }
 
     @Override
@@ -106,29 +105,29 @@ public class MadScientist extends AbstractVillager implements DialogNpc {
 
     @Override
     public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason,
-                                                  @Nullable SpawnGroupData data) {
+                                                  @Nullable SpawnGroupData data, @Nullable net.minecraft.nbt.CompoundTag tag) {
         setJunkie(random.nextBoolean());
-        return super.finalizeSpawn(level, difficulty, reason, data);
+        return super.finalizeSpawn(level, difficulty, reason, data, tag);
     }
 
     @Override
     public void addAdditionalSaveData(net.minecraft.nbt.CompoundTag tag) {
         super.addAdditionalSaveData(tag);
-        ValueOutput output = ValueOutput.of(tag, registryAccess());
+        ValueOutput output = ValueOutput.of(tag, level().registryAccess());
         output.putBoolean("junkie", isJunkie());
     }
 
     @Override
     public void readAdditionalSaveData(net.minecraft.nbt.CompoundTag tag) {
         super.readAdditionalSaveData(tag);
-        ValueInput input = ValueInput.of(tag, registryAccess());
+        ValueInput input = ValueInput.of(tag, level().registryAccess());
         entityData.set(JUNKIE, input.getBooleanOr("junkie", false));
     }
 
     @Override
     public @Nullable AgeableMob getBreedOffspring(ServerLevel level, AgeableMob other) {
         MadScientist child = MOEntities.MAD_SCIENTIST.get().create(level);
-        if (child != null) child.finalizeSpawn(level, level.getCurrentDifficultyAt(blockPosition()), MobSpawnType.BREEDING, null);
+        if (child != null) child.finalizeSpawn(level, level.getCurrentDifficultyAt(blockPosition()), MobSpawnType.BREEDING, null, null);
         return child;
     }
 
@@ -146,7 +145,7 @@ public class MadScientist extends AbstractVillager implements DialogNpc {
         sell(offers, r, new ItemStack(MOItems.ANDROID_PILL_YELLOW.get()), 1, 16, 16);
         sell(offers, r, new ItemStack(MOItems.H_COMPENSATOR.get()), 0.5f, 32, 18);
         if (r.nextFloat() < 1) {
-            offers.add(new MerchantOffer(new ItemCost(MOItems.DILITHIUM_CRYSTAL.get()), new ItemStack(Items.EMERALD, 8 + r.nextInt(8)),
+            offers.add(new MerchantOffer(new ItemStack(MOItems.DILITHIUM_CRYSTAL.get()), new ItemStack(Items.EMERALD, 8 + r.nextInt(8)),
                     MAX_USES, 0, 0));
         }
         sell(offers, r, new ItemStack(MOItems.BARREL_DAMAGE.get()), 1, 8, 4);
@@ -158,7 +157,7 @@ public class MadScientist extends AbstractVillager implements DialogNpc {
     /** 1.7.10 addSellItemStack: emeralds (price + random variation) for the stack, with the given chance. */
     private static void sell(MerchantOffers offers, RandomSource r, ItemStack stack, float chance, int price, int variation) {
         if (r.nextFloat() < chance) {
-            offers.add(new MerchantOffer(new ItemCost(Items.EMERALD, price + r.nextInt(variation)), stack, MAX_USES, 0, 0));
+            offers.add(new MerchantOffer(new ItemStack(Items.EMERALD, price + r.nextInt(variation)), stack, MAX_USES, 0, 0));
         }
     }
 
@@ -227,7 +226,7 @@ public class MadScientist extends AbstractVillager implements DialogNpc {
             var mutant = MOEntities.MUTANT_SCIENTIST.get().create(server);
             if (mutant != null) {
                 mutant.moveTo(getX(), getY(), getZ(), getYRot(), getXRot());
-                mutant.finalizeSpawn(server, server.getCurrentDifficultyAt(blockPosition()), MobSpawnType.CONVERSION, null);
+                mutant.finalizeSpawn(server, server.getCurrentDifficultyAt(blockPosition()), MobSpawnType.CONVERSION, null, null);
                 server.addFreshEntity(mutant);
                 mutant.spawnAnim();
             }

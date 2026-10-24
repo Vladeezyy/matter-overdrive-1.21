@@ -73,14 +73,14 @@ public final class Quests {
 
     private static ItemStack communicationRelay() {
         ItemStack relay = new ItemStack(matteroverdrive.init.MODecorative.COILS.get());
-        relay.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME, net.minecraft.network.chat.Component.literal("Communication Relay"));
+        relay.setHoverName(net.minecraft.network.chat.Component.literal("Communication Relay"));
         return relay;
     }
 
     private static ItemStack hardenedSpine() {
         ItemStack spine = new ItemStack(MOItems.TRITANIUM_SPINE.get());
-        spine.set(matteroverdrive.init.MODataComponents.BIONIC_STATS.get(), new matteroverdrive.item.android.BionicPartItem.Stats(5, -1));
-        spine.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME, net.minecraft.network.chat.Component.literal("Hardened Tritanium Spine"));
+        matteroverdrive.compat.component.Components.set(spine, matteroverdrive.init.MODataComponents.BIONIC_STATS.get(), new matteroverdrive.item.android.BionicPartItem.Stats(5, -1));
+        spine.setHoverName(net.minecraft.network.chat.Component.literal("Hardened Tritanium Spine"));
         return spine;
     }
 

@@ -25,7 +25,7 @@ import net.minecraft.world.phys.Vec3;
 /** The 1.7.10 biotic stats that do something (data/biostats/*), with their numbers. */
 final class StatImpls {
     static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, path);
+        return new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, path);
     }
 
     static String percent(float value) {
@@ -53,9 +53,9 @@ final class StatImpls {
         }
 
         @Override
-        public Map<Holder<Attribute>, AttributeModifier> attributes(int level) {
-            return Map.of(Attributes.MOVEMENT_SPEED, new AttributeModifier(StatImpls.id("android_speed"), speedModify(level),
-                    AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+        public Map<Attribute, AttributeModifier> attributes(int level) {
+            return Map.of(Attributes.MOVEMENT_SPEED, matteroverdrive.compat.Attrs.modifier(StatImpls.id("android_speed"), speedModify(level),
+                    AttributeModifier.Operation.MULTIPLY_TOTAL));
         }
     }
 
@@ -75,9 +75,9 @@ final class StatImpls {
         }
 
         @Override
-        public Map<Holder<Attribute>, AttributeModifier> attributes(int level) {
-            return Map.of(Attributes.ATTACK_DAMAGE, new AttributeModifier(StatImpls.id("android_attack"), attackPower(level),
-                    AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
+        public Map<Attribute, AttributeModifier> attributes(int level) {
+            return Map.of(Attributes.ATTACK_DAMAGE, matteroverdrive.compat.Attrs.modifier(StatImpls.id("android_attack"), attackPower(level),
+                    AttributeModifier.Operation.MULTIPLY_BASE));
         }
     }
 
@@ -420,7 +420,7 @@ final class StatImpls {
             float range = Mth.clamp(distance, 5, 10);
             float power = Mth.clamp(distance, 1, 3) * 0.8f;
             AABB area = player.getBoundingBox().inflate(range);
-            var source = player.level().damageSources().source(Android.SHOCKWAVE_DAMAGE, player);
+            var source = matteroverdrive.compat.Damage.source(player.level(), Android.SHOCKWAVE_DAMAGE, player);
             for (LivingEntity target : player.level().getEntitiesOfClass(LivingEntity.class, area, e -> e != player)) {
                 Vec3 dir = player.position().subtract(target.position());
                 double multiply = range / Math.max(1, dir.length());

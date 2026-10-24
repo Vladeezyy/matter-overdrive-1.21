@@ -84,7 +84,7 @@ public class PlasmaShotgunItem extends EnergyWeaponItem {
         if (!(level instanceof ServerLevel server) || !(entity instanceof ServerPlayer player)) return false;
         stopChargingSound(server, player);
         if (player.getCooldowns().isOnCooldown(weapon.getItem()) || !canFire(weapon)) return false;
-        int elapsed = getUseDuration(weapon, entity) - timeLeft;
+        int elapsed = getUseDuration(weapon) - timeLeft;
         int count = chargedShots(elapsed);
         setEnergy(weapon, getEnergy(weapon) - getEnergyPerShot(weapon));
         fireBolts(server, player, weapon, count, false);

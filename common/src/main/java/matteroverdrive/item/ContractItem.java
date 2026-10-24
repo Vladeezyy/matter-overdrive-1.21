@@ -34,13 +34,13 @@ public class ContractItem extends Item {
     }
 
     public static @Nullable QuestStack getQuest(ItemStack contract) {
-        QuestStack stack = contract.get(MODataComponents.CONTRACT_QUEST.get());
+        QuestStack stack = matteroverdrive.compat.component.Components.get(contract, MODataComponents.CONTRACT_QUEST.get());
         return stack == null || stack.getQuest() == null ? null : stack;
     }
 
     public static ItemStack of(QuestStack stack) {
         ItemStack contract = new ItemStack(matteroverdrive.init.MOItems.CONTRACT.get());
-        contract.set(MODataComponents.CONTRACT_QUEST.get(), stack);
+        matteroverdrive.compat.component.Components.set(contract, MODataComponents.CONTRACT_QUEST.get(), stack);
         return contract;
     }
 
@@ -57,14 +57,14 @@ public class ContractItem extends Item {
             if (getQuest(contract) != null) openScreen.accept(hand);
         } else if (getQuest(contract) == null) {
             Quest quest = Quests.randomContract(player.getRandom());
-            contract.set(MODataComponents.CONTRACT_QUEST.get(), quest.generate(player.getRandom()));
+            matteroverdrive.compat.component.Components.set(contract, MODataComponents.CONTRACT_QUEST.get(), quest.generate(player.getRandom()));
         }
         return net.minecraft.world.InteractionResultHolder.success(player.getItemInHand(hand));
     }
 
     /** 1.7.10 addDetails: the objectives. */
     @Override
-    public void appendHoverText(ItemStack contract, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+    public void appendHoverText(ItemStack contract, @org.jetbrains.annotations.Nullable net.minecraft.world.level.Level context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
         Consumer<Component> tooltip = tooltipLines::add;
         QuestStack stack = getQuest(contract);
         Player player = clientPlayer.get();

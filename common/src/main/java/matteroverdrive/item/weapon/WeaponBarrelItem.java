@@ -70,7 +70,7 @@ public class WeaponBarrelItem extends Item implements WeaponModule {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, @org.jetbrains.annotations.Nullable net.minecraft.world.level.Level context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
         Consumer<Component> tooltip = tooltipLines::add;
         for (WeaponStat stat : TOOLTIP.get(type)) {
             float[] change = type.stats.get(stat);

@@ -11,7 +11,7 @@ import com.mojang.serialization.Codec;
 import matteroverdrive.init.MOAttachments;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import matteroverdrive.compat.codec.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 import matteroverdrive.compat.ValueInput;
 import matteroverdrive.compat.ValueOutput;
@@ -96,8 +96,8 @@ public class PlayerQuests implements ValueIOSerializable {
         public void write(RegistryFriendlyByteBuf buf, PlayerQuests data, boolean initialSync) {
             buf.writeBoolean(initialSync);
             CompoundTag tag = new CompoundTag();
-            tag.put("active", LIST.encodeStart(NbtOps.INSTANCE, data.active).getOrThrow());
-            tag.put("completed", LIST.encodeStart(NbtOps.INSTANCE, data.completed).getOrThrow());
+            tag.put("active", LIST.encodeStart(NbtOps.INSTANCE, data.active).getOrThrow(false, e -> {}));
+            tag.put("completed", LIST.encodeStart(NbtOps.INSTANCE, data.completed).getOrThrow(false, e -> {}));
             buf.writeNbt(tag);
         }
 
@@ -110,10 +110,10 @@ public class PlayerQuests implements ValueIOSerializable {
             data.active.clear();
             data.completed.clear();
             if (tag != null) {
-                LIST.parse(NbtOps.INSTANCE, tag.get("active")).ifSuccess(data.active::addAll);
-                LIST.parse(NbtOps.INSTANCE, tag.get("completed")).ifSuccess(data.completed::addAll);
+                LIST.parse(NbtOps.INSTANCE, tag.get("active")).result().ifPresent(data.active::addAll);
+                LIST.parse(NbtOps.INSTANCE, tag.get("completed")).result().ifPresent(data.completed::addAll);
             }
-            if (!initial && holder instanceof Player player) clientUpdated.accept(player, before, data);
+            if (!initial && holder != null) clientUpdated.accept(holder, before, data);
             return data;
         }
     };

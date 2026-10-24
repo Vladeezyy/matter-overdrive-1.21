@@ -34,7 +34,7 @@ import net.minecraft.world.phys.Vec3;
  */
 public class PlasmaBolt extends Projectile {
     public static final ResourceKey<DamageType> PLASMA = ResourceKey.create(Registries.DAMAGE_TYPE,
-            ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "plasma"));
+            new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "plasma"));
     private static final EntityDataAccessor<Integer> COLOR = SynchedEntityData.defineId(PlasmaBolt.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> RENDER_SIZE = SynchedEntityData.defineId(PlasmaBolt.class, EntityDataSerializers.FLOAT);
 
@@ -85,9 +85,9 @@ public class PlasmaBolt extends Projectile {
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        builder.define(COLOR, 0xFFFFFF);
-        builder.define(RENDER_SIZE, 2f);   // 1.7.10 PlasmaBolt.renderSize default
+    protected void defineSynchedData() {
+        this.entityData.define(COLOR, 0xFFFFFF);
+        this.entityData.define(RENDER_SIZE, 2f);   // 1.7.10 PlasmaBolt.renderSize default
     }
 
     @Override
@@ -97,7 +97,7 @@ public class PlasmaBolt extends Projectile {
         if (!level().isClientSide()) {
             HitResult hit = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);
             if (hit.getType() != HitResult.Type.MISS) {
-                hitTargetOrDeflectSelf(hit);
+                onHit(hit);
                 if (isRemoved()) return;
             }
             travelled += motion.length();
@@ -115,11 +115,11 @@ public class PlasmaBolt extends Projectile {
         Entity target = result.getEntity();
         if (!(level() instanceof ServerLevel server)) return;
         Vec3 before = target.getDeltaMovement();
-        DamageSource source = server.damageSources().source(PLASMA, this, getOwner());
+        DamageSource source = matteroverdrive.compat.Damage.source(server, PLASMA, this, getOwner());
         target.invulnerableTime = 0;
         if (damage > 0 && target.hurt(source, damage)) {
             target.setDeltaMovement(before);     // 1.7.10 restored the target's motion: no knockback
-            if (fireMultiplier > 0) target.igniteForSeconds(10 * fireMultiplier);   // 1.7.10 setFire(10 x multiplier)
+            if (fireMultiplier > 0) target.setSecondsOnFire((int) (10 * fireMultiplier));   // 1.7.10 setFire(10 x multiplier)
         }
         matteroverdrive.network.BoltHitPayload.send(server, result.getLocation(), getDeltaMovement().scale(-1), getColor(), getRenderSize(),
                 target instanceof LivingEntity ? matteroverdrive.network.BoltHitPayload.LIVING : matteroverdrive.network.BoltHitPayload.ENTITY);
@@ -146,7 +146,7 @@ public class PlasmaBolt extends Projectile {
     @Override
     public void addAdditionalSaveData(net.minecraft.nbt.CompoundTag tag) {
         super.addAdditionalSaveData(tag);
-        ValueOutput output = ValueOutput.of(tag, registryAccess());
+        ValueOutput output = ValueOutput.of(tag, level().registryAccess());
         output.putFloat("damage", damage);
         output.putFloat("range", range);
         output.putDouble("travelled", travelled);
@@ -155,7 +155,7 @@ public class PlasmaBolt extends Projectile {
     @Override
     public void readAdditionalSaveData(net.minecraft.nbt.CompoundTag tag) {
         super.readAdditionalSaveData(tag);
-        ValueInput input = ValueInput.of(tag, registryAccess());
+        ValueInput input = ValueInput.of(tag, level().registryAccess());
         damage = input.getFloatOr("damage", 0);
         range = input.getFloatOr("range", 32);
         travelled = input.getDoubleOr("travelled", 0);

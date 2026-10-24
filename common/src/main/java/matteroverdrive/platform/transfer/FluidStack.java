@@ -9,10 +9,10 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import matteroverdrive.compat.codec.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
+import matteroverdrive.compat.codec.ByteBufCodecs;
+import matteroverdrive.compat.codec.StreamCodec;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
@@ -57,7 +57,7 @@ public final class FluidStack {
         if (tag.isEmpty()) {
             return EMPTY;
         }
-        return CODEC.parse(provider.createSerializationContext(NbtOps.INSTANCE), tag).result().orElse(EMPTY);
+        return CODEC.parse(net.minecraft.resources.RegistryOps.create(NbtOps.INSTANCE, provider), tag).result().orElse(EMPTY);
     }
 
     public Tag saveOptional(HolderLookup.Provider provider) {
@@ -65,7 +65,7 @@ public final class FluidStack {
     }
 
     public Tag save(HolderLookup.Provider provider) {
-        return CODEC.encodeStart(provider.createSerializationContext(NbtOps.INSTANCE), this).getOrThrow();
+        return CODEC.encodeStart(net.minecraft.resources.RegistryOps.create(NbtOps.INSTANCE, provider), this).getOrThrow(false, e -> {});
     }
 
     public Fluid getFluid() {

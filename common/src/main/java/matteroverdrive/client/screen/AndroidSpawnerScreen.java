@@ -21,9 +21,9 @@ import matteroverdrive.platform.Platform;
  * Config page has the spawn amount / range / delay and the team (1.7.10 config properties).
  */
 public class AndroidSpawnerScreen extends MachineScreen<AndroidSpawnerMenu> {
-    private static final ResourceLocation BUTTON = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "button_normal");
-    private static final ResourceLocation BUTTON_OVER = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "button_over");
-    private static final ResourceLocation BUTTON_DARK = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "button_over_dark");
+    private static final ResourceLocation BUTTON = new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "button_normal");
+    private static final ResourceLocation BUTTON_OVER = new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "button_over");
+    private static final ResourceLocation BUTTON_DARK = new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "button_over_dark");
     private static final int[] KILL_ALL = {64, 60, 60, 20};
     private static final String[] FIELDS = {"spawn_amount", "spawn_range", "spawn_delay", "team"};
     private static final int FIELD_X = 130, FIELD_Y = 80, FIELD_W = 60, ROW = 18;

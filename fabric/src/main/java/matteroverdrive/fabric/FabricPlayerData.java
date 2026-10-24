@@ -22,9 +22,9 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import matteroverdrive.compat.codec.RegistryFriendlyByteBuf;
+import matteroverdrive.compat.codec.StreamCodec;
+import matteroverdrive.compat.codec.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -44,7 +44,7 @@ final class FabricPlayerData {
     private FabricPlayerData() {}
 
     record SyncPayload(ResourceLocation data, int entity, byte[] bytes) implements CustomPacketPayload {
-        static final Type<SyncPayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "player_data"));
+        static final Type<SyncPayload> TYPE = new Type<>(new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "player_data"));
         static final StreamCodec<FriendlyByteBuf, SyncPayload> CODEC = StreamCodec.of(
                 (buf, payload) -> {
                     buf.writeResourceLocation(payload.data());

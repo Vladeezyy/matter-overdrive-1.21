@@ -4,10 +4,10 @@ import matteroverdrive.MatterOverdrive;
 import matteroverdrive.android.Android;
 import matteroverdrive.android.BioticStat;
 import matteroverdrive.android.BioticStats;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import matteroverdrive.compat.codec.RegistryFriendlyByteBuf;
+import matteroverdrive.compat.codec.ByteBufCodecs;
+import matteroverdrive.compat.codec.StreamCodec;
+import matteroverdrive.compat.codec.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
@@ -16,7 +16,7 @@ import matteroverdrive.platform.PayloadRegistrar;
 /** Android packets (client -> server unless noted): 1.7.10 PacketBioticActionKey, PacketAndroidChangeAbility, PacketTeleportPlayer. */
 public final class AndroidPayloads {
     public record Action() implements CustomPacketPayload {
-        public static final Type<Action> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "android_action"));
+        public static final Type<Action> TYPE = new Type<>(new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "android_action"));
         public static final StreamCodec<RegistryFriendlyByteBuf, Action> STREAM_CODEC = StreamCodec.unit(new Action());
 
         @Override
@@ -26,7 +26,7 @@ public final class AndroidPayloads {
     }
 
     public record SelectStat(String stat) implements CustomPacketPayload {
-        public static final Type<SelectStat> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "android_select"));
+        public static final Type<SelectStat> TYPE = new Type<>(new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "android_select"));
         public static final StreamCodec<RegistryFriendlyByteBuf, SelectStat> STREAM_CODEC =
                 StreamCodec.composite(ByteBufCodecs.STRING_UTF8, SelectStat::stat, SelectStat::new);
 
@@ -37,7 +37,7 @@ public final class AndroidPayloads {
     }
 
     public record Teleport(double x, double y, double z) implements CustomPacketPayload {
-        public static final Type<Teleport> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "android_teleport"));
+        public static final Type<Teleport> TYPE = new Type<>(new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "android_teleport"));
         public static final StreamCodec<RegistryFriendlyByteBuf, Teleport> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.DOUBLE, Teleport::x, ByteBufCodecs.DOUBLE, Teleport::y, ByteBufCodecs.DOUBLE, Teleport::z, Teleport::new);
 
@@ -49,7 +49,7 @@ public final class AndroidPayloads {
 
     /** Server -> clients: a shield hit flash (1.7.10 BioticStatShield TAG_HITS): the attacker's offset from the player. */
     public record ShieldHit(int player, float x, float y, float z) implements CustomPacketPayload {
-        public static final Type<ShieldHit> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "android_shield_hit"));
+        public static final Type<ShieldHit> TYPE = new Type<>(new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "android_shield_hit"));
         public static final StreamCodec<RegistryFriendlyByteBuf, ShieldHit> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.VAR_INT, ShieldHit::player, ByteBufCodecs.FLOAT, ShieldHit::x, ByteBufCodecs.FLOAT, ShieldHit::y,
                 ByteBufCodecs.FLOAT, ShieldHit::z, ShieldHit::new);

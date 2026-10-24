@@ -25,7 +25,7 @@ public class NetworkFlashDriveItem extends Item implements UseFirst {
     }
 
     public static List<BlockPos> getConnections(ItemStack stack) {
-        return stack.getOrDefault(MODataComponents.NETWORK_FILTER.get(), List.of());
+        return matteroverdrive.compat.component.Components.getOrDefault(stack, MODataComponents.NETWORK_FILTER.get(), List.of());
     }
 
     /** Before the machine opens its screen (1.7.10 onItemUse on an IMatterNetworkConnection). */
@@ -36,14 +36,14 @@ public class NetworkFlashDriveItem extends Item implements UseFirst {
         if (!context.getLevel().isClientSide()) {
             List<BlockPos> connections = new ArrayList<>(getConnections(stack));
             if (!connections.remove(pos)) connections.add(pos.immutable());
-            stack.set(MODataComponents.NETWORK_FILTER.get(), List.copyOf(connections));
+            matteroverdrive.compat.component.Components.set(stack, MODataComponents.NETWORK_FILTER.get(), List.copyOf(connections));
         }
         return InteractionResult.SUCCESS;
     }
 
     /** 1.7.10: "[x,y,z] Block name" per connection. */
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, @org.jetbrains.annotations.Nullable net.minecraft.world.level.Level context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
         Consumer<Component> tooltip = tooltipLines::add;
         var level = matteroverdrive.platform.Platform.INSTANCE.isClient() ? matteroverdrive.client.ClientAccess.level() : null;
         for (BlockPos pos : getConnections(stack)) {

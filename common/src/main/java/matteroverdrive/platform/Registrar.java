@@ -34,7 +34,7 @@ public class Registrar<R> {
     }
 
     public <T extends R> RegistryEntry<R, T> register(String name, Supplier<? extends T> factory) {
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(this.modId, name);
+        ResourceLocation id = new net.minecraft.resources.ResourceLocation(this.modId, name);
         return this.add(new RegistryEntry<>(this.registryKey, id), factory);
     }
 
@@ -60,15 +60,22 @@ public class Registrar<R> {
         return new DataComponents(modId);
     }
 
-    /** Data component types ({@code DeferredRegister.DataComponents}) */
-    public static final class DataComponents extends Registrar<net.minecraft.core.component.DataComponentType<?>> {
-        DataComponents(String modId) {
-            super(net.minecraft.core.registries.Registries.DATA_COMPONENT_TYPE, modId);
+    /** Data component types: 1.20.1 has no registry for them, values live in the stack's NBT under the name */
+    public static final class DataComponents {
+        private final java.util.List<java.util.function.Supplier<?>> entries = new java.util.ArrayList<>();
+
+        DataComponents(String modId) {}
+
+        public <D> java.util.function.Supplier<matteroverdrive.compat.component.DataComponentType<D>> registerComponentType(
+                String name, java.util.function.UnaryOperator<matteroverdrive.compat.component.DataComponentType.Builder<D>> builder) {
+            matteroverdrive.compat.component.DataComponentType<D> type = builder.apply(matteroverdrive.compat.component.DataComponentType.builder()).build(name);
+            java.util.function.Supplier<matteroverdrive.compat.component.DataComponentType<D>> entry = () -> type;
+            entries.add(entry);
+            return entry;
         }
 
-        public <D> RegistryEntry<net.minecraft.core.component.DataComponentType<?>, net.minecraft.core.component.DataComponentType<D>> registerComponentType(
-                String name, java.util.function.UnaryOperator<net.minecraft.core.component.DataComponentType.Builder<D>> builder) {
-            return this.register(name, () -> builder.apply(net.minecraft.core.component.DataComponentType.builder()).build());
+        public java.util.List<java.util.function.Supplier<?>> getEntries() {
+            return entries;
         }
     }
 
@@ -79,7 +86,7 @@ public class Registrar<R> {
         }
 
         public <I extends net.minecraft.world.item.Item> ItemEntry<I> register(String name, Supplier<? extends I> factory) {
-            return this.add(new ItemEntry<>(ResourceLocation.fromNamespaceAndPath(this.modId(), name)), factory);
+            return this.add(new ItemEntry<>(new net.minecraft.resources.ResourceLocation(this.modId(), name)), factory);
         }
 
         public <I extends net.minecraft.world.item.Item> ItemEntry<I> registerItem(String name, Function<net.minecraft.world.item.Item.Properties, ? extends I> factory, net.minecraft.world.item.Item.Properties properties) {
@@ -118,7 +125,7 @@ public class Registrar<R> {
         }
 
         public <B extends net.minecraft.world.level.block.Block> BlockEntry<B> register(String name, Supplier<? extends B> factory) {
-            return this.add(new BlockEntry<>(ResourceLocation.fromNamespaceAndPath(this.modId(), name)), factory);
+            return this.add(new BlockEntry<>(new net.minecraft.resources.ResourceLocation(this.modId(), name)), factory);
         }
 
         public <B extends net.minecraft.world.level.block.Block> BlockEntry<B> registerBlock(String name, Function<net.minecraft.world.level.block.state.BlockBehaviour.Properties, ? extends B> factory, net.minecraft.world.level.block.state.BlockBehaviour.Properties properties) {
@@ -131,7 +138,7 @@ public class Registrar<R> {
     }
 
     public <T extends R> RegistryEntry<R, T> register(String name, Function<ResourceLocation, ? extends T> factory) {
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(this.modId, name);
+        ResourceLocation id = new net.minecraft.resources.ResourceLocation(this.modId, name);
         return this.register(name, () -> factory.apply(id));
     }
 

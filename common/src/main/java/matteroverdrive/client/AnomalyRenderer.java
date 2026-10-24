@@ -32,7 +32,7 @@ public class AnomalyRenderer implements matteroverdrive.compat.render.StateBlock
     public AnomalyRenderer(BlockEntityRendererProvider.Context context) {}
 
     private static ResourceLocation tex(String name) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/block/" + name + ".png");
+        return new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "textures/block/" + name + ".png");
     }
 
     public static class State extends BlockEntityRenderState {
@@ -89,8 +89,8 @@ public class AnomalyRenderer implements matteroverdrive.compat.render.StateBlock
 
     private static void vertex(VertexConsumer vc, PoseStack.Pose pose, float r, double theta, double phi) {
         float x = (float) (Math.sin(theta) * Math.cos(phi)), y = (float) Math.cos(theta), z = (float) (Math.sin(theta) * Math.sin(phi));
-        vc.addVertex(pose, x * r, y * r, z * r).setColor(0xFF000000).setUv(0.5f, 0.5f).setOverlay(OverlayTexture.NO_OVERLAY)
-                .setLight(0xF000F0).setNormal(pose, x, y, z);
+        matteroverdrive.compat.render.Vertex.of(vc, pose, x * r, y * r, z * r).setColor(0xFF000000).setUv(0.5f, 0.5f).setOverlay(OverlayTexture.NO_OVERLAY)
+                .setLight(0xF000F0).setNormal(pose, x, y, z).end();
     }
 
     /** Both windings, so it shows whichever way the camera rotation leaves it. */
@@ -106,8 +106,8 @@ public class AnomalyRenderer implements matteroverdrive.compat.render.StateBlock
     }
 
     private static void corner(VertexConsumer vc, PoseStack.Pose pose, float x, float y, float u, float v) {
-        vc.addVertex(pose, x, y, 0).setColor(0xFFFFFFFF).setUv(u, v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(0xF000F0)
-                .setNormal(pose, 0, 0, 1);
+        matteroverdrive.compat.render.Vertex.of(vc, pose, x, y, 0).setColor(0xFFFFFFFF).setUv(u, v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(0xF000F0)
+                .setNormal(pose, 0, 0, 1).end();
     }
 
     /** The sphere and plane reach past the block when the anomaly is heavy. */

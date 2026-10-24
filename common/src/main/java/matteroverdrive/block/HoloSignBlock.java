@@ -1,6 +1,5 @@
 package matteroverdrive.block;
 
-import com.mojang.serialization.MapCodec;
 
 import matteroverdrive.block.entity.HoloSignBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -32,7 +31,6 @@ import java.util.function.Consumer;
  * wall behind it). Right-click to edit the text.
  */
 public class HoloSignBlock extends HorizontalDirectionalBlock implements EntityBlock {
-    public static final MapCodec<HoloSignBlock> CODEC = simpleCodec(HoloSignBlock::new);
     /** Set by the client: opens the text editor for the sign at this position. */
     public static Consumer<BlockPos> openEditor = pos -> {};
 
@@ -41,10 +39,6 @@ public class HoloSignBlock extends HorizontalDirectionalBlock implements EntityB
         registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH));
     }
 
-    @Override
-    protected MapCodec<HoloSignBlock> codec() {
-        return CODEC;
-    }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
@@ -52,7 +46,7 @@ public class HoloSignBlock extends HorizontalDirectionalBlock implements EntityB
     }
 
     @Override
-    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return switch (state.getValue(FACING)) {
             case SOUTH -> Block.box(0, 0, 0, 16, 16, 2);
             case WEST -> Block.box(14, 0, 0, 16, 16, 16);
@@ -62,7 +56,7 @@ public class HoloSignBlock extends HorizontalDirectionalBlock implements EntityB
     }
 
     @Override
-    protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return Shapes.empty();
     }
 
@@ -76,20 +70,20 @@ public class HoloSignBlock extends HorizontalDirectionalBlock implements EntityB
 
     /** 1.7.10 onNeighborBlockChange: needs a solid block behind the panel. */
     @Override
-    protected boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
+    public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         Direction back = state.getValue(FACING).getOpposite();
         return level.getBlockState(pos.relative(back)).isFaceSturdy(level, pos.relative(back), back.getOpposite());
     }
 
     @Override
-    protected BlockState updateShape(BlockState state, Direction direction, BlockState neighbor, net.minecraft.world.level.LevelAccessor level,
+    public BlockState updateShape(BlockState state, Direction direction, BlockState neighbor, net.minecraft.world.level.LevelAccessor level,
                                      BlockPos pos, BlockPos neighborPos) {
         return direction == state.getValue(FACING).getOpposite() && !canSurvive(state, level, pos) ? Blocks.AIR.defaultBlockState()
                 : super.updateShape(state, direction, neighbor, level, pos, neighborPos);
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
         if (level.isClientSide()) openEditor.accept(pos);
         return InteractionResult.SUCCESS;
     }

@@ -36,9 +36,9 @@ public class BionicPartItem extends Item {
         public static final com.mojang.serialization.Codec<Stats> CODEC = com.mojang.serialization.codecs.RecordCodecBuilder.create(i -> i.group(
                 com.mojang.serialization.Codec.DOUBLE.fieldOf("health").forGetter(Stats::health),
                 com.mojang.serialization.Codec.DOUBLE.fieldOf("glitch").forGetter(Stats::glitch)).apply(i, Stats::new));
-        public static final net.minecraft.network.codec.StreamCodec<io.netty.buffer.ByteBuf, Stats> STREAM_CODEC =
-                net.minecraft.network.codec.StreamCodec.composite(net.minecraft.network.codec.ByteBufCodecs.DOUBLE, Stats::health,
-                        net.minecraft.network.codec.ByteBufCodecs.DOUBLE, Stats::glitch, Stats::new);
+        public static final matteroverdrive.compat.codec.StreamCodec<io.netty.buffer.ByteBuf, Stats> STREAM_CODEC =
+                matteroverdrive.compat.codec.StreamCodec.composite(matteroverdrive.compat.codec.ByteBufCodecs.DOUBLE, Stats::health,
+                        matteroverdrive.compat.codec.ByteBufCodecs.DOUBLE, Stats::glitch, Stats::new);
     }
 
     /**
@@ -66,17 +66,17 @@ public class BionicPartItem extends Item {
     }
 
     /** An attribute change of the part; suffix "" for max health and glitch keeps the original modifier ids. */
-    public record Mod(net.minecraft.core.Holder<net.minecraft.world.entity.ai.attributes.Attribute> attribute, double amount,
+    public record Mod(net.minecraft.world.entity.ai.attributes.Attribute attribute, double amount,
                       net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation operation, String suffix) {}
 
     public static final String[] MOD_SUFFIXES = {"", "glitch", "attack", "knockback", "speed", "battery"};
 
     /** 1.7.10 getModifiers: a part's own attributes (legendary, or the Hardened Spine's) replace its defaults. */
     public java.util.List<Mod> modifiers(ItemStack stack) {
-        var ADD = net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADD_VALUE;
-        var BASE = net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADD_MULTIPLIED_BASE;
+        var ADD = net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADDITION;
+        var BASE = net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.MULTIPLY_BASE;
         java.util.List<Mod> mods = new java.util.ArrayList<>();
-        Legendary legendary = stack.get(matteroverdrive.init.MODataComponents.LEGENDARY_PART.get());
+        Legendary legendary = matteroverdrive.compat.component.Components.get(stack, matteroverdrive.init.MODataComponents.LEGENDARY_PART.get());
         if (legendary != null && !legendary.isEmpty()) {
             if (legendary.health() != 0) mods.add(new Mod(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH, legendary.health(), ADD, ""));
             if (legendary.attack() != 0) mods.add(new Mod(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE, legendary.attack(), ADD, "attack"));
@@ -84,24 +84,24 @@ public class BionicPartItem extends Item {
                 mods.add(new Mod(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE, legendary.knockback(), ADD, "knockback"));
             }
             if (legendary.speed() != 0) mods.add(new Mod(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED, legendary.speed(), BASE, "speed"));
-            if (legendary.glitch() != 0) mods.add(new Mod(matteroverdrive.init.MOAttributes.GLITCH_TIME.holder(), legendary.glitch(), BASE, "glitch"));
-            if (legendary.battery() != 0) mods.add(new Mod(matteroverdrive.init.MOAttributes.BATTERY_USE.holder(), legendary.battery(), BASE, "battery"));
+            if (legendary.glitch() != 0) mods.add(new Mod(matteroverdrive.init.MOAttributes.GLITCH_TIME.get(), legendary.glitch(), BASE, "glitch"));
+            if (legendary.battery() != 0) mods.add(new Mod(matteroverdrive.init.MOAttributes.BATTERY_USE.get(), legendary.battery(), BASE, "battery"));
             return mods;
         }
         mods.add(new Mod(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH, maxHealthBonus(stack), ADD, ""));
         if (glitchBonus(stack) != 0) {
-            mods.add(new Mod(matteroverdrive.init.MOAttributes.GLITCH_TIME.holder(), glitchBonus(stack),
-                    net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, ""));
+            mods.add(new Mod(matteroverdrive.init.MOAttributes.GLITCH_TIME.get(), glitchBonus(stack),
+                    net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.MULTIPLY_TOTAL, ""));
         }
         return mods;
     }
 
     public static ResourceLocation modifierId(int slot, String suffix) {
-        return suffix.isEmpty() ? modifierId(slot) : ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "bionic_part_" + slot + "_" + suffix);
+        return suffix.isEmpty() ? modifierId(slot) : new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "bionic_part_" + slot + "_" + suffix);
     }
 
     public double glitchBonus(ItemStack stack) {
-        Stats custom = stack.get(matteroverdrive.init.MODataComponents.BIONIC_STATS.get());
+        Stats custom = matteroverdrive.compat.component.Components.get(stack, matteroverdrive.init.MODataComponents.BIONIC_STATS.get());
         return custom != null ? custom.glitch() : glitch;
     }
 
@@ -112,26 +112,26 @@ public class BionicPartItem extends Item {
 
     /** 1.7.10 getModifiers: max health +1 (one modifier per slot so parts stack). */
     public double maxHealthBonus(ItemStack stack) {
-        Stats custom = stack.get(matteroverdrive.init.MODataComponents.BIONIC_STATS.get());
+        Stats custom = matteroverdrive.compat.component.Components.get(stack, matteroverdrive.init.MODataComponents.BIONIC_STATS.get());
         return custom != null ? custom.health() : health;
     }
 
     public static ResourceLocation modifierId(int slot) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "bionic_part_" + slot);
+        return new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "bionic_part_" + slot);
     }
 
     /** 1.7.10 BionicPart.addDetails: "+n" for additions, "+10%" for operation 1, "50%" (amount + 1) for operation 2. */
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, @org.jetbrains.annotations.Nullable net.minecraft.world.level.Level context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
         Consumer<Component> tooltip = tooltipLines::add;
         if (slot < 4) tooltip.accept(Component.translatable("item." + MatterOverdrive.MODID + ".rogue_android_part.melee").withStyle(ChatFormatting.GOLD));
         for (Mod mod : modifiers(stack)) {
             String value = switch (mod.operation()) {
-                case ADD_VALUE -> "+" + (mod.amount() == Math.rint(mod.amount()) ? String.valueOf((int) mod.amount()) : String.valueOf(mod.amount()));
-                case ADD_MULTIPLIED_BASE -> (mod.amount() >= 0 ? "+" : "") + java.text.NumberFormat.getPercentInstance().format(mod.amount());
+                case ADDITION -> "+" + (mod.amount() == Math.rint(mod.amount()) ? String.valueOf((int) mod.amount()) : String.valueOf(mod.amount()));
+                case MULTIPLY_BASE -> (mod.amount() >= 0 ? "+" : "") + java.text.NumberFormat.getPercentInstance().format(mod.amount());
                 default -> java.text.NumberFormat.getPercentInstance().format(mod.amount() + 1);
             };
-            tooltip.accept(Component.translatable(mod.attribute().value().getDescriptionId()).append(": " + value).withStyle(ChatFormatting.GREEN));
+            tooltip.accept(Component.translatable(mod.attribute().getDescriptionId()).append(": " + value).withStyle(ChatFormatting.GREEN));
         }
     }
 }

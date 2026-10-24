@@ -22,10 +22,10 @@ public interface HoloSink {
     default void fill(PoseStack pose, float x0, float y0, float x1, float y1, int rgb) {
         geometry(pose, HoloRenderTypes.COLOR_QUADS, (p, vc) -> {
             float r = Holo.r(rgb), g = Holo.g(rgb), b = Holo.b(rgb);
-            vc.addVertex(p, x0, y0, 0).setColor(r, g, b, 1);
-            vc.addVertex(p, x1, y0, 0).setColor(r, g, b, 1);
-            vc.addVertex(p, x1, y1, 0).setColor(r, g, b, 1);
-            vc.addVertex(p, x0, y1, 0).setColor(r, g, b, 1);
+            matteroverdrive.compat.render.Vertex.of(vc, p, x0, y0, 0).setColor(r, g, b, 1).end();
+            matteroverdrive.compat.render.Vertex.of(vc, p, x1, y0, 0).setColor(r, g, b, 1).end();
+            matteroverdrive.compat.render.Vertex.of(vc, p, x1, y1, 0).setColor(r, g, b, 1).end();
+            matteroverdrive.compat.render.Vertex.of(vc, p, x0, y1, 0).setColor(r, g, b, 1).end();
         });
     }
 

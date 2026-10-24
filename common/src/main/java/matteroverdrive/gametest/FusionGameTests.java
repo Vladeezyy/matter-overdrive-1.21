@@ -30,8 +30,8 @@ final class FusionGameTests {
     /** Builds the ring from the controller's own position list (hull / coil / IO port), the anomaly in the centre. */
     private static void build(GameTestHelper helper, boolean anomaly, boolean hullForOneCoil, Check check) {
         helper.setBlock(CONTROLLER, MOBlocks.FUSION_REACTOR_CONTROLLER.get().defaultBlockState()
-                .setValue(MachineBlock.FACING, helper.getTestRotation().rotate(Direction.NORTH)));
-        FusionReactorControllerBlockEntity reactor = helper.<FusionReactorControllerBlockEntity>getBlockEntity(CONTROLLER);
+                .setValue(MachineBlock.FACING, matteroverdrive.compat.GameTests.rotation(helper).rotate(Direction.NORTH)));
+        FusionReactorControllerBlockEntity reactor = matteroverdrive.compat.GameTests.<FusionReactorControllerBlockEntity>blockEntity(helper, CONTROLLER);
         boolean replaced = false;
         for (int i = 0; i < FusionReactorControllerBlockEntity.POSITION_COUNT; i++) {
             BlockPos abs = reactor.getPosition(i);
@@ -87,7 +87,7 @@ final class FusionGameTests {
     /** An inscriber next to the IO port (ring position 1) gets the reactor's energy. */
     private static void ioOutputs(GameTestHelper helper, FusionReactorControllerBlockEntity reactor) {
         BlockPos io = reactor.getPosition(1);
-        BlockPos outside = io.relative(helper.getTestRotation().rotate(Direction.NORTH));
+        BlockPos outside = io.relative(matteroverdrive.compat.GameTests.rotation(helper).rotate(Direction.NORTH));
         helper.getLevel().setBlockAndUpdate(outside, MOBlocks.INSCRIBER.get().defaultBlockState());
         helper.runAfterDelay(120, () -> {
             var inscriber = (InscriberBlockEntity) helper.getLevel().getBlockEntity(outside);

@@ -4,7 +4,7 @@ import java.util.function.Supplier;
 
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.core.component.DataComponentType;
+import matteroverdrive.compat.component.DataComponentType;
 
 /** 1.21.1 stand-in for 1.21.5+ net.minecraft.core.component.DataComponentGetter. */
 public interface DataComponentGetter {

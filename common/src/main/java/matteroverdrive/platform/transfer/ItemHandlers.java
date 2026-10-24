@@ -33,7 +33,7 @@ public final class ItemHandlers {
         }
         for (int i = 0; i < handler.getSlots(); i++) {
             ItemStack inSlot = handler.getStackInSlot(i);
-            if (!inSlot.isEmpty() && ItemStack.isSameItemSameComponents(inSlot, stack)) {
+            if (!inSlot.isEmpty() && ItemStack.isSameItemSameTags(inSlot, stack)) {
                 stack = handler.insertItem(i, stack, simulate);
                 if (stack.isEmpty()) {
                     return ItemStack.EMPTY;
@@ -75,7 +75,7 @@ public final class ItemHandlers {
         ItemStack existing = container.getItem(slot);
         int limit = Math.min(slotLimit, stack.getMaxStackSize());
         if (!existing.isEmpty()) {
-            if (!ItemStack.isSameItemSameComponents(stack, existing)) {
+            if (!ItemStack.isSameItemSameTags(stack, existing)) {
                 return stack;
             }
             limit -= existing.getCount();

@@ -10,7 +10,7 @@ import matteroverdrive.android.BioticStat;
 import matteroverdrive.android.BioticStats;
 import matteroverdrive.item.weapon.EnergyPackItem;
 import matteroverdrive.item.weapon.EnergyWeaponItem;
-import net.minecraft.client.DeltaTracker;
+import matteroverdrive.compat.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -41,11 +41,11 @@ public final class AndroidHud {
     }
 
     private static ResourceLocation elem(String name) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/gui/elements/" + name + ".png");
+        return new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "textures/gui/elements/" + name + ".png");
     }
 
     private static ResourceLocation gui(String name) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/gui/" + name + ".png");
+        return new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "textures/gui/" + name + ".png");
     }
 
     /** 1.7.10 hideVanillaHudElements, and no player list while the ability wheel (same key) is open. */

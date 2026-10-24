@@ -35,7 +35,7 @@ public final class ValueOutput {
     }
 
     public <T> void store(String key, Codec<T> codec, T value) {
-        codec.encodeStart(lookup.createSerializationContext(NbtOps.INSTANCE), value).result().ifPresent(t -> tag.put(key, t));
+        codec.encodeStart(net.minecraft.resources.RegistryOps.create(NbtOps.INSTANCE, lookup), value).result().ifPresent(t -> tag.put(key, t));
     }
 
     public <T> void storeNullable(String key, Codec<T> codec, @Nullable T value) {
@@ -114,7 +114,7 @@ public final class ValueOutput {
         }
 
         public void add(T element) {
-            codec.encodeStart(lookup.createSerializationContext(NbtOps.INSTANCE), element).result().ifPresent(list::add);
+            codec.encodeStart(net.minecraft.resources.RegistryOps.create(NbtOps.INSTANCE, lookup), element).result().ifPresent(list::add);
         }
 
         public boolean isEmpty() {
@@ -136,7 +136,7 @@ public final class ValueOutput {
         }
 
         public void discardLast() {
-            list.removeLast();
+            list.remove(list.size() - 1);
         }
 
         public boolean isEmpty() {

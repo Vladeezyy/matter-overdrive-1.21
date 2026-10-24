@@ -62,7 +62,7 @@ public class AbilityWheelScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) {}
+    public void renderBackground(GuiGraphics g) {}
 
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
@@ -88,7 +88,7 @@ public class AbilityWheelScreen extends Screen {
     }
 
     private static ResourceLocation tex(String name) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/gui/elements/" + name + ".png");
+        return new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "textures/gui/elements/" + name + ".png");
     }
 
     private void choose() {

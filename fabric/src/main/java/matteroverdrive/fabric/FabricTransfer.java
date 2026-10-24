@@ -137,7 +137,7 @@ final class FabricTransfer {
         void changed(boolean simulate, long moved) {
             ItemVariant variant = this.context.getItemVariant();
             if (!simulate && moved > 0 && variant.getItem() == this.stack.getItem()) {
-                this.stack.applyComponents(variant.getComponents());
+                this.stack.applyComponents(variant.getTag());
             }
         }
     }
@@ -482,7 +482,7 @@ final class FabricTransfer {
         @Override
         public long insert(FluidVariant resource, long maxAmount, TransactionContext transaction) {
             StoragePreconditions.notBlankNotNegative(resource, maxAmount);
-            if (!resource.getComponents().isEmpty() || this.out > 0 || this.in > 0 && !resource.equals(this.variant)) return 0;
+            if (!resource.getTag().isEmpty() || this.out > 0 || this.in > 0 && !resource.equals(this.variant)) return 0;
             long maxMb = maxAmount / DROPLETS_PER_MB;
             if (maxMb <= 0) return 0;
             int filled = this.handler.fill(new FluidStack(resource.getFluid(), clamp(this.in + maxMb)), IFluidHandler.FluidAction.SIMULATE);
@@ -499,7 +499,7 @@ final class FabricTransfer {
             StoragePreconditions.notBlankNotNegative(resource, maxAmount);
             if (this.in > 0) return 0;
             FluidStack current = this.handler.getFluidInTank(0);
-            if (current.isEmpty() || current.getFluid() != resource.getFluid() || !resource.getComponents().isEmpty()) return 0;
+            if (current.isEmpty() || current.getFluid() != resource.getFluid() || !resource.getTag().isEmpty()) return 0;
             long maxMb = maxAmount / DROPLETS_PER_MB;
             if (maxMb <= 0) return 0;
             FluidStack drained = this.handler.drain(new FluidStack(resource.getFluid(), clamp(this.out + maxMb)), IFluidHandler.FluidAction.SIMULATE);
@@ -626,7 +626,7 @@ final class FabricTransfer {
         public long insert(FluidVariant resource, long maxAmount, TransactionContext transaction) {
             StoragePreconditions.notBlankNotNegative(resource, maxAmount);
             long maxMb = maxAmount / DROPLETS_PER_MB;
-            if (maxMb <= 0 || !resource.getComponents().isEmpty()) return 0;
+            if (maxMb <= 0 || !resource.getTag().isEmpty()) return 0;
             IFluidHandlerItem handler = this.handler();
             int filled = handler.fill(new FluidStack(resource.getFluid(), clamp(maxMb)), IFluidHandler.FluidAction.EXECUTE);
             return filled > 0 && this.context.exchange(ItemVariant.of(handler.getContainer()), 1, transaction) == 1 ? filled * DROPLETS_PER_MB : 0;
@@ -636,7 +636,7 @@ final class FabricTransfer {
         public long extract(FluidVariant resource, long maxAmount, TransactionContext transaction) {
             StoragePreconditions.notBlankNotNegative(resource, maxAmount);
             long maxMb = maxAmount / DROPLETS_PER_MB;
-            if (maxMb <= 0 || !resource.getComponents().isEmpty()) return 0;
+            if (maxMb <= 0 || !resource.getTag().isEmpty()) return 0;
             IFluidHandlerItem handler = this.handler();
             FluidStack drained = handler.drain(new FluidStack(resource.getFluid(), clamp(maxMb)), IFluidHandler.FluidAction.EXECUTE);
             return !drained.isEmpty() && this.context.exchange(ItemVariant.of(handler.getContainer()), 1, transaction) == 1

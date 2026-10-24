@@ -114,12 +114,12 @@ public final class MatterOverdriveNeoForgeClient {
         event.registerFluidType(new IClientFluidTypeExtensions() {
             @Override
             public ResourceLocation getStillTexture() {
-                return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "block/matter_plasma_still");
+                return new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "block/matter_plasma_still");
             }
 
             @Override
             public ResourceLocation getFlowingTexture() {
-                return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "block/matter_plasma_flowing");
+                return new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "block/matter_plasma_flowing");
             }
         }, NeoForgePlatform.MATTER_PLASMA_TYPE.get());
         // 1.7.10 ModelTritaniumArmor (the layer textures: MOItems' armor getArmorTexture)

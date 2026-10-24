@@ -195,11 +195,11 @@ public class Quest {
         }
 
         public int getCurrentObjective(QuestStack stack) {
-            return Math.clamp(stack.getData().getByte("CurrentObjective"), 0, logics.length - 1);
+            return net.minecraft.util.Mth.clamp(stack.getData().getByte("CurrentObjective"), 0, logics.length - 1);
         }
 
         private void setCurrentObjective(QuestStack stack, int objective) {
-            stack.getData().putByte("CurrentObjective", (byte) Math.clamp(objective, 0, logics.length - 1));
+            stack.getData().putByte("CurrentObjective", (byte) net.minecraft.util.Mth.clamp(objective, 0, logics.length - 1));
         }
 
         @Override

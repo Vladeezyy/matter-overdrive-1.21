@@ -67,7 +67,7 @@ public class PlaceBlockLogic extends AbstractLogic {
 
     @Override
     public boolean onEvent(QuestStack stack, Object event, Player player) {
-        if (!(event instanceof QuestEvents.Place place) || !ItemStack.isSameItemSameComponents(blockStack.get(), place.itemInHand())) return false;
+        if (!(event instanceof QuestEvents.Place place) || !ItemStack.isSameItemSameTags(blockStack.get(), place.itemInHand())) return false;
         BlockPos pos = getPos(stack);
         if (pos != null && Vec3.atLowerCornerOf(place.pos()).distanceTo(Vec3.atLowerCornerOf(pos)) > radius) return false;
         tag(stack).putShort("Placed", (short) (getBlockPlaced(stack) + 1));

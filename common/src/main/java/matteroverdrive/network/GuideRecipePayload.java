@@ -6,10 +6,10 @@ import java.util.function.Consumer;
 
 import matteroverdrive.MatterOverdrive;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import matteroverdrive.compat.codec.RegistryFriendlyByteBuf;
+import matteroverdrive.compat.codec.ByteBufCodecs;
+import matteroverdrive.compat.codec.StreamCodec;
+import matteroverdrive.compat.codec.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
@@ -25,7 +25,7 @@ public final class GuideRecipePayload {
     public static Consumer<Grid> onGrid = g -> {};
 
     public record Request(Item item) implements CustomPacketPayload {
-        public static final Type<Request> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "guide_recipe_request"));
+        public static final Type<Request> TYPE = new Type<>(new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "guide_recipe_request"));
         public static final StreamCodec<RegistryFriendlyByteBuf, Request> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.registry(Registries.ITEM), Request::item, Request::new);
 
@@ -37,10 +37,10 @@ public final class GuideRecipePayload {
 
     /** Nine slots (row by row) of the item's options. */
     public record Grid(Item item, List<List<ItemStack>> slots) implements CustomPacketPayload {
-        public static final Type<Grid> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "guide_recipe"));
+        public static final Type<Grid> TYPE = new Type<>(new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "guide_recipe"));
         public static final StreamCodec<RegistryFriendlyByteBuf, Grid> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.registry(Registries.ITEM), Grid::item,
-                ItemStack.OPTIONAL_LIST_STREAM_CODEC.apply(ByteBufCodecs.list()), Grid::slots, Grid::new);
+                matteroverdrive.compat.codec.VanillaCodecs.ITEM_STACK_OPTIONAL_LIST.apply(ByteBufCodecs.list()), Grid::slots, Grid::new);
 
         @Override
         public Type<Grid> type() {
@@ -63,7 +63,7 @@ public final class GuideRecipePayload {
     public static List<List<ItemStack>> find(ServerPlayer player, Item item) {
         var registries = player.level().registryAccess();
         for (var holder : player.level().getServer().getRecipeManager().getRecipes()) {
-            if (!(holder.value() instanceof CraftingRecipe recipe) || recipe.isSpecial()) continue;
+            if (!(holder instanceof CraftingRecipe recipe) || recipe.isSpecial()) continue;
             ItemStack result;
             try {
                 result = recipe.getResultItem(registries);

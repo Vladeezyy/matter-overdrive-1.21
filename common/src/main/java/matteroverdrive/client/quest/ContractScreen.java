@@ -24,7 +24,7 @@ import matteroverdrive.platform.Platform;
  * objectives and rewards in a scroll area, and "[ Accept ]" (red when it can't be taken).
  */
 public class ContractScreen extends Screen {
-    private static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/gui/contract.png");
+    private static final ResourceLocation BACKGROUND = new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "textures/gui/contract.png");
     private static final int WIDTH = 200, HEIGHT = 225, TEXT = 0xFF505758, TITLE = 0xFF2394E3, ACCEPT = 0xFF279F33, RED = 0xFFE65014;
     private static final int INFO_X = 18, INFO_Y = 68, INFO_W = WIDTH - 18 - 14, INFO_H = 120;
     private final InteractionHand hand;
@@ -89,7 +89,7 @@ public class ContractScreen extends Screen {
         List<ItemStack> rewards = quest.getRewards(stack, minecraft.player);
         int content = lines.size() * font.lineHeight + (rewards.isEmpty() ? 0 : 20);
         int maxScroll = Math.max(0, content - INFO_H);
-        scroll = Math.clamp(scroll, 0, maxScroll);
+        scroll = net.minecraft.util.Mth.clamp(scroll, 0, maxScroll);
         g.enableScissor(left + INFO_X, top + INFO_Y, left + INFO_X + INFO_W, top + INFO_Y + INFO_H);
         int y = top + INFO_Y - scroll;
         for (FormattedCharSequence line : lines) {
@@ -136,7 +136,7 @@ public class ContractScreen extends Screen {
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollY) {
         scroll -= (int) Math.signum(scrollY) * 9;
         return true;
     }

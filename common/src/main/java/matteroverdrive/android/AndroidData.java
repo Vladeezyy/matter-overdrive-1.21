@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.mojang.serialization.Codec;
 
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import matteroverdrive.compat.codec.RegistryFriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import matteroverdrive.compat.ValueInput;
 import matteroverdrive.compat.ValueOutput;
@@ -150,7 +150,8 @@ public class AndroidData implements ValueIOSerializable {
             AndroidData data = previous != null ? previous : new AndroidData();
             boolean wasTurning = data.isTurning();
             data.read(buf);
-            if (!wasTurning && data.isTurning() && holder instanceof net.minecraft.world.entity.player.Player player) {
+            if (!wasTurning && data.isTurning() && holder != null) {
+            net.minecraft.world.entity.player.Player player = holder;
                 AndroidClientHooks.onTransformationStarted(player);
             }
             return data;
@@ -168,7 +169,7 @@ public class AndroidData implements ValueIOSerializable {
         buf.writeUtf(activeStat);
         buf.writeMap(effects, (b, k) -> b.writeUtf(k), (b, v) -> b.writeVarLong(v));
         for (int i = 0; i < SLOTS; i++) {
-            ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, getStack(i));
+            matteroverdrive.compat.codec.VanillaCodecs.ITEM_STACK_OPTIONAL.encode(buf, getStack(i));
         }
     }
 
@@ -183,7 +184,7 @@ public class AndroidData implements ValueIOSerializable {
         effects.clear();
         effects.putAll(buf.readMap(b -> b.readUtf(), b -> b.readVarLong()));
         for (int i = 0; i < SLOTS; i++) {
-            ItemStack stack = ItemStack.OPTIONAL_STREAM_CODEC.decode(buf);
+            ItemStack stack = matteroverdrive.compat.codec.VanillaCodecs.ITEM_STACK_OPTIONAL.decode(buf);
             inventory.setStackInSlot(i, stack);
         }
     }

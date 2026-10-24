@@ -60,7 +60,7 @@ public class ItemStackHandler implements IItemHandlerModifiable {
         ItemStack existing = this.stacks.get(slot);
         int limit = this.getStackLimit(slot, stack);
         if (!existing.isEmpty()) {
-            if (!ItemStack.isSameItemSameComponents(stack, existing)) {
+            if (!ItemStack.isSameItemSameTags(stack, existing)) {
                 return stack;
             }
             limit -= existing.getCount();
@@ -126,7 +126,7 @@ public class ItemStackHandler implements IItemHandlerModifiable {
             if (!this.stacks.get(i).isEmpty()) {
                 CompoundTag item = new CompoundTag();
                 item.putInt("Slot", i);
-                items.add(this.stacks.get(i).save(provider, item));
+                items.add(this.stacks.get(i).save(item));
             }
         }
         CompoundTag tag = new CompoundTag();
@@ -142,7 +142,7 @@ public class ItemStackHandler implements IItemHandlerModifiable {
             CompoundTag item = items.getCompound(i);
             int slot = item.getInt("Slot");
             if (slot >= 0 && slot < this.stacks.size()) {
-                ItemStack.parse(provider, item).ifPresent(stack -> this.stacks.set(slot, stack));
+                java.util.Optional.of(ItemStack.of(item)).filter(s -> !s.isEmpty()).ifPresent(stack -> this.stacks.set(slot, stack));
             }
         }
         this.onLoad();

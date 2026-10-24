@@ -43,13 +43,13 @@ public class BatteryItem extends Item {
     }
 
     public int getEnergy(ItemStack stack) {
-        return creative ? capacity : stack.getOrDefault(MODataComponents.ENERGY.get(), 0);
+        return creative ? capacity : matteroverdrive.compat.component.Components.getOrDefault(stack, MODataComponents.ENERGY.get(), 0);
     }
 
     /** A fully charged stack, as listed in the creative tab next to the empty one. */
     public ItemStack charged() {
         ItemStack stack = new ItemStack(this);
-        stack.set(MODataComponents.ENERGY.get(), capacity);
+        matteroverdrive.compat.component.Components.set(stack, MODataComponents.ENERGY.get(), capacity);
         return stack;
     }
 
@@ -73,7 +73,7 @@ public class BatteryItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, @org.jetbrains.annotations.Nullable net.minecraft.world.level.Level context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
         Consumer<Component> tooltip = tooltipLines::add;
         tooltip.accept(Component.translatable("tooltip.matteroverdrive.energy_stored",
                 creative ? Component.literal("∞") : MOText.energy(getEnergy(stack)), MOText.energy(capacity)).withStyle(ChatFormatting.YELLOW));

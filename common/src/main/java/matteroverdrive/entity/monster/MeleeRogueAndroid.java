@@ -40,18 +40,14 @@ public class MeleeRogueAndroid extends RogueAndroid {
     }
 
     @Override
-    protected void dropCustomDeathLoot(ServerLevel level, DamageSource source, boolean recentlyHit) {
-        super.dropCustomDeathLoot(level, source, recentlyHit);
-        if (recentlyHit && (random.nextFloat() < 0.1f + lootingBonus(level, source) || isLegendary())) {
+    protected void dropCustomDeathLoot(DamageSource source, int looting, boolean recentlyHit) {
+        super.dropCustomDeathLoot(source, looting, recentlyHit);
+        if (recentlyHit && (random.nextFloat() < 0.1f + lootingBonus(looting) || isLegendary())) {
             spawnAtLocation(randomPart());
         }
     }
 
-    static float lootingBonus(ServerLevel level, DamageSource source) {
-        if (!(source.getEntity() instanceof LivingEntity killer)) return 0;
-        var looting = level.registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT)
-                .getOrThrow(net.minecraft.world.item.enchantment.Enchantments.LOOTING);
-        int lvl = net.minecraft.world.item.enchantment.EnchantmentHelper.getItemEnchantmentLevel(looting, killer.getMainHandItem());
-        return Math.min(lvl, 10) / 10f;
+    static float lootingBonus(int looting) {
+        return Math.min(looting, 10) / 10f;
     }
 }

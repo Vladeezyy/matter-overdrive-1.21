@@ -50,7 +50,7 @@ public class HoloSignBlockEntity extends matteroverdrive.compat.CompatBlockEntit
     }
 
     @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        return saveCustomOnly(registries);
+    public CompoundTag getUpdateTag() {
+        return saveWithoutMetadata();
     }
 }

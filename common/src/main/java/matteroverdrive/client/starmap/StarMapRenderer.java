@@ -53,7 +53,7 @@ public class StarMapRenderer implements matteroverdrive.compat.render.StateBlock
     }
 
     private static ResourceLocation tex(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, path);
+        return new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, path);
     }
 
     public static class State extends BlockEntityRenderState {
@@ -228,7 +228,7 @@ public class StarMapRenderer implements matteroverdrive.compat.render.StateBlock
                     {1, 0, 1, 1, 1, 1 + top, h, 1 + top, 1, 0, -top, h, 1 + top, 0, 0, 0, 0, 1, 0, 1},
                     {0, 0, 1, 1, 1, -top, h, 1 + top, 1, 0, -top, h, -top, 0, 0, 0, 0, 0, 0, 1}};
             for (float[] f : q) {
-                for (int i = 0; i < 20; i += 5) vc.addVertex(p, f[i], f[i + 1], f[i + 2]).setUv(f[i + 3], f[i + 4]).setColor(r, g, b, 1);
+                for (int i = 0; i < 20; i += 5) matteroverdrive.compat.render.Vertex.of(vc, p, f[i], f[i + 1], f[i + 2]).setUv(f[i + 3], f[i + 4]).setColor(r, g, b, 1).end();
             }
         });
         pose.popPose();

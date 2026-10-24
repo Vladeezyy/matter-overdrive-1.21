@@ -6,10 +6,10 @@ import matteroverdrive.android.BioticStat;
 import matteroverdrive.android.BioticStats;
 import matteroverdrive.init.MOSounds;
 import matteroverdrive.menu.AndroidStationMenu;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import matteroverdrive.compat.codec.RegistryFriendlyByteBuf;
+import matteroverdrive.compat.codec.ByteBufCodecs;
+import matteroverdrive.compat.codec.StreamCodec;
+import matteroverdrive.compat.codec.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -17,7 +17,7 @@ import matteroverdrive.platform.PacketContext;
 
 /** Client -> server: 1.7.10 PacketUnlockBioticStat, sent by clicking a stat in the android station. */
 public record UnlockStatPayload(String stat, int level) implements CustomPacketPayload {
-    public static final Type<UnlockStatPayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "unlock_stat"));
+    public static final Type<UnlockStatPayload> TYPE = new Type<>(new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "unlock_stat"));
     public static final StreamCodec<RegistryFriendlyByteBuf, UnlockStatPayload> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8, UnlockStatPayload::stat, ByteBufCodecs.VAR_INT, UnlockStatPayload::level, UnlockStatPayload::new);
 

@@ -142,7 +142,7 @@ public class ReplicatorBlockEntity extends MachineBlockEntity {
 
     private boolean canOutput(ItemStack product) {
         ItemStack out = inventory.getStack(OUTPUT);
-        return out.isEmpty() || (ItemStack.isSameItemSameComponents(out, product) && out.getCount() < out.getMaxStackSize());
+        return out.isEmpty() || (ItemStack.isSameItemSameTags(out, product) && out.getCount() < out.getMaxStackSize());
     }
 
     private boolean canOutputDust(int m) {
@@ -169,7 +169,7 @@ public class ReplicatorBlockEntity extends MachineBlockEntity {
         }
     }
 
-    private static void addEffect(LivingEntity e, net.minecraft.core.Holder<net.minecraft.world.effect.MobEffect> effect, double duration) {
+    private static void addEffect(LivingEntity e, net.minecraft.world.effect.MobEffect effect, double duration) {
         int ticks = (int) Math.round(duration);
         if (ticks > 1) e.addEffect(new MobEffectInstance(effect, ticks, 0));
     }

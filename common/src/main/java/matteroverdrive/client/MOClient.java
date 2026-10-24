@@ -142,7 +142,8 @@ public final class MOClient {
     public static void blockColors(BiConsumer<BlockColor, Block> event) {
         var colors = net.minecraft.world.item.DyeColor.values();
         for (int i = 0; i < colors.length; i++) {
-            int rgb = colors[i].getTextureDiffuseColor();
+            float[] c = colors[i].getTextureDiffuseColors();
+            int rgb = 0xFF000000 | (int) (c[0] * 255) << 16 | (int) (c[1] * 255) << 8 | (int) (c[2] * 255);
             event.accept((state, level, pos, tint) -> rgb, matteroverdrive.init.MODecorative.COLORED_PLATES.get(i).get());
             event.accept((state, level, pos, tint) -> tint == 0 ? rgb : -1, matteroverdrive.init.MOBlocks.TRITANIUM_CRATES.get(i).get());
         }    }
@@ -190,8 +191,8 @@ public final class MOClient {
     }
 
     /** The HUD layers: the android HUD above the camera overlays, the quest HUD above the chat */
-    public static final ResourceLocation ANDROID_HUD = ResourceLocation.fromNamespaceAndPath(matteroverdrive.MatterOverdrive.MODID, "android_hud");
-    public static final ResourceLocation QUEST_HUD = ResourceLocation.fromNamespaceAndPath(matteroverdrive.MatterOverdrive.MODID, "quest_hud");
+    public static final ResourceLocation ANDROID_HUD = new net.minecraft.resources.ResourceLocation(matteroverdrive.MatterOverdrive.MODID, "android_hud");
+    public static final ResourceLocation QUEST_HUD = new net.minecraft.resources.ResourceLocation(matteroverdrive.MatterOverdrive.MODID, "quest_hud");
 
     private MOClient() {}
 }

@@ -4,9 +4,9 @@ import java.util.function.Consumer;
 
 import io.netty.buffer.ByteBuf;
 import matteroverdrive.MatterOverdrive;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import matteroverdrive.compat.codec.ByteBufCodecs;
+import matteroverdrive.compat.codec.StreamCodec;
+import matteroverdrive.compat.codec.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.phys.Vec3;
@@ -18,7 +18,7 @@ import matteroverdrive.platform.PacketContext;
  * here only the server does). Kind: 0 block, 1 entity, 2 living entity.
  */
 public record BoltHitPayload(float x, float y, float z, float nx, float ny, float nz, int color, float size, int kind) implements CustomPacketPayload {
-    public static final Type<BoltHitPayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "bolt_hit"));
+    public static final Type<BoltHitPayload> TYPE = new Type<>(new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "bolt_hit"));
     public static final StreamCodec<ByteBuf, BoltHitPayload> STREAM_CODEC = new StreamCodec<>() {
         @Override
         public BoltHitPayload decode(ByteBuf buf) {

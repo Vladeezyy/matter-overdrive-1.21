@@ -5,10 +5,10 @@ import java.util.List;
 import matteroverdrive.MatterOverdrive;
 import matteroverdrive.block.entity.ReplicatorBlockEntity.Task;
 import matteroverdrive.menu.PatternMonitorMenu;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import matteroverdrive.compat.codec.RegistryFriendlyByteBuf;
+import matteroverdrive.compat.codec.ByteBufCodecs;
+import matteroverdrive.compat.codec.StreamCodec;
+import matteroverdrive.compat.codec.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import matteroverdrive.platform.PacketContext;
@@ -19,7 +19,7 @@ import matteroverdrive.platform.PacketContext;
  */
 public record PatternRequestPayload(int containerId, List<Task> requests) implements CustomPacketPayload {
     public static final Type<PatternRequestPayload> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "pattern_request"));
+            new Type<>(new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "pattern_request"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, PatternRequestPayload> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.VAR_INT, PatternRequestPayload::containerId,

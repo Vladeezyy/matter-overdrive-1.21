@@ -17,7 +17,6 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
-import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.phys.AABB;
 
 /** Phase 5 checks: energy weapons, plasma bolts, energy packs. */
@@ -42,7 +41,7 @@ final class WeaponGameTests {
         var rifle = matteroverdrive.init.MOItems.PHASER_RIFLE.get();
         net.minecraft.world.item.ItemStack plain = new net.minecraft.world.item.ItemStack(rifle);
         net.minecraft.world.item.ItemStack legendary = plain.copy();
-        legendary.set(matteroverdrive.init.MODataComponents.LEGENDARY_WEAPON.get(), new matteroverdrive.item.weapon.WeaponFactory.Legendary(1.3f, 0.7f, 0.85f, 1.45f));
+        matteroverdrive.compat.component.Components.set(legendary, matteroverdrive.init.MODataComponents.LEGENDARY_WEAPON.get(), new matteroverdrive.item.weapon.WeaponFactory.Legendary(1.3f, 0.7f, 0.85f, 1.45f));
         var zombie = helper.spawn(net.minecraft.world.entity.EntityType.ZOMBIE, new net.minecraft.core.BlockPos(1, 1, 1));
         float base = rifle.getDamage(plain, zombie), boosted = rifle.getDamage(legendary, zombie);
         float attack = (float) zombie.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE);
@@ -51,7 +50,7 @@ final class WeaponGameTests {
                 "cooldown " + rifle.getShootCooldown(legendary));
         helper.assertTrue(rifle.getRange(legendary) == rifle.getRange(plain), "range " + rifle.getRange(legendary));
         var generated = matteroverdrive.item.weapon.WeaponFactory.randomDecorated(helper.getLevel().random, 3, true);
-        helper.assertTrue(generated.has(matteroverdrive.init.MODataComponents.LEGENDARY_WEAPON.get()), "no legendary stats");
+        helper.assertTrue(matteroverdrive.compat.component.Components.has(generated, matteroverdrive.init.MODataComponents.LEGENDARY_WEAPON.get()), "no legendary stats");
         zombie.discard();
         helper.succeed();
     }
@@ -61,7 +60,7 @@ final class WeaponGameTests {
         ItemStack shotgun = charged(MOItems.PLASMA_SHOTGUN.get());
         ServerPlayer player = shooter(helper, shotgun);
         var item = MOItems.PLASMA_SHOTGUN.get();
-        helper.assertTrue(item.release(shotgun, helper.getLevel(), player, item.getUseDuration(shotgun, player) - 15),
+        helper.assertTrue(item.release(shotgun, helper.getLevel(), player, item.getUseDuration(shotgun) - 15),
                 "charged shot not fired");
         List<PlasmaBolt> bolts = bolts(helper, player);
         helper.assertTrue(bolts.size() == 2 && bolts.stream().allMatch(b -> b.getRenderSize() == 2.5f),
@@ -74,7 +73,7 @@ final class WeaponGameTests {
 
     private static ServerPlayer shooter(GameTestHelper helper, ItemStack weapon) {
         ServerPlayer player = helper.makeMockServerPlayerInLevel();
-        var pos = helper.absolutePos(new BlockPos(6, 1, 1)).getBottomCenter();
+        var pos = helper.absolutePos(new BlockPos(6, 1, 1)).getCenter().subtract(0, 0.5, 0);
         player.moveTo(pos.x, pos.y, pos.z, 0, 0);      // yaw 0: looking south (+z)
         player.setItemSlot(EquipmentSlot.MAINHAND, weapon);
         return player;
@@ -144,7 +143,7 @@ final class WeaponGameTests {
     private static void coolsDown(GameTestHelper helper) {
         ItemStack rifle = charged(MOItems.PHASER_RIFLE.get());
         EnergyWeaponItem.setHeat(rifle, 79);
-        rifle.set(matteroverdrive.init.MODataComponents.OVERHEATED.get(), true);
+        matteroverdrive.compat.component.Components.set(rifle, matteroverdrive.init.MODataComponents.OVERHEATED.get(), true);
         for (int i = 0; i < 200; i++) MOItems.PHASER_RIFLE.get().inventoryTick(rifle, helper.getLevel(), null, 0, false);
         helper.assertTrue(EnergyWeaponItem.getHeat(rifle) < 2 && !EnergyWeaponItem.isOverheated(rifle),
                 "after cooling: heat " + EnergyWeaponItem.getHeat(rifle));
@@ -162,13 +161,13 @@ final class WeaponGameTests {
     }
 
     private static void energyPackRecipe(GameTestHelper helper) {
-        EnergyPackRecipe recipe = new EnergyPackRecipe(CraftingBookCategory.MISC);
-        CraftingInput input = CraftingInput.of(3, 1, List.of(new ItemStack(MOItems.TRITANIUM_PLATE.get()),
+        EnergyPackRecipe recipe = new EnergyPackRecipe(new net.minecraft.resources.ResourceLocation("matteroverdrive", "test"), CraftingBookCategory.MISC);
+        net.minecraft.world.inventory.CraftingContainer input = new net.minecraft.world.inventory.TransientCraftingContainer(null, 3, 1, net.minecraft.core.NonNullList.of(ItemStack.EMPTY, new ItemStack(MOItems.TRITANIUM_PLATE.get()),
                 MOItems.BATTERY.get().charged(), new ItemStack(Items.GUNPOWDER)));
         helper.assertTrue(recipe.matches(input, helper.getLevel()), "recipe doesn't match");
         ItemStack out = recipe.assemble(input, helper.getLevel().registryAccess());
         helper.assertTrue(out.is(MOItems.ENERGY_PACK.get()) && out.getCount() == 16, "result " + out);
-        CraftingInput empty = CraftingInput.of(3, 1, List.of(new ItemStack(MOItems.TRITANIUM_PLATE.get()),
+        net.minecraft.world.inventory.CraftingContainer empty = new net.minecraft.world.inventory.TransientCraftingContainer(null, 3, 1, net.minecraft.core.NonNullList.of(ItemStack.EMPTY, new ItemStack(MOItems.TRITANIUM_PLATE.get()),
                 new ItemStack(MOItems.BATTERY.get()), new ItemStack(Items.GUNPOWDER)));
         helper.assertFalse(recipe.matches(empty, helper.getLevel()), "empty battery matches");
         helper.succeed();
@@ -176,7 +175,7 @@ final class WeaponGameTests {
 
     private static void phaserHits(GameTestHelper helper, int level) {
         ItemStack phaser = charged(MOItems.PHASER.get());
-        phaser.set(matteroverdrive.init.MODataComponents.PHASER_LEVEL.get(), level);
+        matteroverdrive.compat.component.Components.set(phaser, matteroverdrive.init.MODataComponents.PHASER_LEVEL.get(), level);
         ServerPlayer player = shooter(helper, phaser);
         var pig = helper.spawnWithNoFreeWill(EntityType.PIG, new BlockPos(6, 1, 5));
         player.lookAt(net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES, pig.position().add(0, 0.4, 0));

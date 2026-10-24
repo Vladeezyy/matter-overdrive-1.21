@@ -16,7 +16,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.state.BlockState;
 import matteroverdrive.compat.ValueInput;
 import matteroverdrive.compat.ValueOutput;
@@ -31,7 +30,7 @@ public class InscriberBlockEntity extends MachineBlockEntity {
     public static final int OUTPUT = 2;
 
     private int inscribeTime;
-    private Optional<RecipeHolder<InscriberRecipe>> recipe = Optional.empty();
+    private Optional<InscriberRecipe> recipe = Optional.empty();
     private boolean recipeDirty = true;
 
     public InscriberBlockEntity(BlockPos pos, BlockState state) {
@@ -59,7 +58,7 @@ public class InscriberBlockEntity extends MachineBlockEntity {
             recipe = findRecipe();
             recipeDirty = false;
         }
-        if (recipe.isEmpty() || !canOutput(recipe.get().value())) {
+        if (recipe.isEmpty() || !canOutput(recipe.get())) {
             inscribeTime = 0;
             return false;
         }
@@ -71,13 +70,13 @@ public class InscriberBlockEntity extends MachineBlockEntity {
         inscribeTime++;
         if (inscribeTime >= getSpeed()) {
             inscribeTime = 0;
-            inscribe(recipe.get().value());
+            inscribe(recipe.get());
         }
         setChanged();
         return true;
     }
 
-    private Optional<RecipeHolder<InscriberRecipe>> findRecipe() {
+    private Optional<InscriberRecipe> findRecipe() {
         ItemStack main = inventory.getStack(MAIN);
         ItemStack secondary = inventory.getStack(SECONDARY);
         if (main.isEmpty() || secondary.isEmpty() || !(getLevel() instanceof ServerLevel level)) {
@@ -90,7 +89,7 @@ public class InscriberBlockEntity extends MachineBlockEntity {
     private boolean canOutput(InscriberRecipe recipe) {
         ItemStack out = inventory.getStack(OUTPUT);
         ItemStack result = recipe.result();
-        return out.isEmpty() || (ItemStack.isSameItemSameComponents(out, result) && out.getCount() + result.getCount() <= out.getMaxStackSize());
+        return out.isEmpty() || (ItemStack.isSameItemSameTags(out, result) && out.getCount() + result.getCount() <= out.getMaxStackSize());
     }
 
     private void inscribe(InscriberRecipe recipe) {
@@ -107,13 +106,13 @@ public class InscriberBlockEntity extends MachineBlockEntity {
 
     /** Total ticks for the current recipe after SPEED upgrades. */
     public int getSpeed() {
-        return recipe.map(r -> (int) (r.value().time() * getUpgradeMultiplier(UpgradeType.SPEED))).orElse(0);
+        return recipe.map(r -> (int) (r.time() * getUpgradeMultiplier(UpgradeType.SPEED))).orElse(0);
     }
 
     public int getEnergyDrainPerTick() {
         int speed = getSpeed();
         if (speed <= 0) return 0;
-        return recipe.map(r -> (int) (r.value().energy() * getUpgradeMultiplier(UpgradeType.POWER_USAGE)) / speed).orElse(0);
+        return recipe.map(r -> (int) (r.energy() * getUpgradeMultiplier(UpgradeType.POWER_USAGE)) / speed).orElse(0);
     }
 
     @Override

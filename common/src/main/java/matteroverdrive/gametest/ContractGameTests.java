@@ -38,10 +38,10 @@ final class ContractGameTests {
     private static void market(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, MOBlocks.CONTRACT_MARKET.get());
-        var market = helper.<ContractMarketBlockEntity>getBlockEntity(pos);
+        var market = matteroverdrive.compat.GameTests.<ContractMarketBlockEntity>blockEntity(helper, pos);
         int wait = market.getTimeUntilNextQuest();
         check(helper, wait > ContractMarketBlockEntity.QUEST_GENERATE_DELAY_MIN - 40, "first delay " + wait);
-        market.loadWithComponents(new net.minecraft.nbt.CompoundTag(), helper.getLevel().registryAccess());
+        market.load(new net.minecraft.nbt.CompoundTag());
         helper.runAfterDelay(2, () -> {
             ItemStack contract = market.getContract(0);
             check(helper, contract.is(MOItems.CONTRACT.get()) && ContractItem.getQuest(contract) != null, "no contract: " + contract);

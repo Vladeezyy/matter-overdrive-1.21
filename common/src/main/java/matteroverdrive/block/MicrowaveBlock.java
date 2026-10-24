@@ -1,6 +1,5 @@
 package matteroverdrive.block;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -14,7 +13,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 /** 1.7.10 BlockMicrowave: a decorative 14x10x10 box, door on the front (no function, creative only in 1.7.10). */
 public class MicrowaveBlock extends HorizontalDirectionalBlock {
-    public static final MapCodec<MicrowaveBlock> CODEC = simpleCodec(MicrowaveBlock::new);
     private static final VoxelShape NORTH_SOUTH = Block.box(1, 0, 3, 15, 10, 13);
     private static final VoxelShape EAST_WEST = Block.box(3, 0, 1, 13, 10, 15);
 
@@ -23,10 +21,6 @@ public class MicrowaveBlock extends HorizontalDirectionalBlock {
         registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH));
     }
 
-    @Override
-    protected MapCodec<MicrowaveBlock> codec() {
-        return CODEC;
-    }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
@@ -39,7 +33,7 @@ public class MicrowaveBlock extends HorizontalDirectionalBlock {
     }
 
     @Override
-    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return state.getValue(FACING).getAxis() == Direction.Axis.X ? EAST_WEST : NORTH_SOUTH;
     }
 }

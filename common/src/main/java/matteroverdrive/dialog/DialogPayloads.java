@@ -3,10 +3,10 @@ package matteroverdrive.dialog;
 import java.util.function.Consumer;
 
 import matteroverdrive.MatterOverdrive;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import matteroverdrive.compat.codec.RegistryFriendlyByteBuf;
+import matteroverdrive.compat.codec.ByteBufCodecs;
+import matteroverdrive.compat.codec.StreamCodec;
+import matteroverdrive.compat.codec.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -20,7 +20,7 @@ public final class DialogPayloads {
     public static Consumer<DialogNpc> openScreen = npc -> {};
 
     public record Manage(int npcId, boolean start) implements CustomPacketPayload {
-        public static final Type<Manage> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "dialog_manage"));
+        public static final Type<Manage> TYPE = new Type<>(new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "dialog_manage"));
         public static final StreamCodec<RegistryFriendlyByteBuf, Manage> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.VAR_INT, Manage::npcId, ByteBufCodecs.BOOL, Manage::start, Manage::new);
 
@@ -31,7 +31,7 @@ public final class DialogPayloads {
     }
 
     public record Interact(int npcId, int messageId, int option) implements CustomPacketPayload {
-        public static final Type<Interact> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "dialog_interact"));
+        public static final Type<Interact> TYPE = new Type<>(new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "dialog_interact"));
         public static final StreamCodec<RegistryFriendlyByteBuf, Interact> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.VAR_INT, Interact::npcId, ByteBufCodecs.VAR_INT, Interact::messageId, ByteBufCodecs.VAR_INT, Interact::option,
                 Interact::new);

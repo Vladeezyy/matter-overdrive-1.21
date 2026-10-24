@@ -52,17 +52,17 @@ public abstract class MachineBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected BlockState rotate(BlockState state, Rotation rotation) {
+    public BlockState rotate(BlockState state, Rotation rotation) {
         return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
     }
 
     @Override
-    protected BlockState mirror(BlockState state, Mirror mirror) {
+    public BlockState mirror(BlockState state, Mirror mirror) {
         return state.rotate(mirror.getRotation(state.getValue(FACING)));
     }
 
     @Override
-    protected RenderShape getRenderShape(BlockState state) {
+    public RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
     }
 
@@ -73,7 +73,7 @@ public abstract class MachineBlock extends BaseEntityBlock {
 
     /** 1.21.1: the 1.21.10 preRemoveSideEffects hook (drops the contents, etc.). */
     @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         if (!state.is(newState.getBlock()) && !matteroverdrive.compat.CompatBlockEntity.skipRemoveSideEffects
                 && level.getBlockEntity(pos) instanceof matteroverdrive.compat.CompatBlockEntity be) {
             be.preRemoveSideEffects(pos, state);
@@ -82,7 +82,7 @@ public abstract class MachineBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
         super.neighborChanged(state, level, pos, neighborBlock, neighborPos, movedByPiston);
         if (level.getBlockEntity(pos) instanceof MachineBlockEntity machine) machine.neighbourChanged();
     }
@@ -93,7 +93,7 @@ public abstract class MachineBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof MachineBlockEntity machine) {
             // 1.7.10 MachineHelper.canOpenMachine
             if (machine.isUseableByPlayer(player)) {
@@ -137,5 +137,14 @@ public abstract class MachineBlock extends BaseEntityBlock {
             }
         }
         level.destroyBlock(pos, false, player);
+    }
+
+    /** Placed from an item: the machine takes over the energy, matter and owner the item carries (1.20.5 did it in BlockItem) */
+    @Override
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable net.minecraft.world.entity.LivingEntity placer, ItemStack stack) {
+        super.setPlacedBy(level, pos, state, placer, stack);
+        if (!stack.isEmpty() && level.getBlockEntity(pos) instanceof matteroverdrive.compat.CompatBlockEntity entity) {
+            entity.applyComponentsFromItemStack(stack);
+        }
     }
 }

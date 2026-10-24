@@ -11,7 +11,7 @@ import matteroverdrive.menu.TransporterMenu;
 import matteroverdrive.transport.TransportLocation;
 import net.minecraft.core.BlockPos;
 import matteroverdrive.compat.DataComponentGetter;
-import net.minecraft.core.component.DataComponentMap;
+import matteroverdrive.compat.component.DataComponentMap;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;

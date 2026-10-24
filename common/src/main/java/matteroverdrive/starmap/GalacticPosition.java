@@ -2,8 +2,8 @@ package matteroverdrive.starmap;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
+import matteroverdrive.compat.codec.ByteBufCodecs;
+import matteroverdrive.compat.codec.StreamCodec;
 
 /** 1.7.10 GalacticPosition: quadrant / star / planet ids, -1 where unset. */
 public record GalacticPosition(int quadrantID, int starID, int planetID) {

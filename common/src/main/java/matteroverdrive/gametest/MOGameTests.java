@@ -85,7 +85,7 @@ public final class MOGameTests {
     public static Collection<TestFunction> generate() {
         List<TestFunction> functions = new ArrayList<>();
         TESTS.forEach((name, spec) -> functions.add(new TestFunction(batch(spec), MatterOverdrive.MODID + "." + name, STRUCTURE,
-                net.minecraft.world.level.block.Rotation.NONE, spec.maxTicks(), 0, true, false, 1, 1, spec.skyAccess(), spec.body())));
+                net.minecraft.world.level.block.Rotation.NONE, spec.maxTicks(), 0, true, 1, 1, spec.body())));
         return functions;
     }
 
@@ -174,7 +174,7 @@ public final class MOGameTests {
     }
 
     private static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, path);
+        return new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, path);
     }
 
     /** NeoForge registers this class, Fabric's gametest entrypoint points to it (it needs a public constructor) */

@@ -138,11 +138,11 @@ final class QuestGameTests {
         var level = helper.getLevel();
         var pools = level.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.TEMPLATE_POOL);
         for (String pool : new String[] {"village/plains/houses", "village/desert/houses"}) {
-            var templates = pools.get(net.minecraft.resources.ResourceLocation.withDefaultNamespace(pool)).templates;
+            var templates = pools.get(new net.minecraft.resources.ResourceLocation(pool)).templates;
             long ours = templates.stream().filter(e -> e.toString().contains("mad_scientist_house")).count();
             check(helper, ours == matteroverdrive.world.VillageHouses.WEIGHT, pool + ": " + ours);
         }
-        var template = level.getStructureManager().get(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(
+        var template = level.getStructureManager().get(new net.minecraft.resources.ResourceLocation(
                 matteroverdrive.MatterOverdrive.MODID, "village/mad_scientist_house")).orElseThrow();
         check(helper, template.getSize().equals(new net.minecraft.core.Vec3i(9, 9, 7)), "size " + template.getSize());
         BlockPos origin = helper.absolutePos(new BlockPos(1, 1, 1));
@@ -178,7 +178,7 @@ final class QuestGameTests {
         check(helper, PlayerQuests.get(player).getActiveQuests().isEmpty(), "not abandoned");
         // a whitelisted pad only scans its blocks
         ItemStack pad = new ItemStack(MOItems.DATA_PAD.get());
-        pad.set(matteroverdrive.init.MODataComponents.DATA_PAD_SCAN.get(),
+        matteroverdrive.compat.component.Components.set(pad, matteroverdrive.init.MODataComponents.DATA_PAD_SCAN.get(),
                 new matteroverdrive.item.DataPadItem.Scan(java.util.List.of(net.minecraft.world.level.block.Blocks.CARROTS), true, true));
         check(helper, matteroverdrive.item.DataPadItem.canScan(pad, net.minecraft.world.level.block.Blocks.CARROTS.defaultBlockState())
                 && !matteroverdrive.item.DataPadItem.canScan(pad, net.minecraft.world.level.block.Blocks.STONE.defaultBlockState())

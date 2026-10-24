@@ -1,7 +1,6 @@
 package matteroverdrive.client.starmap;
 
 import org.joml.Matrix4f;
-import org.joml.Matrix4fStack;
 import org.joml.Quaternionf;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -33,9 +32,9 @@ public final class StarMapPipRenderer {
         float aspect = (float) width / Math.max(1, height);
         RenderSystem.backupProjectionMatrix();
         RenderSystem.setProjectionMatrix(new Matrix4f().setPerspective(75 * Mth.DEG_TO_RAD, aspect, 0.05f, 20), VertexSorting.DISTANCE_TO_ORIGIN);
-        Matrix4fStack modelView = RenderSystem.getModelViewStack();
-        modelView.pushMatrix();
-        modelView.identity();
+        com.mojang.blaze3d.vertex.PoseStack modelView = RenderSystem.getModelViewStack();
+        modelView.pushPose();
+        modelView.setIdentity();
         RenderSystem.applyModelViewMatrix();
         RenderSystem.clear(org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT, Minecraft.ON_OSX);
 
@@ -64,7 +63,7 @@ public final class StarMapPipRenderer {
         StarMapRenderer.renderHologram(ctx);
         buffers.endBatch();
 
-        modelView.popMatrix();
+        modelView.popPose();
         RenderSystem.applyModelViewMatrix();
         RenderSystem.restoreProjectionMatrix();
         RenderSystem.clear(org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT, Minecraft.ON_OSX);

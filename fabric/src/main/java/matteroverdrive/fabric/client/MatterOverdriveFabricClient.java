@@ -87,8 +87,8 @@ public final class MatterOverdriveFabricClient implements ClientModInitializer {
         registerRenderLayers();
         // Matter Plasma (1.7.10 matter_plasma_still / _flowing)
         FluidRenderHandlerRegistry.INSTANCE.register(MOFluids.MATTER_PLASMA.get(), MOFluids.MATTER_PLASMA_FLOWING.get(), new SimpleFluidRenderHandler(
-                ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "block/matter_plasma_still"),
-                ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "block/matter_plasma_flowing")));
+                new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "block/matter_plasma_still"),
+                new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "block/matter_plasma_flowing")));
         // 1.7.10 ModelTritaniumArmor with the layer textures of TritaniumArmorItem.getArmorTexture
         ArmorRenderer.register((pose, buffers, stack, entity, slot, light, contextModel) -> ArmorRenderer.renderPart(pose, buffers, light, stack,
                         TritaniumArmorModel.posed(slot, contextModel), slot == EquipmentSlot.FEET ? TritaniumArmorModel.LAYER_2 : TritaniumArmorModel.LAYER_1),
@@ -118,7 +118,7 @@ public final class MatterOverdriveFabricClient implements ClientModInitializer {
             if (state == null) continue;
             RenderType type = null;
             for (String model : models(state)) {
-                ResourceLocation modelId = ResourceLocation.parse(model);
+                ResourceLocation modelId = new net.minecraft.resources.ResourceLocation(model);
                 RenderType modelType = modelTypes.computeIfAbsent(modelId, m -> {
                     JsonObject json = json(Platform.INSTANCE.modFile("assets", m.getNamespace(), "models", m.getPath() + ".json"));
                     return json != null && json.has("render_type") ? types.get(json.get("render_type").getAsString()) : RenderType.solid();

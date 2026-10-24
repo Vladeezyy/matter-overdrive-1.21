@@ -32,18 +32,17 @@ public final class MOEntities {
     /** 1.7.10 EntityVillagerMadScientist: villager size. */
     public static final RegistryEntry<EntityType<?>, EntityType<matteroverdrive.entity.MadScientist>> MAD_SCIENTIST =
             register("mad_scientist", matteroverdrive.entity.MadScientist::new, MobCategory.MISC,
-                    b -> b.sized(0.6f, 1.95f).eyeHeight(1.62f).clientTrackingRange(10));
+                    b -> b.sized(0.6f, 1.95f).clientTrackingRange(10));
 
     // 1.7.10 failed animals: vanilla sizes
     public static final RegistryEntry<EntityType<?>, EntityType<FailedPig>> FAILED_PIG = register("failed_pig",
-            FailedPig::new, MobCategory.CREATURE, b -> b.sized(0.9f, 0.9f).passengerAttachments(0.86875f).clientTrackingRange(10));
+            FailedPig::new, MobCategory.CREATURE, b -> b.sized(0.9f, 0.9f).clientTrackingRange(10));
     public static final RegistryEntry<EntityType<?>, EntityType<FailedCow>> FAILED_COW = register("failed_cow",
-            FailedCow::new, MobCategory.CREATURE, b -> b.sized(0.9f, 1.4f).eyeHeight(1.3f).passengerAttachments(1.36875f).clientTrackingRange(10));
+            FailedCow::new, MobCategory.CREATURE, b -> b.sized(0.9f, 1.4f).clientTrackingRange(10));
     public static final RegistryEntry<EntityType<?>, EntityType<FailedChicken>> FAILED_CHICKEN = register("failed_chicken",
-            FailedChicken::new, MobCategory.CREATURE, b -> b.sized(0.4f, 0.7f).eyeHeight(0.644f)
-                    .passengerAttachments(new net.minecraft.world.phys.Vec3(0.0, 0.7, -0.1)).clientTrackingRange(10));
+            FailedChicken::new, MobCategory.CREATURE, b -> b.sized(0.4f, 0.7f).clientTrackingRange(10));
     public static final RegistryEntry<EntityType<?>, EntityType<FailedSheep>> FAILED_SHEEP = register("failed_sheep",
-            FailedSheep::new, MobCategory.CREATURE, b -> b.sized(0.9f, 1.3f).eyeHeight(1.235f).passengerAttachments(1.2375f).clientTrackingRange(10));
+            FailedSheep::new, MobCategory.CREATURE, b -> b.sized(0.9f, 1.3f).clientTrackingRange(10));
 
     /** 1.21.1 stand-in for NeoForge 21.10's DeferredRegister.Entities.registerEntityType. */
     private static <E extends net.minecraft.world.entity.Entity> RegistryEntry<EntityType<?>, EntityType<E>> register(String name,

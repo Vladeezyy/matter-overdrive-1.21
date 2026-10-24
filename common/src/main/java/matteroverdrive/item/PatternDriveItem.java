@@ -7,12 +7,10 @@ import java.util.function.Consumer;
 import matteroverdrive.init.MODataComponents;
 import matteroverdrive.matter.ItemPattern;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.CustomModelData;
 
 /**
  * 1.7.10 PatternDrive: stores up to {@code capacity} item patterns (2 for the pattern drive). The icon shows
@@ -31,7 +29,7 @@ public class PatternDriveItem extends Item {
     }
 
     public static List<ItemPattern> getPatterns(ItemStack stack) {
-        return stack.getOrDefault(MODataComponents.PATTERNS.get(), List.of());
+        return matteroverdrive.compat.component.Components.getOrDefault(stack, MODataComponents.PATTERNS.get(), List.of());
     }
 
     /** Whether analysing one more {@code item} can add progress here (an incomplete pattern or a free slot). */
@@ -62,13 +60,13 @@ public class PatternDriveItem extends Item {
     }
 
     public void setPatterns(ItemStack drive, List<ItemPattern> patterns) {
-        drive.set(MODataComponents.PATTERNS.get(), List.copyOf(patterns));
+        matteroverdrive.compat.component.Components.set(drive, MODataComponents.PATTERNS.get(), List.copyOf(patterns));
         int state = patterns.isEmpty() ? 0 : patterns.size() < capacity ? 1 : 2;
-        drive.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(state));
+        drive.getOrCreateTag().putInt("CustomModelData", state);
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, @org.jetbrains.annotations.Nullable net.minecraft.world.level.Level context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
         Consumer<Component> tooltip = tooltipLines::add;
         for (ItemPattern p : getPatterns(stack)) {
             tooltip.accept(Component.empty().append(p.toStack().getHoverName()).append(" " + p.progress() + "%")

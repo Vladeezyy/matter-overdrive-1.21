@@ -34,7 +34,7 @@ final class AnomalyGameTests {
 
     private static GravitationalAnomalyBlockEntity anomaly(GameTestHelper helper, long mass) {
         helper.setBlock(CORE, MOBlocks.GRAVITATIONAL_ANOMALY.get());
-        GravitationalAnomalyBlockEntity a = helper.<GravitationalAnomalyBlockEntity>getBlockEntity(CORE);
+        GravitationalAnomalyBlockEntity a = matteroverdrive.compat.GameTests.<GravitationalAnomalyBlockEntity>blockEntity(helper, CORE);
         a.setMass(mass);
         return a;
     }
@@ -51,7 +51,7 @@ final class AnomalyGameTests {
 
     private static void swallowsItems(GameTestHelper helper) {
         GravitationalAnomalyBlockEntity a = anomaly(helper, 6000);
-        ItemEntity item = helper.spawnItem(Items.IRON_INGOT, new BlockPos(6, 4, 8).getCenter());
+        ItemEntity item = helper.spawnItem(Items.IRON_INGOT, 6.5f, 4.5f, 8.5f);
         item.setDeltaMovement(0, 0, 0);
         helper.runAfterDelay(60, () -> {
             helper.assertTrue(item.isRemoved(), "ingot still there, " + item.position());
@@ -86,7 +86,7 @@ final class AnomalyGameTests {
 
     private static void netherStarCollapse(GameTestHelper helper) {
         anomaly(helper, 6000);
-        helper.spawnItem(Items.NETHER_STAR, new BlockPos(6, 4, 7).getCenter());
+        helper.spawnItem(Items.NETHER_STAR, 6.5f, 4.5f, 7.5f);
         helper.runAfterDelay(60, () -> {
             helper.assertBlockNotPresent(MOBlocks.GRAVITATIONAL_ANOMALY.get(), CORE);
             helper.succeed();
@@ -96,7 +96,7 @@ final class AnomalyGameTests {
     private static void stabilizerSuppresses(GameTestHelper helper) {
         GravitationalAnomalyBlockEntity a = anomaly(helper, 6000);
         helper.setBlock(new BlockPos(6, 4, 2), MOBlocks.GRAVITATIONAL_STABILIZER.get().defaultBlockState()
-                .setValue(MachineBlock.FACING, helper.getTestRotation().rotate(Direction.SOUTH)));
+                .setValue(MachineBlock.FACING, matteroverdrive.compat.GameTests.rotation(helper).rotate(Direction.SOUTH)));
         helper.runAfterDelay(10, () -> {
             near(helper, a.getSuppression(), 0.7, "suppression");
             helper.succeed();
@@ -106,7 +106,7 @@ final class AnomalyGameTests {
     private static void featurePlaces(GameTestHelper helper) {
         var level = helper.getLevel();
         var feature = level.registryAccess().lookupOrThrow(Registries.CONFIGURED_FEATURE).getOrThrow(ResourceKey.create(
-                Registries.CONFIGURED_FEATURE, ResourceLocation.fromNamespaceAndPath("matteroverdrive", "gravitational_anomaly"))).value();
+                Registries.CONFIGURED_FEATURE, new net.minecraft.resources.ResourceLocation("matteroverdrive", "gravitational_anomaly"))).value();
         BlockPos pos = helper.absolutePos(CORE);
         helper.assertTrue(feature.place(level, level.getChunkSource().getGenerator(), level.getRandom(), pos),
                 "feature refused to place");

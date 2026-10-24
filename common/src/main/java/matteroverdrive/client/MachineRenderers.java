@@ -48,7 +48,7 @@ public final class MachineRenderers {
     }
 
     private static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, path);
+        return new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, path);
     }
 
     private static BakedModel model(ResourceLocation id) {
@@ -244,10 +244,10 @@ public final class MachineRenderers {
         private static void plane(PoseStack pose, SubmitNodeCollector collector, ResourceLocation texture, int rgb) {
             collector.submitCustomGeometry(pose, HoloRenderTypes.screen(texture), (p, vc) -> {
                 float r = (rgb >> 16 & 255) / 255f, g = (rgb >> 8 & 255) / 255f, b = (rgb & 255) / 255f;
-                vc.addVertex(p, 0, 0, 0).setUv(0, 0).setColor(r, g, b, 1);
-                vc.addVertex(p, 0, 1, 0).setUv(0, 1).setColor(r, g, b, 1);
-                vc.addVertex(p, 1, 1, 0).setUv(1, 1).setColor(r, g, b, 1);
-                vc.addVertex(p, 1, 0, 0).setUv(1, 0).setColor(r, g, b, 1);
+                matteroverdrive.compat.render.Vertex.of(vc, p, 0, 0, 0).setUv(0, 0).setColor(r, g, b, 1).end();
+                matteroverdrive.compat.render.Vertex.of(vc, p, 0, 1, 0).setUv(0, 1).setColor(r, g, b, 1).end();
+                matteroverdrive.compat.render.Vertex.of(vc, p, 1, 1, 0).setUv(1, 1).setColor(r, g, b, 1).end();
+                matteroverdrive.compat.render.Vertex.of(vc, p, 1, 0, 0).setUv(1, 0).setColor(r, g, b, 1).end();
             });
         }
 

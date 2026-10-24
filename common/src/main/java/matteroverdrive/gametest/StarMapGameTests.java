@@ -70,7 +70,7 @@ final class StarMapGameTests {
         Planet home = claim(player);
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, MOBlocks.STAR_MAP.get());
-        var starMap = helper.<StarMapBlockEntity>getBlockEntity(pos);
+        var starMap = matteroverdrive.compat.GameTests.<StarMapBlockEntity>blockEntity(helper, pos);
         starMap.onPlaced(player);
         var menu = new matteroverdrive.menu.StarMapMenu(0, player.getInventory(), starMap);
         check(helper, menu.slots.size() == 4 + 36, "slots " + menu.slots.size());
@@ -186,7 +186,7 @@ final class StarMapGameTests {
         }
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, MOBlocks.STAR_MAP.get());
-        var starMap = helper.<StarMapBlockEntity>getBlockEntity(pos);
+        var starMap = matteroverdrive.compat.GameTests.<StarMapBlockEntity>blockEntity(helper, pos);
         starMap.onPlaced(player);
         check(helper, starMap.getGalaxyPosition().equals(GalacticPosition.of(home)) && starMap.getDestination().equals(starMap.getGalaxyPosition()),
                 "position " + starMap.getGalaxyPosition());

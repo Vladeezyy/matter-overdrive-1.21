@@ -60,7 +60,7 @@ public final class GuideDocument {
     }
 
     private static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, path);
+        return new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, path);
     }
 
     /** 1.7.10 loadStyleSheetMap: ".class{rules}" with whitespace and comments removed. */

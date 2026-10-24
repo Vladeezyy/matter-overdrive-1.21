@@ -55,11 +55,11 @@ public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractCo
     }
 
     protected static ResourceLocation tex(String name) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/gui/elements/" + name + ".png");
+        return new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "textures/gui/elements/" + name + ".png");
     }
 
     private static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, path);
+        return new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, path);
     }
 
     private List<MachineMenu.Page> pages() {
@@ -159,7 +159,7 @@ public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractCo
             if (!menu.getMachine().getAffectedBy().contains(type)) continue;
             double m = menu.getMachine().getUpgradeMultiplier(type);
             Component text = Math.abs(m - 1) < 1e-6
-                    ? Component.literal("0% ").append(Component.translatable(type.translationKey())).withColor(0xFF8B9EA0)
+                    ? Component.literal("0% ").append(Component.translatable(type.translationKey())).withStyle(s -> s.withColor(0x8B9EA0))
                     : UpgradeItem.describe(type, m);
             g.drawString(font, text, x + 48, y + 84 + line * 11, 0xFFFFFFFF, false);
             line++;

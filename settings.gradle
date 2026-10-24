@@ -15,5 +15,5 @@ plugins {
 
 rootProject.name = 'matteroverdrive'
 include('common')
-include('neoforge')
+include('forge')
 include('fabric')

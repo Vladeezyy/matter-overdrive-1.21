@@ -2,7 +2,6 @@ package matteroverdrive.world;
 
 import java.util.List;
 
-import com.mojang.serialization.MapCodec;
 
 import matteroverdrive.block.TritaniumCrateBlock;
 import matteroverdrive.init.MODataComponents;
@@ -12,7 +11,6 @@ import matteroverdrive.item.ContractItem;
 import matteroverdrive.item.DataPadItem;
 import matteroverdrive.quest.Quests;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
@@ -33,13 +31,13 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
  */
 public class MadScientistCrateProcessor extends StructureProcessor {
     public static final MadScientistCrateProcessor INSTANCE = new MadScientistCrateProcessor();
-    public static final MapCodec<MadScientistCrateProcessor> CODEC = MapCodec.unit(() -> INSTANCE);
+    public static final com.mojang.serialization.Codec<MadScientistCrateProcessor> CODEC = com.mojang.serialization.Codec.unit(() -> INSTANCE);
 
     public static List<ItemStack> contents(RandomSource random) {
         ItemStack contract = ContractItem.of(Quests.GMO.generate(random));
         ItemStack pad = new ItemStack(MOItems.DATA_PAD.get());
-        pad.set(DataComponents.CUSTOM_NAME, Component.literal("Mad Scientist's Data Pad"));
-        pad.set(MODataComponents.DATA_PAD_SCAN.get(), new DataPadItem.Scan(List.of(Blocks.CARROTS, Blocks.POTATOES, Blocks.WHEAT), true, true));
+        pad.setHoverName(Component.literal("Mad Scientist's Data Pad"));
+        matteroverdrive.compat.component.Components.set(pad, MODataComponents.DATA_PAD_SCAN.get(), new DataPadItem.Scan(List.of(Blocks.CARROTS, Blocks.POTATOES, Blocks.WHEAT), true, true));
         return List.of(contract, pad);
     }
 
@@ -52,7 +50,7 @@ public class MadScientistCrateProcessor extends StructureProcessor {
         ListTag items = new ListTag();
         List<ItemStack> contents = contents(settings.getRandom(relative.pos()));
         for (int i = 0; i < contents.size(); i++) {
-            CompoundTag entry = (CompoundTag) ItemStack.CODEC.encodeStart(ops, contents.get(i)).getOrThrow();
+            CompoundTag entry = (CompoundTag) ItemStack.CODEC.encodeStart(ops, contents.get(i)).getOrThrow(false, e -> {});
             entry.putByte("Slot", (byte) i);
             items.add(entry);
         }

@@ -62,11 +62,11 @@ public class StarMapScreen extends AbstractContainerScreen<StarMapMenu> {
     }
 
     private static ResourceLocation sprite(String name) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, name);
+        return new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, name);
     }
 
     private static ResourceLocation holo(String name) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "textures/gui/holo/" + name + ".png");
+        return new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "textures/gui/holo/" + name + ".png");
     }
 
     @Override
@@ -304,13 +304,12 @@ public class StarMapScreen extends AbstractContainerScreen<StarMapMenu> {
 
     // --- rendering -------------------------------------------------------------------------------------
 
-    @Override
-    public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+    private void renderStarMapBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
         // 1.7.10 drawWorldBackground: black, then the hologram in perspective
         g.fill(0, 0, width, height, 0xFF000000);
         g.flush();
         StarMapPipRenderer.render(starMap, partialTick, width, height);
-        renderBg(g, partialTick, mouseX, mouseY);
+        // 1.20.1 AbstractContainerScreen.render draws renderBg itself
     }
 
     @Override
@@ -492,6 +491,7 @@ public class StarMapScreen extends AbstractContainerScreen<StarMapMenu> {
 
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        renderStarMapBackground(g, mouseX, mouseY, partialTick);
         super.render(g, mouseX, mouseY, partialTick);
         renderTooltip(g, mouseX, mouseY);
     }
@@ -539,7 +539,7 @@ public class StarMapScreen extends AbstractContainerScreen<StarMapMenu> {
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollY) {
         // 1.7.10 ElementGroupList.onMouseWheel: scroll += movement * 0.2 (LWJGL wheel steps were 120)
         SCROLL[page] += (int) (scrollY * 120 * 0.2);
         return true;

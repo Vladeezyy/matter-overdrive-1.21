@@ -171,7 +171,7 @@ public class BioticStat {
     }
 
     /** Attribute modifiers held while unlocked and enabled (1.7.10 attributes()). */
-    public java.util.Map<net.minecraft.core.Holder<net.minecraft.world.entity.ai.attributes.Attribute>, net.minecraft.world.entity.ai.attributes.AttributeModifier> attributes(int level) {
+    public java.util.Map<net.minecraft.world.entity.ai.attributes.Attribute, net.minecraft.world.entity.ai.attributes.AttributeModifier> attributes(int level) {
         return java.util.Map.of();
     }
 

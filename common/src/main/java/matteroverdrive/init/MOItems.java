@@ -69,14 +69,14 @@ public final class MOItems {
     public static final ItemEntry<Item> ISOLINEAR_CIRCUIT_MK4 = simple("isolinear_circuit_mk4");
 
     // Tools: tritanium is iron-tier with 3122 durability; damage/speed follow the vanilla iron tools.
-    public static final ItemEntry<SwordItem> TRITANIUM_SWORD = item("tritanium_sword", p -> new SwordItem(MOMaterials.TRITANIUM_TOOL, p),
-            p -> p.attributes(SwordItem.createAttributes(MOMaterials.TRITANIUM_TOOL, 3, -2.4f)));
-    public static final ItemEntry<PickaxeItem> TRITANIUM_PICKAXE = item("tritanium_pickaxe", p -> new PickaxeItem(MOMaterials.TRITANIUM_TOOL, p),
-            p -> p.attributes(DiggerItem.createAttributes(MOMaterials.TRITANIUM_TOOL, 1f, -2.8f)));
-    public static final ItemEntry<AxeItem> TRITANIUM_AXE = item("tritanium_axe", p -> new AxeItem(MOMaterials.TRITANIUM_TOOL, p),
-            p -> p.attributes(DiggerItem.createAttributes(MOMaterials.TRITANIUM_TOOL, 6f, -3.1f)));
-    public static final ItemEntry<HoeItem> TRITANIUM_HOE = item("tritanium_hoe", p -> new HoeItem(MOMaterials.TRITANIUM_TOOL, p),
-            p -> p.attributes(DiggerItem.createAttributes(MOMaterials.TRITANIUM_TOOL, -2f, -1f)));
+    public static final ItemEntry<SwordItem> TRITANIUM_SWORD = item("tritanium_sword", p -> new SwordItem(MOMaterials.TRITANIUM_TOOL, 3, -2.4f, p),
+            p -> p);
+    public static final ItemEntry<PickaxeItem> TRITANIUM_PICKAXE = item("tritanium_pickaxe", p -> new PickaxeItem(MOMaterials.TRITANIUM_TOOL, 1, -2.8f, p),
+            p -> p);
+    public static final ItemEntry<AxeItem> TRITANIUM_AXE = item("tritanium_axe", p -> new AxeItem(MOMaterials.TRITANIUM_TOOL, 6f, -3.1f, p),
+            p -> p);
+    public static final ItemEntry<HoeItem> TRITANIUM_HOE = item("tritanium_hoe", p -> new HoeItem(MOMaterials.TRITANIUM_TOOL, -2, -1f, p),
+            p -> p);
 
     // Armor
     public static final ItemEntry<ArmorItem> TRITANIUM_HELMET = armor("tritanium_helmet", ArmorItem.Type.HELMET);
@@ -184,15 +184,15 @@ public final class MOItems {
 
     // Food (phase 7a; 1.7.10 ItemFood values)
     public static final ItemEntry<Item> EMERGENCY_RATION = item("emergency_ration", Item::new,
-            p -> p.food(new net.minecraft.world.food.FoodProperties.Builder().nutrition(8).saturationModifier(0.8f).build()));
+            p -> p.food(new net.minecraft.world.food.FoodProperties.Builder().nutrition(8).saturationMod(0.8f).build()));
     /** 1.7.10 EarlGrayTea: 4 / 0.8, always drinkable, clears potion effects like milk, leaves the bottle. */
     public static final ItemEntry<matteroverdrive.item.food.DrinkItem> EARL_GRAY_TEA = item("earl_gray_tea",
             p -> new matteroverdrive.item.food.DrinkItem(true, p),
-            p -> p.food(new net.minecraft.world.food.FoodProperties.Builder().nutrition(4).saturationModifier(0.8f).alwaysEdible()
-                    .usingConvertsTo(net.minecraft.world.item.Items.GLASS_BOTTLE).build()).stacksTo(16));
+            p -> p.food(new net.minecraft.world.food.FoodProperties.Builder().nutrition(4).saturationMod(0.8f).alwaysEat()
+                    .build()).stacksTo(16));
     public static final ItemEntry<matteroverdrive.item.food.RomulanAleItem> ROMULAN_ALE = item("romulan_ale", matteroverdrive.item.food.RomulanAleItem::new,
-            p -> p.food(new net.minecraft.world.food.FoodProperties.Builder().nutrition(4).saturationModifier(0.6f).alwaysEdible()
-                    .usingConvertsTo(net.minecraft.world.item.Items.GLASS_BOTTLE).build()).stacksTo(16));
+            p -> p.food(new net.minecraft.world.food.FoodProperties.Builder().nutrition(4).saturationMod(0.6f).alwaysEat()
+                    .build()).stacksTo(16));
     public static final ItemEntry<BlockItem> HOLO_SIGN = block("holo_sign", MOBlocks.HOLO_SIGN);
     public static final ItemEntry<BlockItem> MICROWAVE = block("microwave", MOBlocks.MICROWAVE);
     public static final ItemEntry<BlockItem> TRANSPORTER = block("transporter", MOBlocks.TRANSPORTER);
@@ -279,13 +279,12 @@ public final class MOItems {
     }
 
     private static ItemEntry<ArmorItem> armor(String name, ArmorItem.Type type) {
-        return item(name, p -> new ArmorItem(MOMaterials.TRITANIUM_ARMOR.holder(), type, p) {
-            // NeoForge IItemExtension (Fabric renders the 3D armor with these textures itself)
-            public net.minecraft.resources.ResourceLocation getArmorTexture(net.minecraft.world.item.ItemStack stack, net.minecraft.world.entity.Entity entity,
-                    EquipmentSlot slot, net.minecraft.world.item.ArmorMaterial.Layer layer, boolean innerModel) {
-                return slot == EquipmentSlot.FEET ? MOMaterials.ARMOR_LAYER_2 : MOMaterials.ARMOR_LAYER_1;
+        return item(name, p -> new ArmorItem(MOMaterials.TRITANIUM_ARMOR, type, p) {
+            // Forge IForgeItem (Fabric renders the 3D armor with these textures itself)
+            public String getArmorTexture(net.minecraft.world.item.ItemStack stack, net.minecraft.world.entity.Entity entity, EquipmentSlot slot, String layer) {
+                return (slot == EquipmentSlot.FEET ? MOMaterials.ARMOR_LAYER_2 : MOMaterials.ARMOR_LAYER_1).toString();
             }
-        }, p -> p.durability(type.getDurability(MOMaterials.TRITANIUM_ARMOR_DURABILITY)));
+        }, p -> p);
     }
 
     private static ItemEntry<BlockItem> block(String name, matteroverdrive.platform.BlockEntry<?> block) {

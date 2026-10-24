@@ -43,11 +43,11 @@ public class Planet extends SpaceBody {
     // --- persistence (1.7.10 NBT keys) -------------------------------------------------------------
 
     static Tag saveStack(HolderLookup.Provider registries, ItemStack stack) {
-        return ItemStack.CODEC.encodeStart(registries.createSerializationContext(NbtOps.INSTANCE), stack).getOrThrow();
+        return ItemStack.CODEC.encodeStart(net.minecraft.resources.RegistryOps.create(NbtOps.INSTANCE, registries), stack).getOrThrow(false, e -> {});
     }
 
     static ItemStack loadStack(HolderLookup.Provider registries, Tag tag) {
-        return ItemStack.CODEC.parse(registries.createSerializationContext(NbtOps.INSTANCE), tag).result().orElse(ItemStack.EMPTY);
+        return ItemStack.CODEC.parse(net.minecraft.resources.RegistryOps.create(NbtOps.INSTANCE, registries), tag).result().orElse(ItemStack.EMPTY);
     }
 
     public CompoundTag toNBT(HolderLookup.Provider registries) {

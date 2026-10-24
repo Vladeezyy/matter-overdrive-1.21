@@ -33,11 +33,11 @@ public class SecurityProtocolItem extends Item implements UseFirst {
     }
 
     public static int getType(ItemStack stack) {
-        return stack.getOrDefault(MODataComponents.SECURITY_TYPE.get(), EMPTY);
+        return matteroverdrive.compat.component.Components.getOrDefault(stack, MODataComponents.SECURITY_TYPE.get(), EMPTY);
     }
 
     public static @Nullable UUID getOwner(ItemStack stack) {
-        return stack.get(MODataComponents.SECURITY_OWNER.get());
+        return matteroverdrive.compat.component.Components.get(stack, MODataComponents.SECURITY_OWNER.get());
     }
 
     /** Whether the stack is a [type] protocol of the given owner. */
@@ -56,13 +56,13 @@ public class SecurityProtocolItem extends Item implements UseFirst {
         UUID owner = getOwner(stack);
         if (!player.isShiftKeyDown()) return net.minecraft.world.InteractionResultHolder.pass(player.getItemInHand(hand));
         if (owner == null) {
-            stack.set(MODataComponents.SECURITY_OWNER.get(), player.getUUID());
-            stack.set(MODataComponents.SECURITY_TYPE.get(), CLAIM);
+            matteroverdrive.compat.component.Components.set(stack, MODataComponents.SECURITY_OWNER.get(), player.getUUID());
+            matteroverdrive.compat.component.Components.set(stack, MODataComponents.SECURITY_TYPE.get(), CLAIM);
             return net.minecraft.world.InteractionResultHolder.success(player.getItemInHand(hand));
         }
         if (owner.equals(player.getUUID()) || player.getAbilities().instabuild) {
             int type = getType(stack) + 1;
-            stack.set(MODataComponents.SECURITY_TYPE.get(), type >= TYPES.length ? CLAIM : type);
+            matteroverdrive.compat.component.Components.set(stack, MODataComponents.SECURITY_TYPE.get(), type >= TYPES.length ? CLAIM : type);
             return net.minecraft.world.InteractionResultHolder.success(player.getItemInHand(hand));
         }
         return net.minecraft.world.InteractionResultHolder.pass(player.getItemInHand(hand));
@@ -83,7 +83,7 @@ public class SecurityProtocolItem extends Item implements UseFirst {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, @org.jetbrains.annotations.Nullable net.minecraft.world.level.Level context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
         Consumer<Component> tooltip = tooltipLines::add;
         UUID owner = getOwner(stack);
         if (owner == null) return;

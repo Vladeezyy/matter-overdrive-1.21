@@ -38,10 +38,10 @@ public final class Android {
     public static final boolean TRANSFORMATION_DEATH = true;
     public static final boolean REMOVE_POTION_EFFECTS = true;
     public static final ResourceKey<DamageType> TRANSFORMATION_DAMAGE = ResourceKey.create(Registries.DAMAGE_TYPE,
-            ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "android_transformation"));
+            new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "android_transformation"));
     public static final ResourceKey<DamageType> SHOCKWAVE_DAMAGE = ResourceKey.create(Registries.DAMAGE_TYPE,
-            ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "android_shockwave"));
-    private static final ResourceLocation OUT_OF_POWER = ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, "android_out_of_power");
+            new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "android_shockwave"));
+    private static final ResourceLocation OUT_OF_POWER = new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, "android_out_of_power");
 
     public static AndroidData get(Player player) {
         return MOAttachments.ANDROID.get(player);
@@ -227,20 +227,20 @@ public final class Android {
                 AttributeInstance attribute = player.getAttribute(mod.attribute());
                 if (attribute == null) continue;
                 var id = matteroverdrive.item.android.BionicPartItem.modifierId(slot, mod.suffix());
-                var modifier = new AttributeModifier(id, mod.amount(), mod.operation());
-                if (!modifier.equals(attribute.getModifier(id))) attribute.addOrUpdateTransientModifier(modifier);
+                var modifier = matteroverdrive.compat.Attrs.modifier(id, mod.amount(), mod.operation());
+                if (!matteroverdrive.compat.Attrs.same(modifier, matteroverdrive.compat.Attrs.get(attribute, id))) matteroverdrive.compat.Attrs.addOrUpdate(attribute, modifier);
                 applied.add(new ResourceLocationKey(mod.attribute(), id));
             }
             removePartModifiers(player, slot, applied);
         }
     }
 
-    private record ResourceLocationKey(net.minecraft.core.Holder<net.minecraft.world.entity.ai.attributes.Attribute> attribute,
+    private record ResourceLocationKey(net.minecraft.world.entity.ai.attributes.Attribute attribute,
                                        net.minecraft.resources.ResourceLocation id) {}
 
-    private static final java.util.List<net.minecraft.core.Holder<net.minecraft.world.entity.ai.attributes.Attribute>> PART_ATTRIBUTES = java.util.List.of(
-            Attributes.MAX_HEALTH, Attributes.ATTACK_DAMAGE, Attributes.KNOCKBACK_RESISTANCE, Attributes.MOVEMENT_SPEED, MOAttributes.GLITCH_TIME.holder(),
-            MOAttributes.BATTERY_USE.holder());
+    private static final java.util.List<net.minecraft.world.entity.ai.attributes.Attribute> PART_ATTRIBUTES = java.util.List.of(
+            Attributes.MAX_HEALTH, Attributes.ATTACK_DAMAGE, Attributes.KNOCKBACK_RESISTANCE, Attributes.MOVEMENT_SPEED, MOAttributes.GLITCH_TIME.get(),
+            MOAttributes.BATTERY_USE.get());
 
     /** Removes the slot's part modifiers that aren't in keep. */
     private static void removePartModifiers(Player player, int slot, java.util.Set<ResourceLocationKey> keep) {
@@ -249,7 +249,7 @@ public final class Android {
             if (attribute == null) continue;
             for (String suffix : matteroverdrive.item.android.BionicPartItem.MOD_SUFFIXES) {
                 var id = matteroverdrive.item.android.BionicPartItem.modifierId(slot, suffix);
-                if (!keep.contains(new ResourceLocationKey(holder, id))) attribute.removeModifier(id);
+                if (!keep.contains(new ResourceLocationKey(holder, id))) matteroverdrive.compat.Attrs.remove(attribute, id);
             }
         }
     }
@@ -261,9 +261,9 @@ public final class Android {
             if (attribute == null) continue;
             AttributeModifier modifier = entry.getValue();
             if (enabled) {
-                if (!modifier.equals(attribute.getModifier(modifier.id()))) attribute.addOrUpdateTransientModifier(modifier);
+                if (!matteroverdrive.compat.Attrs.same(modifier, attribute.getModifier(modifier.getId()))) matteroverdrive.compat.Attrs.addOrUpdate(attribute, modifier);
             } else {
-                attribute.removeModifier(modifier.id());
+                attribute.removeModifier(modifier.getId());
             }
         }
     }
@@ -292,21 +292,21 @@ public final class Android {
     /** 1.7.10 manageOutOfPower: half speed (the client glitches every 3 s, see the HUD). */
     private static void manageOutOfPower(ServerPlayer player) {
         AttributeInstance speed = player.getAttribute(Attributes.MOVEMENT_SPEED);
-        if (speed != null && !speed.hasModifier(OUT_OF_POWER)) {
-            speed.addTransientModifier(new AttributeModifier(OUT_OF_POWER, -0.5, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+        if (speed != null && !matteroverdrive.compat.Attrs.has(speed, OUT_OF_POWER)) {
+            speed.addTransientModifier(matteroverdrive.compat.Attrs.modifier(OUT_OF_POWER, -0.5, AttributeModifier.Operation.MULTIPLY_TOTAL));
         }
     }
 
     private static void removeOutOfPower(Player player) {
         AttributeInstance speed = player.getAttribute(Attributes.MOVEMENT_SPEED);
-        if (speed != null) speed.removeModifier(OUT_OF_POWER);
+        if (speed != null) matteroverdrive.compat.Attrs.remove(speed, OUT_OF_POWER);
     }
 
     /** 1.7.10 manageTurning: sickness while turning, a hit every 2 s, then android - and (by default) death. */
     private static void manageTurning(ServerPlayer player, AndroidData data) {
         if (data.turning <= 0) return;
         ServerLevel level = player.serverLevel();
-        var damage = level.damageSources().source(TRANSFORMATION_DAMAGE);
+        var damage = matteroverdrive.compat.Damage.source(level, TRANSFORMATION_DAMAGE);
         data.turning--;
         if (data.turning > 0) {
             player.addEffect(new MobEffectInstance(MobEffects.CONFUSION, TRANSFORM_TIME));
@@ -421,8 +421,8 @@ public final class Android {
     }
 
     /** The attributes the mod adds to players */
-    public static java.util.List<net.minecraft.core.Holder<net.minecraft.world.entity.ai.attributes.Attribute>> playerAttributes() {
-        return java.util.List.of(MOAttributes.GLITCH_TIME.holder(), MOAttributes.BATTERY_USE.holder());
+    public static java.util.List<net.minecraft.world.entity.ai.attributes.Attribute> playerAttributes() {
+        return java.util.List.of(MOAttributes.GLITCH_TIME.get(), MOAttributes.BATTERY_USE.get());
     }
 
     private Android() {}

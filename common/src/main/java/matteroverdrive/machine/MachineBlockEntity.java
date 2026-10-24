@@ -9,7 +9,7 @@ import matteroverdrive.init.MODataComponents;
 import matteroverdrive.item.UpgradeItem;
 import net.minecraft.core.BlockPos;
 import matteroverdrive.compat.DataComponentGetter;
-import net.minecraft.core.component.DataComponentMap;
+import matteroverdrive.compat.component.DataComponentMap;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
@@ -416,7 +416,7 @@ public abstract class MachineBlockEntity extends matteroverdrive.compat.CompatBl
     }
 
     @Override
-    public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
-        return saveCustomOnly(registries);
+    public net.minecraft.nbt.CompoundTag getUpdateTag() {
+        return saveWithoutMetadata();
     }
 }

@@ -6,10 +6,10 @@ import java.util.List;
 import matteroverdrive.MatterOverdrive;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import matteroverdrive.compat.codec.RegistryFriendlyByteBuf;
+import matteroverdrive.compat.codec.ByteBufCodecs;
+import matteroverdrive.compat.codec.StreamCodec;
+import matteroverdrive.compat.codec.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import matteroverdrive.platform.Platform;
@@ -19,7 +19,7 @@ import matteroverdrive.platform.PayloadRegistrar;
 /** 1.7.10 PacketUpdateGalaxy, PacketUpdatePlanet, PacketStarLoading, PacketUpdateTravelEvents. */
 public final class StarMapPayloads {
     private static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MatterOverdrive.MODID, path);
+        return new net.minecraft.resources.ResourceLocation(MatterOverdrive.MODID, path);
     }
 
     /** The whole galaxy: quadrants, stars (no planets), travel events. */
@@ -98,7 +98,7 @@ public final class StarMapPayloads {
             implements CustomPacketPayload {
         public static final Type<Command> TYPE = new Type<>(id("star_map_command"));
         public static final StreamCodec<RegistryFriendlyByteBuf, Command> STREAM_CODEC = StreamCodec.composite(
-                net.minecraft.core.BlockPos.STREAM_CODEC, Command::pos, ByteBufCodecs.BYTE.map(b -> (int) b, i -> (byte) (int) i), Command::zoom,
+                matteroverdrive.compat.codec.VanillaCodecs.BLOCK_POS, Command::pos, ByteBufCodecs.BYTE.map(b -> (int) b, i -> (byte) (int) i), Command::zoom,
                 GalacticPosition.STREAM_CODEC, Command::position, GalacticPosition.STREAM_CODEC, Command::destination, Command::new);
 
         @Override
@@ -109,7 +109,7 @@ public final class StarMapPayloads {
 
     private static void handleCommand(Command command, PacketContext context) {
         if (!(context.player() instanceof ServerPlayer player)) return;
-        if (!player.canInteractWithBlock(command.pos(), 4)
+        if (!(player.distanceToSqr(net.minecraft.world.phys.Vec3.atCenterOf(command.pos())) <= (4 + 4.5) * (4 + 4.5))
                 || !(player.level().getBlockEntity(command.pos()) instanceof matteroverdrive.block.entity.StarMapBlockEntity starMap)
                 || !starMap.isUseableByPlayer(player)) return;
         starMap.setZoomLevel(command.zoom());
@@ -167,10 +167,10 @@ public final class StarMapPayloads {
             Planet planet = star.planet(update.planet());
             if (planet == null) {
                 planet = new Planet();
-                planet.readNBT(update.data(), context.player().registryAccess());
+                planet.readNBT(update.data(), context.player().level().registryAccess());
                 star.addPlanet(planet);
             } else {
-                planet.readNBT(update.data(), context.player().registryAccess());
+                planet.readNBT(update.data(), context.player().level().registryAccess());
             }
             onPlanetChanged.accept(planet);
         }
@@ -186,7 +186,7 @@ public final class StarMapPayloads {
         Star star = galaxy.getStar(new GalacticPosition(request.quadrant(), request.star(), -1));
         if (star == null) return;
         List<CompoundTag> planets = new ArrayList<>();
-        for (Planet planet : star.getPlanets()) planets.add(planet.toNBT(player.registryAccess()));
+        for (Planet planet : star.getPlanets()) planets.add(planet.toNBT(player.level().registryAccess()));
         Platform.INSTANCE.sendToPlayer(player, new StarPlanets(request.quadrant(), request.star(), planets));
     }
 
@@ -195,7 +195,7 @@ public final class StarMapPayloads {
         if (star == null) return;
         for (CompoundTag data : message.planets()) {
             Planet planet = new Planet();
-            planet.readNBT(data, context.player().registryAccess());
+            planet.readNBT(data, context.player().level().registryAccess());
             star.addPlanet(planet);
         }
         GalaxyClient.loadClaimedPlanets();

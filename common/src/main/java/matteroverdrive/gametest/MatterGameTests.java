@@ -59,17 +59,17 @@ final class MatterGameTests {
         var server = helper.getLevel().getServer();
         var estimated = MatterRegistry.estimated(server);
         // weathering + waxing (block conversions, then the waxing recipe)
-        int copper = MatterRegistry.get(server, Items.CHISELED_COPPER);
-        helper.assertTrue(copper > 0 && MatterRegistry.get(server, Items.WAXED_OXIDIZED_CHISELED_COPPER) > 0
-                && !estimated.contains(Items.WAXED_OXIDIZED_CHISELED_COPPER), "waxed oxidized chiseled copper");
+        int copper = MatterRegistry.get(server, Items.CUT_COPPER);
+        helper.assertTrue(copper > 0 && MatterRegistry.get(server, Items.WAXED_OXIDIZED_CUT_COPPER) > 0
+                && !estimated.contains(Items.WAXED_OXIDIZED_CUT_COPPER), "waxed oxidized cut copper");
         // (the stonecutter makes cut copper 4 per block, cheaper than the crafting table: either derivation may win)
-        helper.assertTrue(MatterRegistry.get(server, Items.OXIDIZED_CHISELED_COPPER) > 0 && !estimated.contains(Items.OXIDIZED_CHISELED_COPPER),
+        helper.assertTrue(MatterRegistry.get(server, Items.OXIDIZED_CUT_COPPER) > 0 && !estimated.contains(Items.OXIDIZED_CUT_COPPER),
                 "oxidized chiseled copper");
         // smithing: netherite from ancient debris; stonecutting: polished tuff; concrete from its powder; infested stone
         helper.assertTrue(MatterRegistry.get(server, Items.NETHERITE_INGOT) > 4 * 512 && !estimated.contains(Items.NETHERITE_SWORD)
                 && MatterRegistry.get(server, Items.NETHERITE_SWORD) > MatterRegistry.get(server, Items.DIAMOND_SWORD),
                 "netherite " + MatterRegistry.get(server, Items.NETHERITE_INGOT));
-        helper.assertTrue(MatterRegistry.get(server, Items.POLISHED_TUFF) > 0 && !estimated.contains(Items.POLISHED_TUFF), "polished tuff");
+        helper.assertTrue(MatterRegistry.get(server, Items.POLISHED_DEEPSLATE) > 0 && !estimated.contains(Items.POLISHED_DEEPSLATE), "polished deepslate");
         expect(helper, server, Items.WHITE_CONCRETE, MatterRegistry.get(server, Items.WHITE_CONCRETE_POWDER));
         expect(helper, server, Items.INFESTED_STONE, MatterRegistry.get(server, Items.STONE));
         expect(helper, server, Items.STRIPPED_OAK_LOG, 16);
@@ -88,7 +88,7 @@ final class MatterGameTests {
     /** Two fail-safe upgrades push the 0.5% failure chance down to ~0.03% so the test is deterministic in practice. */
     private static DecomposerBlockEntity decomposer(GameTestHelper helper, BlockPos pos) {
         helper.setBlock(pos, MOBlocks.DECOMPOSER.get());
-        DecomposerBlockEntity d = helper.<DecomposerBlockEntity>getBlockEntity(pos);
+        DecomposerBlockEntity d = matteroverdrive.compat.GameTests.<DecomposerBlockEntity>blockEntity(helper, pos);
         d.getEnergy().set(d.getEnergy().getCapacity());
         int placed = 0;
         for (int i = 0; i < d.getInventory().size() && placed < 2; i++) {
@@ -132,7 +132,7 @@ final class MatterGameTests {
 
     private static void recyclerRefines(GameTestHelper helper) {
         helper.setBlock(A, MOBlocks.RECYCLER.get());
-        RecyclerBlockEntity r = helper.<RecyclerBlockEntity>getBlockEntity(A);
+        RecyclerBlockEntity r = matteroverdrive.compat.GameTests.<RecyclerBlockEntity>blockEntity(helper, A);
         r.getEnergy().set(r.getEnergy().getCapacity());
         // dust with 1 matter: 80 * ln(2)^2 = 38 ticks each
         r.getInventory().setStack(RecyclerBlockEntity.INPUT, MatterDustItem.withMatter(MOItems.MATTER_DUST.get(), 1).copyWithCount(2));
@@ -151,9 +151,9 @@ final class MatterGameTests {
         helper.runAfterDelay(150, () -> {
             int inPipes = 0;
             for (int x = 2; x <= 5; x++) {
-                inPipes += helper.<MatterPipeBlockEntity>getBlockEntity(new BlockPos(x, 1, 1)).getTank().getMatter();
+                inPipes += matteroverdrive.compat.GameTests.<MatterPipeBlockEntity>blockEntity(helper, new BlockPos(x, 1, 1)).getTank().getMatter();
             }
-            int last = helper.<MatterPipeBlockEntity>getBlockEntity(new BlockPos(5, 1, 1)).getTank().getMatter();
+            int last = matteroverdrive.compat.GameTests.<MatterPipeBlockEntity>blockEntity(helper, new BlockPos(5, 1, 1)).getTank().getMatter();
             helper.assertTrue(last > 0, "matter never reached the last pipe");
             helper.assertTrue(inPipes + d.getMatterTank().getMatter() == 100,
                     "matter not conserved: pipes " + inPipes + " decomposer " + d.getMatterTank().getMatter());
@@ -163,7 +163,7 @@ final class MatterGameTests {
 
     private static void analyzerBuildsPattern(GameTestHelper helper) {
         helper.setBlock(A, MOBlocks.ANALYZER.get());
-        AnalyzerBlockEntity a = helper.<AnalyzerBlockEntity>getBlockEntity(A);
+        AnalyzerBlockEntity a = matteroverdrive.compat.GameTests.<AnalyzerBlockEntity>blockEntity(helper, A);
         int placed = 0;
         for (int i = 0; i < a.getInventory().size() && placed < 2; i++) {
             if (a.getInventory().spec(i).role() == MachineInventory.Role.UPGRADE) {

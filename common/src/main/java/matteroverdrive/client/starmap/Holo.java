@@ -34,10 +34,10 @@ final class Holo {
         float f1 = Mth.cos(yaw * Mth.DEG_TO_RAD), f2 = Mth.sin(yaw * Mth.DEG_TO_RAD);
         float f3 = -f2 * Mth.sin(pitch * Mth.DEG_TO_RAD), f4 = f1 * Mth.sin(pitch * Mth.DEG_TO_RAD), f5 = Mth.cos(pitch * Mth.DEG_TO_RAD);
         float s = (float) scale, px = (float) x, py = (float) y, pz = (float) z;
-        vc.addVertex(p, px - f1 * s - f3 * s, py - f5 * s, pz - f2 * s - f4 * s).setUv(u1, v1).setColor(r, g, b, a);
-        vc.addVertex(p, px - f1 * s + f3 * s, py + f5 * s, pz - f2 * s + f4 * s).setUv(u1, v0).setColor(r, g, b, a);
-        vc.addVertex(p, px + f1 * s + f3 * s, py + f5 * s, pz + f2 * s + f4 * s).setUv(u0, v0).setColor(r, g, b, a);
-        vc.addVertex(p, px + f1 * s - f3 * s, py - f5 * s, pz + f2 * s - f4 * s).setUv(u0, v1).setColor(r, g, b, a);
+        matteroverdrive.compat.render.Vertex.of(vc, p, px - f1 * s - f3 * s, py - f5 * s, pz - f2 * s - f4 * s).setUv(u1, v1).setColor(r, g, b, a).end();
+        matteroverdrive.compat.render.Vertex.of(vc, p, px - f1 * s + f3 * s, py + f5 * s, pz - f2 * s + f4 * s).setUv(u1, v0).setColor(r, g, b, a).end();
+        matteroverdrive.compat.render.Vertex.of(vc, p, px + f1 * s + f3 * s, py + f5 * s, pz + f2 * s + f4 * s).setUv(u0, v0).setColor(r, g, b, a).end();
+        matteroverdrive.compat.render.Vertex.of(vc, p, px + f1 * s - f3 * s, py - f5 * s, pz + f2 * s - f4 * s).setUv(u0, v1).setColor(r, g, b, a).end();
     }
 
     static void line(PoseStack.Pose p, VertexConsumer vc, double x1, double y1, double z1, double x2, double y2, double z2, int rgb) {
@@ -47,8 +47,8 @@ final class Holo {
         dx /= len;
         dy /= len;
         dz /= len;
-        vc.addVertex(p, (float) x1, (float) y1, (float) z1).setColor(r(rgb), g(rgb), b(rgb), 1).setNormal(p, dx, dy, dz);
-        vc.addVertex(p, (float) x2, (float) y2, (float) z2).setColor(r(rgb), g(rgb), b(rgb), 1).setNormal(p, dx, dy, dz);
+        matteroverdrive.compat.render.Vertex.of(vc, p, (float) x1, (float) y1, (float) z1).setColor(r(rgb), g(rgb), b(rgb), 1).setNormal(p, dx, dy, dz).end();
+        matteroverdrive.compat.render.Vertex.of(vc, p, (float) x2, (float) y2, (float) z2).setColor(r(rgb), g(rgb), b(rgb), 1).setNormal(p, dx, dy, dz).end();
     }
 
     /** GLU Sphere (z axis through the poles) drawn with glPolygonMode(GL_LINE): its slice and stack edges. */
@@ -83,8 +83,8 @@ final class Holo {
     }
 
     private static void vertex(PoseStack.Pose p, VertexConsumer vc, double radius, double phi, double theta, int rgb) {
-        vc.addVertex(p, (float) (Math.sin(phi) * Math.sin(theta) * radius), (float) (Math.sin(phi) * Math.cos(theta) * radius),
-                (float) (Math.cos(phi) * radius)).setColor(r(rgb), g(rgb), b(rgb), 1);
+        matteroverdrive.compat.render.Vertex.of(vc, p, (float) (Math.sin(phi) * Math.sin(theta) * radius), (float) (Math.sin(phi) * Math.cos(theta) * radius),
+                (float) (Math.cos(phi) * radius)).setColor(r(rgb), g(rgb), b(rgb), 1).end();
     }
 
     /** 1.7.10 RenderUtils.drawCube(sizeX, sizeY, sizeZ) from the origin. */
@@ -95,7 +95,7 @@ final class Holo {
                 {0, 0, 0, 0, sy, 0, sx, sy, 0, sx, 0, 0}, {0, 0, sz, sx, 0, sz, sx, sy, sz, 0, sy, sz},
                 {0, 0, 0, 0, 0, sz, 0, sy, sz, 0, sy, 0}, {sx, 0, 0, sx, sy, 0, sx, sy, sz, sx, 0, sz}};
         for (float[] f : faces) {
-            for (int i = 0; i < 12; i += 3) vc.addVertex(p, f[i], f[i + 1], f[i + 2]).setColor(r, g, b, 1);
+            for (int i = 0; i < 12; i += 3) matteroverdrive.compat.render.Vertex.of(vc, p, f[i], f[i + 1], f[i + 2]).setColor(r, g, b, 1).end();
         }
     }
 
@@ -106,15 +106,15 @@ final class Holo {
                 -size, 0, 0, size, 0, size, size, size, 0,
                 -size, 0, 0, size, size, 0, size, 0, -size,
                 size, 0, -size, size, size, 0, size, 0, size};
-        for (int i = 0; i < v.length; i += 3) vc.addVertex(p, v[i], v[i + 1], v[i + 2]).setColor(r, g, b, 1);
+        for (int i = 0; i < v.length; i += 3) matteroverdrive.compat.render.Vertex.of(vc, p, v[i], v[i + 1], v[i + 2]).setColor(r, g, b, 1).end();
     }
 
     /** A textured quad from (x, y) of the given size in the current frame (1.7.10 RenderUtils.renderIcon). */
     static void icon(PoseStack.Pose p, VertexConsumer vc, float x, float y, float w, float h, int rgb) {
         float r = r(rgb), g = g(rgb), b = b(rgb);
-        vc.addVertex(p, x, y + h, 0).setUv(0, 1).setColor(r, g, b, 1);
-        vc.addVertex(p, x + w, y + h, 0).setUv(1, 1).setColor(r, g, b, 1);
-        vc.addVertex(p, x + w, y, 0).setUv(1, 0).setColor(r, g, b, 1);
-        vc.addVertex(p, x, y, 0).setUv(0, 0).setColor(r, g, b, 1);
+        matteroverdrive.compat.render.Vertex.of(vc, p, x, y + h, 0).setUv(0, 1).setColor(r, g, b, 1).end();
+        matteroverdrive.compat.render.Vertex.of(vc, p, x + w, y + h, 0).setUv(1, 1).setColor(r, g, b, 1).end();
+        matteroverdrive.compat.render.Vertex.of(vc, p, x + w, y, 0).setUv(1, 0).setColor(r, g, b, 1).end();
+        matteroverdrive.compat.render.Vertex.of(vc, p, x, y, 0).setUv(0, 0).setColor(r, g, b, 1).end();
     }
 }

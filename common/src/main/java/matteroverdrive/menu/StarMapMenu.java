@@ -7,7 +7,7 @@ import matteroverdrive.init.MOMenus;
 import matteroverdrive.starmap.BuildingItem;
 import matteroverdrive.starmap.Planet;
 import matteroverdrive.starmap.ShipItem;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import matteroverdrive.compat.codec.RegistryFriendlyByteBuf;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -50,7 +50,7 @@ public class StarMapMenu extends AbstractContainerMenu {
 
     @Override
     public boolean stillValid(Player player) {
-        return !starMap.isRemoved() && player.canInteractWithBlock(starMap.getBlockPos(), 4) && starMap.isUseableByPlayer(player);
+        return !starMap.isRemoved() && (player.distanceToSqr(net.minecraft.world.phys.Vec3.atCenterOf(starMap.getBlockPos())) <= (4 + 4.5) * (4 + 4.5)) && starMap.isUseableByPlayer(player);
     }
 
     @Override

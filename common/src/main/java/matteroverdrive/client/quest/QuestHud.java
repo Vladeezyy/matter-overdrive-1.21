@@ -10,7 +10,7 @@ import matteroverdrive.init.MOSounds;
 import matteroverdrive.quest.PlayerQuests;
 import matteroverdrive.quest.Quest;
 import matteroverdrive.quest.QuestStack;
-import net.minecraft.client.DeltaTracker;
+import matteroverdrive.compat.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;

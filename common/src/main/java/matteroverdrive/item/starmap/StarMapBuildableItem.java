@@ -32,28 +32,28 @@ public abstract class StarMapBuildableItem extends Item implements Buildable {
 
     @Override
     public long getBuildStart(ItemStack stack) {
-        return stack.getOrDefault(MODataComponents.BUILD_START.get(), 0L);
+        return matteroverdrive.compat.component.Components.getOrDefault(stack, MODataComponents.BUILD_START.get(), 0L);
     }
 
     @Override
     public void setBuildStart(ItemStack stack, long buildStart) {
-        stack.set(MODataComponents.BUILD_START.get(), buildStart);
+        matteroverdrive.compat.component.Components.set(stack, MODataComponents.BUILD_START.get(), buildStart);
     }
 
     /** 1.7.10: only a stack that has a start time (any NBT) can finish. */
     @Override
     public boolean isReadyToBuild(Level level, ItemStack stack, Planet planet) {
-        return stack.has(MODataComponents.BUILD_START.get()) && getBuildStart(stack) + getBuildLength(stack, planet) < level.getGameTime();
+        return matteroverdrive.compat.component.Components.has(stack, MODataComponents.BUILD_START.get()) && getBuildStart(stack) + getBuildLength(stack, planet) < level.getGameTime();
     }
 
     @Override
     public @Nullable UUID getOwnerID(ItemStack stack) {
-        return stack.get(MODataComponents.SECURITY_OWNER.get());
+        return matteroverdrive.compat.component.Components.get(stack, MODataComponents.SECURITY_OWNER.get());
     }
 
     @Override
     public void setOwner(ItemStack stack, UUID owner) {
-        stack.set(MODataComponents.SECURITY_OWNER.get(), owner);
+        matteroverdrive.compat.component.Components.set(stack, MODataComponents.SECURITY_OWNER.get(), owner);
     }
 
     /** 1.7.10 MOBaseItem.addDetails: the ".details" text, "/n" separated. */
@@ -62,7 +62,7 @@ public abstract class StarMapBuildableItem extends Item implements Buildable {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, @org.jetbrains.annotations.Nullable net.minecraft.world.level.Level context, java.util.List<Component> tooltipLines, TooltipFlag flag) {
         Consumer<Component> tooltip = tooltipLines::add;
         String key = getDescriptionId() + ".details";
         if (!net.minecraft.locale.Language.getInstance().has(key)) return;

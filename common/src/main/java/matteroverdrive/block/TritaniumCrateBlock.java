@@ -1,6 +1,5 @@
 package matteroverdrive.block;
 
-import com.mojang.serialization.MapCodec;
 
 import matteroverdrive.block.entity.TritaniumCrateBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -32,7 +31,6 @@ import org.jetbrains.annotations.Nullable;
  * It keeps its contents when broken (like a shulker box).
  */
 public class TritaniumCrateBlock extends BaseEntityBlock {
-    public static final MapCodec<TritaniumCrateBlock> CODEC = simpleCodec(TritaniumCrateBlock::new);
     private static final VoxelShape NORTH_SOUTH = Block.box(0, 0, 2, 16, 13, 14);
     private static final VoxelShape EAST_WEST = Block.box(2, 0, 0, 14, 13, 16);
 
@@ -41,14 +39,10 @@ public class TritaniumCrateBlock extends BaseEntityBlock {
         registerDefaultState(stateDefinition.any().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH));
     }
 
-    @Override
-    protected MapCodec<TritaniumCrateBlock> codec() {
-        return CODEC;
-    }
 
     /** 1.21.1-1.21.3 BaseEntityBlock is invisible by default (1.21.4+ draws the model) */
     @Override
-    protected net.minecraft.world.level.block.RenderShape getRenderShape(BlockState state) {
+    public net.minecraft.world.level.block.RenderShape getRenderShape(BlockState state) {
         return net.minecraft.world.level.block.RenderShape.MODEL;
     }
 
@@ -63,12 +57,12 @@ public class TritaniumCrateBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return state.getValue(HorizontalDirectionalBlock.FACING).getAxis() == Direction.Axis.X ? EAST_WEST : NORTH_SOUTH;
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof TritaniumCrateBlockEntity crate) {
             player.openMenu(crate);
         }
@@ -76,7 +70,7 @@ public class TritaniumCrateBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+    public void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         if (level.getBlockEntity(pos) instanceof TritaniumCrateBlockEntity crate) {
             crate.recheckOpen();
         }
@@ -84,28 +78,28 @@ public class TritaniumCrateBlock extends BaseEntityBlock {
 
     /** The contents go into the dropped item (container component), not onto the ground. */
     @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         if (!state.is(newState.getBlock())) level.updateNeighbourForOutputSignal(pos, this);
         super.onRemove(state, level, pos, newState, movedByPiston);
     }
 
     @Override
-    protected boolean hasAnalogOutputSignal(BlockState state) {
+    public boolean hasAnalogOutputSignal(BlockState state) {
         return true;
     }
 
     @Override
-    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+    public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
         return AbstractContainerMenu.getRedstoneSignalFromBlockEntity(level.getBlockEntity(pos));
     }
 
     @Override
-    protected BlockState rotate(BlockState state, Rotation rotation) {
+    public BlockState rotate(BlockState state, Rotation rotation) {
         return state.setValue(HorizontalDirectionalBlock.FACING, rotation.rotate(state.getValue(HorizontalDirectionalBlock.FACING)));
     }
 
     @Override
-    protected BlockState mirror(BlockState state, Mirror mirror) {
+    public BlockState mirror(BlockState state, Mirror mirror) {
         return state.rotate(mirror.getRotation(state.getValue(HorizontalDirectionalBlock.FACING)));
     }
 
