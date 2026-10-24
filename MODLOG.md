@@ -848,3 +848,35 @@
 - Bugs found on the way: `EventNetworkChannel` events are named by the sender (client→server packets arrive as
   `ClientCustomPayloadEvent`); 1.20.1 `setItem` on a crate with a pending loot table needs the level (now the loot table is
   set after the fixed items in buildings); the `neoforge:obj` loader is `forge:obj` in 1.20.1.
+- Also fixed for 1.20.1: screens draw their own dimmed background (1.20.1 `Screen.render` does not); the star map,
+  anomaly and stabilizer block entities give Forge their render box (Forge 1.20.1 culls by the block entity's
+  `getRenderBoundingBox`, 1.21 NeoForge asked the renderer: the galaxy vanished when its block was off screen); the Fabric
+  HUD mixins hide food and air through the icon blits of `renderPlayerHealth` (1.20.1 has no `renderFood`); the
+  access widener entry for `SpawnPlacements.register` (Loom's `validateAccessWidener` fails the build on a stale entry
+  while dev runs still start).
+- Tests: GameTests Forge 95/95, Fabric 100/100 (95 + the Fabric transfer tests). Scene 142/142 on both loaders, compared
+  shot by shot with the 1.21.1 screenshots (Forge) and Forge with Fabric: same scenes; the android station on Forge
+  shows more abilities because its scene world kept the player's data from earlier runs (Fabric's fresh world matches
+  the 1.21.1 Fabric shots).
+- Performance (`sh tools/perf.sh stress`, MacBook Air, 1.20.1 renders 3-4x the frame rate of 1.21.10 here, so compare
+  milliseconds per frame):
+
+  | Loader | Empty field | 576 burning vanilla furnaces | 48 MO modules (576 machines and pipes) |
+  |---|---|---|---|
+  | Forge | 840 FPS, 5.01 ms/tick | 806 FPS, 5.20 ms | 311 FPS, 3.28 ms |
+  | Fabric | 1150 FPS, 3.05 ms/tick | 1133 FPS, 3.28 ms | 431 FPS, 2.04 ms |
+  | 1.21.10 NeoForge (main, same machine) | 282 FPS, 3.81 ms/tick | 286 FPS, 3.79 ms | 233 FPS, 3.82 ms |
+
+  Server: the working machines cost less than the furnaces on both loaders. Client: the modules add 1.4-2.0 ms per frame
+  (1.21.10: 0.8 ms); most of it is the working inscribers' moving rail and head (a block model drawn every frame,
+  `ModelBlockRenderer.renderModel` is slower in 1.20.1). PerfScene first showed far worse numbers on 1.20.1: removing the
+  furnaces of the previous step dropped their recipe experience as hundreds of orbs (1.21.10 skipped that with
+  `UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS`); the scene now removes the furnaces' block entities first.
+- Outside dev: the Forge release jar (reobfuscated to SRG by ModDevGradle) on a Forge 47.4.28 server from the official
+  installer: starts, makes a world and the galaxy (star names read from the jar), stops cleanly, no errors.
+- Outside dev, Fabric: `sh tools/prodscene.sh` (Loom `ClientProductionRunTask`, the release jar with Fabric API in a
+  production client): 142/142 shots, same as dev. The jar ships Team Reborn Energy nested and no GameTests.
+- Jars: `forge/build/libs/matteroverdrive-forge-1.0.3+1.20.1.jar`, `fabric/build/libs/matteroverdrive-fabric-1.0.3+1.20.1.jar`.
+  Not released (no upload asked for).
+- Open: the client cost of working inscribers on 1.20.1 (see the table); the Forge jar on NeoForge 47.1 (1.20.1) and on
+  a Fabric production server were not run.

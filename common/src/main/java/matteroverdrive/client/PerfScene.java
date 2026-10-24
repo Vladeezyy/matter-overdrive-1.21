@@ -174,6 +174,7 @@ public final class PerfScene {
             setQuietly(level, p, state);
         }
         level.getEntitiesOfClass(ItemEntity.class, new AABB(field).inflate(40)).forEach(e -> e.discard());
+        level.getEntitiesOfClass(net.minecraft.world.entity.ExperienceOrb.class, new AABB(field).inflate(40)).forEach(e -> e.discard());
     }
 
     /** 48 modules of 12 blocks each: vanilla furnaces or working Matter Overdrive machines in the same places. */
@@ -477,6 +478,8 @@ public final class PerfScene {
     private static void setQuietly(ServerLevel level, BlockPos pos, BlockState state) {
         matteroverdrive.compat.CompatBlockEntity.skipRemoveSideEffects = true;
         try {
+            // vanilla furnaces would drop their items and the experience of their recipes (orbs that eat frames later)
+            if (level.getBlockEntity(pos) instanceof AbstractFurnaceBlockEntity) level.removeBlockEntity(pos);
             level.setBlock(pos, state, Block.UPDATE_CLIENTS);
         } finally {
             matteroverdrive.compat.CompatBlockEntity.skipRemoveSideEffects = false;
