@@ -877,6 +877,7 @@
 - Outside dev, Fabric: `sh tools/prodscene.sh` (Loom `ClientProductionRunTask`, the release jar with Fabric API in a
   production client): 142/142 shots, same as dev. The jar ships Team Reborn Energy nested and no GameTests.
 - Jars: `forge/build/libs/matteroverdrive-forge-1.0.3+1.20.1.jar`, `fabric/build/libs/matteroverdrive-fabric-1.0.3+1.20.1.jar`.
-  Not released (no upload asked for).
+  Released 2026-10-25 as GitHub release `v1.0.3-1.20.1` and on CurseForge (files 9315423 Fabric, 9315424 Forge;
+  description and summary list 1.20.1).
 - Open: the client cost of working inscribers on 1.20.1 (see the table); the Forge jar on NeoForge 47.1 (1.20.1) and on
   a Fabric production server were not run.

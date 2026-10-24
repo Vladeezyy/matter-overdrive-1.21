@@ -15,8 +15,8 @@ The port is a rewrite against modern APIs that keeps the original's behaviour, n
 translations (English and Russian; the port adds Ukrainian, German, Spanish and Portuguese (Brazil), not by native
 speakers). The 1.7.10 source (0.4.2) is the specification.
 
-**Download:** [Modrinth](https://modrinth.com/mod/matter-overdrive-1.21-unofficial-port) ·
-[GitHub releases](https://github.com/Vladeezyy/matter-overdrive-1.21/releases)
+**Download:** [CurseForge](https://www.curseforge.com/minecraft/mc-mods/matter-overdrive-unofficial-port) ·
+[GitHub release 1.0.3 for 1.20.1](https://github.com/Vladeezyy/matter-overdrive-1.21/releases/tag/v1.0.3-1.20.1)
 
 ## Status
 Everything from the original is ported:
