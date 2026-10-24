@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " R ",
+    "TGT",
+    "TDT"
+  ],
+  "key": {
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "T": {
+      "tag": "c:ingots/tritanium"
+    },
+    "G": {
+      "item": "minecraft:gold_ingot"
+    },
+    "D": {
+      "tag": "c:gems/dilithium"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "matteroverdrive:battery"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " D ",
+    "TCT",
+    " T "
+  ],
+  "key": {
+    "D": {
+      "item": "minecraft:black_dye"
+    },
+    "T": {
+      "item": "matteroverdrive:tritanium_plate"
+    },
+    "C": {
+      "item": "minecraft:chest"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "matteroverdrive:tritanium_crate_black"
+  }
+}

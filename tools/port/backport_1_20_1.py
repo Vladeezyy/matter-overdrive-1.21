@@ -64,6 +64,8 @@ RENAMES = [
     (r'(\w+)\.<([\w.]+)>getBlockEntity\(', COMPAT + r'.GameTests.<\2>blockEntity(\1, '),
     (r'JsonParser\.parseReader\(', 'JsonParser.parseReader('),
     (r'\.ifSuccess\(', '.result().ifPresent('),
+    (r'isCorrectToolForDrops\(ItemStack \w+, BlockState (\w+)\)', r'isCorrectToolForDrops(BlockState \1)'),
+    (r'\bhelper\.makeMockServerPlayerInLevel\(\)', COMPAT + '.GameTests.mockServerPlayer(helper)'),
     (r'\.withCallback\(\((\w+), (\w+)\) ->', r'.withCallback((context, \1, \2) ->'),
     (r'(ValueOutput|ValueInput)\.of\(tag, registryAccess\(\)\)', r'\1.of(tag, level().registryAccess())'),
     (r'\.getBottomCenter\(\)', '.getCenter().subtract(0, 0.5, 0)'),

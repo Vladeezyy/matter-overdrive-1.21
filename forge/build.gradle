@@ -35,6 +35,8 @@ legacyForge {
         // headless in-game tests (matteroverdrive.gametest), then exits
         gameTestServer {
             type = 'gameTestServer'
+            // Forge 1.20.1 runs the tests in an ordinary server world (vanilla: a flat one): its own folder, flat
+            gameDirectory = project.file('run-gametest')
         }
     }
 
@@ -49,7 +51,7 @@ configurations {
     runtimeClasspath.extendsFrom localRuntime
 }
 
-// neoforge.mods.toml comes from src/main/templates with the gradle properties
+// mods.toml comes from src/main/templates with the gradle properties
 var generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
     var replaceProperties = [
             minecraft_version      : minecraft_version,
@@ -68,10 +70,15 @@ var generateModMetadata = tasks.register('generateModMetadata', ProcessResources
 sourceSets.main.resources.srcDir generateModMetadata
 legacyForge.ideSyncTask generateModMetadata
 
-// Before 1.21.5 the game test server reuses run/world: each run starts from a fresh world
-def gameTestWorld = file('run/world')
+// Forge 1.20.1's game test server is a dedicated server on server.properties: each run starts from a fresh flat world
+def gameTestDir = file('run-gametest')
 tasks.matching { it.name == 'runGameTestServer' }.configureEach {
-    doFirst { gameTestWorld.deleteDir() }
+    doFirst {
+        new File(gameTestDir, 'world').deleteDir()
+        gameTestDir.mkdirs()
+        new File(gameTestDir, 'server.properties').text = 'level-type=minecraft\\:flat\ngenerate-structures=false\nspawn-monsters=false\nonline-mode=false\n'
+        new File(gameTestDir, 'eula.txt').text = 'eula=true\n'
+    }
 }
 
 tasks.withType(JavaCompile).configureEach { options.compilerArgs += ['-Xmaxerrs', '10000'] }

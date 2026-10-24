@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "TT",
+    "TT"
+  ],
+  "key": {
+    "T": {
+      "tag": "c:ingots/tritanium"
+    }
+  },
+  "result": {
+    "count": 8,
+    "item": "matteroverdrive:decorative_clean"
+  }
+}

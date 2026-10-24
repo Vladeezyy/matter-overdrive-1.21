@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "#minecraft:coal_ores",
+      "required": false
+    },
+    {
+      "id": "#forge:ores/coal",
+      "required": false
+    }
+  ]
+}

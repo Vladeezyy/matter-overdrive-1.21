@@ -1,0 +1,33 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "CHC",
+    "2M3",
+    "CTC"
+  ],
+  "key": {
+    "C": {
+      "item": "matteroverdrive:fusion_reactor_coil"
+    },
+    "H": {
+      "item": "matteroverdrive:holo_sign"
+    },
+    "2": {
+      "item": "matteroverdrive:isolinear_circuit_mk2"
+    },
+    "3": {
+      "item": "matteroverdrive:isolinear_circuit_mk3"
+    },
+    "M": {
+      "item": "matteroverdrive:machine_casing"
+    },
+    "T": {
+      "tag": "c:plates/tritanium"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "matteroverdrive:fusion_reactor_controller"
+  }
+}

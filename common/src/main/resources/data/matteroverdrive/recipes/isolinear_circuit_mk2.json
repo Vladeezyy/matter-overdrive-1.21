@@ -1,0 +1,14 @@
+{
+  "type": "matteroverdrive:inscriber",
+  "main": {
+    "item": "matteroverdrive:isolinear_circuit_mk1"
+  },
+  "secondary": {
+    "item": "minecraft:gold_ingot"
+  },
+  "result": {
+    "item": "matteroverdrive:isolinear_circuit_mk2"
+  },
+  "energy": 64000,
+  "time": 300
+}

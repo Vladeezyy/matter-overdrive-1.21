@@ -31,12 +31,12 @@ import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.levelgen.GenerationStep;
 
 /**
- * The NeoForge biome modifiers (data/matteroverdrive/neoforge/biome_modifier) applied with the Fabric BiomeModifications: the
- * same files, read from the mod jar. Supports neoforge:add_features and neoforge:add_spawns with biomes neoforge:any, neoforge:and,
- * neoforge:not, a tag or a biome id (what the mod uses; from the Rats port).
+ * The Forge biome modifiers (data/matteroverdrive/forge/biome_modifier) applied with the Fabric BiomeModifications: the
+ * same files, read from the mod jar. Supports forge:add_features and forge:add_spawns with biomes forge:any, forge:and,
+ * forge:not, a tag or a biome id (what the mod uses; from the Rats port).
  */
 final class FabricBiomeModifiers {
-    private static final String DIR = "data/" + MatterOverdrive.MODID + "/neoforge/biome_modifier";
+    private static final String DIR = "data/" + MatterOverdrive.MODID + "/forge/biome_modifier";
 
     private FabricBiomeModifiers() {}
 
@@ -61,13 +61,13 @@ final class FabricBiomeModifiers {
     }
 
     private static void apply(ResourceLocation id, JsonObject json) {
-        if (json.has("neoforge:conditions")) {
+        if (json.has("forge:conditions")) {
             throw new IllegalStateException("Unsupported conditions in " + id);
         }
         Predicate<BiomeSelectionContext> biomes = biomes(json.get("biomes"));
         String type = json.get("type").getAsString();
         switch (type) {
-            case "neoforge:add_features" -> {
+            case "forge:add_features" -> {
                 GenerationStep.Decoration step = GenerationStep.Decoration.valueOf(json.get("step").getAsString().toUpperCase(java.util.Locale.ROOT));
                 List<ResourceKey<net.minecraft.world.level.levelgen.placement.PlacedFeature>> features = strings(json.get("features")).stream()
                         .map(f -> ResourceKey.create(Registries.PLACED_FEATURE, new net.minecraft.resources.ResourceLocation(f))).toList();
@@ -75,7 +75,7 @@ final class FabricBiomeModifiers {
                     features.forEach(feature -> context.getGenerationSettings().addFeature(step, feature));
                 });
             }
-            case "neoforge:add_spawns" -> {
+            case "forge:add_spawns" -> {
                 List<JsonObject> spawners = new ArrayList<>();
                 JsonElement element = json.get("spawners");
                 if (element.isJsonArray()) {
@@ -106,18 +106,18 @@ final class FabricBiomeModifiers {
         if (biomes.isJsonObject()) {
             JsonObject object = biomes.getAsJsonObject();
             switch (object.get("type").getAsString()) {
-                case "neoforge:any" -> {
+                case "forge:any" -> {
                     return BiomeSelectors.all();
                 }
-                case "neoforge:and" -> {
+                case "forge:and" -> {
                     Predicate<BiomeSelectionContext> all = context -> true;
                     for (JsonElement each : object.getAsJsonArray("values")) all = all.and(biomes(each));
                     return all;
                 }
-                case "neoforge:or" -> {
+                case "forge:or" -> {
                     return biomes(object.get("values"));
                 }
-                case "neoforge:not" -> {
+                case "forge:not" -> {
                     return biomes(object.get("value")).negate();
                 }
                 default -> throw new IllegalStateException("Unsupported biomes: " + biomes);

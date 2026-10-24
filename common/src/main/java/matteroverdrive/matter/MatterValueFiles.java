@@ -1,0 +1,102 @@
+package matteroverdrive.matter;
+
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.jetbrains.annotations.Nullable;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import matteroverdrive.MatterOverdrive;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
+
+/**
+ * The {@code matteroverdrive:matter} item data map on 1.20.1 (no data maps on either loader): the 1.21 NeoForge
+ * {@code data/<namespace>/data_maps/item/matter.json} files, merged as NeoForge does (packs in order, {@code "replace": true} drops what lower packs gave, then
+ * {@code "remove"}). Tags are resolved on first use after a reload, when the server's tags are bound. The loaders call
+ * {@link #load} from a server data reload listener that runs after the tags.
+ */
+public final class MatterValueFiles {
+    private static final String PATH = "data_maps/item/matter.json";
+    /** Entries in load order: "#tag" or item id → value */
+    private static volatile Map<String, Integer> entries = Map.of();
+    private static volatile List<String> removed = List.of();
+    private static volatile @Nullable Map<Item, Integer> resolved;
+
+    private MatterValueFiles() {}
+
+    public static void load(ResourceManager manager) {
+        Map<String, Integer> values = new LinkedHashMap<>();
+        List<String> remove = new ArrayList<>();
+        for (String namespace : manager.getNamespaces()) {
+            ResourceLocation id = new net.minecraft.resources.ResourceLocation(namespace, PATH);
+            for (Resource resource : manager.getResourceStack(id)) {
+                try (Reader reader = resource.openAsReader()) {
+                    JsonObject json = net.minecraft.util.GsonHelper.parse(reader);
+                    if (json.has("replace") && json.get("replace").getAsBoolean()) values.clear();
+                    if (json.has("values")) {
+                        for (Map.Entry<String, JsonElement> entry : json.getAsJsonObject("values").entrySet()) {
+                            JsonElement value = entry.getValue();
+                            if (value.isJsonObject()) {
+                                JsonObject object = value.getAsJsonObject();
+                                if (object.has("replace") && object.get("replace").getAsBoolean()) values.remove(entry.getKey());
+                                value = object.get("value");
+                            }
+                            values.put(entry.getKey(), value.getAsInt());
+                        }
+                    }
+                    if (json.has("remove")) json.getAsJsonArray("remove").forEach(e -> remove.add(e.getAsString()));
+                } catch (Exception e) {
+                    MatterOverdrive.LOGGER.error("Could not read matter values {} from {}", id, resource.sourcePackId(), e);
+                }
+            }
+        }
+        entries = values;
+        removed = remove;
+        resolved = null;
+    }
+
+    public static @Nullable Integer get(Item item) {
+        Map<Item, Integer> map = resolved;
+        if (map == null) {
+            map = resolve();
+            resolved = map;
+        }
+        return map.get(item);
+    }
+
+    private static Map<Item, Integer> resolve() {
+        Map<Item, Integer> map = new HashMap<>();
+        // in file order, later entries over earlier ones (as NeoForge resolves them)
+        entries.forEach((key, value) -> {
+            if (key.startsWith("#")) {
+                TagKey<Item> tag = TagKey.create(Registries.ITEM, new net.minecraft.resources.ResourceLocation(key.substring(1)));
+                for (Holder<Item> holder : BuiltInRegistries.ITEM.getTagOrEmpty(tag)) map.put(holder.value(), value);
+            } else {
+                BuiltInRegistries.ITEM.getOptional(new net.minecraft.resources.ResourceLocation(key)).ifPresent(item -> map.put(item, value));
+            }
+        });
+        for (String key : removed) {
+            if (key.startsWith("#")) {
+                TagKey<Item> tag = TagKey.create(Registries.ITEM, new net.minecraft.resources.ResourceLocation(key.substring(1)));
+                for (Holder<Item> holder : BuiltInRegistries.ITEM.getTagOrEmpty(tag)) map.remove(holder.value());
+            } else {
+                BuiltInRegistries.ITEM.getOptional(new net.minecraft.resources.ResourceLocation(key)).ifPresent(map::remove);
+            }
+        }
+        return map;
+    }
+}

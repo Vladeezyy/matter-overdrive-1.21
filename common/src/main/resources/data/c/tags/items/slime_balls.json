@@ -1,0 +1,14 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "minecraft:slime_ball",
+      "required": false
+    },
+    "#c:slimeballs",
+    {
+      "id": "#forge:slime_balls",
+      "required": false
+    }
+  ]
+}

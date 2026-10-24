@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " T ",
+    "IPM",
+    " T "
+  ],
+  "key": {
+    "T": {
+      "item": "matteroverdrive:tritanium_plate"
+    },
+    "I": {
+      "item": "matteroverdrive:integration_matrix"
+    },
+    "M": {
+      "item": "matteroverdrive:me_conversion_matrix"
+    },
+    "P": {
+      "item": "minecraft:sticky_piston"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "matteroverdrive:portable_decomposer"
+  }
+}

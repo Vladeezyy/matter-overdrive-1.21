@@ -1,0 +1,21 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "minecraft:red_sandstone",
+      "required": false
+    },
+    {
+      "id": "minecraft:cut_red_sandstone",
+      "required": false
+    },
+    {
+      "id": "minecraft:chiseled_red_sandstone",
+      "required": false
+    },
+    {
+      "id": "minecraft:smooth_red_sandstone",
+      "required": false
+    }
+  ]
+}

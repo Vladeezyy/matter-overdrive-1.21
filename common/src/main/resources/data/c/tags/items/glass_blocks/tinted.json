@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "minecraft:tinted_glass",
+      "required": false
+    },
+    {
+      "id": "#forge:glass_tinted",
+      "required": false
+    }
+  ]
+}

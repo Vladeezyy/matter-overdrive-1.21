@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "###",
+    "#B#",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "matteroverdrive:decorative_vent_bright"
+    },
+    "B": {
+      "item": "minecraft:black_dye"
+    }
+  },
+  "result": {
+    "count": 8,
+    "item": "matteroverdrive:decorative_vent_dark"
+  }
+}

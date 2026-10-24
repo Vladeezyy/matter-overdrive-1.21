@@ -1,0 +1,14 @@
+{
+  "type": "matteroverdrive:inscriber",
+  "main": {
+    "item": "matteroverdrive:isolinear_circuit_mk2"
+  },
+  "secondary": {
+    "item": "minecraft:diamond"
+  },
+  "result": {
+    "item": "matteroverdrive:isolinear_circuit_mk3"
+  },
+  "energy": 88000,
+  "time": 600
+}

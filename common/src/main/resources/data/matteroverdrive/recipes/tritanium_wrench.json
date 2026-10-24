@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "T T",
+    " Y ",
+    " T "
+  ],
+  "key": {
+    "T": {
+      "tag": "c:ingots/tritanium"
+    },
+    "Y": {
+      "item": "minecraft:yellow_wool"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "matteroverdrive:tritanium_wrench"
+  }
+}

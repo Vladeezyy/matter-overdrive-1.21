@@ -1,0 +1,36 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "III",
+    "SPC",
+    "WHB"
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "S": {
+      "item": "matteroverdrive:weapon_receiver"
+    },
+    "P": {
+      "item": "matteroverdrive:plasma_core"
+    },
+    "C": {
+      "item": "matteroverdrive:isolinear_circuit_mk3"
+    },
+    "W": {
+      "tag": "minecraft:wool"
+    },
+    "H": {
+      "item": "matteroverdrive:weapon_handle"
+    },
+    "B": {
+      "item": "matteroverdrive:battery"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "matteroverdrive:phaser_rifle"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "bonus_rolls": 0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "matteroverdrive:charging_station",
+          "functions": [
+            {
+              "function": "matteroverdrive:copy_components"
+            }
+          ]
+        }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        },
+        {
+          "condition": "minecraft:block_state_property",
+          "block": "matteroverdrive:charging_station",
+          "properties": {
+            "part": "0"
+          }
+        }
+      ]
+    }
+  ]
+}

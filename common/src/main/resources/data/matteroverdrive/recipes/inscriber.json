@@ -1,0 +1,33 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "IDI",
+    "TPT",
+    "RMR"
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "D": {
+      "tag": "c:gems/dilithium"
+    },
+    "T": {
+      "tag": "c:plates/tritanium"
+    },
+    "P": {
+      "item": "minecraft:piston"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "M": {
+      "item": "matteroverdrive:machine_casing"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "matteroverdrive:inscriber"
+  }
+}

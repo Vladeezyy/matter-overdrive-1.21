@@ -19,7 +19,7 @@ public class MachineBlockItem extends BlockItem {
 
     /** 1.7.10 hasTagCompound: anything carried with the machine (energy, matter, owner, destinations, a name). */
     public static boolean isConfigured(ItemStack stack) {
-        return !stack.getTag().isEmpty();
+        return stack.getTag() != null && !stack.getTag().isEmpty();
     }
 
     @Override

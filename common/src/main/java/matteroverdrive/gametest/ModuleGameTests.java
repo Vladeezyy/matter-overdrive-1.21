@@ -31,7 +31,7 @@ final class ModuleGameTests {
     }
 
     private static ServerPlayer player(GameTestHelper helper) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = matteroverdrive.compat.GameTests.mockServerPlayer(helper);
         var pos = helper.absolutePos(new BlockPos(6, 1, 1)).getCenter().subtract(0, 0.5, 0);
         player.moveTo(pos.x, pos.y, pos.z, 0, 0);
         return player;

@@ -26,11 +26,11 @@ public record PlayerData<T extends INBTSerializable<CompoundTag>>(ResourceLocati
     }
 
     public T get(Player player) {
-        return Platform.INSTANCE.getData(player, this);
+        return Platform.INSTANCE.playerData(player).get(this);
     }
 
     /** Sends the data to the clients that get it (server side) */
     public void sync(Player player) {
-        if (player instanceof ServerPlayer server) Platform.INSTANCE.syncData(server, this);
+        if (player instanceof ServerPlayer server) PlayerDataSync.sync(server, this, false);
     }
 }

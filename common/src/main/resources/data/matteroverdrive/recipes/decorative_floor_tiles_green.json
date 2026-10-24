@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#G#",
+    "#Q#",
+    "#G#"
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:clay"
+    },
+    "Q": {
+      "item": "minecraft:quartz"
+    },
+    "G": {
+      "item": "minecraft:green_dye"
+    }
+  },
+  "result": {
+    "count": 12,
+    "item": "matteroverdrive:decorative_floor_tiles_green"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "minecraft:cobbled_deepslate",
+      "required": false
+    },
+    {
+      "id": "#forge:cobblestone/deepslate",
+      "required": false
+    }
+  ]
+}

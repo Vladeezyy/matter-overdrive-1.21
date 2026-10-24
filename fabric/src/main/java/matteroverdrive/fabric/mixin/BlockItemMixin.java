@@ -13,7 +13,7 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 /** NeoForge's EntityPlaceEvent for players: after the block is placed, before the stack in hand shrinks */
 @Mixin(BlockItem.class)
 public abstract class BlockItemMixin {
-    @Inject(method = "place", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;consume(ILnet/minecraft/world/entity/LivingEntity;)V"))
+    @Inject(method = "place", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;gameEvent(Lnet/minecraft/world/level/gameevent/GameEvent;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/gameevent/GameEvent$Context;)V"))
     private void matteroverdrive$onPlace(BlockPlaceContext context, CallbackInfoReturnable<InteractionResult> cir) {
         if (!context.getLevel().isClientSide && context.getPlayer() != null) {
             QuestEvents.onPlace(context.getPlayer(), context.getClickedPos(), context.getLevel().getBlockState(context.getClickedPos()));

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "##",
+    "##"
+  ],
+  "key": {
+    "#": {
+      "tag": "c:plates/tritanium"
+    }
+  },
+  "result": {
+    "count": 12,
+    "item": "matteroverdrive:decorative_tritanium_plate"
+  }
+}

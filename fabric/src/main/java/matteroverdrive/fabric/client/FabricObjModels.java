@@ -180,7 +180,7 @@ public final class FabricObjModels {
         }
 
         @Override
-        public BakedModel bake(ModelBaker baker, Function<Material, TextureAtlasSprite> sprites, ModelState state) {
+        public BakedModel bake(ModelBaker baker, Function<Material, TextureAtlasSprite> sprites, ModelState state, ResourceLocation location) {
             ObjFile file = this.obj.obj();
             Map<String, TextureAtlasSprite> materialSprites = new HashMap<>();
             Function<String, TextureAtlasSprite> spriteOf = material -> materialSprites.computeIfAbsent(material,

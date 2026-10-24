@@ -99,9 +99,8 @@ public interface Platform {
 
     // --- player data ------------------------------------------------------------------------------------
 
-    <T extends INBTSerializable<CompoundTag>> T getData(Player player, PlayerData<T> data);
-
-    <T extends INBTSerializable<CompoundTag>> void syncData(ServerPlayer player, PlayerData<T> data);
+    /** The player's {@link PlayerData} (Forge: a capability, Fabric: a field added by a mixin) */
+    PlayerDataStore playerData(Player player);
 
     // --- other mods' storages (NeoForge capabilities, Fabric transfer API and Team Reborn Energy) ----------
 

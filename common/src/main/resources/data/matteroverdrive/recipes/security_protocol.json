@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PP",
+    "CP"
+  ],
+  "key": {
+    "P": {
+      "item": "minecraft:paper"
+    },
+    "C": {
+      "item": "matteroverdrive:isolinear_circuit_mk1"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "matteroverdrive:security_protocol"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " B ",
+    "RUR",
+    " C "
+  ],
+  "key": {
+    "B": {
+      "item": "matteroverdrive:battery"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "U": {
+      "item": "matteroverdrive:upgrade_base"
+    },
+    "C": {
+      "item": "minecraft:quartz"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "matteroverdrive:upgrade_power"
+  }
+}

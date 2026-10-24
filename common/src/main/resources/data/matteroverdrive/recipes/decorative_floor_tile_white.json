@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#W#",
+    "#Q#",
+    "#W#"
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:clay"
+    },
+    "Q": {
+      "item": "minecraft:quartz"
+    },
+    "W": {
+      "item": "minecraft:white_dye"
+    }
+  },
+  "result": {
+    "count": 12,
+    "item": "matteroverdrive:decorative_floor_tile_white"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " S ",
+    "CFC",
+    "GMR"
+  ],
+  "key": {
+    "S": {
+      "item": "matteroverdrive:security_protocol"
+    },
+    "C": {
+      "item": "matteroverdrive:isolinear_circuit_mk3"
+    },
+    "F": {
+      "item": "matteroverdrive:forcefield_emitter"
+    },
+    "G": {
+      "item": "minecraft:glowstone_dust"
+    },
+    "M": {
+      "item": "matteroverdrive:machine_casing"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "matteroverdrive:star_map"
+  }
+}

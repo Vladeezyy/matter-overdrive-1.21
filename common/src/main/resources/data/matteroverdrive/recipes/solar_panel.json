@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "CGC",
+    "GQG",
+    "KMK"
+  ],
+  "key": {
+    "C": {
+      "item": "minecraft:coal"
+    },
+    "G": {
+      "item": "minecraft:glass"
+    },
+    "Q": {
+      "item": "minecraft:quartz"
+    },
+    "K": {
+      "item": "matteroverdrive:isolinear_circuit_mk2"
+    },
+    "M": {
+      "item": "matteroverdrive:machine_casing"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "matteroverdrive:solar_panel"
+  }
+}

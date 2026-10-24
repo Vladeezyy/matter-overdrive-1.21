@@ -38,7 +38,7 @@ final class MachineGameTests {
             SolarPanelBlockEntity panel = matteroverdrive.compat.GameTests.<SolarPanelBlockEntity>blockEntity(helper, A);
             // 1.7.10: round(16 * cos(0)) = 16 FE/t at noon
             helper.assertTrue(panel.getChargeAmount() == SolarPanelBlockEntity.CHARGE_AMOUNT,
-                    "charge at noon was " + panel.getChargeAmount());
+                    "charge at noon was " + panel.getChargeAmount() + ", sky light " + helper.getLevel().getBrightness(net.minecraft.world.level.LightLayer.SKY, helper.absolutePos(A)));
             helper.assertTrue(panel.getEnergy().getEnergy() > 0, "no energy after 20 ticks of noon");
             helper.assertTrue(panel.isActive(), "panel not active at noon");
             helper.succeed();

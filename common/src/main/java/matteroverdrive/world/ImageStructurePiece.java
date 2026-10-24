@@ -108,7 +108,6 @@ public class ImageStructurePiece extends StructurePiece {
             level.getChunk(pos).markPosForPostprocessing(pos);   // pipes and fences connect once the chunk is done
         }
         if (entry.has("crate_loot") && level.getBlockEntity(pos) instanceof TritaniumCrateBlockEntity crate) {
-            net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity.setLootTable(level, random, pos, ANDROID_HOUSE_LOOT);
             // android house: 10 in 200 crates also hold a level 3 legendary weapon
             if (building == Building.ANDROID_HOUSE && random.nextInt(200) < 10) {
                 crate.setItem(0, WeaponFactory.randomDecorated(random, 3, true));
@@ -119,6 +118,8 @@ public class ImageStructurePiece extends StructurePiece {
                 contract.getData().putIntArray("Pos", new int[] {pos.getX(), pos.getY(), pos.getZ()});
                 crate.setItem(0, matteroverdrive.item.ContractItem.of(contract));
             }
+            // after the fixed items: 1.20.1 setItem unpacks a pending loot table, which needs the (not yet set) level
+            net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity.setLootTable(level, random, pos, ANDROID_HOUSE_LOOT);
         }
         if (entry.has("weapon") && random.nextInt(200) < 10 && level.getBlockEntity(pos) instanceof WeaponStationBlockEntity station) {
             station.getInventory().setStack(WeaponStationBlockEntity.WEAPON, WeaponFactory.randomDecorated(random, 3, true));

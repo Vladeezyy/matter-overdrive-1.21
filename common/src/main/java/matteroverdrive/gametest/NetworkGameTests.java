@@ -108,7 +108,7 @@ final class NetworkGameTests {
             ItemStack scanner = s.getInventory().getStack(PatternStorageBlockEntity.SCANNER);
             helper.assertTrue(matteroverdrive.item.MatterScannerItem.getDatabase(helper.getLevel(), scanner) == s,
                     "scanner not linked: " + matteroverdrive.item.MatterScannerItem.getLink(scanner));
-            var player = helper.makeMockServerPlayerInLevel();
+            var player = matteroverdrive.compat.GameTests.mockServerPlayer(helper);
             boolean ok = matteroverdrive.item.MatterScannerItem.scan(helper.getLevel(), scanner, player, helper.absolutePos(target));
             List<ItemPattern> patterns = s.getPatterns();
             helper.assertTrue(ok && helper.getLevel().getBlockState(helper.absolutePos(target)).isAir()

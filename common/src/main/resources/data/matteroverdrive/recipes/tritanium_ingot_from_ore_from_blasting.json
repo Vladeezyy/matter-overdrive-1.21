@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:blasting",
+  "category": "misc",
+  "ingredient": {
+    "tag": "c:ores/tritanium"
+  },
+  "result": "matteroverdrive:tritanium_ingot",
+  "experience": 1.0,
+  "cookingtime": 100
+}

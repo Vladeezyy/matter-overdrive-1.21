@@ -82,7 +82,7 @@ public class OmniToolItem extends EnergyWeaponItem {
     }
 
     @Override
-    public boolean isCorrectToolForDrops(ItemStack stack, BlockState state) {
+    public boolean isCorrectToolForDrops(BlockState state) {
         return true;
     }
 

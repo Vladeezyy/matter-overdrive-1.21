@@ -72,7 +72,7 @@ final class WeaponGameTests {
     }
 
     private static ServerPlayer shooter(GameTestHelper helper, ItemStack weapon) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = matteroverdrive.compat.GameTests.mockServerPlayer(helper);
         var pos = helper.absolutePos(new BlockPos(6, 1, 1)).getCenter().subtract(0, 0.5, 0);
         player.moveTo(pos.x, pos.y, pos.z, 0, 0);      // yaw 0: looking south (+z)
         player.setItemSlot(EquipmentSlot.MAINHAND, weapon);

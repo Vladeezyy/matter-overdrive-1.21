@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "minecraft:redstone",
+      "required": false
+    },
+    {
+      "id": "#forge:dusts/redstone",
+      "required": false
+    }
+  ]
+}

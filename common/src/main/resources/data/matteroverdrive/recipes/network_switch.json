@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " G ",
+    "CFC",
+    " M "
+  ],
+  "key": {
+    "G": {
+      "item": "minecraft:glass"
+    },
+    "C": {
+      "item": "matteroverdrive:isolinear_circuit_mk1"
+    },
+    "F": {
+      "item": "matteroverdrive:network_flash_drive"
+    },
+    "M": {
+      "item": "matteroverdrive:machine_casing"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "matteroverdrive:network_switch"
+  }
+}

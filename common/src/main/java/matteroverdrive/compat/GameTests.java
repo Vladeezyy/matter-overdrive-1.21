@@ -14,6 +14,29 @@ public final class GameTests {
         return (T) helper.getBlockEntity(pos);
     }
 
+    /**
+     * The 1.20.2+ {@code helper.makeMockServerPlayerInLevel()}: a creative player on an embedded channel (the 1.20.1 one
+     * has a connection without a channel, which Forge's login handling dereferences)
+     */
+    public static net.minecraft.server.level.ServerPlayer mockServerPlayer(GameTestHelper helper) {
+        var player = new net.minecraft.server.level.ServerPlayer(helper.getLevel().getServer(), helper.getLevel(),
+                new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "test-mock-player")) {
+            @Override
+            public boolean isSpectator() {
+                return false;
+            }
+
+            @Override
+            public boolean isCreative() {
+                return true;
+            }
+        };
+        var connection = new net.minecraft.network.Connection(net.minecraft.network.protocol.PacketFlow.SERVERBOUND);
+        new io.netty.channel.embedded.EmbeddedChannel(connection);
+        helper.getLevel().getServer().getPlayerList().placeNewPlayer(connection, player);
+        return player;
+    }
+
     /** {@code helper.getTestRotation()} */
     public static net.minecraft.world.level.block.Rotation rotation(GameTestHelper helper) {
         return helper.testInfo.getRotation();

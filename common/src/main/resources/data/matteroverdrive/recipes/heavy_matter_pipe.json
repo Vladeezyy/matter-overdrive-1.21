@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "RMR",
+    "TMT",
+    "RMR"
+  ],
+  "key": {
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "M": {
+      "item": "matteroverdrive:s_magnet"
+    },
+    "T": {
+      "tag": "c:plates/tritanium"
+    }
+  },
+  "result": {
+    "count": 8,
+    "item": "matteroverdrive:heavy_matter_pipe"
+  }
+}

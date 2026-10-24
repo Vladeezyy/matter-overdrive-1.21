@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " M ",
+    "CPC",
+    "DED"
+  ],
+  "key": {
+    "M": {
+      "item": "matteroverdrive:machine_casing"
+    },
+    "C": {
+      "item": "matteroverdrive:isolinear_circuit_mk1"
+    },
+    "P": {
+      "item": "matteroverdrive:isolinear_circuit_mk2"
+    },
+    "D": {
+      "tag": "c:gems/dilithium"
+    },
+    "E": {
+      "item": "minecraft:ender_eye"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "matteroverdrive:h_compensator"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " T ",
+    "I I",
+    "GRG"
+  ],
+  "key": {
+    "T": {
+      "tag": "c:plates/tritanium"
+    },
+    "I": {
+      "tag": "c:ingots/tritanium"
+    },
+    "G": {
+      "item": "minecraft:gold_ingot"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "matteroverdrive:machine_casing"
+  }
+}

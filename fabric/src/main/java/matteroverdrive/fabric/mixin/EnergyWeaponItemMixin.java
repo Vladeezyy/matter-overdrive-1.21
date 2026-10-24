@@ -12,7 +12,7 @@ import net.minecraft.world.item.ItemStack;
 @Mixin(EnergyWeaponItem.class)
 public abstract class EnergyWeaponItemMixin implements FabricItem {
     @Override
-    public boolean allowComponentsUpdateAnimation(Player player, InteractionHand hand, ItemStack oldStack, ItemStack newStack) {
+    public boolean allowNbtUpdateAnimation(Player player, InteractionHand hand, ItemStack oldStack, ItemStack newStack) {
         return ((EnergyWeaponItem) (Object) this).shouldCauseReequipAnimation(oldStack, newStack, false);
     }
 }

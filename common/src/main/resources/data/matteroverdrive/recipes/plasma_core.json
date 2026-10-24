@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "GI ",
+    "MCM",
+    " IG"
+  ],
+  "key": {
+    "G": {
+      "item": "minecraft:glass"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "M": {
+      "item": "matteroverdrive:s_magnet"
+    },
+    "C": {
+      "item": "matteroverdrive:matter_container"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "matteroverdrive:plasma_core"
+  }
+}

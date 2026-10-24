@@ -1,0 +1,36 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "B3B",
+    "TCT",
+    "2M1"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:black_wool"
+    },
+    "3": {
+      "item": "matteroverdrive:isolinear_circuit_mk3"
+    },
+    "T": {
+      "tag": "c:ingots/tritanium"
+    },
+    "C": {
+      "item": "minecraft:chest"
+    },
+    "2": {
+      "item": "matteroverdrive:isolinear_circuit_mk2"
+    },
+    "M": {
+      "item": "matteroverdrive:machine_casing"
+    },
+    "1": {
+      "item": "matteroverdrive:isolinear_circuit_mk1"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "matteroverdrive:pattern_storage"
+  }
+}

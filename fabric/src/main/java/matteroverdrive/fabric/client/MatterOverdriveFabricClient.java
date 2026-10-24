@@ -97,8 +97,9 @@ public final class MatterOverdriveFabricClient implements ClientModInitializer {
         ClientTickEvents.START_CLIENT_TICK.register(client -> MOClient.onClientTickStart());
         ClientTickEvents.END_CLIENT_TICK.register(client -> MOClient.onClientTickEnd());
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> MOClient.onLoggedOut());
-        ItemTooltipCallback.EVENT.register((stack, context, flag, lines) -> MOClient.onTooltip(stack, lines));
-        HudRenderCallback.EVENT.register((graphics, delta) -> {
+        ItemTooltipCallback.EVENT.register((stack, flag, lines) -> MOClient.onTooltip(stack, lines));
+        HudRenderCallback.EVENT.register((graphics, partialTick) -> {
+            var delta = matteroverdrive.compat.DeltaTracker.now(partialTick);
             AndroidHud.render(graphics, delta);
             QuestHud.render(graphics, delta);
         });

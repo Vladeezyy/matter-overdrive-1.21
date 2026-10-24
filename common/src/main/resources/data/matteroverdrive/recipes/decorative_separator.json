@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#N#",
+    "#N#",
+    "#N#"
+  ],
+  "key": {
+    "#": {
+      "item": "matteroverdrive:decorative_tritanium_plate"
+    },
+    "N": {
+      "tag": "c:nuggets/tritanium"
+    }
+  },
+  "result": {
+    "count": 8,
+    "item": "matteroverdrive:decorative_separator"
+  }
+}

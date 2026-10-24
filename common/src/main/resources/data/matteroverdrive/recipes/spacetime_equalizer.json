@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " M ",
+    "EHE",
+    " M "
+  ],
+  "key": {
+    "M": {
+      "item": "matteroverdrive:s_magnet"
+    },
+    "E": {
+      "item": "minecraft:ender_pearl"
+    },
+    "H": {
+      "item": "matteroverdrive:h_compensator"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "matteroverdrive:spacetime_equalizer"
+  }
+}

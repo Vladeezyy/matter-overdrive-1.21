@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "minecraft:mossy_cobblestone",
+      "required": false
+    },
+    {
+      "id": "#forge:cobblestone/mossy",
+      "required": false
+    }
+  ]
+}

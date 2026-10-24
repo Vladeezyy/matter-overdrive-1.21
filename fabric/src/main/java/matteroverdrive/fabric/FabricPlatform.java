@@ -93,13 +93,15 @@ public final class FabricPlatform implements Platform {
         throw new IllegalStateException("Packets to the server can only be sent from the client");
     };
 
-    /** Registers the queued entries: attributes, data components, armor materials, then vanilla order, then modded registries */
+    private static net.minecraft.network.FriendlyByteBuf bytes(CustomPacketPayload payload, ServerPlayer to) {
+        return matteroverdrive.platform.Payloads.INSTANCE.encode(payload, to.server.registryAccess());
+    }
+
+    /** Registers the queued entries: attributes, then vanilla order, then modded registries */
     @SuppressWarnings({"unchecked", "rawtypes"})
     static void registerAll() {
         Set<ResourceLocation> order = new LinkedHashSet<>();
         order.add(Registries.ATTRIBUTE.location());
-        order.add(Registries.DATA_COMPONENT_TYPE.location());
-        order.add(Registries.ARMOR_MATERIAL.location());
         List<ResourceLocation> modded = new ArrayList<>();
         // the registry of registries in registration order (its keySet() has no order)
         for (Registry<?> each : BuiltInRegistries.REGISTRY) {
@@ -165,20 +167,16 @@ public final class FabricPlatform implements Platform {
     @Override
     public <T extends AbstractContainerMenu> MenuType<T> menuType(MenuFactory<T> factory) {
         // the extra data travels as bytes and is read back with the client's registries
-        return new ExtendedScreenHandlerType<>((int id, Inventory inventory, byte[] data) ->
-                factory.create(id, inventory, new RegistryFriendlyByteBuf(Unpooled.wrappedBuffer(data), inventory.player.registryAccess())), ByteBufCodecs.BYTE_ARRAY);
+        return new ExtendedScreenHandlerType<>((id, inventory, buf) ->
+                factory.create(id, inventory, RegistryFriendlyByteBuf.of(buf, inventory.player.level().registryAccess())));
     }
 
     @Override
     public void openMenu(ServerPlayer player, MenuProvider provider, Consumer<RegistryFriendlyByteBuf> extraData) {
-        RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.buffer(), player.registryAccess());
-        extraData.accept(buf);
-        byte[] data = new byte[buf.readableBytes()];
-        buf.readBytes(data);
-        player.openMenu(new ExtendedScreenHandlerFactory<byte[]>() {
+        player.openMenu(new ExtendedScreenHandlerFactory() {
             @Override
-            public byte[] getScreenOpeningData(ServerPlayer opener) {
-                return data;
+            public void writeScreenOpeningData(ServerPlayer opener, net.minecraft.network.FriendlyByteBuf buf) {
+                extraData.accept(RegistryFriendlyByteBuf.of(buf, opener.server.registryAccess()));
             }
 
             @Override
@@ -208,35 +206,30 @@ public final class FabricPlatform implements Platform {
 
     @Override
     public void sendToPlayer(ServerPlayer player, CustomPacketPayload payload) {
-        ServerPlayNetworking.send(player, payload);
+        ServerPlayNetworking.send(player, payload.type().id(), bytes(payload, player));
     }
 
     @Override
     public void sendToTrackingAndSelf(Entity entity, CustomPacketPayload payload) {
-        for (ServerPlayer player : PlayerLookup.tracking(entity)) ServerPlayNetworking.send(player, payload);
-        if (entity instanceof ServerPlayer self) ServerPlayNetworking.send(self, payload);
+        for (ServerPlayer player : PlayerLookup.tracking(entity)) sendToPlayer(player, payload);
+        if (entity instanceof ServerPlayer self) sendToPlayer(self, payload);
     }
 
     @Override
     public void sendToTrackingChunk(ServerLevel level, BlockPos pos, CustomPacketPayload payload) {
-        for (ServerPlayer player : PlayerLookup.tracking(level, pos)) ServerPlayNetworking.send(player, payload);
+        for (ServerPlayer player : PlayerLookup.tracking(level, pos)) sendToPlayer(player, payload);
     }
 
     @Override
     public boolean canSend(ServerPlayer player, CustomPacketPayload.Type<?> type) {
-        return player.connection != null && ServerPlayNetworking.canSend(player, type);
+        return player.connection != null && ServerPlayNetworking.canSend(player, type.id());
     }
 
     // --- player data ---
 
     @Override
-    public <T extends INBTSerializable<CompoundTag>> T getData(Player player, PlayerData<T> data) {
-        return FabricPlayerData.get(player, data);
-    }
-
-    @Override
-    public <T extends INBTSerializable<CompoundTag>> void syncData(ServerPlayer player, PlayerData<T> data) {
-        FabricPlayerData.sync(player, data);
+    public matteroverdrive.platform.PlayerDataStore playerData(Player player) {
+        return ((matteroverdrive.platform.PlayerDataStore.Holder) player).matteroverdrive$playerData();
     }
 
     // --- storages: the mod's own blocks directly, other mods' through Fabric's transfer API and TR Energy ---
@@ -332,7 +325,7 @@ public final class FabricPlatform implements Platform {
 
     @Override
     public @Nullable Integer matterValue(Item item) {
-        return FabricMatterValues.get(item);
+        return matteroverdrive.matter.MatterValueFiles.get(item);
     }
 
     @Override

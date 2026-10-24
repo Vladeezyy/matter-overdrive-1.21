@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " H ",
+    "TST",
+    "CMC"
+  ],
+  "key": {
+    "H": {
+      "item": "matteroverdrive:holo_sign"
+    },
+    "T": {
+      "tag": "c:plates/tritanium"
+    },
+    "S": {
+      "item": "matteroverdrive:spacetime_equalizer"
+    },
+    "C": {
+      "item": "matteroverdrive:s_magnet"
+    },
+    "M": {
+      "item": "matteroverdrive:machine_casing"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "matteroverdrive:gravitational_stabilizer"
+  }
+}
