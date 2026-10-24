@@ -1,5 +1,5 @@
 {
-  "loader": "neoforge:obj",
+  "loader": "forge:obj",
   "model": "matteroverdrive:models/block/inscriber_idle.obj",
   "flip_v": true,
   "textures": {

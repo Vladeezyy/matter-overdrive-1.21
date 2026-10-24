@@ -79,6 +79,7 @@ public abstract class MachineScreen<M extends MachineMenu<?>> extends AbstractCo
 
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        renderBackground(g);  // 1.20.1: Screen.render draws no background (1.20.2+ does)
         super.render(g, mouseX, mouseY, partialTick);
         renderTooltip(g, mouseX, mouseY);
         renderExtraTooltips(g, mouseX - leftPos, mouseY - topPos, mouseX, mouseY);

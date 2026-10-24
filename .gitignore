@@ -51,3 +51,5 @@ CLAUDE.md
 /build-*.log
 run-gametest/
 fabric/run-prod/
+forge/run-prod-server/
+forge/run-gametest/

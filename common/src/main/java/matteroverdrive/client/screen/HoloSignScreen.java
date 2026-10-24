@@ -39,6 +39,7 @@ public class HoloSignScreen extends Screen {
 
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        renderBackground(g);  // 1.20.1: Screen.render draws no background (1.20.2+ does)
         super.render(g, mouseX, mouseY, partialTick);
         g.drawCenteredString(font, title, width / 2, height / 2 - 85, 0xFFFFFFFF);
     }

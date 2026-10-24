@@ -304,6 +304,10 @@ public class StarMapScreen extends AbstractContainerScreen<StarMapMenu> {
 
     // --- rendering -------------------------------------------------------------------------------------
 
+    /** The star map draws its own full-screen background (no dimming) */
+    @Override
+    public void renderBackground(GuiGraphics g) {}
+
     private void renderStarMapBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
         // 1.7.10 drawWorldBackground: black, then the hologram in perspective
         g.fill(0, 0, width, height, 0xFF000000);

@@ -92,8 +92,15 @@ final class MatterOverdriveForgeClient {
 
         IEventBus game = MinecraftForge.EVENT_BUS;
         game.addListener((TickEvent.ClientTickEvent event) -> {
-            if (event.phase == TickEvent.Phase.START) MOClient.onClientTickStart();
-            else MOClient.onClientTickEnd();
+            if (event.phase == TickEvent.Phase.START) {
+                MOClient.onClientTickStart();
+            } else {
+                MOClient.onClientTickEnd();
+                matteroverdrive.client.PerfScene.onTick();
+            }
+        });
+        game.addListener((TickEvent.RenderTickEvent event) -> {
+            if (event.phase == TickEvent.Phase.END) matteroverdrive.client.PerfScene.onFrame();
         });
         game.addListener((ClientPlayerNetworkEvent.LoggingOut event) -> MOClient.onLoggedOut());
         game.addListener((ItemTooltipEvent event) -> MOClient.onTooltip(event.getItemStack(), event.getToolTip()));

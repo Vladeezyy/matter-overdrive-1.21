@@ -1,5 +1,5 @@
 {
-  "loader": "neoforge:obj",
+  "loader": "forge:obj",
   "model": "matteroverdrive:models/block/tritanium_crate.obj",
   "flip_v": true,
   "textures": {

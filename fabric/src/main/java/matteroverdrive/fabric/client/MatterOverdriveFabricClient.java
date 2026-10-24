@@ -95,7 +95,12 @@ public final class MatterOverdriveFabricClient implements ClientModInitializer {
                 MOItems.TRITANIUM_HELMET.get(), MOItems.TRITANIUM_CHESTPLATE.get(), MOItems.TRITANIUM_LEGGINGS.get(), MOItems.TRITANIUM_BOOTS.get());
 
         ClientTickEvents.START_CLIENT_TICK.register(client -> MOClient.onClientTickStart());
-        ClientTickEvents.END_CLIENT_TICK.register(client -> MOClient.onClientTickEnd());
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            MOClient.onClientTickEnd();
+            matteroverdrive.client.PerfScene.onTick();
+        });
+        // PerfScene counts frames (Forge: RenderTickEvent END)
+        WorldRenderEvents.END.register(context -> matteroverdrive.client.PerfScene.onFrame());
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> MOClient.onLoggedOut());
         ItemTooltipCallback.EVENT.register((stack, flag, lines) -> MOClient.onTooltip(stack, lines));
         HudRenderCallback.EVENT.register((graphics, partialTick) -> {

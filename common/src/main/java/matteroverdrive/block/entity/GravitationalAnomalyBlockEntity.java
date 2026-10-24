@@ -348,4 +348,9 @@ public class GravitationalAnomalyBlockEntity extends matteroverdrive.compat.Comp
         return String.format(java.util.Locale.ROOT, "mass %d, range %.2f, break range %.2f, horizon %.2f, strength %.2f",
                 mass, getMaxRange(), getBlockBreakRange(), getEventHorizon(), getRealMass() * 4 * suppression);
     }
+
+    /** Forge 1.20.1 culls a block entity by this box (1.21 asked the renderer, see the client renderer); unused on Fabric */
+    public net.minecraft.world.phys.AABB getRenderBoundingBox() {
+        return new net.minecraft.world.phys.AABB(getBlockPos()).inflate(getEventHorizon() * 2 + 1);
+    }
 }

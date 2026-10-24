@@ -1,5 +1,5 @@
 {
-  "loader": "neoforge:obj",
+  "loader": "forge:obj",
   "model": "matteroverdrive:models/block/pattern_storage_drive_3.obj",
   "flip_v": true,
   "textures": {

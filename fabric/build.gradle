@@ -49,6 +49,16 @@ loom {
             programArgs '--quickPlaySingleplayer', 'mo_scene'
             runDir('run')
         }
+        // performance and look checks (matteroverdrive.client.PerfScene), as on Forge: -Pperf=stress|hands, -Pjfr
+        perf {
+            client()
+            name 'Perf'
+            vmArg "-Dmatteroverdrive.perf=${project.findProperty('perf') ?: 'stress'}"
+            vmArg "-Dmatteroverdrive.perf.types=${project.findProperty('types') ?: ''}"
+            if (project.hasProperty('jfr')) vmArg '-XX:StartFlightRecording=filename=perf.jfr,settings=profile'
+            programArgs '--quickPlaySingleplayer', project.findProperty('world') ?: 'mo_scene'
+            runDir('run')
+        }
         // headless in-game tests (fabric-gametest entrypoint), then exits
         gametest {
             server()

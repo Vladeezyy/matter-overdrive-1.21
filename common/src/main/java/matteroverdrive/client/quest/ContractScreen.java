@@ -55,6 +55,7 @@ public class ContractScreen extends Screen {
 
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        renderBackground(g);  // 1.20.1: Screen.render draws no background (1.20.2+ does)
         super.render(g, mouseX, mouseY, partialTick);
         QuestStack stack = quest();
         if (stack == null) {

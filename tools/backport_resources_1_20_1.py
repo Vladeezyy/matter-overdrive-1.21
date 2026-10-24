@@ -14,7 +14,7 @@ What changes for 1.20.1:
 - the 1.21 c: tags the data refers to are shipped with the mod (from NeoForge 21.1, every entry optional): neither 1.20.1
   loader has them (Forge has forge:, Fabric the old c: names, which the NeoForge files already list as optional);
 - the mod's materials also go into the 1.20.1 forge: and c: tags so other mods find them;
-- NeoForge biome modifiers become Forge ones (data/<mod>/forge/biome_modifier, forge: types);
+- NeoForge biome modifiers become Forge ones (data/<mod>/forge/biome_modifier, forge: types); OBJ models use forge:obj;
 - structure NBT files get the 1.20.1 data version; pack.mcmeta with pack format 15.
 """
 import gzip
@@ -222,6 +222,12 @@ def set_data_version(path):
 
 for f in data.glob("*/structures/**/*.nbt"):
     set_data_version(f)
+
+# OBJ models: the Forge 1.20.1 loader name (Fabric's FabricObjModels reads the same files)
+for f in (root / "assets").rglob("models/**/*.json"):
+    text = f.read_text(encoding="utf-8")
+    if '"neoforge:obj"' in text:
+        f.write_text(text.replace('"neoforge:obj"', '"forge:obj"'), encoding="utf-8")
 
 # 7. pack.mcmeta
 save(root / "pack.mcmeta", {"pack": {"description": "Matter Overdrive resources", "pack_format": 15}})

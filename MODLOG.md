@@ -820,3 +820,31 @@
 - Fix: the names are read from the classpath (`getResourceAsStream`, like `BuildingTemplate`).
 - Checked: the NeoForge jar of every version (1.21.1 – 26.3) on a production server, a new world each (no errors, the
   saved galaxy has real star names); GameTests on 26.2, both loaders.
+
+## 2026-10-25 — Minecraft 1.20.1: Forge 47 + Fabric (branch `mc/1.20.1`, from `fabric-1.21.1`)
+- One `common` for both loaders again: Forge 47.4.28 (the same jar runs on NeoForge 47.1 for 1.20.1) and Fabric
+  (Fabric API 0.92, Team Reborn Energy 3.0.0), Java 17. Content and numbers are those of 1.0.3.
+- The 1.20.5+ APIs the 1.21.1 code uses are stand-ins with the same names in `matteroverdrive.compat`: stream codecs and
+  payloads (`compat.codec`), item data components kept in the stack's NBT under the component name (`compat.component`;
+  `stack.get(X)` → `Components.get(stack, X)`), `DeltaTracker`, `ItemContainerContents`, attribute modifiers by id
+  (`Attrs`: UUID from the id), damage sources, vertex calls in any order (`compat.render.Vertex`, the 1.20.1 buffer only
+  takes elements in format order), GUI sprites (1.20.1 has no sprite atlas: each sprite is its own texture, the nine-slice
+  scaling read from the `.mcmeta`). `tools/port/backport_1_20_1.py` rewrites the sources (idempotent);
+  `tools/backport_resources_1_20_1.py` the data.
+- Network: both loaders only move bytes; `platform/Payloads` encodes and decodes with the payloads' stream codecs (Forge:
+  one channel, Fabric: a channel per payload). Player data (android, quests): `PlayerDataStore` — a Forge capability, a
+  field of a Fabric mixin on `Player` — synced by `PlayerDataSync` like the 1.21 attachments.
+- Machines carried as items: `matteroverdrive:copy_components` loot function (the block entity's components into the
+  item's NBT), taken back in `MachineBlock.setPlacedBy`; crates: `copy_nbt` of `Items` into `BlockEntityTag`.
+- Recipes: `InscriberRecipe` with its id and a JSON serializer; matter values derived from `getResultItem`.
+- Data maps and NeoForge loot modifiers do not exist in 1.20.1: the same files are read by `MatterValueFiles` (reload
+  listener on both loaders) and `AddedLootTables` (`LootTableLoadEvent` / `LootTableEvents.MODIFY`). Biome modifiers are
+  Forge ones (`data/matteroverdrive/forge/biome_modifier`, read by Fabric too). The 1.21 `c:` tags the data uses ship
+  with the mod (contents from NeoForge 21.1, all entries optional); the mod's materials are also in `forge:` and the old
+  Fabric `c:` names.
+- Forge specifics: ATs in SRG names (`tools/port/at_to_srg.py`; MDG legacyforge ignores Mojang names), common compiled on
+  Forge userdev (the MCP setup applies no AT). Game tests in their own flat world (`forge/run-gametest`): Forge's test
+  server is an ordinary dedicated server.
+- Bugs found on the way: `EventNetworkChannel` events are named by the sender (client→server packets arrive as
+  `ClientCustomPayloadEvent`); 1.20.1 `setItem` on a crate with a pending loot table needs the level (now the loot table is
+  set after the fixed items in buildings); the `neoforge:obj` loader is `forge:obj` in 1.20.1.

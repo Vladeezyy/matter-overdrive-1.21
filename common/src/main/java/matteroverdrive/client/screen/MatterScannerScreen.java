@@ -64,6 +64,7 @@ public class MatterScannerScreen extends Screen {
 
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        renderBackground(g);  // 1.20.1: Screen.render draws no background (1.20.2+ does)
         super.render(g, mouseX, mouseY, partialTick);
         ItemStack scanner = scanner();
         if (!(scanner.getItem() instanceof MatterScannerItem)) {
@@ -122,11 +123,6 @@ public class MatterScannerScreen extends Screen {
             matteroverdrive.compat.Gui.setTooltipForNextFrame(g, font, Component.translatable("gui.matteroverdrive.pattern", hovered.toStack().getHoverName(), hovered.progress()),
                     mouseX, mouseY);
         }
-    }
-
-    @Override
-    public void renderBackground(GuiGraphics g) {
-        renderBackground(g);
     }
 
     private @Nullable ItemPattern patternAt(double mx, double my) {

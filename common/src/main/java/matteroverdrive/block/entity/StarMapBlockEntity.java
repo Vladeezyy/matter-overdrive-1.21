@@ -135,4 +135,10 @@ public class StarMapBlockEntity extends MachineBlockEntity {
         position = input.read("GalacticPosition", net.minecraft.nbt.CompoundTag.CODEC).map(GalacticPosition::fromNBT).orElse(GalacticPosition.NONE);
         destination = input.read("GalacticDestination", net.minecraft.nbt.CompoundTag.CODEC).map(GalacticPosition::fromNBT).orElse(GalacticPosition.NONE);
     }
+
+    /** Forge 1.20.1 culls a block entity by this box (1.21 asked the renderer, see the client renderer); unused on Fabric */
+    public net.minecraft.world.phys.AABB getRenderBoundingBox() {
+        var pos = getBlockPos();
+        return new net.minecraft.world.phys.AABB(pos.getX() - 3, pos.getY(), pos.getZ() - 3, pos.getX() + 4, pos.getY() + 6, pos.getZ() + 4);
+    }
 }

@@ -1,15 +1,15 @@
-# Matter Overdrive for Minecraft 1.21.1 (NeoForge and Fabric)
+# Matter Overdrive for Minecraft 1.20.1 (Forge and Fabric)
 
 ![Matter Overdrive](docs/modrinth/banner.png)
 
 An unofficial port of [Matter Overdrive](https://github.com/simeonradivoev/MatterOverdrive) by Simeon Radivoev
-from Minecraft 1.7.10 to **Minecraft 1.21.1** on **NeoForge 21.1** and **Fabric** (Fabric API; Team Reborn Energy for
-FE is included in the jar).
+from Minecraft 1.7.10 to **Minecraft 1.20.1** on **Forge 47** (the jar also runs on NeoForge 47.1 for 1.20.1) and
+**Fabric** (Fabric API; Team Reborn Energy for FE is included in the jar).
 
-This branch builds both loaders from one `common` module (all game code, compiled on vanilla) plus thin `neoforge/`
-and `fabric/` modules; the Minecraft 1.21.10 build lives on `main`. Both builds share the game code: the
-1.21.10 APIs the code is written against are re-created for 1.21.1 in `matteroverdrive.compat`, and
-`tools/backport_1_21_1.py` converts the generated resources.
+This branch (`mc/1.20.1`) builds both loaders from one `common` module (all game code) plus thin `forge/` and `fabric/`
+modules. It is a backport of the 1.21.1 branch: the 1.20.5+ APIs the code is written against are re-created for 1.20.1
+in `matteroverdrive.compat` (`tools/port/backport_1_20_1.py` rewrites the sources), and
+`tools/backport_resources_1_20_1.py` converts the resources. The 1.21.x and 26.x builds live on the other branches.
 
 The port is a rewrite against modern APIs that keeps the original's behaviour, numbers, textures, sounds and
 translations (English and Russian; the port adds Ukrainian, German, Spanish and Portuguese (Brazil), not by native
@@ -36,17 +36,17 @@ Details: [MODDING_PLAN.md](MODDING_PLAN.md) and the work log [MODLOG.md](MODLOG.
 difference from 1.7.10.
 
 ## Building
-Requires JDK 21.
+Gradle runs on JDK 21 (Fabric Loom), the mod is compiled for Java 17.
 ```bash
-./gradlew build                        # jars in neoforge/build/libs/ and fabric/build/libs/
-./gradlew :neoforge:runClient          # dev client (:fabric:runClient for Fabric)
-./gradlew :neoforge:runGameTestServer  # headless in-game tests (:fabric:runGametest)
-./gradlew :neoforge:runScene           # scripted scene: screenshots to <loader>/run/screenshots/ (:fabric:runScene)
+./gradlew build                     # jars in forge/build/libs/ and fabric/build/libs/
+./gradlew :forge:runClient          # dev client (:fabric:runClient for Fabric)
+sh tools/gametest.sh                # headless in-game tests, LOADER=forge|fabric (under a hang watchdog)
+sh tools/mkscene.sh                 # makes the scene world <loader>/run/saves/mo_scene (flat, creative)
+sh tools/scenetest.sh               # scripted scene: screenshots to <loader>/run/screenshots/
+sh tools/perf.sh stress             # frame rate and server tick time against vanilla furnaces
 ```
-`runScene` needs a 1.21.1 world named `mo_scene` in `<loader>/run/saves/` (a flat creative world made by the
-dedicated server works).
-Resources for simple content are generated from the original 1.7.10 assets by `tools/gen_resources.py`, then
-converted for 1.21.1 by `tools/backport_1_21_1.py` (see MODLOG.md for the commands).
+Resources for simple content were generated from the original 1.7.10 assets by `tools/gen_resources.py`, converted
+for 1.21.1 by `tools/backport_1_21_1.py` and for 1.20.1 by `tools/backport_resources_1_20_1.py`.
 
 ## License and credits
 GPL-3.0-or-later, the same license as the original — see [LICENSE.md](LICENSE.md).

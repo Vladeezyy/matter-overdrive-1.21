@@ -39,7 +39,7 @@ import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 
 /**
- * NeoForge's {@code neoforge:obj} model loader for the mod's models on Fabric: the same JSON files (model, flip_v,
+ * Forge's {@code forge:obj} model loader for the mod's models on Fabric: the same JSON files (model, flip_v,
  * textures, visibility, display, overrides) and Wavefront files (v / vt / vn / f, g groups, usemtl, the mtl's
  * {@code map_Kd #texture} and {@code neoforge_TintIndex}). The models bake to plain vanilla models once per resource
  * reload, so drawing them costs what a JSON model costs.
@@ -79,7 +79,7 @@ public final class FabricObjModels {
             for (Map.Entry<ResourceLocation, Resource> entry : found.entrySet()) {
                 try (Reader reader = entry.getValue().openAsReader()) {
                     JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
-                    if (!json.has("loader") || !json.get("loader").getAsString().equals("neoforge:obj")) continue;
+                    if (!json.has("loader") || !json.get("loader").getAsString().equals("forge:obj")) continue;
                     ResourceLocation file = new net.minecraft.resources.ResourceLocation(json.get("model").getAsString());
                     ObjFile obj = files.get(file);
                     if (obj == null) {

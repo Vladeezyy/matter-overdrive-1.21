@@ -44,15 +44,16 @@ final class ForgeNetwork {
         Payloads.registerAll();
         channel = NetworkRegistry.ChannelBuilder.named(CHANNEL_ID).networkProtocolVersion(() -> VERSION)
                 .clientAcceptedVersions(VERSION::equals).serverAcceptedVersions(VERSION::equals).eventNetworkChannel();
-        channel.addListener((NetworkEvent.ServerCustomPayloadEvent event) -> {
-            if (event instanceof NetworkEvent.ServerCustomPayloadLoginEvent) return;
+        // Forge names the events by the sender: ClientCustomPayloadEvent arrives on the server, ServerCustomPayloadEvent on the client
+        channel.addListener((NetworkEvent.ClientCustomPayloadEvent event) -> {
+            if (event instanceof NetworkEvent.ClientCustomPayloadLoginEvent) return;
             NetworkEvent.Context context = event.getSource().get();
             ServerPlayer sender = context.getSender();
             if (sender != null) receive(event.getPayload(), sender.server.registryAccess(), context, sender, false);
             context.setPacketHandled(true);
         });
-        channel.addListener((NetworkEvent.ClientCustomPayloadEvent event) -> {
-            if (event instanceof NetworkEvent.ClientCustomPayloadLoginEvent) return;
+        channel.addListener((NetworkEvent.ServerCustomPayloadEvent event) -> {
+            if (event instanceof NetworkEvent.ServerCustomPayloadLoginEvent) return;
             NetworkEvent.Context context = event.getSource().get();
             receive(event.getPayload(), clientRegistries.get(), context, null, true);
             context.setPacketHandled(true);

@@ -81,4 +81,10 @@ public class GravitationalStabilizerBlockEntity extends MachineBlockEntity {
     public @Nullable AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
         return null;   // no GUI in 1.7.10
     }
+
+    /** Forge 1.20.1 culls a block entity by this box (1.21 asked the renderer, see the client renderer); unused on Fabric */
+    public net.minecraft.world.phys.AABB getRenderBoundingBox() {
+        var facing = getBlockState().getValue(matteroverdrive.machine.MachineBlock.FACING);
+        return new net.minecraft.world.phys.AABB(getBlockPos()).expandTowards(facing.getStepX() * RANGE, 0, facing.getStepZ() * RANGE).inflate(1);
+    }
 }
