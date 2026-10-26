@@ -35,19 +35,6 @@ Everything from the original is ported:
 Details: [MODDING_PLAN.md](MODDING_PLAN.md) and the work log [MODLOG.md](MODLOG.md), including every deliberate
 difference from 1.7.10.
 
-## Building
-Gradle runs on JDK 21 (Fabric Loom), the mod is compiled for Java 17.
-```bash
-./gradlew build                     # jars in forge/build/libs/ and fabric/build/libs/
-./gradlew :forge:runClient          # dev client (:fabric:runClient for Fabric)
-sh tools/gametest.sh                # headless in-game tests, LOADER=forge|fabric (under a hang watchdog)
-sh tools/mkscene.sh                 # makes the scene world <loader>/run/saves/mo_scene (flat, creative)
-sh tools/scenetest.sh               # scripted scene: screenshots to <loader>/run/screenshots/
-sh tools/perf.sh stress             # frame rate and server tick time against vanilla furnaces
-```
-Resources for simple content were generated from the original 1.7.10 assets by `tools/gen_resources.py`, converted
-for 1.21.1 by `tools/backport_1_21_1.py` and for 1.20.1 by `tools/backport_resources_1_20_1.py`.
-
 ## License and credits
 GPL-3.0-or-later, the same license as the original — see [LICENSE.md](LICENSE.md).
 Original mod, art, sounds and translations: Simeon Radivoev and the Matter Overdrive contributors.
