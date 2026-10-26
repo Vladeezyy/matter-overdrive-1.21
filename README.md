@@ -35,19 +35,6 @@ Everything from the original is ported:
 Details: [MODDING_PLAN.md](MODDING_PLAN.md) and the work log [MODLOG.md](MODLOG.md), including every deliberate
 difference from 1.7.10.
 
-## Building
-Requires JDK 21.
-```bash
-./gradlew build                        # jars in neoforge/build/libs/ and fabric/build/libs/
-./gradlew :neoforge:runClient          # dev client (:fabric:runClient for Fabric)
-./gradlew :neoforge:runGameTestServer  # headless in-game tests (:fabric:runGametest)
-./gradlew :neoforge:runScene           # scripted scene: screenshots to <loader>/run/screenshots/ (:fabric:runScene)
-```
-`runScene` needs a 1.21.1 world named `mo_scene` in `<loader>/run/saves/` (a flat creative world made by the
-dedicated server works).
-Resources for simple content are generated from the original 1.7.10 assets by `tools/gen_resources.py`, then
-converted for 1.21.1 by `tools/backport_1_21_1.py` (see MODLOG.md for the commands).
-
 ## License and credits
 GPL-3.0-or-later, the same license as the original — see [LICENSE.md](LICENSE.md).
 Original mod, art, sounds and translations: Simeon Radivoev and the Matter Overdrive contributors.
