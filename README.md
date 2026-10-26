@@ -48,18 +48,6 @@ Everything from the original is ported:
 Details: [MODDING_PLAN.md](MODDING_PLAN.md) and the work log [MODLOG.md](MODLOG.md), including every deliberate
 difference from 1.7.10.
 
-## Building
-Requires JDK 21.
-```bash
-./gradlew build              # jar in build/libs/
-./gradlew runClient          # dev client
-./gradlew runGameTestServer  # headless in-game tests
-./gradlew runScene           # scripted scene: screenshots of the machines and features to run/screenshots/
-```
-`runScene` needs a world named `mo_scene` in `run/saves/` (any copy of a dev world).
-Resources for simple content are generated from the original 1.7.10 assets by `tools/gen_resources.py`
-(see MODLOG.md for the command).
-
 ## Performance
 1.0.1 measured machines against vanilla furnaces in the same scene (`tools/perf.sh`, see MODLOG.md): idle inscribers and
 pattern storages render as fast as furnaces, a big working base costs about half the frame rate and server time it did
