@@ -24,7 +24,10 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -65,6 +68,7 @@ public final class MOGameTests {
         add("ores_place_in_stone", 100, false, MOGameTests::oresPlaceInStone);
         add("dilithium_drops_crystal", 100, false, MOGameTests::dilithiumDropsCrystal);
         add("tritanium_smelts", 100, false, MOGameTests::tritaniumSmelts);
+        add("tritanium_ingot_in_survival", 100, false, MOGameTests::tritaniumIngotInSurvival);
         add("tool_tiers", 100, false, MOGameTests::toolTiers);
         MachineGameTests.addAll();
         MatterGameTests.addAll();
@@ -146,6 +150,40 @@ public final class MOGameTests {
         var recipes = helper.getLevel().getServer().getRecipeManager();
         var key = ResourceKey.<Recipe<?>>create(Registries.RECIPE, id("tritanium_ingot_from_ore_from_smelting"));
         helper.assertTrue(recipes.byKey(key).isPresent(), Component.literal("smelting recipe missing"));
+        helper.succeed();
+    }
+
+    /**
+     * #1: a tritanium ingot without cheating: the ore mined with an iron pickaxe drops itself, and the ore and the dust
+     * in a furnace or a blast furnace, 9 nuggets and the block on a crafting table all give ingots.
+     */
+    private static void tritaniumIngotInSurvival(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        var recipes = level.recipeAccess();
+        List<ItemStack> drops = Block.getDrops(MOBlocks.TRITANIUM_ORE.get().defaultBlockState(), level,
+                helper.absolutePos(new BlockPos(0, 1, 0)), null, null, new ItemStack(Items.IRON_PICKAXE));
+        helper.assertTrue(drops.size() == 1 && drops.get(0).is(MOBlocks.TRITANIUM_ORE.get().asItem()),
+                Component.literal("tritanium ore dropped " + drops));
+        ItemStack ore = drops.get(0);
+        ItemStack dust = new ItemStack(MOItems.TRITANIUM_DUST.get());
+        for (var type : List.of(RecipeType.SMELTING, RecipeType.BLASTING)) {
+            for (ItemStack in : List.of(ore, dust)) {
+                SingleRecipeInput input = new SingleRecipeInput(in);
+                var recipe = recipes.getRecipeFor(type, input, level);
+                helper.assertTrue(recipe.isPresent(), Component.literal("no " + type + " recipe for " + in));
+                ItemStack out = recipe.get().value().assemble(input, level.registryAccess());
+                helper.assertTrue(out.is(MOItems.TRITANIUM_INGOT.get()), Component.literal(type + " of " + in + " gives " + out));
+            }
+        }
+        ItemStack nugget = new ItemStack(MOItems.TRITANIUM_NUGGET.get());
+        CraftingInput nuggets = CraftingInput.of(3, 3, List.of(nugget, nugget, nugget, nugget, nugget, nugget, nugget, nugget, nugget));
+        CraftingInput block = CraftingInput.of(1, 1, List.of(new ItemStack(MOBlocks.TRITANIUM_BLOCK.get())));
+        for (CraftingInput input : List.of(nuggets, block)) {
+            var recipe = recipes.getRecipeFor(RecipeType.CRAFTING, input, level);
+            helper.assertTrue(recipe.isPresent(), Component.literal("no crafting recipe for " + input.items()));
+            ItemStack out = recipe.get().value().assemble(input, level.registryAccess());
+            helper.assertTrue(out.is(MOItems.TRITANIUM_INGOT.get()), Component.literal(input.items() + " crafts " + out));
+        }
         helper.succeed();
     }
 
